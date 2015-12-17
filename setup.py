@@ -109,6 +109,7 @@ sources =   [
                "pdbio.cpp",
                "superpose.cpp",
                "scorpionforcefield.cpp",
+               "imcforcefield.cpp",
                "minimizers/lbfgs_interface.cpp",
                "minimizers/routines.c",
                "minimizers/lbfgs_wrapper/lbfgsb_wrapper.cpp",

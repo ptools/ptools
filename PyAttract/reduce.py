@@ -11,7 +11,7 @@ version = "%prog 1.0"
 parser = OptionParser(usage)
 
 # --ff option: choice of forcefield
-parser.add_option("--ff",type="str",dest="ffversion",help="choice of CG force field: attract1, attract2 or scorpion")
+parser.add_option("--ff",type="str",dest="ffversion",help="choice of CG force field: attract1, attract2, scorpion, or imc")
 
 # --cgopt option: choice of charge optimization with SCORPION
 parser.add_option("--cgopt", dest="optimizecharges", action="store_true", default=False,
@@ -39,8 +39,8 @@ print "thispath is: ", thispath
 
 # define other parameter files
 cmd_options=[]
-if options.ffversion not in ["attract1","attract2","scorpion"]:
-    sys.stderr.write ("Error: please choose one of the following CG force field: attract1, attract2 or scorpion\n")
+if options.ffversion not in ["attract1","attract2","scorpion","imc"]:
+    sys.stderr.write ("Error: please choose one of the following CG force field: attract1, attract2, scorpion, or imc\n")
     sys.exit(1)
 if options.warning:
     if options.ffversion!="scorpion":
@@ -70,5 +70,11 @@ if options.ffversion=="attract1":
 if options.ffversion=="attract2":
     cmd_options.append(args[0])
     prgname = os.path.join(thispath, "reduce_attract2.py")
+
+    os.system(prgname +  " %s"%" ".join(cmd_options))
+
+if options.ffversion=="imc":
+    cmd_options.append(args[0])
+    prgname = os.path.join(thispath, "reduce_imc.py")
 
     os.system(prgname +  " %s"%" ".join(cmd_options))

@@ -106,7 +106,7 @@ private:
     friend class AttractForceField1;
     friend class McopForceField;
     friend class ScorpionForceField;
-
+    friend class ImcForceField;
 
 };  //end class AttractRigid
 

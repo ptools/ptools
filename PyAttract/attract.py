@@ -231,7 +231,7 @@ print "rstk = ",rstk
 def check_ffversion(reduced):
     header = open(reduced, 'r').readline()
     if not 'HEADER' in header:
-         sys.stderr.write("ERROR: reduced PDB file must contain a HEADER line specifying the chosen forcefield (scorpion, attract1, attract2)\n")
+         sys.stderr.write("ERROR: reduced PDB file must contain a HEADER line specifying the chosen forcefield (scorpion, attract1, attract2, imc)\n")
          sys.exit(1)
 
     #read cg format:
@@ -260,7 +260,11 @@ allff_specs = {
                           'ff_class': AttractForceField2,
                           'minimizer_class': Lbfgs
                           },
-
+                          
+             'IMC': {'ff_file': 'imc.par', 
+                          'ff_class': ImcForceField,
+                          'minimizer_class': ImcLbfgs
+                          },
            }
 
 
@@ -418,9 +422,9 @@ for trans in translations:
 
         #calculates true energy, and rmsd if possible
         #with the new ligand position
-        forcefield=ff_specs['ff_class'](ff_specs['ff_file'],  surreal(500))
+        forcefield=ff_specs['ff_class'](ff_specs['ff_file'],  surreal(15))
         print "%4s %6s %6s %13s %13s"  %(" ","Trans", "Rot", "Ener", "RmsdCA_ref")
-        pl = AttractPairList(rec, ligand,surreal(500))
+        pl = AttractPairList(rec, ligand,surreal(15))
         print "%-4s %6d %6d %13.7f %13s" %("==", transnb, rotnb, forcefield.nonbon8(rec,ligand,pl), str(rms))
         output.PrintMatrix()
 

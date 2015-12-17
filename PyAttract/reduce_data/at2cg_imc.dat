@@ -1,0 +1,469 @@
+# version Nov. 2015
+# empty lines and lines starting with # are ignored
+
+# residue  atom      atom      bead	    bead  	
+# name     name      weight    id  	    name 
+
+# 5 columns, other columns are ignored
+# a residue definition must start and finish by a line starting with #===
+# add generic beads first
+
+# IMC/US force field
+# Side chains beads are located at the centre of mass of the side chain (with CA weight of 1)
+# Backbone beads are located at the centre of mass of the acetamide units comprising the alpha carbon
+# atom names follow Amber naming
+
+#=== generic bead for all protein residues
+*         CA        12        1         BB
+*         C         12        1         BB        
+*         O         16        1         BB        
+*         N         14        1         BB        
+#*         H         1         1         BB        
+#=== glycine
+GLY       EMPTY     0         0         EMPTY 
+#=== alanine
+ALA       CA        1         2         A       
+ALA       CB        12        2         A       
+ALA       HB1       1         2         A       
+ALA       HB2       1         2         A       
+ALA       HB3       1         2         A       
+#=== arginine
+ARG       CA        1         3         R
+ARG       CB        12        3         R
+ARG       HB1       1         3         R        
+ARG       HB2       1         3         R        
+ARG       CG        12        3         R
+ARG       HG1       1         3         R        
+ARG       HG2       1         3         R              
+ARG       CD        12        3         R
+ARG       HD1       1         3         R        
+ARG       HD2       1         3         R                
+ARG       NE        14        3         R
+ARG       HE        1         3         R  
+ARG       CZ        12        3         R
+ARG       NH1       14        3         R
+ARG       HH12      1         3         R
+ARG       HH12      1         3         R
+ARG       NH2       14        3         R
+ARG       HH21      1         3         R
+ARG       HH22      1         3         R
+#=== asparte
+ASP       CA        1         4         D       
+ASP       CB        12        4         D
+ASP       HB1       1         4         D       
+ASP       HB2       1         4         D             
+ASP       CG        12        4         D       
+ASP       OD1       16        4         D       
+ASP       OD2       16        4         D
+#=== aspartic acid
+ASH       CA        1         5         DH       
+ASH       CB        12        5         DH
+ASH       HB1       1         5         DH       
+ASH       HB2       1         5         DH             
+ASH       CG        12        5         DH       
+ASH       OD1       16        5         DH       
+ASH       OD2       16        5         DH
+ASH       HD2       1         5         DH
+#=== asparagine
+ASN       CA        1         6         N       
+ASN       CB        12        6         N
+ASN       HB1       1         6         N       
+ASN       HB2       1         6         N       
+ASN       CG        12        6         N       
+ASN       OD1       16        6         N
+ASN       ND2       14        6         N       
+ASN       HD21      1         6         N
+ASN       HD22      1         6         N              
+#=== cysteine
+CYS       CA        1         7         C       
+CYS       CB        12        7         C
+CYS       HB1       1         7         C
+CYS       HB2       1         7         C                       
+CYS       SG        32        7         C       
+CYS       HG        1         7         C       
+#=== glutamate
+GLU       CA        1         8         E
+GLU       CB        12        8         E
+GLU       HB1       1         8         E
+GLU       HB2       1         8         E
+GLU       CG        12        8         E
+GLU       HG1       1         8         E
+GLU       HG2       1         8         E
+GLU       CD        12        8         E
+GLU       OE1       16        8         E 
+GLU       OE2       16        8         E
+#=== glutamic acid
+GLH       CA        1         9         EH
+GLH       CB        12        9         EH
+GLH       HB1       1         9         EH
+GLH       HB2       1         9         EH
+GLH       CG        12        9         EH
+GLH       HG1       1         9         EH
+GLH       HG2       1         9         EH
+GLH       CD        12        9         EH
+GLH       OE1       16        9         EH
+GLH       OE2       16        9         EH
+GLH       HE2       1         9         EH
+#=== glutamine
+GLN       CA        1         10        Q        
+GLN       CB        12        10        Q
+GLN       HB1       1         10        Q        
+GLN       HB2       1         10        Q                
+GLN       CG        12        10        Q
+GLN       HG1       1         10        Q        
+GLN       HG2       1         10        Q               
+GLN       CD        12        10        Q       
+GLN       OE1       16        10        Q       
+GLN       NE2       14        10        Q       
+GLN       HE21      1         10        Q       
+GLN       HE22      1         10        Q
+#=== histidine (tautomer delta)
+HID       CA        1         11        HD       
+HID       CB        12        11        HD
+HID       HB1       1         11        HD       
+HID       HB2       1         11        HD             
+HID       CG        12        11        HD       
+HID       ND1       14        11        HD
+HID       HD1       1         11        HD              
+HID       CD2       12        11        HD
+HID       HD2       1         11        HD              
+HID       NE2       14        11        HD
+HID       CE1       12        11        HD
+HID       HE1       1         11        HD
+#=== histidine (tautomer epsilon)
+HIE       CA        1         12        HE       
+HIE       CB        12        12        HE
+HIE       HB1       1         12        HE       
+HIE       HB2       1         12        HE             
+HIE       CG        12        12        HE       
+HIE       ND1       14        12        HE
+HIE       CD2       12        12        HE
+HIE       HD2       1         12        HE              
+HIE       NE2       14        12        HE
+HIE       HE2       1         12        HE              
+HIE       CE1       12        12        HE
+HIE       HE1       1         12        HE
+#=== histidine (protonated)
+HIH       CA        1         13        HH       
+HIH       CB        12        13        HH
+HIH       HB1       1         13        HH       
+HIH       HB2       1         13        HH             
+HIH       CG        12        13        HH       
+HIH       ND1       14        13        HH
+HIH       HD1       1         13        HH              
+HIH       CD2       12        13        HH
+HIH       HD2       1         13        HH              
+HIH       NE2       14        13        HH
+HIH       HE2       1         13        HH              
+HIH       CE1       12        13        HH
+HIH       HE1       1         13        HH
+#=== isoleucine
+ILE       CA        1         14        I       
+ILE       CB        12        14        I
+ILE       HB        1         14        I              
+ILE       CG1       12        14        I
+ILE       HG11      1         14        I       
+ILE       HG12      1         14        I              
+ILE       CG2       12        14        I
+ILE       HG21      1         14        I       
+ILE       HG22      1         14        I                   
+ILE       HG23      1         14        I                   
+ILE       CD        12        14        I
+ILE       HD1       1         14        I
+ILE       HD2       1         14        I
+ILE       HD3       1         14        I      
+#=== leucine
+LEU       CA        1         15        L       
+LEU       CB        12        15        L
+LEU       HB1       1         15        L       
+LEU       HB2       1         15        L              
+LEU       CG        12        15        L
+LEU       HG        1         15        L              
+LEU       CD1       12        15        L
+LEU       HD11      1         15        L       
+LEU       HD12      1         15        L       
+LEU       HD13      1         15        L             
+LEU       CD2       12        15        L       
+LEU       HD21      1         15        L       
+LEU       HD22      1         15        L       
+LEU       HD23      1         15        L
+#=== lysine
+LYS       CA        1         16        K        
+LYS       CB        12        16        K
+LYS       HB1       1         16        K        
+LYS       HB2       1         16        K                
+LYS       CG        12        16        K
+LYS       HG1       1         16        K        
+LYS       HG2       1         16        K          
+LYS       CD        12        16        K
+LYS       HD1       1         16        K        
+LYS       HD2       1         16        K          
+LYS       CE        12        16        K
+LYS       HE1       1         16        K        
+LYS       HE2       1         16        K  
+LYS       NZ        14        16        K
+LYS       HZ1       1         16        K                                
+LYS       HZ2       1         16        K                                
+LYS       HZ3       1         16        K                                
+#=== lysine (neutral)
+LYN       CA        1         17        KN        
+LYN       CB        12        17        KN
+LYN       HB1       1         17        KN        
+LYN       HB2       1         17        KN                
+LYN       CG        12        17        KN
+LYN       HG1       1         17        KN        
+LYN       HG2       1         17        KN          
+LYN       CD        12        17        KN
+LYN       HD1       1         17        KN        
+LYN       HD2       1         17        KN          
+LYN       CE        12        17        KN
+LYN       HE1       1         17        KN        
+LYN       HE2       1         17        KN  
+LYN       NZ        14        17        KN
+LYN       HZ1       1         17        KN                                
+LYN       HZ2       1         17        KN
+#=== acetyl-lysine (neutral)
+KAC       CA        1         18        KA        
+KAC       CB        12        18        KA
+KAC       HB1       1         18        KA        
+KAC       HB2       1         18        KA                
+KAC       CG        12        18        KA
+KAC       HG1       1         18        KA        
+KAC       HG2       1         18        KA          
+KAC       CD        12        18        KA
+KAC       HD1       1         18        KA        
+KAC       HD2       1         18        KA          
+KAC       CE        12        18        KA
+KAC       HE1       1         18        KA        
+KAC       HE2       1         18        KA  
+KAC       NZ        14        18        KA
+KAC       HZ        1         18        KA
+KAC       CH        12        18        KA
+KAC       OH        16        18        KA                                                                
+KAC       CH3       12        18        KA                                                                
+KAC       HT1       1         18        KA                                                                
+KAC       HT2       1         18        KA                                                                
+KAC       HT3       1         18        KA
+#=== trimethyl-lysine
+K3M       CA        1         19        KM        
+K3M       CB        12        19        KM
+K3M       HB1       1         19        KM        
+K3M       HB2       1         19        KM                
+K3M       CG        12        19        KM
+K3M       HG1       1         19        KM        
+K3M       HG2       1         19        KM          
+K3M       CD        12        19        KM
+K3M       HD1       1         19        KM
+K3M       HD2       1         19        KM          
+K3M       CE        12        19        KM
+K3M       HE1       1         19        KM        
+K3M       HE2       1         19        KM  
+K3M       NZ        14        19        KM                                                     
+K3M       CM1       12        19        KM
+K3M       CH11      1         19        KM                                                                
+K3M       CH12      1         19        KM                                                                
+K3M       CH13      1         19        KM
+K3M       CM2       12        19        KM
+K3M       CH21      1         19        KM                                                                
+K3M       CH22      1         19        KM                                                               
+K3M       CH23      1         19        KM                                                                  
+K3M       CM3       12        19        KM
+K3M       CH31      1         19        KM                                                                
+K3M       CH32      1         19        KM                                                                
+K3M       CH33      1         19        KM
+#=== methionine
+MET       CA        1         20        M
+MET       CB        12        20        M
+MET       HB1       1         20        M              
+MET       HB2       1         20        M                            
+MET       CG        12        20        M
+MET       HG1       1         20        M       
+MET       HG2       1         20        M       
+MET       SD        32        20        M       
+MET       CE        12        20        M
+MET       HE1       1         20        M                                       
+MET       HE2       1         20        M                                       
+MET       HE3       1         20        M 
+#=== phenylalanine
+PHE       CA        1         21        F
+PHE       CB        12        21        F
+PHE       HB1       1         21        F              
+PHE       HB2       1         21        F                            
+PHE       CG        12        21        F       
+PHE       CD1       12        21        F
+PHE       HD1       1         21        F
+PHE       CD2       12        21        F
+PHE       HD2       1         21        F
+PHE       CE1       12        21        F
+PHE       HE1       1         21        F
+PHE       CE2       12        21        F
+PHE       HE2       1         21        F
+PHE       CZ        12        21        F
+PHE       HZ        1         21        F
+#=== proline
+PRO       CA        1         22        P       
+PRO       CB        12        22        P       
+PRO       HB1       1         22        P       
+PRO       HB2       1         22        P
+PRO       CG        12        22        P       
+PRO       HG1       1         22        P       
+PRO       HG2       1         22        P
+PRO       CD        12        22        P       
+PRO       HD1       1         22        P       
+PRO       HD2       1         22        P
+#=== serine
+SER       CA        1         23        S       
+SER       CB        12        23        S 
+SER       HB1       1         23        S
+SER       HB2       1         23        S                        
+SER       OG        16        23        S
+SER       HG        1         23        S
+#=== phosphoserine (-1)
+SP1       CA        1         24        SP       
+SP1       CB        12        24        SP 
+SP1       HB1       1         24        SP
+SP1       HB2       1         24        SP                        
+SP1       OG        16        24        SP
+SP1       P         31        24        SP
+SP1       O1P       16        24        SP
+SP1       O2P       16        24        SP
+SP1       O3P       16        24        SP
+SP1       HO3       1         24        SP
+#=== phosphoserine (-2)
+SP2       CA        1         25        SP2      
+SP2       CB        12        25        SP2
+SP2       HB1       1         25        SP2
+SP2       HB2       1         25        SP2                       
+SP2       OG        16        25        SP2
+SP2       P         31        25        SP2
+SP2       O1P       16        25        SP2
+SP2       O2P       16        25        SP2
+SP2       O3P       16        25        SP2
+#=== threonine
+THR       CA        1         26        T       
+THR       CB        12        26        T 
+THR       HB        1         26        T
+THR       OG1       16        26        T
+THR       HG1       1         26        T
+THR       CG2       12        26        T
+THR       HG21      1         26        T
+THR       HG22      1         26        T
+THR       HG23      1         26        T
+#=== phosphothreonine (-1)
+TP1       CA        1         27        TP       
+TP1       CB        12        27        TP 
+TP1       HB        1         27        TP
+TP1       OG1       16        27        TP
+TP1       CG2       12        27        TP
+TP1       HG21      1         27        TP
+TP1       HG22      1         27        TP
+TP1       HG23      1         27        TP
+TP1       P         31        27        TP
+TP1       O1P       16        27        TP
+TP1       O2P       16        27        TP
+TP1       O3P       16        27        TP
+TP1       HO3       1         27        TP
+#=== phosphothreonine (-2)
+TP2       CA        1         28        TP2
+TP2       CB        12        28        TP2
+TP2       HB        1         28        TP2
+TP2       OG1       16        28        TP2
+TP2       CG2       12        28        TP2
+TP2       HG21      1         28        TP2
+TP2       HG22      1         28        TP2
+TP2       HG23      1         28        TP2
+TP2       P         31        28        TP2
+TP2       O1P       16        28        TP2
+TP2       O2P       16        28        TP2
+TP2       O3P       16        28        TP2
+#=== tyrosine
+TYR       CA        1         29        Y
+TYR       CB        12        29        Y
+TYR       HB1       1         29        Y              
+TYR       HB2       1         29        Y                            
+TYR       CG        12        29        Y       
+TYR       CD1       12        29        Y
+TYR       HD1       1         29        Y                    
+TYR       CD2       12        29        Y
+TYR       HD2       1         29        Y                     
+TYR       CE1       12        29        Y
+TYR       HE1       1         29        Y                     
+TYR       CE2       12        29        Y
+TYR       HE2       1         29        Y                     
+TYR       CZ        12        29        Y       
+TYR       OH        16        29        Y
+TYR       HH        1         29        Y
+#=== phosphotyrosine (-1)
+YP1       CA        1         30        YP
+YP1       CB        12        30        YP
+YP1       HB1       1         30        YP              
+YP1       HB2       1         30        YP                            
+YP1       CG        12        30        YP       
+YP1       CD1       12        30        YP
+YP1       HD1       1         30        YP                    
+YP1       CD2       12        30        YP
+YP1       HD2       1         30        YP                     
+YP1       CE1       12        30        YP
+YP1       HE1       1         30        YP                     
+YP1       CE2       12        30        YP
+YP1       HE2       1         30        YP                     
+YP1       CZ        12        30        YP       
+YP1       OH        16        30        YP
+YP1       P         31        30        YP
+YP1       O1P       16        30        YP
+YP1       O2P       16        30        YP
+YP1       O3P       16        30        YP
+YP1       HO3       1         30        YP
+#=== phosphotyrosine (-2)
+YP2       CA        1         31        YP2
+YP2       CB        12        31        YP2
+YP2       HB1       1         31        YP2             
+YP2       HB2       1         31        YP2                           
+YP2       CG        12        31        YP2      
+YP2       CD1       12        31        YP2
+YP2       HD1       1         31        YP2                   
+YP2       CD2       12        31        YP2
+YP2       HD2       1         31        YP2                    
+YP2       CE1       12        31        YP2
+YP2       HE1       1         31        YP2                    
+YP2       CE2       12        31        YP2
+YP2       HE2       1         31        YP2                    
+YP2       CZ        12        31        YP2      
+YP2       OH        16        31        YP2
+YP2       P         31        31        YP2
+YP2       O1P       16        31        YP2
+YP2       O2P       16        31        YP2
+YP2       O3P       16        31        YP2
+#=== tryptophan
+TRP       CA        1         32        W
+TRP       CB        12        32        W
+TRP       HB1       1         32        W        
+TRP       HB2       1         32        W                
+TRP       CG        12        32        W
+TRP       CD1       12        32        W
+TRP       HD1       1         32        W
+TRP       CD2       12        32        W
+TRP       NE1       14        32        W
+TRP       HE1       1         32        W                          
+TRP       CE2       12        32        W       
+TRP       CE3       12        32        W
+TRP       HE3       1         32        W       
+TRP       CH2       12        32        W
+TRP       HH2       1         32        W              
+TRP       CZ3       12        32        W
+TRP       HZ3       1         32        W              
+TRP       CZ2       12        32        W       
+TRP       HZ2       1         32        W
+#=== valine
+VAL       CA        1         33        V       
+VAL       CB        12        33        V
+VAL       HB        1        33        V              
+VAL       CG1       12        33        V
+VAL       HG11      1         33        V       
+VAL       HG12      1         33        V       
+VAL       HG13      1         33        V              
+VAL       CG2       12        33        V
+VAL       HG21      1         33        V
+VAL       HG22      1         33        V       
+VAL       HG23      1         33        V
+#=== 
