@@ -1,5 +1,6 @@
 g++
 git
 libboost-dev
+libf2c2-dev
 python-dev
 python-pip
