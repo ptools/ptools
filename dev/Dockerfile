@@ -5,8 +5,10 @@
 # Version: 1.0.0
 #
 # Usage:
+#     $ cd /path/to/ptools/
+#     $
 #     $ # Docker container creation (first time only).
-#     $ docker build -t ptools:dev /path/to/ptools/dev
+#     $ docker build -t ptools:dev ./dev
 #     $
 #     $ # Work in docker environment (from ptools local repository).
 #     $ docker run --rm -v $(pwd):/src/ptools ptools:dev
@@ -21,18 +23,6 @@ RUN apt-get update && cat /opt/requirements_system.txt | xargs apt-get install -
 COPY requirements_python.txt /opt/
 RUN pip install --upgrade pip && pip install -r /opt/requirements_python.txt
 
-
-# Set working directory.
-WORKDIR /src
-
-
-# Compile and install ptools libf2c.
-RUN git clone http://github.com/ptools/ptools_dep && \
-    cd ptools_dep/libf2c2-20090411 && \
-    make -f makefile.u CFLAGS="-ansi -g -O2 -fomit-frame-pointer -D_GNU_SOURCE  -fPIC -DNON_UNIX_STDIO -Df2c" && \
-    make -f makefile.u CFLAGS="-ansi -g -O2 -fomit-frame-pointer -D_GNU_SOURCE  -fPIC -DNON_UNIX_STDIO -Df2c" libf2c.a && \
-    cp f2c.h    /usr/include && \
-    cp libf2c.a /usr/lib
-
+# The entrypoint script is executed everytime the container starts.
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
