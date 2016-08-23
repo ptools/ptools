@@ -84,7 +84,27 @@ std::swap(m_activeAtoms, newactivelist);
 
 }
 
+void AttractRigidbody::AddAtom(const Atom& at)
+{
+    Atomproperty atp(at);
+    Coord3D co = at.coords;
+    AddAtom(atp,co);
+}
 
+void AttractRigidbody::AddAtom(const Atomproperty& at, Coord3D co)
+{
+    mAtomProp.push_back(at);
+    AddCoord(co);
+    //Add AttractRigidbody parameters
+    uint   atcategory  = 0;
+    dbl  atcharge   = 0.0;
+    std::string extra = at.extra;
+    std::istringstream iss( extra );
+    iss >> atcategory >> atcharge ;
+    m_atomTypeNumber.push_back(atcategory-1);  // -1 to directly use the atomTypeNumber into C-array
+    m_charge.push_back(atcharge);
+    m_forces.push_back(Coord3D());
+}
 
 } //namespace PTools
 

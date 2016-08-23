@@ -355,10 +355,11 @@ dbl BaseAttractForceField::Function(const Vdouble& stateVars )
     //put the ligands to the correct positions defined by stateVars
     for (uint i=0; i<m_movedligand.size(); i++)
     {
+
         m_movedligand[i] = m_centeredligand[i];
         m_movedligand[i].resetForces(); //just to be sure that the forces are set to zero. Maybe not needed.
 
-
+        
 
         if (m_movedligand[i].hasrotation)
         {
@@ -378,6 +379,7 @@ dbl BaseAttractForceField::Function(const Vdouble& stateVars )
         }
 
 
+
     }
 
 
@@ -393,10 +395,6 @@ dbl BaseAttractForceField::Function(const Vdouble& stateVars )
             assert(plistnumber < m_pairlists.size() );
             enernon += nonbon8(m_movedligand[i], m_movedligand[j],  m_pairlists[plistnumber++] );   //calculates energy contribution for every pair. Forces are stored for each ligand
         }
-
-
-
-
 
 
     return enernon;
@@ -504,7 +502,6 @@ dbl AttractForceField2::nonbon8_forces(AttractRigidbody& rec, AttractRigidbody& 
 
 
         dbl charge= rec.m_charge[i]* lig.m_charge[j];  //charge product of the two atoms
-        //std::cout << "charge: " << charge << std::endl;
 
         rec.unsafeGetCoords(i,a); lig.unsafeGetCoords(j,b);
 
@@ -654,6 +651,7 @@ void BaseAttractForceField::Rota(uint molIndex, dbl phi,dbl ssi, dbl rot, Vdoubl
     AttractRigidbody * pLigCentered = & m_centeredligand[molIndex] ; // pointer to the centered ligand
     AttractRigidbody * pLigMoved  = & m_movedligand[molIndex] ; // pointer to the rotated/translated ligand (for forces)
 
+
     assert(shift+2 < delta.size());
     for (uint i=0; i< pLigCentered->m_activeAtoms.size(); i++)
     {
@@ -664,8 +662,11 @@ void BaseAttractForceField::Rota(uint molIndex, dbl phi,dbl ssi, dbl rot, Vdoubl
         Y = coords.y;
         Z = coords.z;
 
+
         xar=X*crot+Y*srot;
         yar=-X*srot+Y*crot;
+
+
         pm[0][0]=-xar*cssp-yar*cp-Z*sssp ;
         pm[1][0]=xar*cscp-yar*sp+Z*sscp ;
         pm[2][0]=0.0 ;
@@ -678,6 +679,7 @@ void BaseAttractForceField::Rota(uint molIndex, dbl phi,dbl ssi, dbl rot, Vdoubl
         pm[1][2]=yar*cssp-xar*cp ;
         pm[2][2]=-yar*ss ;
 
+
         for (uint j=0;j<3;j++)
         {
             delta[j+shift] += pm[0][j] * pLigMoved->m_forces[atomIndex].x ;
@@ -685,6 +687,7 @@ void BaseAttractForceField::Rota(uint molIndex, dbl phi,dbl ssi, dbl rot, Vdoubl
             delta[j+shift] += pm[2][j] * pLigMoved->m_forces[atomIndex].z ;
         }
     }
+
 
     if (print) std::cout << "Rotational forces: " << delta[shift] << " " << delta[shift+1] << " " << delta[shift+2] << std::endl;
 

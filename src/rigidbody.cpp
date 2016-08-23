@@ -144,7 +144,9 @@ dbl Rigidbody::Radius()
 
 void Rigidbody::Translate(const Coord3D& tr)
 {
+          
     CoordsArray::Translate(tr);
+
 }
 
 void Rigidbody::AttractEulerRotate(dbl phi, dbl ssi, dbl rot)

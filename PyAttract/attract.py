@@ -11,8 +11,6 @@ import string
 import bz2  #for compression of Ligand and receptor data
 import base64 #compressed ligand and receptor as base64 strings
 
-
-
 def surreal(i):
     return i
 
@@ -33,6 +31,17 @@ def PrintVect(vect):
         print vect[i], " | ",
     print ''
 
+def printWeights(w, e):
+    print "### WEIGHTS BEGIN"
+    for region in xrange(0, len(w)):
+        sum = 0
+        print "###       Start Region %d" %(region+1)
+        for copy in xrange(0, len(w[region])):
+            sum += w[region][copy]
+            print "WEIGHT    REGION %d COPY %d = %f    (Energy = %f)" %(region+1, copy+1, w[region][copy], e[region][copy])
+        print "WEIGHT    SUM OF WEIGHTS = %f" %sum
+        print "###       End Region %d" %(region+1)
+    print "### WEIGHTS END"
 
 
 class Rotation:
@@ -84,6 +93,9 @@ class Rotation:
     
     def __iter__(self):
         return self._rot.__iter__()
+
+    def __getitem__(self, i):
+        return self._rot.__getitem__(i)
 
 
 
@@ -185,18 +197,17 @@ def checkFile(name, comment):
 ##  MAIN ATTRACT PROGRAM  #
 ###########################
 from optparse import OptionParser
-parser = OptionParser(usage="%prog -r receptor_file -l ligand_file [-h] [-s] [-t] [--ref]")
+parser = OptionParser(usage="%prog -r receptor_file -l ligand_file [-h] [-s] [-trans] [-rot] [--ref]")
 parser.add_option("-r", "--receptor", action="store", type="string", dest="receptor_name", help="name of the receptor file")
 parser.add_option("-l", "--ligand", action="store", type="string", dest="ligand_name", help="name of the ligand file")
 parser.add_option("-s", "--single", action="store_true", dest="single", default=False, help="single minimization mode")
 parser.add_option("--ref", action="store", type="string", dest="reffile", help="reference ligand for rmsd" )
-parser.add_option("-t", "--translation", action="store", type="int", dest="transnb", help="translation number (distributed mode) starting from 0 for the first one!")
-parser.add_option("--start1", action="store_true", default=False, dest="start1", help="(only useful with -t), use 1 for the first translation point")
+parser.add_option("--trans", "--translation", action="store", type="int", dest="transnb", help="translation number (distributed mode).")
+parser.add_option("--rot", "--rotation", action="store", type="int", dest="rotnb", help="rotation number (distributed mode).")
+parser.add_option("--start1", action="store_true", default=False, dest="start1", help="(only useful with -trans), use 1 for the first translation point")
+parser.add_option("--mcop", action="store_true", default=False, dest="regions", help="mcop option for multi-copy rigid-body docking")
 (options, args) = parser.parse_args()
 
-
-#receptor_name=args[0]
-#ligand_name=args[1]
 
 print """
 **********************************************************************
@@ -213,7 +224,7 @@ import locale
 
 #locale.setlocale(locale.LC_ALL, 'fr_FR')
 time_start = datetime.datetime.now()
-#print now,"(",now.strftime("%A %B %d %Y, %H:%M"),")"
+
 print "Start time:", time_start
 
 
@@ -248,7 +259,7 @@ if rec_ff != lig_ff:
 allff_specs = {
              'SCORPION': {'ff_file': 'scorpion.par', 
                           'ff_class': ScorpionForceField,
-                          'minimizer_class': ScorpionLbfgs
+                          'minimizer_class': Lbfgs
                           },
 
              'ATTRACT1': {'ff_file': 'aminon.par', 
@@ -287,22 +298,30 @@ checkFile(ff_specs['ff_file'], "forcefield file is required.")
 
 
 
-
 #load receptor and ligand:
-rec=Rigidbody(options.receptor_name)
-lig=Rigidbody(options.ligand_name)
-rec=AttractRigidbody(rec)
-lig=AttractRigidbody(lig)
+if options.regions:
+    rec=Mcoprigid(options.receptor_name)
+    core=AttractRigidbody(options.ligand_name)
+    lig=Mcoprigid()
+    lig.setCore(core)
+else:
+    rec=Rigidbody(options.receptor_name)
+    rec=AttractRigidbody(rec)
+    lig=Rigidbody(options.ligand_name)
+    lig=AttractRigidbody(lig)
+
 print "Reading receptor (fixed): %s with %d particules" %( options.receptor_name, len(rec) )
 print "Reading  ligand (mobile): %s with %d particules" %( options.ligand_name,   len(lig) )
 
-if (options.single and options.transnb):
-    parser.error("options -s and -t are mutually exclusive")
+if (options.single and (options.transnb or options.rotnb)):
+    parser.error("options -s and -trans/rot are mutually exclusive")
 
 # save all minimization variables in trajectory file
 trjname = "minimization.trj"
-if (options.single):
+if (options.single or (options.transnb and options.rotnb)):
     ftraj = open(trjname, "w")
+    if(options.regions):
+        weight_variation = open("weight_variation.dat", "w")
 
 if (options.reffile):
     checkFile(options.reffile, "")
@@ -314,6 +333,15 @@ if (options.reffile):
         print "No Calpha atom found for ligand (DNA?). RMSD will be calculated on all grains"
     else:
         Rmsd_alias = rmsdca
+
+firstr = 0
+ff = open("translation.dat",'r')
+for line in ff: 
+    if "ATOM" in line:
+        spl = line.split()
+        firstr = int(spl[1])-1
+        break
+ff.close()
 
 if (not options.single):
     #systematic docking with default translations and rotations
@@ -331,43 +359,44 @@ else: #(single mode)
 
 
 printFiles=True
-# option -t used: define the selected translation
+# option -trans used: define the selected translation
 transnb=0
 if (options.transnb!=None):
     # check for rotation.dat and translation.dat
     checkFile("rotation.dat", "rotation file is required.")
     checkFile("translation.dat", "translation file is required.\nFormer users may rename translat.dat into translation.dat.")
     trans=Rigidbody("translation.dat")
-
-    transnb=options.transnb
-
-    if options.start1 is True:
-       transnb -= 1
-
-    co=trans.getCoords(transnb)
-    translations=[[transnb+1,co]]
-
-    if transnb!= len(trans)-1:
+    co=trans.getCoords(options.transnb-1)
+    translations=[[options.transnb,co]]
+    transnb=options.transnb-1
+    if transnb!=len(trans)-1:
         printFiles=False #don't append ligand, receptor, etc. unless this is the last translation point of the simulation
 
-
+if (options.rotnb!=None):
+    rotations = [rotations[options.rotnb-1]]
 
 # core attract algorithm
 for trans in translations:
     transnb+=1
-    print "@@@@@@@ Translation nb %i @@@@@@@" %(transnb)
+    print "@@@@@@@ Translation nb %i @@@@@@@" %(transnb+firstr)
     rotnb=0
     for rot in rotations:
         rotnb+=1
         print "----- Rotation nb %i -----"%rotnb
         minimcounter=0
-        ligand=AttractRigidbody(lig)
+        if options.regions:
+            ligand=Mcoprigid(lig)
+            receptor=Mcoprigid(rec)
+        else:
+            ligand=AttractRigidbody(lig)
+            receptor=AttractRigidbody(rec)
 
         center=ligand.FindCenter()
         ligand.Translate(Coord3D()-center) #set ligand center of mass to 0,0,0
         ligand.AttractEulerRotate(surreal(rot[0]),surreal(rot[1]),surreal(rot[2]))
         ligand.Translate(trans[1])
 
+        
         for minim in minimlist:
             minimcounter+=1
             cutoff=math.sqrt(minim['squarecutoff'])
@@ -377,41 +406,77 @@ for trans in translations:
 
             #performs single minimization on receptor and ligand, given maxiter=niter and restraint constant rstk
             forcefield=ff_specs['ff_class'](ff_specs['ff_file'], surreal(cutoff)   )
-            rec.setTranslation(False)
-            rec.setRotation(False)
+            if options.regions: 
+                mcopff = McopForceField(forcefield, surreal(cutoff))
+            receptor.setTranslation(False)
+            receptor.setRotation(False)
             
-            forcefield.AddLigand(rec)
-            forcefield.AddLigand(ligand)
+            if options.regions:
+                mcopff.setLigand(ligand)
+                mcopff.setReceptor(receptor)
+            else:
+                forcefield.AddLigand(receptor)
+                forcefield.AddLigand(ligand)
             rstk=minim['rstk']  #restraint force
             #if rstk>0.0:
                 #forcefield.SetRestraint(rstk)
-            lbfgs_minimizer=ff_specs['minimizer_class'](forcefield)
-            lbfgs_minimizer.minimize(niter)
+
+            if options.regions:
+                lbfgs_minimizer=Lbfgs(mcopff)
+                lbfgs_minimizer.minimize(niter)
+            else :
+                lbfgs_minimizer=ff_specs['minimizer_class'](forcefield)
+                lbfgs_minimizer.minimize(niter)
+            
             X=lbfgs_minimizer.GetMinimizedVars()  #optimized freedom variables after minimization
 
 
-            #TODO: test and use CenterToOrigin() !
-            output=AttractRigidbody(ligand)
+            if options.regions:
+                output=Mcoprigid(ligand)
+            else:
+                output=AttractRigidbody(ligand)
+
             center=output.FindCenter()
             output.Translate(Coord3D()-center)
             output.AttractEulerRotate(surreal(X[0]), surreal(X[1]), surreal(X[2]))
             output.Translate(Coord3D(surreal(X[3]),surreal(X[4]),surreal(X[5])))
             output.Translate(center)
 
-            ligand=AttractRigidbody(output)
-            if (options.single):
+            if options.regions:
+                ligand=Mcoprigid(output)
+            else:
+                ligand=AttractRigidbody(output)
+            if (options.single or (options.transnb and options.rotnb)):
                 ntraj=lbfgs_minimizer.GetNumberIter()
                 for iteration in range(ntraj):
                     traj = lbfgs_minimizer.GetMinimizedVarsAtIter(iteration)
-                    for t in traj:
+                    for t in traj[0:6]:
                         ftraj.write("%f "%t)
                     ftraj.write("\n")
                 ftraj.write("~~~~~~~~~~~~~~\n")
+                if (options.regions):
+                    savedWeights = mcopff.getSavedWeights()
+                    for i, region in enumerate(savedWeights[0]):
+                        weight_variation.write("Region %i\t"%(i+1))
+                        for k, copy in enumerate(region):
+                            weight_variation.write("Copy %i\t"%(k+1))
+                    weight_variation.write("\n\n")
+                    for iteration in range(ntraj):
+                        for region in savedWeights[iteration]:
+                            weight_variation.write("\t\t")
+                            for copy in region:
+                                weight_variation.write("%f\t"%copy)
+                        weight_variation.write("\n")
+                    weight_variation.write("~~~~~~~~~~~~~~\n")
+                
 
 
         #computes RMSD if reference structure available
         if (options.reffile):
-            rms=Rmsd_alias(ref, output)
+            if(options.regions):
+                rms=Rmsd_alias(ref, output.getCore())
+            else: 
+                rms=Rmsd_alias(ref, output)
         else:
             rms="XXXX"
 
@@ -420,9 +485,14 @@ for trans in translations:
         #with the new ligand position
         forcefield=ff_specs['ff_class'](ff_specs['ff_file'],  surreal(500))
         print "%4s %6s %6s %13s %13s"  %(" ","Trans", "Rot", "Ener", "RmsdCA_ref")
-        pl = AttractPairList(rec, ligand,surreal(500))
-        print "%-4s %6d %6d %13.7f %13s" %("==", transnb, rotnb, forcefield.nonbon8(rec,ligand,pl), str(rms))
-        output.PrintMatrix()
+        if options.regions:
+            print "%-4s %6d %6d %13.7f %13s" %("==", transnb + firstr, rotnb, mcopff.CalcEnergy(receptor,ligand,forcefield,500), str(rms))
+            output.getCore().PrintMatrix() #getCore because PrintMatrix works on AttractRigidy and not Mcoprigid
+            printWeights(receptor.getWeights(), mcopff.getMcopE())
+        else:
+            pl = AttractPairList(receptor, ligand,surreal(500))
+            print "%-4s %6d %6d %13.7f %13s" %("==", transnb + firstr, rotnb, forcefield.nonbon8(receptor,ligand,pl), str(rms))
+            output.PrintMatrix()
 
 
 #output compressed ligand and receptor:
@@ -435,8 +505,10 @@ if ( not options.single and printFiles==True):
     print compress_file("attract.inp")
 
 # close trajectory file for single minimization 
-if (options.single):
+if (options.single or (options.transnb and options.rotnb)):
     ftraj.close()
+    if (options.regions):
+        weight_variation.close()
     print "Saved all minimization variables (translations/rotations) in %s" %(trjname)
 
 # print end and elapsed time

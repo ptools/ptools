@@ -46,9 +46,8 @@ cdef CppAttractRigidbody* _getAttractRigidbody_from_py_name(pyname):
 
 
 cdef class AttractRigidbody (Rigidbody) :
-    # cdef CppAttractRigidbody* thisptr
 
-    def __cinit__(self, arg):
+    def __cinit__(self, arg=''):
         
         # first deallocate the previously allocated Rigidbody
         del self.thisptr
@@ -60,8 +59,12 @@ cdef class AttractRigidbody (Rigidbody) :
            self.thisptr = <CppRigidbody*> new CppAttractRigidbody(deref(rigidbodyptr))
            return
         elif isinstance(arg, str):
-           self.thisptr = <CppRigidbody*> _getAttractRigidbody_from_py_name(arg)
-           return
+           if arg == '':
+              self.thisptr = <CppRigidbody*> new CppAttractRigidbody()
+              return
+           else:
+              self.thisptr = <CppRigidbody*> _getAttractRigidbody_from_py_name(arg)
+              return
         elif isinstance(arg, AttractRigidbody):
            oldrigidbody = <AttractRigidbody> arg
            oldrigidbody_ptr = <CppAttractRigidbody*> oldrigidbody.thisptr

@@ -6,7 +6,7 @@ cdef extern from "atomselection.h" namespace "PTools":
     cdef cppclass CppAtomSelection "PTools::AtomSelection":
         CppAtomSelection()
         CppAtomSelection(CppAtomSelection&)
-        CppAtomSelection(CppRigidbody)
+        CppAtomSelection(CppRigidbody&)
 
         unsigned int Size()
         void SetRigid(CppRigidbody&)
@@ -38,19 +38,20 @@ cdef class AtomSelection:
             self.thisptr = new CppAtomSelection()
             return
 
-        if isinstance(AtomSelection, arg):
+        elif isinstance(arg, AtomSelection):
             atsel  = <AtomSelection> arg
             atselptr  = <CppAtomSelection*> atsel.thisptr
             self.thisptr = new CppAtomSelection(deref(atselptr))
             return
 
-        if isinstance(Rigidbody, arg):
+        elif isinstance(arg, Rigidbody):
             rig = <Rigidbody> arg
             rigptr = rig.thisptr
             self.pyRigid = arg
             self.thisptr = new CppAtomSelection(deref(rigptr))
 
-        raise RuntimeError("cannot reach here")
+        else:
+            raise RuntimeError("cannot reach here")
 
     def __dealloc__(self):
         if self.thisptr:

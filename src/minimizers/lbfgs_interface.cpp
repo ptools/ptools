@@ -1,4 +1,5 @@
 #include "lbfgs_interface.h"
+#include "mcopff.h"
 
 #include <string.h>
 #include <iostream>
@@ -71,17 +72,14 @@ inline std::vector<double> todbl(std::vector<surreal> & vcplx)
 
 void Lbfgs::minimize(int maxiter)
 {
-
     int n = objToMinimize.ProblemSize();
     std::cout  << "number of free variables for the minimizer: " << n << std::endl;
-
-
     std::vector<double> l(n);
     std::vector<double> u(n);
     Vint nbd(n);
-
     x.resize(n);
     g.resize(n);
+
 
     for (int i=0;i<n; i++)
     {
@@ -93,14 +91,12 @@ void Lbfgs::minimize(int maxiter)
     }  //unconstrained problem
 
 
-
     int rc;
 
     int m = 5;
 
     m_opt = lbfgsb_create(n, m, &l[0], &u[0], &nbd[0]);
     assert(m_opt);
-
 
     m_opt->iprint=-1;
 
@@ -109,8 +105,10 @@ void Lbfgs::minimize(int maxiter)
     m_opt->max_iter = maxiter;
 
     int last_iter = 0;
+    int sub_iter = 0;
 
-    /*    opt->iprint = 0;*/
+    double grad = 0;
+
     while (1) {
         rc = lbfgsb_run(m_opt, &x[0], &f, &g[0]);
         if (rc == 0) {
@@ -120,65 +118,31 @@ void Lbfgs::minimize(int maxiter)
             break;
         } else if (rc == 1) {
 
-
-
-/*
-//check analytical derivatives with surreal:
-{
-            std::vector<dbl> vdblx;
-            tocplx(x,vdblx);
-            std::vector<dbl> vdblg;
-            tocplx(g,vdblg);
-
-            f = objToMinimize.Function(vdblx);
-            objToMinimize.Derivatives(vdblx,vdblg);
-
-            g=todbl(vdblg);
-
-
-            for (uint i=0; i<x.size(); i++)
-            {
-                std::vector<surreal> svdblx = vdblx ;
-                svdblx[i]+=surreal(0,1);
-                std::cout <<"check: " << svdblx[i] << std::endl;
-
-                std::cout << g[i] << "==" << imag(objToMinimize.Function(svdblx)) << "  " ;
-            }
-            std::cout << std::endl;
-}
-//end check derivatives
-*/
-
-
-
-
             if (last_iter < m_opt->niter)
             {
                 //this is a new iteration
                 last_iter = m_opt->niter;
+                sub_iter = 0;
                 //saves the minimizer variables for each iteration (can be useful for generating animations)
                 m_vars_over_time.push_back(x);
-
+                objToMinimize.saveWeights(); //Only saves weights if objToMinimize is McopForceField. 
             }
-
+            
+            double sum = 0;
+            for(int i=0; i < g.size(); i++){
+                sum += g[i]*g[i];
+            }
+            
 
             std::vector<dbl> vdblx;
             tocplx(x,vdblx);
             std::vector<dbl> vdblg;
             tocplx(g,vdblg);
-
             f = objToMinimize.Function(vdblx);
             objToMinimize.Derivatives(vdblx,vdblg);
-
             g=todbl(vdblg);
-
-//                 std::cout << "analytical derivatives: \n";
-//                 for(uint i=0; i<g.size(); i++)
-//                 {
-//                     std::cout << "deriv[" << i << "]: " << g[i] << std::endl;
-//                 }
-//                 objToMinimize.NumDerivatives(x,g,true);
-
+            grad = sqrt(sum);
+            sub_iter ++;
 
         } else {
             assert(!"can not reach here");
@@ -209,8 +173,14 @@ if (iter>=m_vars_over_time.size())
 return m_vars_over_time[iter];
 }
 
-
-
+std::vector< std::vector<dbl> > Lbfgs::getWeights(){
+    if (McopForceField * p = dynamic_cast<McopForceField *>(&objToMinimize)){
+        // objToMinimize is of type McopForceField
+        ForceField& r_objToMinimize = objToMinimize;
+        McopForceField& r_Mcop_objToMinimize = dynamic_cast<McopForceField&>(r_objToMinimize);
+        r_Mcop_objToMinimize.getWeights();
+    }
+}
 
 
 

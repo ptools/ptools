@@ -40,7 +40,6 @@ public:
     {
         std::vector<Coord3D> forcesrec (rec.Size());
         std::vector<Coord3D> forceslig (lig.Size());
-
         dbl ener = nonbon8_forces(rec, lig, pairlist, forcesrec, forceslig, print);
         rec.addForces(forcesrec);
         lig.addForces(forceslig);

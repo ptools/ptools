@@ -42,6 +42,10 @@ public:
 
     ///virtual destructor (Effective C++ - Scott Meyers - Item 7)
     virtual ~ForceField(){};
+    
+    /// Saves weights into attribute. Used at each minimization iteration in order to follow
+    /// the weights' evolution during the docking. Used only for McopForcefield. 
+    virtual void saveWeights(){};
 
 } ;
 

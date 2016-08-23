@@ -1,6 +1,7 @@
 from cython.operator cimport dereference as deref
 from libcpp.string cimport string
 
+
 cdef extern from "<vector>" namespace "std":
     cdef cppclass vector[T]:
         cppclass iterator:
@@ -37,11 +38,13 @@ cdef extern from "attractforcefield.h" namespace "PTools":
     cdef cppclass CppAttractForceField2 "PTools::AttractForceField2" (CppBaseAttractForceField)  :
        CppAttractForceField2(string&, double)
        
-       
-cdef class BaseAttractForceField:
-    cdef CppBaseAttractForceField * thisptr
-       
-       
+
+cdef class ForceField:
+    #cdef int junk_variable; # to avoid having empty cdef class
+    cdef CppForceField* thisptr
+      
+cdef class BaseAttractForceField(ForceField):
+    cdef int junk_variable; # to avoid having empty cdef class
     
 
 cdef class AttractForceField2(BaseAttractForceField):
@@ -49,6 +52,10 @@ cdef class AttractForceField2(BaseAttractForceField):
     #cdef CppAttractForceField2* thisptr
     
     def __cinit__(self, filename, cutoff):
+        # deallocate
+        del self.thisptr
+        self.thisptr = <CppForceField*> 0
+
         cdef char* c_filename
         cdef string * cppname
 
@@ -63,23 +70,28 @@ cdef class AttractForceField2(BaseAttractForceField):
 
     def AddLigand(self, AttractRigidbody rig):
         self.rigidlist.append(rig)
-        self.thisptr.AddLigand(deref(<CppAttractRigidbody*>rig.thisptr))
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        cpp_ptr.AddLigand(deref(<CppAttractRigidbody*>rig.thisptr))
 
     def Function(self, vec):
         cdef vector[double] v
         for el in vec:
            v.push_back(el)
 
-        return self.thisptr.Function(v)
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.Function(v)
         
     def getVdw(self):
-        return self.thisptr.getVdw()
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.getVdw()
     
     def getCoulomb(self):
-        return self.thisptr.getCoulomb()
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.getCoulomb()
 
     def nonbon8(self, AttractRigidbody rec, AttractRigidbody lig, AttractPairList pl, verbose=False):
-        return self.thisptr.nonbon8(deref(<CppAttractRigidbody*>rec.thisptr), deref(<CppAttractRigidbody*>lig.thisptr), deref(pl.thisptr), verbose)
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.nonbon8(deref(<CppAttractRigidbody*>rec.thisptr), deref(<CppAttractRigidbody*>lig.thisptr), deref(pl.thisptr), verbose)
 
 
 cdef extern from "attractforcefield.h" namespace "PTools":
@@ -98,33 +110,43 @@ cdef class AttractForceField1(BaseAttractForceField):
 
 
     def __cinit__(self, filename, cutoff):
+        # deallocate
+        del self.thisptr
+        self.thisptr = <CppForceField*> 0
+
         cdef char* c_filename
         cdef string * cppname
 
         c_filename = <char*> filename
         cppname = new string(c_filename)
-        self.thisptr = new CppAttractForceField1(deref(cppname), cutoff)
+        self.thisptr =  new CppAttractForceField1(deref(cppname), cutoff)
         del cppname
 
     def __dealloc__(self):
         del self.thisptr
 
     def AddLigand(self, AttractRigidbody rig):
-        self.thisptr.AddLigand(deref(<CppAttractRigidbody*>rig.thisptr))
+        self.rigidlist.append(rig)
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        cpp_ptr.AddLigand(deref(<CppAttractRigidbody*>rig.thisptr))
 
     def Function(self, vec):
         cdef vector[double] v
         for el in vec:
            v.push_back(el)
 
-        return self.thisptr.Function(v)
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.Function(v)
         
     def getVdw(self):
-        return self.thisptr.getVdw()
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.getVdw()
     
     def getCoulomb(self):
-        return self.thisptr.getCoulomb()
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.getCoulomb()
 
     def nonbon8(self, AttractRigidbody rec, AttractRigidbody lig, AttractPairList pl, verbose=False):
-        return self.thisptr.nonbon8(deref(<CppAttractRigidbody*>rec.thisptr), deref(<CppAttractRigidbody*>lig.thisptr), deref(pl.thisptr), verbose)
+        cdef CppBaseAttractForceField* cpp_ptr = <CppBaseAttractForceField*> self.thisptr
+        return cpp_ptr.nonbon8(deref(<CppAttractRigidbody*>rec.thisptr), deref(<CppAttractRigidbody*>lig.thisptr), deref(pl.thisptr), verbose)
 

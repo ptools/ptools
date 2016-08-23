@@ -29,11 +29,10 @@
 #include <vector>
 #include <cassert>
 
-
+#include "coordsarray.h"
 #include "coord3d.h"
 #include "atom.h"
 #include "basetypes.h"
-#include "coordsarray.h"
 
 
 namespace PTools
@@ -44,7 +43,7 @@ namespace PTools
 
 class AtomSelection; // forward declaration
 
-class Rigidbody:private CoordsArray
+class Rigidbody: public CoordsArray
 {
 
 private:
@@ -102,10 +101,10 @@ public:
     void SetAtom(uint pos, const Atom& atom);
 
     /// add an atom to the molecule (deep copy)
-    void AddAtom(const Atomproperty& at, Coord3D co);
+    virtual void AddAtom(const Atomproperty& at, Coord3D co);
 
     /// add an atom to the molecule
-    void AddAtom(const Atom& at);
+    virtual void AddAtom(const Atom& at);
 
     //returns the coordinates of atom i
     Coord3D GetCoords(uint i) const

@@ -21,7 +21,7 @@
 #define _COORDS_ARRAY_H_
 
 #include <vector>
-#include<stdexcept>
+#include <stdexcept>
 
 
 #include "coord3d.h"

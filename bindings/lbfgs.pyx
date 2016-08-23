@@ -3,11 +3,14 @@ from libcpp.string cimport string
 
 cdef extern from "lbfgs_interface.h" namespace "PTools":
     cdef cppclass CppLbfgs "PTools::Lbfgs":
-        CppLbfgs(CppBaseAttractForceField&)
+        CppLbfgs(CppForceField&)
         void minimize(int)
         vector[double] GetMinimizedVars()
         vector[double] GetMinimizedVarsAtIter(int)
         int GetNumberIter()
+        #void denormalize_weights()
+        #void normalize_weights()
+        vector[vector[double]] getWeights()
 
 cdef class Lbfgs:
     
@@ -15,8 +18,8 @@ cdef class Lbfgs:
 
     def __cinit__(self, forcefield):
         
-        ff = <BaseAttractForceField?> forcefield
-        cdef CppBaseAttractForceField * ffptr = <CppBaseAttractForceField*?> ff.thisptr
+        ff = <ForceField?> forcefield
+        cdef CppForceField * ffptr = <CppForceField*?> ff.thisptr
         self.thisptr = new CppLbfgs(deref(ffptr))
 
     def __dealloc__(self):
@@ -41,3 +44,12 @@ cdef class Lbfgs:
         for i in xrange(vars.size()):
             out.append(vars[i])
         return out
+
+    #def denormalize_weights(self):
+    #    self.thisptr.denormalize_weights()
+
+    #def normalize_weights(self):
+    #    self.thisptr.normalize_weights()
+
+    def getWeights(self):
+        self.thisptr.getWeights()

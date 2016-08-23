@@ -31,6 +31,9 @@ parser.add_option("--conv", action='store', type='string', dest='convName', help
 
 parser.add_option("--allow_missing", action="store_true", dest="warning",default=False, help="don't stop program if atoms are missing, only display a warning on stderr")
 
+# --mcop option: create multicopy reduced protein
+parser.add_option("--mcop", dest="regions", default=False, help="positions of the multicopy region(s) separated by ';' (eg. 12-21;45-48)")
+
 
 
 (options, args) = parser.parse_args()
@@ -297,91 +300,133 @@ for line in lines:
 #==========================================================
 # load atomic pdb file into Rigidbody object
 #==========================================================
-allAtom=Rigidbody(atomicName)
-sys.stderr.write("Load atomic file %s with %d atoms \n" %(atomicName, len(allAtom)))
 
-#extract all 'atoms' objects
-atomList=[]
-for i in xrange(len(allAtom)):
-        atom = allAtom.CopyAtom(i)
-        # look for residue or base type conversion
-        resName = atom.residType
-        if resName in resConv.keys():
-                atom.residType =  resConv[resName] 
-        # look for atom type conversion
-        atomTag = atom.residType + '-' + atom.atomType
-        if atomTag in atomConv.keys():
-                atomName = atomConv[atomTag].split('-')[1] 
-                atom.atomType =  atomName 
-        atomList.append(atom)
+models = []
+if options.regions:
+# Preparing pdb multicopy models
+    if options.regions.endswith('.pdb'):
+        core = Rigidbody(args[0])
+        region_copies = []
+        for i in xrange(1, len(args)):
+            region_copies.append(Mcop(args[i]))
+        models.append(core)
+        models.append(region_copies)
+        write_mcop('_mcop.pdb', core, region_copies)
+    else:
+        core, region_copies = multicopy(atomicName, options.regions)
+        write_mcop('_mcop.pdb', core, region_copies)
+        models.append(core)
+        models.append(region_copies)
+else:
+    models.append(Rigidbody(atomicName))
+    sys.stderr.write("Load atomic file %s with %d atoms \n" %(atomicName, len(models[0])))
 
-#count residues
-residueTagList=[]
-coarseResList=[]
-for atom in atomList:
-        resName = atom.residType
-        # create a unique identifier for every residue
-        # resTag is for instance "LEU-296-A"
-        resTag = resName + '-'+ str(atom.residId) + '-' + atom.chainId
-        if resTag not in residueTagList:
-                if resBeadAtomModel.has_key(resName):
-                        residueTagList.append(resTag)
-                        # add a pattern residue to the list of coarse residues for the protein
-                        # beware of the hugly list copy: use copy.deepcopy() !
-                        coarseResList.append(copy.deepcopy(resBeadAtomModel[resName]))
-                else:
-                        sys.stderr.write("WARNING: residue %s is unknown the residues <-> beads <-> atoms list !!\n" %(resName))
-                        sys.stderr.write("       : residue %s will not be reduced into coarse grain\n" %(resName))
-sys.stderr.write("Number of residues: %i\n" %(len(residueTagList)))
+def reduce_model(allAtom):
+    #extract all 'atoms' objects
+    atomList=[]
+    for i in xrange(len(allAtom)):
+            atom = allAtom.CopyAtom(i)
+            # look for residue or base type conversion
+            resName = atom.residType
+            if resName in resConv.keys():
+                    atom.residType =  resConv[resName] 
+            # look for atom type conversion
+            atomTag = atom.residType + '-' + atom.atomType
+            if atomTag in atomConv.keys():
+                    atomName = atomConv[atomTag].split('-')[1] 
+                    atom.atomType =  atomName 
+            atomList.append(atom)
 
-#==========================================================
-# iterate through all atoms and residues to fill beads
-#==========================================================
-sys.stderr.write("Reading all atoms and filling beads:\n")
-for atom in atomList:
-        #resTag is like "LEU-296-A"
-        resTag = atom.residType + '-' + str(atom.residId) + '-' + atom.chainId
-        if resTag in residueTagList:
-                id = residueTagList.index(resTag)
-                coarseResList[id].FillAtom(atom.atomType, atom.coords.x, atom.coords.y, atom.coords.z)
-#==========================================================
-# reduce beads
-#==========================================================
-coarsegrainPdb = ""   # complete coarse grain (reduced) pdb file
-atomCnt = 0           # atom counter
-sys.stderr.write("Coarse graining:\n")
-for i in range(len(residueTagList)):
-        tag = residueTagList[i].split('-')
-        resName = tag[0]
-        resId = int(tag[1])
-        coarseRes = coarseResList[i].Reduce(resName, resId)
-        for bead in coarseRes:
-                coord = bead[0]
-                atomName = bead[1]
-                atomTypeId = bead[2]
-                if atomTypeId in beadChargeDic:
-                        atomCharge = beadChargeDic[atomTypeId]
-                else:
-                        sys.stderr.write("WARNING: cannot find charge of bead %s %2d in %s \n" %(atomName, atomTypeId, ffName))
-                        sys.stderr.write("       : set default charge to 0.0\n")
-                        atomCharge = 0.0
-                prop = Atomproperty()
-                prop.atomType = atomName
-                atomCnt += 1
-                prop.atomId = atomCnt
-                prop.residId = resId
-                prop.residType = resName
-                prop.chainId = ' '
-                extra = ('%5i%8.3f%2i%2i') %(atomTypeId,atomCharge,0,0)
-                prop.extra = extra
-                newAtom = Atom(prop, coord)
-                coarsegrainPdb += newAtom.ToPdbString() + "\n"
+    #count residues
+    residueTagList=[]
+    coarseResList=[]
+    for atom in atomList:
+            resName = atom.residType
+            # create a unique identifier for every residue
+            # resTag is for instance "LEU-296-A"
+            resTag = resName + '-'+ str(atom.residId) + '-' + atom.chainId
+            if resTag not in residueTagList:
+                    if resBeadAtomModel.has_key(resName):
+                            residueTagList.append(resTag)
+                            # add a pattern residue to the list of coarse residues for the protein
+                            # beware of the hugly list copy: use copy.deepcopy() !
+                            coarseResList.append(copy.deepcopy(resBeadAtomModel[resName]))
+                    else:
+                            sys.stderr.write("WARNING: residue %s is unknown the residues <-> beads <-> atoms list !!\n" %(resName))
+                            sys.stderr.write("       : residue %s will not be reduced into coarse grain\n" %(resName))
+    sys.stderr.write("Number of residues: %i\n" %(len(residueTagList)))
 
-#==========================================================
-# output coarse grain (reduced) pdb file
-#==========================================================
-sys.stdout.write("HEADER    ATTRACT1 REDUCED PDB FILE\n")
-sys.stdout.write(coarsegrainPdb)
-sys.stderr.write("Coarse grain (reduced) output")
-sys.stderr.write(": %d beads \n" %(atomCnt))
+    #==========================================================
+    # iterate through all atoms and residues to fill beads
+    #==========================================================
+    sys.stderr.write("Reading all atoms and filling beads:\n")
+    for atom in atomList:
+            #resTag is like "LEU-296-A"
+            resTag = atom.residType + '-' + str(atom.residId) + '-' + atom.chainId
+            if resTag in residueTagList:
+                    id = residueTagList.index(resTag)
+                    coarseResList[id].FillAtom(atom.atomType, atom.coords.x, atom.coords.y, atom.coords.z)
+    #==========================================================
+    # reduce beads
+    #==========================================================
+    coarsegrainPdb = ""   # complete coarse grain (reduced) pdb file
+    atomCnt = 0           # atom counter
+    sys.stderr.write("Coarse graining:\n")
+    for i in range(len(residueTagList)):
+            tag = residueTagList[i].split('-')
+            resName = tag[0]
+            resId = int(tag[1])
+            coarseRes = coarseResList[i].Reduce(resName, resId)
+            for bead in coarseRes:
+                    coord = bead[0]
+                    atomName = bead[1]
+                    atomTypeId = bead[2]
+                    if atomTypeId in beadChargeDic:
+                            atomCharge = beadChargeDic[atomTypeId]
+                    else:
+                            sys.stderr.write("WARNING: cannot find charge of bead %s %2d in %s \n" %(atomName, atomTypeId, ffName))
+                            sys.stderr.write("       : set default charge to 0.0\n")
+                            atomCharge = 0.0
+                    prop = Atomproperty()
+                    prop.atomType = atomName
+                    atomCnt += 1
+                    prop.atomId = atomCnt
+                    prop.residId = resId
+                    prop.residType = resName
+                    prop.chainId = ' '
+                    extra = ('%5i%8.3f%2i%2i') %(atomTypeId,atomCharge,0,0)
+                    prop.extra = extra
+                    newAtom = Atom(prop, coord)
+                    coarsegrainPdb += newAtom.ToPdbString() + "\n"
+
+    #==========================================================
+    # output coarse grain (reduced) pdb file
+    #==========================================================
+    sys.stdout.write(coarsegrainPdb)
+    sys.stderr.write("Coarse grain (reduced) output")
+    sys.stderr.write(": %d beads \n" %(atomCnt))
+
+# iterate through all models (important for multicopy option) and write reduced pdb
+print "HEADER    ATTRACT1 REDUCED PDB FILE"
+# iterate through 'models' varialbe which contains max 2 elements.
+# The fist element of the models list is a Rigidbody (the core in the mcop case, and the whole protein in the normal case)
+# In the mcop case, there is a second element, which is the region_copies list (a list of Mcop objects).
+for i in xrange(0,len(models)):
+    if i == 0 and options.regions != ':':
+        sys.stderr.write("\nCore:\n")
+        print 'MODEL       0'
+        reduce_model(models[i])
+        print 'ENDMDL      0'
+    if i >= 1:
+        # iterate through number of regions
+        for j in xrange(0, len(models[1])):
+            # iterate through number of regions copies
+            for k in xrange(0,len(models[1][j])):
+                sys.stderr.write("\nRegion %i Copy %i:\n" %(j+1, k+1))
+                print 'MODEL       ' + str(j+1) + '  ' + str(k+1)
+                reduce_model(models[1][j][k])
+                print 'ENDMDL    ' + str(j+1) + '  ' + str(k+1)
+        sys.stderr.write("\n\nSummary:\n")
+        for j in xrange(0, len(models[1])):
+            sys.stderr.write("Region %i:    %i copies\n" %(j+1,len(models[1][j])))
 
