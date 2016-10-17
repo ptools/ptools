@@ -37,15 +37,12 @@ class TestSpatialObjectArray(unittest.TestCase):
 
     def setUp(self):
         import numpy
-        array = numpy.array(( (0, 0, 0), (1, 1, 1)), dtype=float)
+        array = numpy.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = SpatialObject(array)
 
     def test_constructor(self):
         self.assertEqual(self.obj.coords.shape, (2, 3))
         # assert_array_almost_equal(o.coords, (1, 1, 1))
-
-
-
 
 
 def test_coord3d_no_args():
@@ -60,15 +57,15 @@ def test_coord3d_scalar():
     assert_array_almost_equal(c, (1, 1, 1))
 
 
-def test_coord3d_array():
+def test_coord3d_vector():
     c = coord3d([2, 2, 2])
     assert c.shape == (3, )
     assert_array_almost_equal(c, (2, 2, 2))
 
 
-def test_coord3d_fails():
+def test_coord3d_vector_fails():
     with pytest.raises(ValueError) as excinfo:
-        c = coord3d([2, 2])
+        coord3d([2, 2])
     err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
     assert err in str(excinfo.value)
 
@@ -80,12 +77,14 @@ def test_coord3d_array():
     assert_array_almost_equal(c[0], (0, 0, 0))
     assert_array_almost_equal(c[1], (1, 1, 1))
 
+
 def test_coord3d_array_fails():
     array = ((0, 0, 0, 0), (1, 1, 1, 1))
     with pytest.raises(ValueError) as excinfo:
         coord3d(array)
     err = '3-d coordinate array should be N x 3'
     assert err in str(excinfo.value)
+
 
 def test_coord3d_array_fails2():
     """Test raises the appropriate exeception when array has more that
@@ -97,4 +96,3 @@ def test_coord3d_array_fails2():
         coord3d(array)
     err = '3-d coordinate array should have at most 2 dimensions'
     assert err in str(excinfo.value)
-

@@ -51,4 +51,3 @@ def coord3d(value=(0, 0, 0)):
               '({} found)'.format(len(value.shape))
         raise ValueError(err)
     return value
-

@@ -4,9 +4,7 @@ atom groups."""
 
 import copy
 
-import numpy
-
-from pyptools.spatial import SpatialObject, coord3d
+from pyptools.spatial import SpatialObject
 
 
 class BaseAtom(SpatialObject):
@@ -58,9 +56,9 @@ class BaseAtom(SpatialObject):
 class Atom(BaseAtom):
     """Atom that belongs to a group of atoms.
 
-    Its coordinates are a weak reference to the AtomCollection coordinate array.
-    Atom knows its positions in the AtomCollection and can therefore find
-    its coordinates into the AtomCollection coordinate array.
+    Its coordinates are a weak reference to the AtomCollection coordinate
+    array. Atom knows its positions in the AtomCollection and can therefore
+    find its coordinates into the AtomCollection coordinate array.
 
     An Atom initialization can only be done from a BaseAtom.
 
@@ -76,7 +74,6 @@ class Atom(BaseAtom):
         super().__init__(orig=atom)
         self.serial = serial
         self.collection = collection
-
 
 
 class AtomCollection(object):
@@ -96,9 +93,3 @@ class AtomCollection(object):
 
     def __iter__(self):
         return iter(self.atoms)
-
-
-
-
-
-
