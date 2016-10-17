@@ -42,7 +42,7 @@ class TestSpatialObjectArray(unittest.TestCase):
 
     def test_constructor(self):
         self.assertEqual(self.obj.coords.shape, (2, 3))
-        # assert_array_almost_equal(o.coords, (1, 1, 1))
+        assert_array_almost_equal(self.obj.coords[1], (1, 1, 1))
 
 
 def test_coord3d_no_args():

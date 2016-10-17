@@ -3,6 +3,8 @@
 
 import unittest
 
+import numpy
+
 from pyptools.atom import BaseAtom, Atom, AtomCollection
 
 from . import assert_array_almost_equal
@@ -106,10 +108,12 @@ class TestAtom(unittest.TestCase):
 class TestAtomCollection(unittest.TestCase):
 
     def setUp(self):
-        self.atoms = AtomCollection([BaseAtom() for i in range(10)])
+        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i))
+                                     for i in range(10)])
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms.atoms), 10)
+        self.assertEqual(self.atoms.coords.shape, (10, 3))
 
     def test_len(self):
         self.assertEqual(len(self.atoms), 10)
@@ -118,3 +122,19 @@ class TestAtomCollection(unittest.TestCase):
         # If an exeception is raised here, AtomCollection is not iterable
         # which is not what we want.
         iter(self.atoms)
+
+    def test_coordinates(self):
+        ref_coords = numpy.array([[i, i, i] for i in range(10)], dtype=float)
+        assert_array_almost_equal(self.atoms.coords, ref_coords)
+
+    def test_set_atom_coordinates_from_array(self):
+        self.atoms.coords[0] = (42, 42, 42)
+        assert_array_almost_equal(self.atoms.atoms[0].coords, (42, 42, 42))
+
+    def test_set_atom_coordinates_from_atom(self):
+        self.atoms.atoms[0].coords = (42, 42, 42)
+        assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
+
+    # def test_foo(self):
+    #     a = self.atoms.atoms[0].coords
+    #     assert 1 == 2

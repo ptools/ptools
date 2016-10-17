@@ -4,7 +4,7 @@ atom groups."""
 
 import copy
 
-from pyptools.spatial import SpatialObject
+from pyptools.spatial import SpatialObject, coord3d
 
 
 class BaseAtom(SpatialObject):
@@ -75,8 +75,19 @@ class Atom(BaseAtom):
         self.serial = serial
         self.collection = collection
 
+    @SpatialObject.coords.getter
+    def coords(self):
+        """Get atom cartesian coordinates."""
+        print('youpi')
+        return self.collection.coords[self.serial].copy()
 
-class AtomCollection(object):
+    @SpatialObject.coords.setter
+    def coords(self, pos):
+        print('coucou')
+        self.collection.coords[self.serial] = coord3d(pos)
+
+
+class AtomCollection(SpatialObject):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -87,6 +98,7 @@ class AtomCollection(object):
     def __init__(self, atoms):
         self.atoms = [Atom(atom, serial, self)
                       for serial, atom in enumerate(atoms)]
+        super().__init__([atom.coords for atom in self.atoms])
 
     def __len__(self):
         return len(self.atoms)
