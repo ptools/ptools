@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -20,16 +20,12 @@ test_requirements = [
 setup(
     name='pyptools',
     version='0.1.0',
-    description="New PTools: a fully pythonic PToolss",
+    description="New PTools: a fully pythonic PTools",
     long_description=readme + '\n\n' + history,
     author="Benoist LAURENT",
     author_email='benoistlaurent@gmail.com',
     url='https://github.com/benoistlaurent/pyptools',
-    packages=[
-        'pyptools',
-    ],
-    package_dir={'pyptools':
-                 'pyptools'},
+    packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
     license="GNU General Public License v3",
