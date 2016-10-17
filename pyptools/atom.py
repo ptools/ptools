@@ -1,6 +1,7 @@
 
 """atom - Defines classes and function that handle atom and atom groups."""
 
+import copy
 
 import numpy
 
@@ -21,6 +22,14 @@ class BaseAtom(object):
 
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
                  resid=0, charge=0.0, coords=(0, 0, 0), orig=None):
+        if orig is not None:
+            self._init_copy(orig)
+        else:
+            self._init_non_copy(index, name, resname, chain, resid, charge,
+                                coords)
+
+    def _init_non_copy(self, index, name, resname, chain, resid, charge,
+                       coords):
         self.name = name
         self.resname = resname
         self.chain = chain
@@ -57,6 +66,10 @@ class BaseAtom(object):
             raise ValueError(err)
         self._coords = pos
 
+    def copy(self):
+        """Return a copy of the current atom."""
+        return copy.copy(self)
+
 
 class Atom(BaseAtom):
     """Atom that belongs to a group of atoms.
@@ -75,8 +88,8 @@ class Atom(BaseAtom):
             belongs to.
 
     """
-    def __init__(self, serial, atom, collection):
-        super().__init__(atom)
+    def __init__(self, atom, serial=0, collection=None):
+        super().__init__(orig=atom)
         self.serial = serial
         self.collection = collection
 
@@ -91,7 +104,8 @@ class AtomCollection(object):
         atoms (list[BaseAtom]): list of atoms
     """
     def __init__(self, atoms):
-        self.atoms = [Atom(i, atom, self) for i, atom in enumerate(atoms)]
+        self.atoms = [Atom(atom, serial, self)
+                      for serial, atom in enumerate(atoms)]
 
     def __len__(self):
         return len(self.atoms)
