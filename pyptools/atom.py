@@ -1,12 +1,15 @@
 
-"""atom - Defines classes and function that handle atom and atom groups."""
+"""pyptools.atom - Defines classes and function that handle atom and
+atom groups."""
 
 import copy
 
 import numpy
 
+from pyptools.spatial import SpatialObject, coord3d
 
-class BaseAtom(object):
+
+class BaseAtom(SpatialObject):
     """Base class for an Atom.
 
     Args:
@@ -30,41 +33,22 @@ class BaseAtom(object):
 
     def _init_non_copy(self, index, name, resname, chain, resid, charge,
                        coords):
+        super().__init__(coords)
         self.name = name
         self.resname = resname
         self.chain = chain
         self.index = index
         self.resid = resid
         self.charge = charge
-        self.__set_coords(coords)
 
     def _init_copy(self, other):
+        super().__init__(other.coords)
         self.name = other.name
         self.resname = other.resname
         self.chain = other.chain
         self.index = other.index
         self.resid = other.resid
         self.charge = other.charge
-        self.__set_coords(other.coords)
-
-    @property
-    def coords(self):
-        """Get atom cartesian coordinates."""
-        return self._coords
-
-    @coords.setter
-    def coords(self, pos):
-        """Set atom cartesian coordinates."""
-        self.__set_coords(pos)
-
-    def __set_coords(self, pos):
-        if not isinstance(pos, numpy.ndarray):
-            pos = numpy.array(pos, dtype=float)
-        if not pos.shape == (3, ):
-            err = 'atom coordinates but by a scalar or vector of shape 1 x 3 '\
-                  '(found {})'.format(pos.shape)
-            raise ValueError(err)
-        self._coords = pos
 
     def copy(self):
         """Return a copy of the current atom."""
