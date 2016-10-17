@@ -3,7 +3,7 @@
 
 import unittest
 
-from pyptools.atom import BaseAtom
+from pyptools.atom import BaseAtom, AtomCollection
 
 from . import assert_array_almost_equal
 
@@ -41,3 +41,14 @@ class TestAtom(unittest.TestCase):
         err = 'atom coordinates but by a scalar or vector of shape 1 x 3 '
         with self.assertRaisesRegex(ValueError, err):
             atom.coords = (1, 2)
+
+
+class TestAtomCollection(unittest.TestCase):
+
+    def test_initialization(self):
+        atoms = [BaseAtom() for i in range(10)]
+        atoms = AtomCollection(atoms)
+        self.assertEqual(len(atoms), 10)
+        # If an exeception is raised here, AtomCollection is not iterable
+        # which is not what we want.
+        iter(atoms)
