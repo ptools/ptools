@@ -58,8 +58,8 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source pyptools setup.py test
-	coverage report -m
+	py.test --cov-report term-missing --cov=pyptools tests/
+
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/pyptools.rst
