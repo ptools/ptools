@@ -70,20 +70,20 @@ class Atom(BaseAtom):
             belongs to.
 
     """
-    def __init__(self, atom, serial=0, collection=None):
+    def __init__(self, atom, serial, collection):
         super().__init__(orig=atom)
         self.serial = serial
         self.collection = collection
 
-    @SpatialObject.coords.getter
+    @property
     def coords(self):
         """Get atom cartesian coordinates."""
-        print('youpi')
+        if self.collection is None:
+            print('pas cool')
         return self.collection.coords[self.serial].copy()
 
-    @SpatialObject.coords.setter
+    @coords.setter
     def coords(self, pos):
-        print('coucou')
         self.collection.coords[self.serial] = coord3d(pos)
 
 
@@ -98,7 +98,7 @@ class AtomCollection(SpatialObject):
     def __init__(self, atoms):
         self.atoms = [Atom(atom, serial, self)
                       for serial, atom in enumerate(atoms)]
-        super().__init__([atom.coords for atom in self.atoms])
+        super().__init__([atom._coords for atom in self.atoms])
 
     def __len__(self):
         return len(self.atoms)

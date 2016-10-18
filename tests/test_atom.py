@@ -88,12 +88,13 @@ class TestBaseAtom(unittest.TestCase):
 class TestAtom(unittest.TestCase):
 
     def test_constructor(self):
-        # Check that all arguments are adequatly set from original atom
-        # and that atom coordinates are not a reference to
+        # Check that when using copy constructor, all arguments are
+        # adequatly set and that atom coordinates are not a reference to
         # the initial atom coordinates.
         orig = BaseAtom(name='CA', resname='ALA', chain='A',
                         index=42, resid=17, charge=2.0, coords=(1, 2, 3))
-        atom = Atom(orig)
+        collection = AtomCollection([orig])
+        atom = collection.atoms[0]
         self.assertEqual(atom.name, 'CA')
         self.assertEqual(atom.resname, 'ALA')
         self.assertEqual(atom.chain, 'A')
@@ -134,7 +135,3 @@ class TestAtomCollection(unittest.TestCase):
     def test_set_atom_coordinates_from_atom(self):
         self.atoms.atoms[0].coords = (42, 42, 42)
         assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
-
-    # def test_foo(self):
-    #     a = self.atoms.atoms[0].coords
-    #     assert 1 == 2

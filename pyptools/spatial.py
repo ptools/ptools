@@ -6,7 +6,7 @@
 import numpy
 
 
-class SpatialObject(object):
+class SpatialObject:
     """A object which coordinates.
 
     Implements basic spatial operations such as translation, rotation, etc.
@@ -17,11 +17,13 @@ class SpatialObject(object):
     @property
     def coords(self):
         """Get atom cartesian coordinates."""
+        print(self.__class__.__name__, 'coords::getter')
         return self._coords
 
     @coords.setter
     def coords(self, pos):
         """Set atom cartesian coordinates."""
+        print(self.__class__.__name__, 'coords::setter')
         self._coords = coord3d(pos)
 
     def translate(self, v):
