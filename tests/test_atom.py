@@ -135,3 +135,11 @@ class TestAtomCollection(unittest.TestCase):
     def test_set_atom_coordinates_from_atom(self):
         self.atoms.atoms[0].coords = (42, 42, 42)
         assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
+
+    def test_getitem(self):
+        atom = self.atoms[0]
+        self.assertTrue(isinstance(atom, Atom))
+        assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+        atom.coords = [42, 17, 323]
+        assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+

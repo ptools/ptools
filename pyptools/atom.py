@@ -11,26 +11,27 @@ class BaseAtom(SpatialObject):
     """Base class for an Atom.
 
     Args:
-        index (int):
-        name (str):
-        resname (str):
-        chain (str):
-        resid (int):
-        charge (float):
-        coords (numpy.ndarray):
+        index (int): index (read from topology file)
+        name (str): atom name
+        resname (str): residue name
+        chain (str): chain identifier
+        resid (int): residue number (read from topology file)
+        charge (float): charge
+        coords (numpy.ndarray): cartesian coordinates
+        meta (dict[str, ()]): metadata dictionnary
         orig (BaseAtom): initialize from other BaseAtom (copy constructor)
     """
 
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
-                 resid=0, charge=0.0, coords=(0, 0, 0), orig=None):
+                 resid=0, charge=0.0, coords=(0, 0, 0), meta={}, orig=None):
         if orig is not None:
             self._init_copy(orig)
         else:
             self._init_non_copy(index, name, resname, chain, resid, charge,
-                                coords)
+                                coords, meta)
 
     def _init_non_copy(self, index, name, resname, chain, resid, charge,
-                       coords):
+                       coords, meta):
         super().__init__(coords)
         self.name = name
         self.resname = resname
@@ -38,6 +39,7 @@ class BaseAtom(SpatialObject):
         self.index = index
         self.resid = resid
         self.charge = charge
+        self.meta = meta
 
     def _init_copy(self, other):
         super().__init__(other.coords)
@@ -47,6 +49,7 @@ class BaseAtom(SpatialObject):
         self.index = other.index
         self.resid = other.resid
         self.charge = other.charge
+        self.meta = other.meta
 
     def copy(self):
         """Return a copy of the current atom."""
@@ -78,8 +81,6 @@ class Atom(BaseAtom):
     @property
     def coords(self):
         """Get atom cartesian coordinates."""
-        if self.collection is None:
-            print('pas cool')
         return self.collection.coords[self.serial].copy()
 
     @coords.setter
@@ -101,7 +102,14 @@ class AtomCollection(SpatialObject):
         super().__init__([atom._coords for atom in self.atoms])
 
     def __len__(self):
+        """Get the number of atoms in the collection."""
         return len(self.atoms)
 
     def __iter__(self):
+        """Iterate over the collection atoms."""
         return iter(self.atoms)
+
+    def __getitem__(self, serial):
+        """Access an atom by its serial number (which the internal index
+        starting at 0)."""
+        return self.atoms[serial]
