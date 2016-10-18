@@ -5,7 +5,8 @@ import unittest
 
 from pyptools.io import read_pdb
 
-from . import TEST_PDB, TEST_PDB_ATOM_NAMES, random_filename
+from . import TEST_PDB, TEST_PDB_ATOM_NAMES
+from .testing.io import random_filename
 
 
 class TestIO(unittest.TestCase):

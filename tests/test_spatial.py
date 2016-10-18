@@ -7,7 +7,7 @@ import pytest
 
 from pyptools.spatial import SpatialObject, coord3d
 
-from . import assert_array_almost_equal
+from .testing.moreassert import assert_array_almost_equal
 
 
 class TestSpatialObjectVector(unittest.TestCase):

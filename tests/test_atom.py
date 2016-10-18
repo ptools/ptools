@@ -7,7 +7,7 @@ import numpy
 
 from pyptools.atom import BaseAtom, Atom, AtomCollection
 
-from . import assert_array_almost_equal
+from .testing.moreassert import assert_array_almost_equal
 
 
 class TestBaseAtom(unittest.TestCase):
