@@ -3,6 +3,9 @@
 atom groups."""
 
 import copy
+import math
+
+import numpy
 
 from pyptools.spatial import SpatialObject, coord3d
 
@@ -113,3 +116,15 @@ class AtomCollection(SpatialObject):
         """Access an atom by its serial number (which the internal index
         starting at 0)."""
         return self.atoms[serial]
+
+    def get_center(self):
+        """Return the isobarycenter (geometric center) of a collection of
+        atoms."""
+        return sum(self.coords) / len(self)
+
+    def get_radius_of_gyration(self):
+        """Return the isometric radius of gyration (atom mass is not taken
+        into account)."""
+        centered = self.coords - self.get_center()
+        rgyr2 = numpy.sum(centered ** 2) / len(self)
+        return math.sqrt(rgyr2)

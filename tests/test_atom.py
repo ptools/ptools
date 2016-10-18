@@ -142,3 +142,12 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+
+    def test_get_center(self):
+        center = self.atoms.get_center()
+        assert_array_almost_equal(center, [4.5, 4.5, 4.5])
+
+    def test_get_radius_of_gyration(self):
+        rgyr = self.atoms.get_radius_of_gyration()
+        # Reference value calculated with VMD.
+        self.assertAlmostEqual(rgyr, 4.9749369621276855, places=6)
