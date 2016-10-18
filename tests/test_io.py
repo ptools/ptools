@@ -1,5 +1,5 @@
 
-"""test_io - tests for `pyptools.io` module."""
+"""test_io - Tests for `pyptools.io` module."""
 
 import unittest
 

@@ -1,5 +1,5 @@
 
-"""test_atom - Tests the `pyptools.atom` module."""
+"""test_atom - Tests for `pyptools.atom` module."""
 
 import unittest
 

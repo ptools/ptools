@@ -1,5 +1,5 @@
 
-"""test_spatial - Tests the `pyptools.spatial` module."""
+"""test_spatial - Tests for `pyptools.spatial` module."""
 
 import unittest
 
