@@ -142,4 +142,3 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
-
