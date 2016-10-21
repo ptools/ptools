@@ -49,7 +49,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .cache/
 
 lint: ## check style with flake8
-	flake8 pyptools tests
+	flake8 --ignore=E501 pyptools tests
 
 test: ## run tests quickly with the default Python
 	py.test

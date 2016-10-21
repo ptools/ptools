@@ -66,7 +66,7 @@ class TestReadAttractParameters(unittest.TestCase):
         tmpfile = mk_tmp_file(content=content)
         filename = tmpfile.name
         err = 'Cannot read minimization line from attract parameter file: '\
-                    'expected at least 3 values, found 2'
+              'expected at least 3 values, found 2'
         with self.assertRaisesRegex(ValueError, err):
             io.read_attract_parameter(filename)
         tmpfile.close()

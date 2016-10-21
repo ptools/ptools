@@ -39,4 +39,3 @@ class TestPairList(unittest.TestCase):
         pairlist = PairList(self.ligand, self.receptor, 5.0)
         pairs_ref = PairList.sort(*CONTACTS_REF)
         assert_array_equal(pairlist, pairs_ref)
-

@@ -7,6 +7,7 @@ from pyptools.rigidbody import RigidBody
 
 from . import TEST_PDB
 
+
 class TestRigidBody(unittest.TestCase):
 
     def setUp(self):
@@ -15,4 +16,3 @@ class TestRigidBody(unittest.TestCase):
     def test_constructor(self):
         rb = RigidBody(TEST_PDB)
         self.assertEqual(len(rb), 10)
-
