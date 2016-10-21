@@ -1,6 +1,7 @@
 
 """linalg - Defines functions to read/write files."""
 
+import os
 
 from .atom import BaseAtom, AtomCollection
 
@@ -44,8 +45,23 @@ def read_pdb(filename):
         return atom
 
     atoms = []
+    assert_file_exists(filename)
     with open(filename, 'rt') as f:
         for line in f:
             if is_atom_line(line):
                 atoms.append(read_atom_line(line))
     return AtomCollection(atoms)
+
+
+def assert_file_exists(path):
+    """Check input file exists, raises an exception if it does not.
+
+    Args:
+        path (str): path to file.
+
+    Raises:
+        FileNotFound: if file does not exist.
+    """
+    if not os.path.exists(path):
+        err = "No such file: '{}'".format(path)
+        raise FileNotFoundError(err)
