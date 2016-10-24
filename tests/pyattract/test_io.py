@@ -72,7 +72,6 @@ class TestAttractIO(unittest.TestCase):
         tmpfile_ligand.close()
 
 
-
 class TestReadAttractParameters(unittest.TestCase):
 
     def test_file_does_not_exist(self):
