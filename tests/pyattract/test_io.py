@@ -53,6 +53,25 @@ class TestAttractIO(unittest.TestCase):
             io.read_forcefield_from_reduced(tmpfile.name)
         tmpfile.close()
 
+    def test_check_ff_version_match(self):
+        tmpfile_receptor = mk_tmp_file(TEST_DUM_RED_CONTENT)
+        tmpfile_ligand = mk_tmp_file(TEST_DUM_RED_CONTENT)
+        ff = io.check_ff_version_match(tmpfile_receptor.name, tmpfile_ligand.name)
+        self.assertEqual(ff, 'attract1')
+        tmpfile_receptor.close()
+        tmpfile_ligand.close()
+
+    def test_check_ff_version_match_fail(self):
+        content = TEST_DUM_RED_CONTENT.replace('ATTRACT1', 'ATTRACT2')
+        tmpfile_receptor = mk_tmp_file(TEST_DUM_RED_CONTENT)
+        tmpfile_ligand = mk_tmp_file(content)
+        err = 'receptor and ligand force field names do not match'
+        with self.assertRaisesRegex(ValueError, err):
+            io.check_ff_version_match(tmpfile_receptor.name, tmpfile_ligand.name)
+        tmpfile_receptor.close()
+        tmpfile_ligand.close()
+
+
 
 class TestReadAttractParameters(unittest.TestCase):
 

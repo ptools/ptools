@@ -6,6 +6,29 @@ from . import PYATTRACT_FORCEFIELDS
 from ..io import assert_file_exists
 
 
+def check_ff_version_match(receptor, ligand):
+    """Read force field name from receptor and ligand files and check that
+    they match.
+
+    Args:
+        receptor (str): path to receptor file.
+        ligand (str): path to ligand file.
+
+    Returns:
+        str: force field name.
+
+    Raises:
+        ValueError: if force field name from receptor and ligand differ.
+    """
+    ff_rec = read_forcefield_from_reduced(receptor)
+    ff_lig = read_forcefield_from_reduced(ligand)
+    if ff_rec != ff_lig:
+        err = "receptor and ligand force field names do not match: '{}' != '{}'"
+        err = err.format(ff_rec, ff_lig)
+        raise ValueError(err)
+    return ff_rec
+
+
 def read_forcefield_from_reduced(path):
     """Read force field name from reduced PDB.
 
