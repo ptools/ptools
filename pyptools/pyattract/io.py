@@ -2,11 +2,64 @@
 """pyattract.io - Read/Write pyattract files."""
 
 
-def read_attract_parameter(filename):
-    """Read attract parameter file.
+from . import PYATTRACT_FORCEFIELDS
+from ..io import assert_file_exists
+
+
+def read_forcefield_from_reduced(path):
+    """Read force field name from reduced PDB.
+
+    Force field is read from the first line which should be formatted as
+    HEADER <FORCE_FIELD_NAME>.
+
+    Args:
+        path (str): path to reduced PDB.
+
+    Raises:
+        IOError: if header cannot be extracted from first line.
 
     Returns:
-        nbminim (int): number of minimizations to perform
+        str: force field name in lower case.
+    """
+    def get_header_line():
+        assert_file_exists(path)
+        with open(path, 'rt') as f:
+            line = f.readline()
+        if not line.startswith('HEADER'):
+            err = '{}: reduced PDB file first line must be a HEADER line '\
+                  'specifying the chosen force field ({})'
+            err = err.format(path, PYATTRACT_FORCEFIELDS)
+            raise IOError(err)
+        return line
+
+    def get_header_tokens():
+        line = get_header_line()
+        tokens = line.split()
+        if len(tokens) < 2:
+            err = "{}: cannot read force field name from first line '{}'"
+            err = err.format(path, line)
+            raise IOError(err)
+        return tokens
+
+    def get_ffname():
+        ff = get_header_tokens()[1].lower()
+        if ff not in PYATTRACT_FORCEFIELDS:
+            err = "{}: invalid force field name '{}': must choose between {}"
+            err = err.format(path, ff, PYATTRACT_FORCEFIELDS)
+            raise ValueError(err)
+        return ff
+
+    return get_ffname()
+
+
+def read_attract_parameter(path):
+    """Read attract parameter file.
+
+    Args:
+        path (str): path to attract parameter file.
+
+    Returns:
+        nbminim (int): number of minimizations to perform.
         lignames (list[str])
         minimlist (list[dict[str, (int or float)]])
         rstk (float)
@@ -60,7 +113,7 @@ def read_attract_parameter(filename):
         return minim
 
     # Read file ignoring comments.
-    with open(filename, 'rt') as f:
+    with open(path, 'rt') as f:
         lines = [line for line in f if not line[0] in ('#', '!')]
 
     # First number is the number of minimizations to perform.

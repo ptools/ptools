@@ -5,12 +5,53 @@ import unittest
 
 import pyptools.pyattract.io as io
 
-from . import TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND
+from . import (TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND,
+               TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT)
 from ..testing.io import random_filename, mk_tmp_file, mk_empty_file
 
 
 with open(TEST_ATTRACT_PARAMS, 'rt') as f:
     TEST_ATTRACT_PARAMETER_CONTENT = f.read()
+
+
+class TestAttractIO(unittest.TestCase):
+
+    def test_read_forcefield_from_reduced(self):
+        tmpfile = mk_tmp_file(content=TEST_DUM_RED_CONTENT)
+        ff = io.read_forcefield_from_reduced(tmpfile.name)
+        self.assertEqual('attract1', ff)
+        tmpfile.close()
+
+    def test_read_forcefield_from_reduced_no_header(self):
+        tmpfile = mk_tmp_file(content=TEST_DUM_PDB_CONTENT)
+        err = 'reduced PDB file first line must be a HEADER line'
+        with self.assertRaisesRegex(IOError, err):
+            io.read_forcefield_from_reduced(tmpfile.name)
+        tmpfile.close()
+
+    def test_read_forcefield_from_reduced_misformatted_header(self):
+        # Remove first line from proper RED file content and replace it
+        # with a line that only contains HEADER with nothing following.
+        lines = TEST_DUM_RED_CONTENT.splitlines()[1:]
+        lines.insert(0, 'HEADER    ')
+
+        # Make sure the proper exeception is raised.
+        tmpfile = mk_tmp_file(content='\n'.join(lines))
+        err = '.* cannot read force field name from first line .*'
+        with self.assertRaisesRegex(IOError, err):
+            io.read_forcefield_from_reduced(tmpfile.name)
+        tmpfile.close()
+
+    def test_read_forcefield_from_reduced_bad_ff(self):
+        # Replace force field name with a bad one i.e. not defined
+        # in `pyptools.pyattract.PYATTRACT_FORCEFIELDS`.
+        content = TEST_DUM_RED_CONTENT.replace('ATTRACT1', 'FOO')
+        # Make sure the proper exeception is raised.
+        tmpfile = mk_tmp_file(content=content)
+        err = '.* invalid force field name .*'
+        with self.assertRaisesRegex(ValueError, err):
+            io.read_forcefield_from_reduced(tmpfile.name)
+        tmpfile.close()
 
 
 class TestReadAttractParameters(unittest.TestCase):
