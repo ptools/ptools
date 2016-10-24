@@ -51,3 +51,14 @@ def coord3d(value=(0, 0, 0)):
               '({} found)'.format(len(value.shape))
         raise ValueError(err)
     return value
+
+
+def translate(coords, v):
+    """In-place translation of coordinates by a vector.
+
+    Args:
+        coords (numpy.array): N x 3 shaped array
+        v (iterable[float, int]): 1 x 3 shaped vector
+    """
+    numpy.add(coords, v, coords)
+

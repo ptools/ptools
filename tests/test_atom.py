@@ -151,3 +151,16 @@ class TestAtomCollection(unittest.TestCase):
         rgyr = self.atoms.get_radius_of_gyration()
         # Reference value calculated with VMD.
         self.assertAlmostEqual(rgyr, 4.9749369621276855, places=6)
+
+    def test_translate(self):
+        origin = (0, 0, 0)
+        center = self.atoms.get_center()
+        self.atoms.translate(origin - center)
+        assert_array_almost_equal(self.atoms.get_center(), (0, 0, 0))
+
+    def test_translate_scalar(self):
+        scalar = -4.5
+        self.atoms.translate(scalar)
+        assert_array_almost_equal(self.atoms.get_center(), (0, 0, 0))
+
+

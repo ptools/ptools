@@ -7,7 +7,7 @@ import math
 
 import numpy
 
-from pyptools.spatial import SpatialObject, coord3d
+from pyptools.spatial import SpatialObject, coord3d, translate
 
 
 class BaseAtom(SpatialObject):
@@ -128,3 +128,12 @@ class AtomCollection(SpatialObject):
         centered = self.coords - self.get_center()
         rgyr2 = numpy.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
+
+    def translate(self, v):
+        """Translate all atom coordinates by vector `v`.
+
+        Args:
+            v (array[float, int], int): 1 x 3 shaped vector or scalar
+        """
+        translate(self.coords, v)
+
