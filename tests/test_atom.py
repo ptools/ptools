@@ -174,6 +174,8 @@ class TestAtomCollection(unittest.TestCase):
         self.assertAlmostEqual(rgyr, 4.9749369621276855, places=6)
 
     def test_translate(self):
+        # Translate is a method herited from `spatial.SpatialObject`.
+        # Basically is should work on any child class.
         origin = (0, 0, 0)
         center = self.atoms.get_center()
         self.atoms.translate(origin - center)
