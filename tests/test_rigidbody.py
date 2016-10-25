@@ -64,6 +64,14 @@ class TestRigidBody(unittest.TestCase):
         rb = RigidBody(TEST_PDB)
         self.assertEqual(len(rb), 10)
 
+    def test_copy_constructor(self):
+        rb1 = RigidBody(TEST_PDB)
+        rb2 = RigidBody(rb1)
+        self.assertEqual(len(rb1), len(rb2))
+        ref_coords = rb1.coords.copy()
+        rb1.coords.fill(0)
+        assert_array_equal(rb2.coords, ref_coords)
+
 
 class TestAttractRigidBody(unittest.TestCase):
 

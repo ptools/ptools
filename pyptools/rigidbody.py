@@ -1,6 +1,8 @@
 
 """pyptools.rigidbody - Defines the RigidBody class and children."""
 
+import copy
+
 import numpy
 
 from .atom import AtomCollection
@@ -12,10 +14,17 @@ class RigidBody(AtomCollection):
     from a file.
 
     Args:
-        filename (str): path to topology file.
+        arg (str, RigidBody): path to topology file or parent RigidBody.
     """
-    def __init__(self, filename):
-        atoms = read_pdb(filename)
+    def __init__(self, arg):
+        if isinstance(arg, str):
+            atoms = read_pdb(arg)
+        elif isinstance(arg, AtomCollection):
+            atoms = copy.deepcopy(arg.atoms)
+        else:
+            err = 'RigidBody can only be initialized from file name or '\
+                  'parent RigidBody'
+            raise TypeError(err)
         super().__init__(atoms)
 
 
