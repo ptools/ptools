@@ -9,6 +9,7 @@ from . import TEST_PDB, TEST_RED
 from .testing.io import mk_tmp_file
 from .testing.moreassert import assert_array_equal
 
+
 # The content of a reduced PDB (RED).
 REDFILE = {
     'content': """\
@@ -60,17 +61,30 @@ ATOM     10  CSE TYR     4      -3.525  -1.079   3.005   28
 
 class TestRigidBody(unittest.TestCase):
 
-    def test_constructor(self):
-        rb = RigidBody(TEST_PDB)
-        self.assertEqual(len(rb), 10)
+    def setUp(self):
+        self.rb = RigidBody(TEST_PDB)
 
-    def test_copy_constructor(self):
-        rb1 = RigidBody(TEST_PDB)
-        rb2 = RigidBody(rb1)
-        self.assertEqual(len(rb1), len(rb2))
-        ref_coords = rb1.coords.copy()
-        rb1.coords.fill(0)
-        assert_array_equal(rb2.coords, ref_coords)
+    def test_constructor(self):
+        self.assertEqual(len(self.rb), 10)
+
+    def _assert_copy_successful(self, thecopy):
+        # Check that both RigidBody instances have the same number of atoms.
+        self.assertEqual(len(thecopy), len(self.rb))
+        self.assertEqual(thecopy.coords.shape, (10, 3))
+
+        # Change parent AtomCollection coordinates and make sure it does not
+        # affect the copy.
+        ref_coords = self.rb.coords.copy()
+        self.rb.coords.fill(0)
+        assert_array_equal(thecopy.coords, ref_coords)
+
+    def test_copy_constructor1(self):
+        thecopy = self.rb.copy()
+        self._assert_copy_successful(thecopy)
+
+    def test_copy_constructor2(self):
+        thecopy = RigidBody.copy(self.rb)
+        self._assert_copy_successful(thecopy)
 
 
 class TestAttractRigidBody(unittest.TestCase):
@@ -106,4 +120,3 @@ class TestAttractRigidBody(unittest.TestCase):
         assert_array_equal(arb.atom_forces[0], [1, 2, 3])
         arb.reset_forces()
         assert_array_equal(arb.atom_forces, 0.0)
-

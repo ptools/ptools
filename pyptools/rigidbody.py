@@ -1,8 +1,6 @@
 
 """pyptools.rigidbody - Defines the RigidBody class and children."""
 
-import copy
-
 import numpy
 
 from .atom import AtomCollection
@@ -14,18 +12,17 @@ class RigidBody(AtomCollection):
     from a file.
 
     Args:
-        arg (str, RigidBody): path to topology file or parent RigidBody.
+        filename (str): path to topology file.
+        atoms (list[Atom]): list of Atom instances or AtomCollection.
     """
-    def __init__(self, arg):
-        if isinstance(arg, str):
-            atoms = read_pdb(arg)
-        elif isinstance(arg, AtomCollection):
-            atoms = copy.deepcopy(arg.atoms)
-        else:
-            err = 'RigidBody can only be initialized from file name or '\
-                  'parent RigidBody'
-            raise TypeError(err)
+    def __init__(self, filename='', atoms=[]):
+        if filename:
+            atoms = read_pdb(filename)
         super().__init__(atoms)
+
+    def copy(self):
+        """Return a copy of the current RigidBody."""
+        return self.__class__(atoms=self.atoms)
 
 
 class AttractRigidBody(RigidBody):
@@ -78,4 +75,3 @@ class AttractRigidBody(RigidBody):
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""
         self.atom_forces.fill(0)
-

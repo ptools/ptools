@@ -61,4 +61,3 @@ def translate(coords, v):
         v (iterable[float, int]): 1 x 3 shaped vector
     """
     numpy.add(coords, v, coords)
-

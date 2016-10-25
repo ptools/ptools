@@ -104,6 +104,10 @@ class AtomCollection(SpatialObject):
                       for serial, atom in enumerate(atoms)]
         super().__init__([atom._coords for atom in self.atoms])
 
+    def copy(self):
+        """Return a copy of the current collection."""
+        return self.__class__(self.atoms)
+
     def __len__(self):
         """Get the number of atoms in the collection."""
         return len(self.atoms)
@@ -136,4 +140,3 @@ class AtomCollection(SpatialObject):
             v (array[float, int], int): 1 x 3 shaped vector or scalar
         """
         translate(self.coords, v)
-
