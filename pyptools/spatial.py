@@ -25,8 +25,12 @@ class SpatialObject:
         self._coords = coord3d(pos)
 
     def translate(self, v):
-        """Translate object coordinates using vector `v`."""
-        self.coords += v
+        """Translate object coordinates using vector `v`.
+
+        Args:
+            v (array[float, int], int): 1 x 3 shaped vector or scalar
+        """
+        translate(self.coords, v)
 
 
 def coord3d(value=(0, 0, 0)):
