@@ -4,7 +4,6 @@
 
 
 import math
-from math import cos, sin
 
 import numpy
 
@@ -44,6 +43,14 @@ class SpatialObject:
             gamma (float): rotation angle around the Z-axis
         """
         rotate(self.coords, alpha, beta, gamma)
+
+    def transform(self, matrix):
+        """Transform object by 4x4 matrix.
+
+        Args:
+            matrix (numpy.ndarray): 4 x 4 matrix.
+        """
+        transform(self.coords, matrix)
 
 
 def coord3d(value=(0, 0, 0)):
@@ -97,17 +104,17 @@ def rotation(alpha=0.0, beta=0.0, gamma=0.0):
     beta = math.radians(beta)
     gamma = math.radians(gamma)
     r = numpy.identity(4)
-    r[0, 0] = cos(beta) * cos(gamma)
-    r[0, 1] = -cos(beta) * sin(gamma)
-    r[0, 2] = sin(beta)
+    r[0, 0] = math.cos(beta) * math.cos(gamma)
+    r[0, 1] = -math.cos(beta) * math.sin(gamma)
+    r[0, 2] = math.sin(beta)
 
-    r[1, 0] = cos(alpha) * sin(gamma) + sin(alpha) * sin(beta) * cos(gamma)
-    r[1, 1] = cos(alpha) * cos(gamma) - sin(alpha) * sin(beta) * sin(gamma)
-    r[1, 2] = -sin(alpha) * cos(beta)
+    r[1, 0] = math.cos(alpha) * math.sin(gamma) + math.sin(alpha) * math.sin(beta) * math.cos(gamma)
+    r[1, 1] = math.cos(alpha) * math.cos(gamma) - math.sin(alpha) * math.sin(beta) * math.sin(gamma)
+    r[1, 2] = -math.sin(alpha) * math.cos(beta)
 
-    r[2, 0] = sin(alpha) * sin(gamma) - cos(alpha) * sin(beta) * cos(gamma)
-    r[2, 1] = sin(alpha) * cos(gamma) + cos(alpha) * sin(beta) * sin(gamma)
-    r[2, 2] = cos(alpha) * cos(beta)
+    r[2, 0] = math.sin(alpha) * math.sin(gamma) - math.cos(alpha) * math.sin(beta) * math.cos(gamma)
+    r[2, 1] = math.sin(alpha) * math.cos(gamma) + math.cos(alpha) * math.sin(beta) * math.sin(gamma)
+    r[2, 2] = math.cos(alpha) * math.cos(beta)
     return r
 
 
@@ -122,3 +129,24 @@ def rotate(coords, alpha=0.0, beta=0.0, gamma=0.0):
     """
     matrix = rotation(alpha, beta, gamma)
     coords[:] = numpy.inner(coords, matrix[:3, :3])
+
+
+def transform(coords, matrix):
+    """In-place transformation of coordinates by a 4 x 4 matrix.
+
+    Args:
+        coords (numpy.ndarray): N x 3 shaped array
+        matrix (numpy.ndarray): 4 x 4 matrix
+    """
+    # Reshape coords to N x 4 with the last component being 1.
+    n = coords.shape[1]
+    a = numpy.ones((coords.shape[0], n + 1))
+    a[:, :-1] = coords
+
+    # Apply transformation matrix to coordinates.
+    a[:] = numpy.inner(a, matrix)
+
+    # Weight coordinates and reshape into N x 3 again.
+    coords[:] = (a[:,0:n].T / a[:,n]).T
+
+
