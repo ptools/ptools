@@ -49,7 +49,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .cache/
 
 lint: ## check style with flake8
-	flake8 --ignore=E501 pyptools tests
+	flake8 --ignore=E501 pyptools
+	flake8 --ignore=E501,E201,E241 tests  # ignore whitespaces in matrix definitinos
 
 test: ## run tests quickly with the default Python
 	py.test

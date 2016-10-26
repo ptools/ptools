@@ -7,7 +7,7 @@ import math
 
 import numpy
 
-from pyptools.spatial import SpatialObject, coord3d, translate
+from pyptools.spatial import SpatialObject, coord3d
 
 
 class BaseAtom(SpatialObject):
