@@ -52,6 +52,10 @@ class SpatialObject:
         """
         transform(self.coords, matrix)
 
+    def attract_euler_rotate(self, phi, ssi, rot):
+        """Rotate object with Attract convention."""
+        attract_euler_rotate(self.coords, phi, ssi, rot)
+
 
 def coord3d(value=(0, 0, 0)):
     """Convert an object to a 1 x 3 shaped numpy array of floats."""
@@ -134,6 +138,13 @@ def rotate(coords, alpha=0.0, beta=0.0, gamma=0.0):
 def transform(coords, matrix):
     """In-place transformation of coordinates by a 4 x 4 matrix.
 
+    This function should be used only when the transformation matrix
+    last row and last column differ from (0, 0, 0, 1).
+    When its not the case, just convert the transformation matrix to 3 x 3
+    and multiply coordinates::
+
+        >>> coords[:] = numpy.inner(coords, matrix[:3, :3])
+
     Args:
         coords (numpy.ndarray): N x 3 shaped array
         matrix (numpy.ndarray): 4 x 4 matrix
@@ -147,6 +158,59 @@ def transform(coords, matrix):
     a[:] = numpy.inner(a, matrix)
 
     # Weight coordinates and reshape into N x 3 again.
-    coords[:] = (a[:,0:n].T / a[:,n]).T
+    coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
+def attract_euler_rotation(phi, ssi, rot):
+    """Return the rotation matrix for an Euler rotation with Attract
+    convention.
+
+    Args:
+        coords (numpy.ndarray): N x 3 shaped array
+        phi (float):
+        ssi (float):
+        rot (float):
+
+    Returns:
+        numpy.ndarray: 3 x 3 matrix
+    """
+    cs = math.cos(ssi)
+    cp = math.cos(phi)
+    ss = math.sin(ssi)
+    sp = math.sin(phi)
+    crot = math.cos(rot)
+    srot = math.sin(rot)
+
+    cscp = cs * cp
+    cssp = cs * sp
+    sscp = ss * cp
+    sssp = ss * sp
+
+    eulermat = numpy.identity(3)
+
+    eulermat[0][0] = crot * cscp + srot * sp
+    eulermat[0][1] = srot * cscp - crot * sp
+    eulermat[0][2] = sscp
+
+    eulermat[1][0] = crot * cssp - srot * cp
+    eulermat[1][1] = srot * cssp + crot * cp
+    eulermat[1][2] = sssp
+
+    eulermat[2][0] = -crot * ss
+    eulermat[2][1] = -srot * ss
+    eulermat[2][2] = cs
+
+    return eulermat
+
+
+def attract_euler_rotate(coords, phi, ssi, rot):
+    """In-place Euler rotation of coordinates with the Attract convention.
+
+    Args:
+        coords (numpy.ndarray): N x 3 shaped array
+        phi (float):
+        ssi (float):
+        rot (float):
+    """
+    matrix = attract_euler_rotation(phi, ssi, rot)
+    coords[:] = numpy.inner(coords, matrix)
