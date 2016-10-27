@@ -155,7 +155,7 @@ class TestRotation(unittest.TestCase):
 
         assert_array_almost_equal(coords, ref_coords, decimal=5)
 
-    def test_rotate_so(self):
+    def test_rotate_spatial_object(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
@@ -181,6 +181,41 @@ class TestRotation(unittest.TestCase):
                       [10.0000000,   13.325602,   33.502663]]
 
         assert_array_almost_equal(o.coords, ref_coords, decimal=5)
+
+
+    def test_rotate_abstract_euler(self):
+        # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
+        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+
+        # Initialize SpatialObject.
+        o = spatial.SpatialObject(coords)
+
+        # Attract Euler rotation.
+        o.attract_euler_rotate(10, 12, 14)
+
+        # Coordinates calculated with ptools version c9f7fee::
+        #
+        #     >>> from ptools import *
+        #     >>> rb = Rigidbody('test_10atoms.pdb')
+        #     >>> rb.AttractEulerRotate(10, 12, 14)
+        #     >>> for i in xrange(10):
+        #     ...     c = r.getCoords(i)
+        #     ...     print c.x, c.y, c.z
+        #
+        ref = numpy.array([
+            [1.92178620509, 0.634022491719, 23.6411664954],
+            [1.10926523817, 1.12485261069, 25.0899230217],
+            [0.296744271247, 1.61568272966, 26.5386795481],
+            [-0.515776695676, 2.10651284863, 27.9874360744],
+            [-1.3282976626, 2.5973429676, 29.4361926007],
+            [-2.14081862952, 3.08817308657, 30.8849491271],
+            [-2.95333959645, 3.57900320554, 32.3337056534],
+            [-3.76586056337, 4.06983332451, 33.7824621798],
+            [-4.57838153029, 4.56066344348, 35.2312187061],
+            [-5.39090249721, 5.05149356245, 36.6799752325],
+        ])
+
+        assert_array_almost_equal(o.coords, ref)
 
 
 
