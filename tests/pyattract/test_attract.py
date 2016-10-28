@@ -38,3 +38,15 @@ class TestAttractCommandLine(CaptureStderrTest):
         with self.assertRaisesRegex(SystemExit, '2'):
             attract.parse_command_line('-r foo -l bar --foobar'.split())
         self.assertIn('unrecognized arguments: --foobar', self.error)
+
+    def test_single_option(self):
+        args = attract.parse_command_line('-r foo -l bar --single'.split())
+        self.assertTrue(args.single)
+        args = attract.parse_command_line('-r foo -l bar -s'.split())
+        self.assertTrue(args.single)
+
+    def test_ref_option(self):
+        args = attract.parse_command_line('-r foo -l bar --ref foo.pdb'.split())
+        self.assertEqual(args.ref, 'foo.pdb')
+
+
