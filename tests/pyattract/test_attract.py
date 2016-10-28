@@ -6,6 +6,7 @@ import unittest
 
 import pyptools.pyattract.attract as attract
 
+from . import TEST_RECEPTOR_RED, TEST_LIGAND_RED
 
 
 class CaptureStderrTest(unittest.TestCase):
@@ -50,3 +51,19 @@ class TestAttractCommandLine(CaptureStderrTest):
         self.assertEqual(args.ref, 'foo.pdb')
 
 
+class TestAttract(CaptureStderrTest):
+
+    def test_receptor_not_found(self):
+        args = ['-r', 'foo', '-l', TEST_LIGAND_RED]
+        with self.assertRaisesRegex(FileNotFoundError, "No such file: 'foo'"):
+            attract.main(args)
+
+    def test_ligand_not_found(self):
+        args = ['-r', TEST_RECEPTOR_RED, '-l', 'bar']
+        with self.assertRaisesRegex(FileNotFoundError, "No such file: 'bar'"):
+            attract.main(args)
+
+    def test_run(self):
+        args = ['-r', TEST_RECEPTOR_RED, '-l', TEST_LIGAND_RED]
+        attract.main(args)
+        raise NotImplementedError('TODO')

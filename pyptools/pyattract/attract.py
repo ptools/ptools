@@ -40,8 +40,11 @@ def main(args=None):
     # Attract core algorithm.
     for i, trans in enumerate(translations):
         transnb = i + 1
+        print("Translation {}/{}".format(transnb, len(translations)))
         for j, rotnb in enumerate(rotations):
             rotnb = j + 1
+            print("Rotation {}/{}".format(rotnb, len(rotations)))
+
 
 
 
