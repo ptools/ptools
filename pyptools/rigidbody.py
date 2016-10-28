@@ -39,8 +39,8 @@ class AttractRigidBody(RigidBody):
             N x 3 shaped array for atom forces
     """
 
-    def __init__(self, filename):
-        super().__init__(filename)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         N = len(self)
         self.atom_categories = numpy.zeros(N, dtype=int)
         self.atom_charges = numpy.zeros(N, dtype=float)
