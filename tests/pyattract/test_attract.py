@@ -63,7 +63,9 @@ class TestAttract(CaptureStderrTest):
         with self.assertRaises(FileNotFoundError):
             attract.main(args)
 
+    import pytest
+    @pytest.mark.skip(reason='not implemented yet')
     def test_run(self):
         args = ['-r', TEST_RECEPTOR_RED, '-l', TEST_LIGAND_RED]
         attract.main(args)
-        raise NotImplementedError('TODO')
+        self.fail("not implemented yet")

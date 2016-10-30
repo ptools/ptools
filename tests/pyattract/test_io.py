@@ -6,7 +6,8 @@ import unittest
 import pyptools.pyattract.io as io
 
 from . import (TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND,
-               TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT)
+               TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT,
+               TEST_AMINON_CONTENT)
 from ..testing.io import random_filename, mk_tmp_file, mk_empty_file
 
 
@@ -16,11 +17,33 @@ with open(TEST_ATTRACT_PARAMS, 'rt') as f:
 
 class TestAttractIO(unittest.TestCase):
 
+    def test_read_aminon(self):
+        tmpfile = mk_tmp_file(content=TEST_AMINON_CONTENT)
+        params = io.read_aminon(tmpfile.name)
+        tmpfile.close()
+        self.assertEqual(len(params), 5)
+        self.assertTrue(all([len(p) == 2 for p in params]))
+
+        # Check radii read ok.
+        self.assertEqual(params[0][0], 2.000)
+        self.assertEqual(params[1][0], 1.900)
+        self.assertEqual(params[2][0], 1.950)
+        self.assertEqual(params[3][0], 1.900)
+        self.assertEqual(params[4][0], 1.900)
+
+        # Check amplitudes read ok.
+        self.assertEqual(params[0][1], 1.000)
+        self.assertEqual(params[1][1], 1.000)
+        self.assertEqual(params[2][1], 2.000)
+        self.assertEqual(params[3][1], 0.600)
+        self.assertEqual(params[4][1], 0.600)
+
     def test_read_forcefield_from_reduced(self):
         tmpfile = mk_tmp_file(content=TEST_DUM_RED_CONTENT)
         ff = io.read_forcefield_from_reduced(tmpfile.name)
-        self.assertEqual('attract1', ff)
         tmpfile.close()
+        self.assertEqual('attract1', ff)
+
 
     def test_read_forcefield_from_reduced_no_header(self):
         tmpfile = mk_tmp_file(content=TEST_DUM_PDB_CONTENT)

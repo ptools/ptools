@@ -5,6 +5,34 @@
 from . import PYATTRACT_FORCEFIELDS
 
 
+def read_aminon(path):
+    """Read Attract force field parameter file.
+
+    This file is supposed to have 3 values per line:
+
+        - index (int)
+        - atom radius (float)
+        - amplitude (float)
+        - inull (0)
+
+    Args:
+        path (str): path to file.
+
+    Returns:
+        list[(float, float)]: radius and amplitude values for each line.
+    """
+    params = []
+    with open(path, 'rt') as f:
+        for line in f:
+            # Ignore empty lines and lines starting with '#'.
+            if line.strip() and not line.startswith('#'):
+                tokens = line.split()
+                radius = float(tokens[1])
+                amplitude = float(tokens[2])
+                params.append((radius, amplitude))
+    return params
+
+
 def check_ff_version_match(receptor, ligand):
     """Read force field name from receptor and ligand files and check that
     they match.
