@@ -55,12 +55,12 @@ class TestAttract(CaptureStderrTest):
 
     def test_receptor_not_found(self):
         args = ['-r', 'foo', '-l', TEST_LIGAND_RED]
-        with self.assertRaisesRegex(FileNotFoundError, "No such file: 'foo'"):
+        with self.assertRaises(FileNotFoundError):
             attract.main(args)
 
     def test_ligand_not_found(self):
         args = ['-r', TEST_RECEPTOR_RED, '-l', 'bar']
-        with self.assertRaisesRegex(FileNotFoundError, "No such file: 'bar'"):
+        with self.assertRaises(FileNotFoundError):
             attract.main(args)
 
     def test_run(self):

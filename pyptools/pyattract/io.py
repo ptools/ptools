@@ -3,7 +3,6 @@
 
 
 from . import PYATTRACT_FORCEFIELDS
-from ..io import assert_file_exists
 
 
 def check_ff_version_match(receptor, ligand):
@@ -45,7 +44,6 @@ def read_forcefield_from_reduced(path):
         str: force field name in lower case.
     """
     def get_header_line():
-        assert_file_exists(path)
         with open(path, 'rt') as f:
             line = f.readline()
         if not line.startswith('HEADER'):
