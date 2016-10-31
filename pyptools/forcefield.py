@@ -38,6 +38,10 @@ class ForceField:
         self._vdw_energy = 0.0
         self._electrostatic_energy = 0.0
 
+    def update(self):
+        """Calculate all energy terms while returning nothing."""
+        self.non_bonded_energy()
+
     def energy(self):
         """Return the total energy between the two molecules, which basically
         corresponds to the non-bonded energy."""
@@ -89,7 +93,7 @@ class AttractForceField1(ForceField):
 
         pairlist = PairList(self.receptor, self.ligand, cutoff=5.0)
         contacts = pairlist.contacts()
-        distances = pairlist.distances()
+        norm2 = pairlist.sqdistances()
 
         alldx = [self.receptor.coords[ir] - self.ligand.coords[il]
                  for ir, il in contacts]
@@ -102,7 +106,7 @@ class AttractForceField1(ForceField):
             rlen = self._repulsive[category_rec][category_lig]
 
             dx = alldx[i]
-            r2 = distances[i]
+            r2 = norm2[i]
             rr2 = 1.0 / r2
             dx = dx + rr2
 
