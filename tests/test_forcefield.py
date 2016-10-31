@@ -4,9 +4,8 @@ import unittest
 from pyptools.rigidbody import AttractRigidBody
 from pyptools.forcefield import ForceField, AttractForceField1
 
-
 from .pyattract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
-
+from .testing.moreassert import assert_array_equal
 
 
 class TestForceField(unittest.TestCase):
@@ -21,7 +20,16 @@ class TestAttractForceField1(unittest.TestCase):
     def setUp(self):
         self.receptor = AttractRigidBody(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody(TEST_LIGAND_RED)
-        self.ff = AttractForceField1(self.receptor, self.ligand, TEST_AMINON)
+        self.ff = AttractForceField1(self.receptor, self.ligand)
 
-    def test_foo(self):
-        self.ff.energy()
+    def test_read_ff_params(self):
+        ff = AttractForceField1(self.receptor, self.ligand,
+                                paramfile=TEST_AMINON)
+        assert_array_equal(ff._repulsive, self.ff._repulsive)
+        assert_array_equal(ff._attractive, self.ff._attractive)
+
+    def test_calculate_energy(self):
+        self.ff.update()
+        # Reference values calculated from PTools 1d4b930.
+        self.assertAlmostEqual(self.ff.vdw_energy(), -4.85626395114)
+        self.assertAlmostEqual(self.ff.electrostatic_energy(), 0.0)
