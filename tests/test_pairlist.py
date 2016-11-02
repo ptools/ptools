@@ -26,25 +26,31 @@ CONTACTS_REF = [
 ]
 
 
-
-
 class TestPairList(unittest.TestCase):
 
     def setUp(self):
+        self.cutoff = 5.0
         self.ligand = RigidBody(TEST_LIGAND)
         self.receptor = RigidBody(TEST_RECEPTOR)
         self.assertEqual(len(self.ligand), 974)
         self.assertEqual(len(self.receptor), 936)
-        self.pairlist = PairList(self.receptor, self.ligand, 5.0)
+        self.pairlist = PairList(self.receptor, self.ligand, self.cutoff)
 
-    def test_contacts_ok(self):
+    def test_contacts(self):
         # Check that contacts measured with PairList are the same as
         # those the reference (calculated from VMD).
         pairs = self.pairlist.contacts()
         pairs_ref = PairList.sort(*CONTACTS_REF)
         assert_array_equal(pairs, pairs_ref)
 
-    def test_distances_ok(self):
+    def test_distances(self):
+        # Check that the number of distances corresponds to the number of
+        # contacts and that all distances are below cutoff.
+        distances = self.pairlist.distances()
+        self.assertEqual(len(distances), len(self.pairlist.contacts()))
+        self.assertTrue(all(distances < self.cutoff))
+
+    def test_all_distances(self):
         # Read reference distances.
         with open(TEST_DISTANCES_RECEPTOR_LIGAND, 'rt') as f:
             ref = [[float(value) for value in line.split()]
