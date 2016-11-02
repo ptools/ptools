@@ -182,7 +182,6 @@ class TestRotation(unittest.TestCase):
 
         assert_array_almost_equal(o.coords, ref_coords, decimal=5)
 
-
     def test_rotate_abstract_euler(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
@@ -218,10 +217,8 @@ class TestRotation(unittest.TestCase):
         assert_array_almost_equal(o.coords, ref)
 
 
-
 class TestTransformation(unittest.TestCase):
     """Test transformations thanks to 4 x 4 matrices."""
-
 
     def test_transform_rotation(self):
         """Test transformation with a rotation matrix.
@@ -252,8 +249,7 @@ class TestTransformation(unittest.TestCase):
         m = numpy.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
                          [ 0.74291592,  0.00244003,  0.20881428,  0.91014385],
                          [ 0.71045798,  0.85828462,  0.71570462,  0.96008097],
-                         [ 0.4331563 ,  0.30949433,  0.9348666 ,  0.48177513]])
-
+                         [ 0.43315630,  0.30949433,  0.93486660,  0.48177513]])
 
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
@@ -282,7 +278,7 @@ class TestTransformation(unittest.TestCase):
         m = numpy.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
                          [ 0.74291592,  0.00244003,  0.20881428,  0.91014385],
                          [ 0.71045798,  0.85828462,  0.71570462,  0.96008097],
-                         [ 0.4331563 ,  0.30949433,  0.9348666 ,  0.48177513]])
+                         [ 0.43315630,  0.30949433,  0.93486660,  0.48177513]])
 
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))

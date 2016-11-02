@@ -2,7 +2,6 @@
 import math
 
 import numpy
-from scipy.spatial.distance import cdist
 
 from .pairlist import PairList
 from .pyattract.io import read_aminon
@@ -60,8 +59,6 @@ class ForceField:
         """Calculate the van der Waals energy (Lennard-Jones energy)
         between a receptor and a ligand."""
         return self._electrostatic_energy
-
-
 
 
 class AttractForceField1(ForceField):

@@ -1,8 +1,6 @@
 
 """linalg - Defines functions to read/write files."""
 
-import os
-
 from .atom import BaseAtom, AtomCollection
 
 

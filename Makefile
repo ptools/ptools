@@ -48,13 +48,17 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .cache/
 
-lint: ## check style with flake8
+lint: lint-package lint-tests ## check style with flake8
+
+lint-package:
 	flake8 --ignore=E501 pyptools
-	flake8 --ignore=E501,E201,E241 tests  # ignore whitespaces in matrix definitinos
+
+lint-tests:
+	# Ignore whitespaces in matrix definitinos
+	flake8 --ignore=E501,E201,E241 tests
 
 test: ## run tests quickly with the default Python
 	py.test
-
 
 test-all: ## run tests on every Python version with tox
 	tox

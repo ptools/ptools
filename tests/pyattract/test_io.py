@@ -44,7 +44,6 @@ class TestAttractIO(unittest.TestCase):
         tmpfile.close()
         self.assertEqual('attract1', ff)
 
-
     def test_read_forcefield_from_reduced_no_header(self):
         tmpfile = mk_tmp_file(content=TEST_DUM_PDB_CONTENT)
         err = 'reduced PDB file first line must be a HEADER line'

@@ -4,6 +4,8 @@
 import sys
 import unittest
 
+import pytest
+
 import pyptools.pyattract.attract as attract
 
 from . import TEST_RECEPTOR_RED, TEST_LIGAND_RED
@@ -63,7 +65,6 @@ class TestAttract(CaptureStderrTest):
         with self.assertRaises(FileNotFoundError):
             attract.main(args)
 
-    import pytest
     @pytest.mark.skip(reason='not implemented yet')
     def test_run(self):
         args = ['-r', TEST_RECEPTOR_RED, '-l', TEST_LIGAND_RED]

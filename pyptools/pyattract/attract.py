@@ -4,7 +4,7 @@
 
 import argparse
 
-from pyptools.rigidbody import AttractRigidBody
+# from pyptools.rigidbody import AttractRigidBody
 
 
 def parse_command_line(args=None):
@@ -22,30 +22,30 @@ def parse_command_line(args=None):
 
 
 def main(args=None):
-    args = parse_command_line(args)
-    trjname = 'minimization.trj'  # save minimization variables to trjname
+    return
 
-    # TODO: check file exits:
-    #   - attract.inp
-    #   - aminon.par
+#     args = parse_command_line(args)
+#     # trjname = 'minimization.trj'  # save minimization variables to trjname
 
-    # Load receptor and ligand.
-    receptor = AttractRigidBody(args.receptor)
-    ligand = AttractRigidBody(args.ligand)
+#     # TODO: check file exits:
+#     #   - attract.inp
+#     #   - aminon.par
 
-    # Single calculation mode.
-    translations = [[1, ligand.get_center()]]
-    rotations = [(0, 0, 0)]
+#     # Load receptor and ligand.
+#     receptor = AttractRigidBody(args.receptor)
+#     ligand = AttractRigidBody(args.ligand)
 
-    # Attract core algorithm.
-    for i, trans in enumerate(translations):
-        transnb = i + 1
-        print("Translation {}/{}".format(transnb, len(translations)))
-        for j, rotnb in enumerate(rotations):
-            rotnb = j + 1
-            print("Rotation {}/{}".format(rotnb, len(rotations)))
+#     # Single calculation mode.
+#     translations = [[1, ligand.get_center()]]
+#     rotations = [(0, 0, 0)]
 
-
+#     # Attract core algorithm.
+#     for i, trans in enumerate(translations):
+#         transnb = i + 1
+#         print("Translation {}/{}".format(transnb, len(translations)))
+#         for j, rotnb in enumerate(rotations):
+#             rotnb = j + 1
+#             print("Rotation {}/{}".format(rotnb, len(rotations)))
 
 
 if __name__ == '__main__':
