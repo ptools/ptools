@@ -272,7 +272,7 @@ class TestTransformation(unittest.TestCase):
         spatial.transform(coords, m)
         assert_array_almost_equal(coords, ref)
 
-    def test_transform_so(self):
+    def test_transform_spatial_object(self):
         """Test spatial.SpatialObject.transform."""
         # Input transformation matrix (just a random matrix).
         m = numpy.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
@@ -307,54 +307,47 @@ class TestTransformation(unittest.TestCase):
         assert_array_almost_equal(o.coords, ref)
 
 
-def test_coord3d_no_args():
-    c = spatial.coord3d()
-    assert c.shape == (3, )
-    assert_array_almost_equal(c, (0, 0, 0))
+class TestCoord3D(unittest.TestCase):
 
+    def test_empty_constructor(self):
+        c = spatial.coord3d()
+        self.assertEqual(c.shape, (3, ))
+        assert_array_almost_equal(c, (0, 0, 0))
 
-def test_coord3d_scalar():
-    c = spatial.coord3d(1)
-    assert c.shape == (3, )
-    assert_array_almost_equal(c, (1, 1, 1))
+    def test_constructor_scalar(self):
+        c = spatial.coord3d(1)
+        self.assertEqual(c.shape, (3, ))
+        assert_array_almost_equal(c, (1, 1, 1))
 
+    def test_constructor_vector(self):
+        c = spatial.coord3d([1, 2, 3])
+        self.assertEqual(c.shape, (3, ))
+        assert_array_almost_equal(c, (1, 2, 3))
 
-def test_coord3d_vector():
-    c = spatial.coord3d([2, 2, 2])
-    assert c.shape == (3, )
-    assert_array_almost_equal(c, (2, 2, 2))
+    def test_constructor_vector_fails(self):
+        err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d([2, 2])
 
+    def test_constructor_array(self):
+        array = ((0, 0, 0), (1, 1, 1))
+        c = spatial.coord3d(array)
+        self.assertEqual(c.shape, (2, 3))
+        assert_array_almost_equal(c[0], (0, 0, 0))
+        assert_array_almost_equal(c[1], (1, 1, 1))
 
-def test_coord3d_vector_fails():
-    with pytest.raises(ValueError) as excinfo:
-        spatial.coord3d([2, 2])
-    err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
-    assert err in str(excinfo.value)
+    def test_constructor_array_fails(self):
+        array = ((0, 0, 0, 0), (1, 1, 1, 1))
+        err = '3-d coordinate array should be N x 3'
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d(array)
 
-
-def test_coord3d_array():
-    array = ((0, 0, 0), (1, 1, 1))
-    c = spatial.coord3d(array)
-    assert c.shape == (2, 3)
-    assert_array_almost_equal(c[0], (0, 0, 0))
-    assert_array_almost_equal(c[1], (1, 1, 1))
-
-
-def test_coord3d_array_fails():
-    array = ((0, 0, 0, 0), (1, 1, 1, 1))
-    with pytest.raises(ValueError) as excinfo:
-        spatial.coord3d(array)
-    err = '3-d coordinate array should be N x 3'
-    assert err in str(excinfo.value)
-
-
-def test_coord3d_array_fails2():
-    """Test raises the appropriate exeception when array has more that
-    2 dimensions."""
-    array = (((0, 0, 0, 0), (1, 1, 1, 1)),
-             ((0, 0, 0, 0), (1, 1, 1, 1)),
-             ((0, 0, 0, 0), (1, 1, 1, 1)))
-    with pytest.raises(ValueError) as excinfo:
-        spatial.coord3d(array)
-    err = '3-d coordinate array should have at most 2 dimensions'
-    assert err in str(excinfo.value)
+    def test_constructor_array_fails2(self):
+        """Test raises the appropriate exeception when array has more that
+        2 dimensions."""
+        array = (((0, 0, 0, 0), (1, 1, 1, 1)),
+                 ((0, 0, 0, 0), (1, 1, 1, 1)),
+                 ((0, 0, 0, 0), (1, 1, 1, 1)))
+        err = '3-d coordinate array should have at most 2 dimensions'
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d(array)

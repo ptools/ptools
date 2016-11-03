@@ -58,7 +58,7 @@ lint-tests:
 	flake8 --ignore=E501,E201,E241 tests
 
 test: ## run tests quickly with the default Python
-	py.test
+	py.test --ignore=tests/pyattract/test_attract.py
 
 test-all: ## run tests on every Python version with tox
 	tox
