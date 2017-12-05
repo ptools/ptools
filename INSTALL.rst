@@ -11,7 +11,7 @@ Quick setup guide
 
 This is the very minimal set of instructions required to install Ptools
 in a Python virtual environment.
-It assumes all Ptools dependencies have been duly installed::
+It assumes python 2.7 and all Ptools dependencies have been duly installed::
 
     $ virtualenv ptools-env
     $ source ptools-env/bin/activate
@@ -29,6 +29,7 @@ Building and installing Ptools
 
 The Ptools library has few dependencies namely :
 
+- python 2.7.xx
 - a C++ compiler (e.g. the `GNU Compiler`_),
 - a developers version of the Python_ interpreter,
 - the Boost_ library, 
