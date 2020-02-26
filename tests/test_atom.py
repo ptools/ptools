@@ -140,6 +140,9 @@ class TestAtomCollection(unittest.TestCase):
     def test_len(self):
         self.assertEqual(len(self.atoms), 10)
 
+    def test_size(self):
+        self.assertEqual(len(self.atoms), 10)
+
     def test_isiterable(self):
         # If an exeception is raised here, AtomCollection is not iterable
         # which is not what we want.

@@ -112,6 +112,13 @@ class AtomCollection(SpatialObject):
         """Get the number of atoms in the collection."""
         return len(self.atoms)
 
+    def size(self):
+        """Get the number of atoms in the collection.
+
+        Alias for len(AtomCollection).
+        """
+        return len(self)
+
     def __iter__(self):
         """Iterate over the collection atoms."""
         return iter(self.atoms)
