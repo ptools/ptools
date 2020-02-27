@@ -55,7 +55,7 @@ class TestRotation(unittest.TestCase):
                [  0.00,    0.00,   -1.00,    0.00],
                [  0.00,    1.00,    0.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(alpha=90)
+        m = spatial.rotation_by(alpha=90)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 180°.
@@ -63,7 +63,7 @@ class TestRotation(unittest.TestCase):
                [  0.00,   -1.00,   -0.00,    0.00],
                [  0.00,    0.00,   -1.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(alpha=180)
+        m = spatial.rotation_by(alpha=180)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 10°.
@@ -71,7 +71,7 @@ class TestRotation(unittest.TestCase):
                [ 0.0000000,    0.984808,   -0.173648,    0.000000],
                [ 0.0000000,    0.173648,    0.984808,    0.000000],
                [ 0.0000000,    0.000000,    0.000000,    1.000000]]
-        m = spatial.rotation(alpha=10)
+        m = spatial.rotation_by(alpha=10)
         assert_array_almost_equal(m, ref)
 
     def test_rotation_Y(self):
@@ -80,7 +80,7 @@ class TestRotation(unittest.TestCase):
                [  0.00,    1.00,    0.00,    0.00],
                [ -1.00,    0.00,    0.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(beta=90)
+        m = spatial.rotation_by(beta=90)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 180°.
@@ -88,7 +88,7 @@ class TestRotation(unittest.TestCase):
                [  0.00,    1.00,    0.00,    0.00],
                [ -0.00,    0.00,   -1.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(beta=180)
+        m = spatial.rotation_by(beta=180)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 10°.
@@ -96,7 +96,7 @@ class TestRotation(unittest.TestCase):
                [ 0.0000000,    1.000000,    0.000000,    0.000000],
                [-0.1736482,    0.000000,    0.984808,    0.000000],
                [ 0.0000000,    0.000000,    0.000000,    1.000000]]
-        m = spatial.rotation(beta=10)
+        m = spatial.rotation_by(beta=10)
         assert_array_almost_equal(m, ref)
 
     def test_rotation_Z(self):
@@ -105,7 +105,7 @@ class TestRotation(unittest.TestCase):
                [  1.00,    0.00,    0.00,    0.00],
                [  0.00,    0.00,    1.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(gamma=90)
+        m = spatial.rotation_by(gamma=90)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 180°.
@@ -113,7 +113,7 @@ class TestRotation(unittest.TestCase):
                [  0.00,   -1.00,    0.00,    0.00],
                [  0.00,    0.00,    1.00,    0.00],
                [  0.00,    0.00,    0.00,    1.00]]
-        m = spatial.rotation(gamma=180)
+        m = spatial.rotation_by(gamma=180)
         assert_array_almost_equal(m, ref)
 
         # Rotation by 10°.
@@ -121,22 +121,22 @@ class TestRotation(unittest.TestCase):
                [ 0.1736482,    0.984808,    0.000000,    0.000000],
                [ 0.0000000,    0.000000,    1.000000,    0.000000],
                [ 0.0000000,    0.000000,    0.000000,    1.000000]]
-        m = spatial.rotation(gamma=10)
+        m = spatial.rotation_by(gamma=10)
         assert_array_almost_equal(m, ref)
 
     def test_rotation_XYZ(self):
         """Test rotation in X, Y and Z is equivalent to successive rotation
         in X, then Y, then Z."""
-        m = spatial.rotation(alpha=10, beta=10, gamma=10)
-        ref = spatial.rotation(alpha=10).dot(spatial.rotation(beta=10)).dot(spatial.rotation(gamma=10))
+        m = spatial.rotation_by(alpha=10, beta=10, gamma=10)
+        ref = spatial.rotation_by(alpha=10).dot(spatial.rotation_by(beta=10)).dot(spatial.rotation_by(gamma=10))
         assert_array_almost_equal(m, ref)
 
-    def test_rotate(self):
+    def test_rotate_by(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Rotate by 12° along X-axis.
-        spatial.rotate(coords, alpha=12)
+        spatial.rotate_by(coords, alpha=12)
 
         # Reference coordinates calculated with VMD::
         #     set m [transaxis x 12]
@@ -163,7 +163,7 @@ class TestRotation(unittest.TestCase):
         o = spatial.SpatialObject(coords)
 
         # Rotate by 12° along X-axis.
-        o.rotate(alpha=12)
+        o.rotate_by(alpha=12)
 
         # Reference coordinates calculated with VMD::
         #     set m [transaxis x 12]
@@ -238,7 +238,7 @@ class TestTransformation(unittest.TestCase):
         coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         ref = coords.copy()
-        spatial.rotate(ref, alpha=10)
+        spatial.rotate_by(ref, alpha=10)
 
         spatial.transform(coords, m)
         assert_array_almost_equal(coords, ref)

@@ -34,7 +34,7 @@ class SpatialObject:
         """
         translate(self.coords, v)
 
-    def rotate(self, alpha=0.0, beta=0.0, gamma=0.0):
+    def rotate_by(self, alpha=0.0, beta=0.0, gamma=0.0):
         """Rotate object coordinates around X, Y and Z axes.
 
         Args:
@@ -42,7 +42,7 @@ class SpatialObject:
             beta (float): rotation angle around the Y-axis
             gamma (float): rotation angle around the Z-axis
         """
-        rotate(self.coords, alpha, beta, gamma)
+        rotate_by(self.coords, alpha, beta, gamma)
 
     def transform(self, matrix):
         """Transform object by 4x4 matrix.
@@ -91,7 +91,7 @@ def translate(coords, v):
     numpy.add(coords, v, coords)
 
 
-def rotation(alpha=0.0, beta=0.0, gamma=0.0):
+def rotation_by(alpha=0.0, beta=0.0, gamma=0.0):
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
@@ -122,7 +122,7 @@ def rotation(alpha=0.0, beta=0.0, gamma=0.0):
     return r
 
 
-def rotate(coords, alpha=0.0, beta=0.0, gamma=0.0):
+def rotate_by(coords, alpha=0.0, beta=0.0, gamma=0.0):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -131,7 +131,12 @@ def rotate(coords, alpha=0.0, beta=0.0, gamma=0.0):
         beta (float): rotation angle around the Y-axis
         gamma (float): rotation angle around the Z-axis
     """
-    matrix = rotation(alpha, beta, gamma)
+    matrix = rotation_by(alpha, beta, gamma)
+    rotate(coords, matrix)
+
+
+def rotate(coords, matrix):
+    """In-place rotation of coordinates using a rotation matrix."""
     coords[:] = numpy.inner(coords, matrix[:3, :3])
 
 
