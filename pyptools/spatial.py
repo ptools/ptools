@@ -44,6 +44,10 @@ class SpatialObject:
         """
         rotate_by(self.coords, alpha, beta, gamma)
 
+    def rotate(self, matrix):
+        """Rotate object using rotation matrix."""
+        rotate(self.coords, matrix)
+
     def transform(self, matrix):
         """Transform object by 4x4 matrix.
 

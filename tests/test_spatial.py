@@ -351,3 +351,16 @@ class TestCoord3D(unittest.TestCase):
         err = '3-d coordinate array should have at most 2 dimensions'
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(array)
+
+
+class TestSpatialObjectTransformations(unittest.TestCase):
+    def setUp(self):
+        array = numpy.array(((0, 0, 0), (1, 1, 1)), dtype=float)
+        self.obj = spatial.SpatialObject(array)
+
+    def test_rotate(self):
+        ref = [[0.0, 0.0, 0.0],
+               [1.0, 0.8111595511436462, 1.1584558486938477]]
+        matrix = spatial.rotation_by(alpha=10)
+        self.obj.rotate(matrix)
+        assert_array_almost_equal(self.obj.coords, ref)
