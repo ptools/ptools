@@ -10,6 +10,10 @@ import numpy
 from pyptools.spatial import SpatialObject, coord3d
 
 
+# The Protein Data Bank format for atom coordinates
+PDB_FMT = "%-6s%5s %4s%c%-4s%c%4s%s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s"
+
+
 class BaseAtom(SpatialObject):
     """Base class for an Atom.
 
@@ -57,6 +61,43 @@ class BaseAtom(SpatialObject):
     def copy(self):
         """Return a copy of the current atom."""
         return copy.copy(self)
+
+    def topdb(self):
+        def first_alpha(s):
+            for c in s:
+                if c.isalpha():
+                    return c
+            return ""
+
+        rec = "ATOM"
+        indexbuf = "*****"
+        residbuf = "****"
+        altlocchar = " "
+        insertion = " "
+        chain = " " if not self.chain else self.chain
+        occ = 1.0
+        b = 0.0
+        element = first_alpha(self.name)
+
+        if self.index < 100000:
+            indexbuf = "{0:5d}".format(self.index)
+        elif self.index < 1048576:
+            indexbuf = "{0:05x}".format(self.index)
+
+        if self.resid < 10000:
+            residbuf = "{0:4d}".format(self.resid)
+        elif self.resid < 65536:
+            residbuf = "{0:04x}".format(self.resid)
+
+        namebuf = self.name.center(4)
+        if len(self.name) > 2:
+            namebuf = "{0:>4s}".format(self.name)
+
+        x, y, z = self.coords
+
+        return PDB_FMT % (rec, indexbuf, namebuf, altlocchar,
+                          self.resname, chain[0], residbuf, insertion[0],
+                          x, y, z, occ, b, "", element)
 
 
 class Atom(BaseAtom):
@@ -139,3 +180,12 @@ class AtomCollection(SpatialObject):
         centered = self.coords - self.get_center()
         rgyr2 = numpy.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
+
+    def topdb(self):
+        """Return a string representing the AtomCollection in PDB format."""
+        return "\n".join(atom.topdb() for atom in self)
+
+    def writepdb(self, path):
+        """Write the AtomCollection to a PDB formatted file."""
+        with open(path, "wt") as f:
+            print(self.topdb(), file=f)
