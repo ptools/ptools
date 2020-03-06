@@ -69,6 +69,16 @@ class SpatialObject:
         """
         self.transform(matrix)
 
+    def moveby(self, direction):
+        """Translate object coordinates using vector `v`.
+
+        This is an alias for `SpatialObject.translate`.
+
+        Args:
+            v (array[float, int], int): 1 x 3 shaped vector or scalar
+        """
+        self.translate(direction)
+
     def attract_euler_rotate(self, phi, ssi, rot):
         """Rotate object with Attract convention."""
         attract_euler_rotate(self.coords, phi, ssi, rot)
