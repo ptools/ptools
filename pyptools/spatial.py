@@ -5,7 +5,7 @@
 
 import math
 
-import numpy
+import numpy as np
 
 
 class SpatialObject:
@@ -25,6 +25,9 @@ class SpatialObject:
     def coords(self, pos):
         """Set atom cartesian coordinates."""
         self._coords = coord3d(pos)
+
+    def centroid(self):
+        return centroid(self._coords)
 
     def translate(self, v):
         """Translate object coordinates using vector `v`.
@@ -64,8 +67,8 @@ class SpatialObject:
 def coord3d(value=(0, 0, 0)):
     """Convert an object to a 1 x 3 shaped numpy array of floats."""
     if isinstance(value, (int, float)):
-        return numpy.full((3,), value, dtype=float)
-    value = numpy.array(value, dtype=float)
+        return np.full((3,), value, dtype=float)
+    value = np.array(value, dtype=float)
 
     if len(value.shape) == 1:
         if value.shape[0] != 3:
@@ -92,7 +95,7 @@ def translate(coords, v):
         coords (numpy.ndarray): N x 3 shaped array
         v (iterable[float, int]): 1 x 3 shaped vector
     """
-    numpy.add(coords, v, coords)
+    np.add(coords, v, coords)
 
 
 def rotation_by(alpha=0.0, beta=0.0, gamma=0.0):
@@ -111,7 +114,7 @@ def rotation_by(alpha=0.0, beta=0.0, gamma=0.0):
     alpha = math.radians(alpha)
     beta = math.radians(beta)
     gamma = math.radians(gamma)
-    r = numpy.identity(4)
+    r = np.identity(4)
     r[0, 0] = math.cos(beta) * math.cos(gamma)
     r[0, 1] = -math.cos(beta) * math.sin(gamma)
     r[0, 2] = math.sin(beta)
@@ -141,7 +144,7 @@ def rotate_by(coords, alpha=0.0, beta=0.0, gamma=0.0):
 
 def rotate(coords, matrix):
     """In-place rotation of coordinates using a rotation matrix."""
-    coords[:] = numpy.inner(coords, matrix[:3, :3])
+    coords[:] = np.inner(coords, matrix[:3, :3])
 
 
 def transform(coords, matrix):
@@ -160,11 +163,11 @@ def transform(coords, matrix):
     """
     # Reshape coords to N x 4 with the last component being 1.
     n = coords.shape[1]
-    a = numpy.ones((coords.shape[0], n + 1))
+    a = np.ones((coords.shape[0], n + 1))
     a[:, :-1] = coords
 
     # Apply transformation matrix to coordinates.
-    a[:] = numpy.inner(a, matrix)
+    a[:] = np.inner(a, matrix)
 
     # Weight coordinates and reshape into N x 3 again.
     coords[:] = (a[:, 0:n].T / a[:, n]).T
@@ -195,7 +198,7 @@ def attract_euler_rotation(phi, ssi, rot):
     sscp = ss * cp
     sssp = ss * sp
 
-    eulermat = numpy.identity(3)
+    eulermat = np.identity(3)
 
     eulermat[0][0] = crot * cscp + srot * sp
     eulermat[0][1] = srot * cscp - crot * sp
@@ -222,4 +225,19 @@ def attract_euler_rotate(coords, phi, ssi, rot):
         rot (float):
     """
     matrix = attract_euler_rotation(phi, ssi, rot)
-    coords[:] = numpy.inner(coords, matrix)
+    coords[:] = np.inner(coords, matrix)
+
+
+def translation_matrix(direction):
+    """Return the matrix to translate by direction vector."""
+    m = np.identity(4)
+    m[:3, 3] = direction[:3]
+    return m
+
+
+def centroid(x):
+    """Return x centroid.
+
+    Centroid is the average coordinate along axis 0.
+    """
+    return np.mean(x, axis=0)

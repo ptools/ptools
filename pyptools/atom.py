@@ -172,7 +172,7 @@ class AtomCollection(SpatialObject):
     def get_center(self):
         """Return the isobarycenter (geometric center) of a collection of
         atoms."""
-        return sum(self.coords) / len(self)
+        return self.centroid()
 
     def get_radius_of_gyration(self):
         """Return the isometric radius of gyration (atom mass is not taken
