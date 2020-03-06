@@ -59,6 +59,16 @@ class SpatialObject:
         """
         transform(self.coords, matrix)
 
+    def move(self, matrix):
+        """Transform object by 4x4 matrix.
+
+        This is an alias for `SpatialObject.transform`.
+
+        Args:
+            matrix (numpy.ndarray): 4 x 4 matrix.
+        """
+        self.transform(matrix)
+
     def attract_euler_rotate(self, phi, ssi, rot):
         """Rotate object with Attract convention."""
         attract_euler_rotate(self.coords, phi, ssi, rot)
