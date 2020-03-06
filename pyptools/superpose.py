@@ -59,11 +59,11 @@ def fit_matrix(mobile, target):
 
     return result
 
+
 def fit(mobile, target):
     """Fit two RigidBody."""
     matrix = fit_matrix(mobile, target)
     mobile.move(matrix)
-    mobile.writepdb("coucou.pdb")
 
 
 def main():
