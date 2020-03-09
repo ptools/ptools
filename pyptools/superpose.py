@@ -9,7 +9,6 @@ from pyptools import spatial
 from pyptools.rigidbody import RigidBody
 
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 
 class Screw:
@@ -174,6 +173,7 @@ def mat_trans_2_screw(matrix):
         screw.angle = -screw.angle
 
     return screw
+
 
 
 def main():

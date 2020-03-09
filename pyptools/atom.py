@@ -59,7 +59,7 @@ class BaseAtom(SpatialObject):
         self.meta = other.meta
 
     def copy(self):
-        """Return a copy of the current atom."""
+        """Returns a copy of the current atom."""
         return copy.copy(self)
 
     def topdb(self):
@@ -124,7 +124,7 @@ class Atom(BaseAtom):
 
     @property
     def coords(self):
-        """Get atom cartesian coordinates."""
+        """Gets atom cartesian coordinates."""
         return self.collection.coords[self.serial].copy()
 
     @coords.setter
@@ -150,15 +150,15 @@ class AtomCollection(SpatialObject):
         super().__init__(coords)
 
     def copy(self):
-        """Return a copy of the current collection."""
+        """Returns a copy of the current collection."""
         return self.__class__(self.atoms)
 
     def __len__(self):
-        """Get the number of atoms in the collection."""
+        """Gets the number of atoms in the collection."""
         return len(self.atoms)
 
     def size(self):
-        """Get the number of atoms in the collection.
+        """Gets the number of atoms in the collection.
 
         Alias for len(AtomCollection).
         """
@@ -169,27 +169,32 @@ class AtomCollection(SpatialObject):
         return iter(self.atoms)
 
     def __getitem__(self, serial):
-        """Access an atom by its serial number (which the internal index
+        """Accesses an atom by its serial number (which the internal index
         starting at 0)."""
         return self.atoms[serial]
 
     def get_center(self):
-        """Return the isobarycenter (geometric center) of a collection of
+        """Returns the isobarycenter (geometric center) of a collection of
         atoms."""
         return self.centroid()
 
     def get_radius_of_gyration(self):
-        """Return the isometric radius of gyration (atom mass is not taken
+        """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
         centered = self.coords - self.get_center()
         rgyr2 = np.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
 
     def topdb(self):
-        """Return a string representing the AtomCollection in PDB format."""
+        """Returns a string representing the AtomCollection in PDB format."""
         return "\n".join(atom.topdb() for atom in self)
 
     def writepdb(self, path):
-        """Write the AtomCollection to a PDB formatted file."""
+        """Writes the AtomCollection to a PDB formatted file."""
         with open(path, "wt") as f:
             print(self.topdb(), file=f)
+
+    def set_chain(self, chain):
+        """Sets all atom chain property."""
+        for atom in self.atoms:
+            atom.chain = chain

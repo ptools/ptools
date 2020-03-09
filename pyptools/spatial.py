@@ -6,6 +6,8 @@
 import math
 
 import numpy as np
+from scipy.linalg import expm, norm
+from scipy.spatial.transform import Rotation
 
 
 class SpatialObject:
@@ -271,3 +273,30 @@ def norm(u):
 def angle(u, v):
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
+
+
+def rotation_matrix(axis, angle):
+    """Returns the rotation matrix to rotate around the axis by given angle.
+
+    Args:
+        axis (np.array): N x 3
+        angle (float): angle in radians
+
+    Returns:
+        numpy.array: 4 x 4 rotation matrix
+    """
+    r = expm(np.cross(np.identity(3), axis / norm(axis) * angle))
+    m = np.identity(4)
+    m[:3, :3] = r
+    return m
+
+
+def ab_rotation_matrix(A, B, angle):
+    """Returns the rotation matrix to rotate around axis (A, B) by angle (in radians)."""
+    return rotation_matrix(B - A, angle)
+
+
+def ab_rotate(coords, A, B, angle):
+    """Rotates coords around axis (A, B) by angle theta (in radians)."""
+    m = rotation_matrix(B - A, angle)
+    rotate(coords, m)
