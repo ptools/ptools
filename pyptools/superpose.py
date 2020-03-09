@@ -3,11 +3,22 @@
 Superposition methods.
 """
 
+import math
+
 from pyptools import spatial
 from pyptools.rigidbody import RigidBody
 
 import numpy as np
 from scipy.spatial.transform import Rotation
+
+
+class Screw:
+    def __init__(self):
+        self.unit = np.zeros(3)
+        self.normtranslation = 0.0
+        self.point = np.zeros(3)
+        self.angle = 0.0
+
 
 
 def kabsch_matrix(P, Q):
@@ -66,12 +77,111 @@ def fit(mobile, target):
     mobile.move(matrix)
 
 
+def mat_trans_2_screw(matrix):
+    assert matrix.shape == (4, 4)
+
+    EPSILON = 1e-5
+
+    trans = matrix[:3, 3]
+    rotmatrix = matrix[:3, :3]
+
+    x, y, z = rotmatrix[0], rotmatrix[1], rotmatrix[2]
+
+    a = rotmatrix[0][0]
+    b = rotmatrix[1][1]
+    c = rotmatrix[2][2]
+
+    eigenvect = np.zeros(3)
+    screw = Screw()
+
+    if abs(1 + a - b - c) > EPSILON:
+        eigenvect[0] = x[0] + 1 - b - c
+        eigenvect[1] = x[1] + y[0]
+        eigenvect[2] = x[2] + z[0]
+        screw.unit = eigenvect / np.linalg.norm(eigenvect)
+        screw.normtranslation = np.dot(screw.unit, trans)
+
+        s = trans - screw.normtranslation * screw.unit
+        screw.point[0] = 0
+        screw.point[1] = s[2] * z[1] + s[1] * (1 - z[2])
+        screw.point[2] = s[1] * y[2] + s[2] * (1 - y[1])
+        screw.point = screw.point / (1 + x[0] - y[1] - z[2])
+
+    elif abs(1 - a + b - c) > EPSILON:
+        eigenvect[0] = y[0] + x[1]
+        eigenvect[1] = y[1] + 1 - x[0] - z[2]
+        eigenvect[2] = y[2] + z[1]
+
+        screw.unit = eigenvect / np.linalg.norm(eigenvect)
+        screw.normtranslation = np.dot(screw.unit, trans)
+
+        s = trans - screw.normtranslation * screw.unit
+        screw.point[0] =  s.z * z[0] + s[0] * (1 - z[2])
+        screw.point[1] =  0
+        screw.point[2] =  s[0] * x[2] + s[2] * (1 - x[0])
+        screw.point = screw.point / (1 - x[0] + y[1] - z[2])
+
+    elif abs(1 - a - b + c) > EPSILON:
+        eigenvect[0] = z[0] + x[2]
+        eigenvect[1] = z[1] + y[2]
+        eigenvect[2] = z[2] + 1 - x[0] - y[1]
+
+        screw.unitVector = eigenvect / np.linalg.norm(eigenvect)
+        screw.normtranslation = np.dot(screw.unitVector, trans)
+
+        s = trans - screw.normtranslation * screw.unitVector
+        screw.point[0] = s[1] * y[0] + s[0] * (1 - y[1])
+        screw.point[1] = s[0] * x[1] + s[1] * (1 - x[0])
+        screw.point[2] =  0
+        screw.point = screw.point/(1 - x[0] - y[1] + z[2])
+
+    else:     # angle=0
+        screw.point = spatial.coord3d(0, 0, 0)
+        norm_trans = np.norm(trans)
+        if norm_trans != 0:
+            screw.unit = trans / norm_trans
+        else:
+            screw.unit =  spatial.coord3d(0, 0, 1)
+        screw.normtranslation = np.norm(trans)
+        screw.angle = 0
+        return screw
+
+    v = spatial.coord3d((1, 0, 0))
+    if abs(spatial.angle(screw.unit, v)) < 0.1:
+        v = spatial.coord3d((0, 0, 1))
+
+    u = v - np.dot(v, screw.unit) * screw.unit
+    u /= np.linalg.norm(u)
+
+    uprime = np.dot(rotmatrix, u)
+    cost = np.dot(u, uprime)
+    usec = np.cross(screw.unit, u)
+    sint = np.dot(usec, uprime)
+
+    if cost < -1:
+        cost = -1
+    if cost > 1:
+        cost = 1
+
+    screw.angle = math.acos(cost)
+    if sint < 0:
+        screw.angle = -screw.angle
+
+    return screw
+
+
+
+
+
+
+
 def main():
     target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
     mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
     matrix = fit_matrix(mobile, target)
-    print(matrix)
+    mat_trans_2_screw(matrix)
+
 
 
 if __name__ == '__main__':
