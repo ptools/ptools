@@ -1,6 +1,7 @@
 
 """test_spatial - Tests for `pyptools.spatial` module."""
 
+import math
 import unittest
 
 import numpy
@@ -364,3 +365,14 @@ class TestSpatialObjectTransformations(unittest.TestCase):
         matrix = spatial.rotation_by(alpha=10)
         self.obj.rotate(matrix)
         assert_array_almost_equal(self.obj.coords, ref)
+
+
+
+class TestSpatial(unittest.TestCase):
+
+    def test_angle(self):
+        u = (2, 2, 0)
+        v = (0, 3, 0)
+        angle = spatial.angle(u, v)
+        self.assertAlmostEqual(math.degrees(angle), 45)
+

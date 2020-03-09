@@ -261,3 +261,13 @@ def centroid(x):
     Centroid is the average coordinate along axis 0.
     """
     return np.mean(x, axis=0)
+
+
+def norm(u):
+    """Returns the norm of a vector."""
+    return np.linalg.norm(u)
+
+
+def angle(u, v):
+    """Returns the angle between two vectors in radians."""
+    return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
