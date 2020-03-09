@@ -188,3 +188,12 @@ class TestAtomCollection(unittest.TestCase):
         scalar = -4.5
         self.atoms.translate(scalar)
         assert_array_almost_equal(self.atoms.get_center(), (0, 0, 0))
+
+    def test_add(self):
+        atoms2 = AtomCollection([BaseAtom(coords=(i+100, i, i))
+                                 for i in range(10)])
+        all_atoms = self.atoms + atoms2
+        N = len(self.atoms) + len(atoms2)
+        self.assertEqual(len(all_atoms), N)
+
+

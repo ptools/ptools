@@ -173,6 +173,14 @@ class AtomCollection(SpatialObject):
         starting at 0)."""
         return self.atoms[serial]
 
+    def __add__(self, other):
+        """Concatenate two RigidBody instances."""
+        output = self.copy()
+        for atom in other:
+            output.atoms.append(atom.copy())
+            output._coords = np.append(output._coords, atom._coords)
+        return output
+
     def get_center(self):
         """Returns the isobarycenter (geometric center) of a collection of
         atoms."""

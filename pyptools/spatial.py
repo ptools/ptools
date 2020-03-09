@@ -53,6 +53,10 @@ class SpatialObject:
         """Rotate object using rotation matrix."""
         rotate(self.coords, matrix)
 
+    def ab_rotate(self, A, B, angle):
+        """PTools rotation around axis."""
+        ab_rotate(self.coords, A, B, angle)
+
     def transform(self, matrix):
         """Transform object by 4x4 matrix.
 
