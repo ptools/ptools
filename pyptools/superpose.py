@@ -19,6 +19,12 @@ class Screw:
         self.point = np.zeros(3)
         self.angle = 0.0
 
+    def __str__(self):
+        return (f"Screw(unit={self.unit}, "
+                f"normtranslation={self.normtranslation}), "
+                f"point={self.point}), "
+                f"angle={self.angle})")
+
 
 
 def kabsch_matrix(P, Q):
@@ -170,18 +176,12 @@ def mat_trans_2_screw(matrix):
     return screw
 
 
-
-
-
-
-
 def main():
     target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
     mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
     matrix = fit_matrix(mobile, target)
     mat_trans_2_screw(matrix)
-
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ atom groups."""
 import copy
 import math
 
-import numpy
+import numpy as np
 
 from pyptools.spatial import SpatialObject, coord3d
 
@@ -143,7 +143,11 @@ class AtomCollection(SpatialObject):
     def __init__(self, atoms):
         self.atoms = [Atom(atom, serial, self)
                       for serial, atom in enumerate(atoms)]
-        super().__init__([atom._coords for atom in self.atoms])
+        if self.atoms:
+            coords = [atom._coords for atom in self.atoms]
+        else:
+            coords = np.zeros((0, 3))
+        super().__init__(coords)
 
     def copy(self):
         """Return a copy of the current collection."""
@@ -178,7 +182,7 @@ class AtomCollection(SpatialObject):
         """Return the isometric radius of gyration (atom mass is not taken
         into account)."""
         centered = self.coords - self.get_center()
-        rgyr2 = numpy.sum(centered ** 2) / len(self)
+        rgyr2 = np.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
 
     def topdb(self):
