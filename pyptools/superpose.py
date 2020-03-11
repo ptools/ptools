@@ -142,12 +142,12 @@ def mat_trans_2_screw(matrix):
 
     else:     # angle=0
         screw.point = spatial.coord3d(0, 0, 0)
-        norm_trans = np.norm(trans)
+        norm_trans = np.linalg.norm(trans)
         if norm_trans != 0:
             screw.unit = trans / norm_trans
         else:
             screw.unit =  spatial.coord3d(0, 0, 1)
-        screw.normtranslation = np.norm(trans)
+        screw.normtranslation = np.linalg.norm(trans)
         screw.angle = 0
         return screw
 
@@ -182,7 +182,6 @@ def main():
 
     matrix = fit_matrix(mobile, target)
     mat_trans_2_screw(matrix)
-
 
 if __name__ == '__main__':
     main()
