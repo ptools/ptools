@@ -178,7 +178,7 @@ class AtomCollection(SpatialObject):
         output = self.copy()
         for atom in other:
             output.atoms.append(atom.copy())
-            output._coords = np.append(output._coords, atom._coords)
+            output._coords = np.vstack((output._coords, atom._coords))
         return output
 
     def get_center(self):
