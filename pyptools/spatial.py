@@ -101,6 +101,7 @@ def coord3d(value=(0, 0, 0), *args):
             bad_coord3d_initialization()
         elif len(args) != 2:
             bad_coord3d_initialization()
+        value = (value, args[0], args[1])
 
     if isinstance(value, (int, float)):
         return np.full((3,), value, dtype=float)
