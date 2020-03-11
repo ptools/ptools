@@ -90,8 +90,18 @@ class SpatialObject:
         attract_euler_rotate(self.coords, phi, ssi, rot)
 
 
-def coord3d(value=(0, 0, 0)):
+def coord3d(value=(0, 0, 0), *args):
     """Convert an object to a 1 x 3 shaped numpy array of floats."""
+    def bad_coord3d_initialization():
+        args_s = ", ".join(f"{str(a)}" for a in args)
+        raise ValueError(f"Bad coord3d initialization: coord3d({value}, {args_s})")
+
+    if args:
+        if not isinstance(value, (int, float)):
+            bad_coord3d_initialization()
+        elif len(args) != 2:
+            bad_coord3d_initialization()
+
     if isinstance(value, (int, float)):
         return np.full((3,), value, dtype=float)
     value = np.array(value, dtype=float)
@@ -304,3 +314,30 @@ def ab_rotate(coords, A, B, angle):
     """Rotates coords around axis (A, B) by angle theta (in radians)."""
     m = rotation_matrix(B - A, angle)
     rotate(coords, m)
+
+
+def main():
+    euler_angles = [-12, 7, 13.5]
+    r_ptools = attract_euler_rotation(*euler_angles)
+
+    from itertools import permutations
+
+    np.set_printoptions(precision=2)
+
+    print("PTools:")
+    print(r_ptools)
+    print()
+
+    print("scipy.spatial.transform.Rotation.from_euler:")
+
+
+    for perm in permutations("xyz"):
+        perm = ''.join(perm)
+        r = Rotation.from_euler(perm, euler_angles).as_matrix()
+        print(f"perm={perm}:")
+        print(r)
+        print()
+
+
+if __name__ == '__main__':
+    main()
