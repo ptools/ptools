@@ -331,7 +331,6 @@ def main():
 
     print("scipy.spatial.transform.Rotation.from_euler:")
 
-
     for perm in permutations("xyz"):
         perm = ''.join(perm)
         r = Rotation.from_euler(perm, euler_angles).as_matrix()

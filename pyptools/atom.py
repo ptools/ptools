@@ -8,6 +8,7 @@ import math
 import numpy as np
 
 from pyptools.spatial import SpatialObject, coord3d
+from . import tables
 
 
 # The Protein Data Bank format for atom coordinates
@@ -30,7 +31,8 @@ class BaseAtom(SpatialObject):
     """
 
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
-                 resid=0, charge=0.0, coords=(0, 0, 0), meta={}, orig=None):
+                 resid=0, charge=0.0, coords=(0, 0, 0), meta={},
+                 orig=None):
         if orig is not None:
             self._init_copy(orig)
         else:
@@ -47,6 +49,8 @@ class BaseAtom(SpatialObject):
         self.resid = resid
         self.charge = charge
         self.meta = meta
+        self.element = guess_atom_element(self.name)
+        self.mass = guess_atom_mass(self.element)
 
     def _init_copy(self, other):
         super().__init__(other.coords)
@@ -57,18 +61,14 @@ class BaseAtom(SpatialObject):
         self.resid = other.resid
         self.charge = other.charge
         self.meta = other.meta
+        self.element = other.element
+        self.mass = other.mass
 
     def copy(self):
         """Returns a copy of the current atom."""
         return copy.copy(self)
 
     def topdb(self):
-        def first_alpha(s):
-            for c in s:
-                if c.isalpha():
-                    return c
-            return ""
-
         rec = "ATOM"
         indexbuf = "*****"
         residbuf = "****"
@@ -77,7 +77,7 @@ class BaseAtom(SpatialObject):
         chain = " " if not self.chain else self.chain
         occ = 1.0
         b = 0.0
-        element = first_alpha(self.name)
+        element = self.element
 
         if self.index < 100000:
             indexbuf = "{0:5d}".format(self.index)
@@ -149,6 +149,10 @@ class AtomCollection(SpatialObject):
             coords = np.zeros((0, 3))
         super().__init__(coords)
 
+    def masses(self):
+        """Returns the array of atom masses."""
+        return np.array([atom.mass for atom in self.atoms])
+
     def copy(self):
         """Returns a copy of the current collection."""
         return self.__class__(self.atoms)
@@ -206,3 +210,19 @@ class AtomCollection(SpatialObject):
         """Sets all atom chain property."""
         for atom in self.atoms:
             atom.chain = chain
+
+
+def guess_atom_element(atom_name):
+    """Returns the atom element based on its name.
+
+    Basically returns the first non-numeric character in atom_name.
+    """
+    for c in atom_name:
+        if c.isalpha():
+            return c
+    return ""
+
+
+def guess_atom_mass(element):
+    """Returns the atom mass based on the element name."""
+    return tables.masses.get(element, 0.0)
