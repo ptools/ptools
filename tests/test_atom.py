@@ -167,12 +167,12 @@ class TestAtomCollection(unittest.TestCase):
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
-    def test_get_center(self):
-        center = self.atoms.get_center()
+    def test_center(self):
+        center = self.atoms.center()
         assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
-    def test_get_radius_of_gyration(self):
-        rgyr = self.atoms.get_radius_of_gyration()
+    def test_radius_of_gyration(self):
+        rgyr = self.atoms.radius_of_gyration()
         # Reference value calculated with VMD.
         self.assertAlmostEqual(rgyr, 4.9749369621276855, places=6)
 
@@ -180,14 +180,14 @@ class TestAtomCollection(unittest.TestCase):
         # Translate is a method herited from `spatial.SpatialObject`.
         # Basically is should work on any child class.
         origin = (0, 0, 0)
-        center = self.atoms.get_center()
+        center = self.atoms.center()
         self.atoms.translate(origin - center)
-        assert_array_almost_equal(self.atoms.get_center(), (0, 0, 0))
+        assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
 
     def test_translate_scalar(self):
         scalar = -4.5
         self.atoms.translate(scalar)
-        assert_array_almost_equal(self.atoms.get_center(), (0, 0, 0))
+        assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
 
     def test_add(self):
         atoms2 = AtomCollection([BaseAtom(coords=(i+100, i, i))

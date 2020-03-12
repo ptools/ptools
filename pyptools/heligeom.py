@@ -29,8 +29,6 @@ def extend(hp, mono1, N, Z=False):
         raise NotImplementedError("not implemented yet")
     monoTest.set_chain(string.ascii_uppercase[i % 26])
 
-    print(final.coords.shape)
-
     final += monoTest
 
     i += 1

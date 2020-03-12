@@ -185,15 +185,15 @@ class AtomCollection(SpatialObject):
             output._coords = np.vstack((output._coords, atom._coords))
         return output
 
-    def get_center(self):
+    def center(self):
         """Returns the isobarycenter (geometric center) of a collection of
         atoms."""
         return self.centroid()
 
-    def get_radius_of_gyration(self):
+    def radius_of_gyration(self):
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
-        centered = self.coords - self.get_center()
+        centered = self.coords - self.center()
         rgyr2 = np.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
 

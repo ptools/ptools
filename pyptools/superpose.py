@@ -55,8 +55,8 @@ def kabsch_matrix(P, Q):
 
 def fit_matrix(mobile, target):
     """Return the fit matrix between two RigidBody."""
-    t0 = target.get_center()
-    t1 = mobile.get_center()
+    t0 = target.center()
+    t1 = mobile.center()
 
     # Center to origin.
     coords_target = target.coords - t0
@@ -177,11 +177,23 @@ def mat_trans_2_screw(matrix):
 
 
 def main():
-    target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
-    matrix = fit_matrix(mobile, target)
-    mat_trans_2_screw(matrix)
+    r = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
+
+    print(r.get_center())
+
+    exit()
+
+
+
+
+
+
+    # target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
+    # mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
+
+    # matrix = fit_matrix(mobile, target)
+    # mat_trans_2_screw(matrix)
 
 if __name__ == '__main__':
     main()
