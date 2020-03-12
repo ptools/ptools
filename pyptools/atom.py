@@ -190,6 +190,38 @@ class AtomCollection(SpatialObject):
         atoms."""
         return self.centroid()
 
+    def center_of_mass(self):
+        """Return the center of mass (barycenter)."""
+        weights = self.masses().reshape(-1, 1)
+        return (self.coords * weights).sum(axis=0)  / weights.sum()
+
+    def moment_of_inertia(self):
+        masses = self.masses()
+        com = self.center_of_mass()
+        pos = self.coords - com
+
+        tens = np.zeros((3, 3))
+
+        tens[0][0] = (masses * (pos[:, 1] ** 2 + pos[:, 2] ** 2)).sum()
+        tens[0][1] = - (masses * pos[:, 0] * pos[:, 1]).sum()
+        tens[0][2] = - (masses * pos[:, 0] * pos[:, 2]).sum()
+
+        tens[1][0] = tens[0][1]
+        tens[1][1] = (masses * (pos[:, 0] ** 2 + pos[:, 2] ** 2)).sum()
+        tens[1][2] = - (masses * pos[:, 1] * pos[:, 2]).sum()
+
+        tens[2][0] = tens[0][2]
+        tens[2][1] = tens[1][2]
+        tens[2][2] = (masses * (pos[:, 0] ** 2 + pos[:, 1] ** 2)).sum()
+
+        return tens
+
+    def principal_axes(self):
+        """Calculate the principal axes."""
+        val, vec = np.linalg.eig(self.moment_of_inertia())
+        indices = np.argsort(val)[::-1]
+        return vec[:, indices].T
+
     def radius_of_gyration(self):
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""

@@ -177,23 +177,11 @@ def mat_trans_2_screw(matrix):
 
 
 def main():
+    target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
+    mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
-    r = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
-
-    print(r.get_center())
-
-    exit()
-
-
-
-
-
-
-    # target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    # mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
-
-    # matrix = fit_matrix(mobile, target)
-    # mat_trans_2_screw(matrix)
+    matrix = fit_matrix(mobile, target)
+    mat_trans_2_screw(matrix)
 
 if __name__ == '__main__':
     main()
