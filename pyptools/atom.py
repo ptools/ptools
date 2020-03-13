@@ -140,7 +140,7 @@ class AtomCollection(SpatialObject):
     Args:
         atoms (list[BaseAtom]): list of atoms
     """
-    def __init__(self, atoms):
+    def __init__(self, atoms=[]):
         self.atoms = [Atom(atom, serial, self)
                       for serial, atom in enumerate(atoms)]
         if self.atoms:

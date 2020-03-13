@@ -146,9 +146,14 @@ class TestAtomCollection(unittest.TestCase):
         self.atoms = AtomCollection([BaseAtom(coords=(i, i, i))
                                      for i in range(10)])
 
-    def test_constructor(self):
+    def test_initialization(self):
         self.assertEqual(len(self.atoms.atoms), 10)
         self.assertEqual(self.atoms.coords.shape, (10, 3))
+
+    def test_initialization_empty(self):
+        atoms = AtomCollection()
+        self.assertEqual(len(atoms.atoms), 0)
+        self.assertEqual(atoms.coords.shape, (0, 3))
 
     def _assert_copy_successful(self, thecopy):
         # Check that both AtomCollections have the same dimensions.
@@ -161,11 +166,11 @@ class TestAtomCollection(unittest.TestCase):
         self.atoms.coords.fill(0)
         assert_array_equal(thecopy.coords, ref_coords)
 
-    def test_copy_constructor1(self):
+    def test_copy_initialization1(self):
         thecopy = self.atoms.copy()
         self._assert_copy_successful(thecopy)
 
-    def test_copy_constructor2(self):
+    def test_copy_initialization2(self):
         thecopy = AtomCollection.copy(self.atoms)
         self._assert_copy_successful(thecopy)
 
