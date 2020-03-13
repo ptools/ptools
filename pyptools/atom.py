@@ -42,7 +42,7 @@ class BaseAtom(SpatialObject):
     def _init_non_copy(self, index, name, resname, chain, resid, charge,
                        coords, meta):
         super().__init__(coords)
-        self.name = name
+        self._name = name
         self.resname = resname
         self.chain = chain
         self.index = index
@@ -52,9 +52,19 @@ class BaseAtom(SpatialObject):
         self.element = guess_atom_element(self.name)
         self.mass = guess_atom_mass(self.element)
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, s):
+        self._name = s
+        self.element = guess_atom_element(self.name)
+        self.mass = guess_atom_mass(self.element)
+
     def _init_copy(self, other):
         super().__init__(other.coords)
-        self.name = other.name
+        self._name = other._name
         self.resname = other.resname
         self.chain = other.chain
         self.index = other.index
@@ -257,4 +267,4 @@ def guess_atom_element(atom_name):
 
 def guess_atom_mass(element):
     """Returns the atom mass based on the element name."""
-    return tables.masses.get(element, 0.0)
+    return tables.masses.get(element, 1.0)

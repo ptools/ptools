@@ -3,8 +3,9 @@
 
 import unittest
 
-import numpy
+import numpy as np
 
+import pyptools
 from pyptools.atom import BaseAtom, Atom, AtomCollection
 
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal
@@ -178,6 +179,10 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(self.atoms), 10)
 
     def test_size(self):
+        self.assertEqual(self.atoms.size(), 10)
+
+
+    def test_size(self):
         self.assertEqual(len(self.atoms), 10)
 
     def test_isiterable(self):
@@ -186,7 +191,7 @@ class TestAtomCollection(unittest.TestCase):
         iter(self.atoms)
 
     def test_coordinates(self):
-        ref_coords = numpy.array([[i, i, i] for i in range(10)], dtype=float)
+        ref_coords = np.array([[i, i, i] for i in range(10)], dtype=float)
         assert_array_almost_equal(self.atoms.coords, ref_coords)
 
     def test_set_atom_coordinates_from_array(self):
@@ -204,9 +209,35 @@ class TestAtomCollection(unittest.TestCase):
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
+
+    def test_update_name(self):
+        # Updating an atom's name should also update its type and mass.
+        for i in range(10):
+            self.atoms[i].name = "CA"
+        self.assertEqual("".join(at.element for at in self.atoms),
+                         "C" * len(self.atoms))
+
+        mass_ref = pyptools.tables.masses["C"]
+        assert_array_almost_equal(self.atoms.masses(),
+                                  np.ones(len(self.atoms)) * mass_ref)
+
     def test_center(self):
         center = self.atoms.center()
         assert_array_almost_equal(center, [4.5, 4.5, 4.5])
+
+    def test_center_of_masses(self):
+        # Masses are 1. COM should be same as center
+        center = self.atoms.center_of_mass()
+        assert_array_almost_equal(center, [4.5, 4.5, 4.5])
+
+        # Set masses to 12 (in principle, updating an atom's name
+        # should also update its type).
+        for i in range(5):
+            self.atoms[i].name = "CA"
+        for i in range(5, 10):
+            self.atoms[i].name = "NZ"
+        center = self.atoms.center_of_mass()
+        assert_array_almost_equal(center, [4.69179, 4.69179, 4.69179])
 
     def test_radius_of_gyration(self):
         rgyr = self.atoms.radius_of_gyration()
@@ -232,5 +263,9 @@ class TestAtomCollection(unittest.TestCase):
         all_atoms = self.atoms + atoms2
         N = len(self.atoms) + len(atoms2)
         self.assertEqual(len(all_atoms), N)
+
+    def test_masses(self):
+        # atoms name "XXX" should weight 0
+        assert_array_equal(self.atoms.masses(), np.ones(10))
 
 
