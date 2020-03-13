@@ -7,7 +7,8 @@ import tempfile
 import numpy as np
 
 import pyptools
-from pyptools.atom import BaseAtom, Atom, AtomCollection
+from pyptools.atom import (BaseAtom, Atom, AtomCollection, guess_atom_element,
+                           guess_atom_mass)
 
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal
 
@@ -306,3 +307,36 @@ class TestAtomCollection(unittest.TestCase):
         # Close (and delete) temporary file.
         f.close()
 
+    def test_set_chain(self):
+        self.atoms.set_chain("A")
+        self.assertEqual("".join(a.chain for a in self.atoms), "A" * len(self.atoms))
+        self.atoms.set_chain("B")
+        self.assertEqual("".join(a.chain for a in self.atoms), "B" * len(self.atoms))
+
+
+class TestGuessAtomName(unittest.TestCase):
+    def test_basic(self):
+        self.assertEqual(guess_atom_element("CA"), "C")
+        self.assertEqual(guess_atom_element("NZ"), "N")
+
+    def test_has_numeric(self):
+        self.assertEqual(guess_atom_element("CA1"), "C")
+
+    def test_starts_with_numeric(self):
+        self.assertEqual(guess_atom_element("1CA"), "C")
+
+    def test_has_only_numeric(self):
+        self.assertEqual(guess_atom_element("111"), "X")
+
+
+class TestGuessAtomMass(unittest.TestCase):
+    def test_basic(self):
+        self.assertAlmostEqual(guess_atom_mass("C"), 12.01100)
+        self.assertAlmostEqual(guess_atom_mass("H"), 1.00800)
+        self.assertAlmostEqual(guess_atom_mass("O"), 15.99900)
+        self.assertAlmostEqual(guess_atom_mass("N"), 14.00700)
+        self.assertAlmostEqual(guess_atom_mass("P"), 30.97400)
+        self.assertAlmostEqual(guess_atom_mass("S"), 32.06000)
+
+    def test_element_does_not_exists(self):
+        self.assertAlmostEqual(guess_atom_mass("DUMMY"), 1.0)

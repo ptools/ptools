@@ -262,7 +262,7 @@ def guess_atom_element(atom_name):
     for c in atom_name:
         if c.isalpha():
             return c
-    return ""
+    return "X"
 
 
 def guess_atom_mass(element):
