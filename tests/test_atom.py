@@ -87,7 +87,33 @@ class TestBaseAtom(unittest.TestCase):
     def test_topdb(self):
         atom = BaseAtom(name="CA", resname="ALA", chain="A",
                         index=42, resid=17, charge=2.0, coords=(1, 2, 3))
-        reference_string = "ATOM     42  CA  ALA A  17       1.000   2.000   3.000  1.00  0.00           C"
+        reference_string = ("ATOM     42  CA  ALA A  17       "
+                            "1.000   2.000   3.000  1.00  0.00           "
+                            "C")
+        self.assertEqual(atom.topdb(), reference_string)
+
+    def test_topdb_long_atomid(self):
+        atom = BaseAtom(name="CA", resname="ALA", chain="A",
+                        index=110000, resid=17, charge=2.0, coords=(1, 2, 3))
+        reference_string = ("ATOM  1adb0  CA  ALA A  17       "
+                            "1.000   2.000   3.000  1.00  0.00           "
+                            "C")
+        self.assertEqual(atom.topdb(), reference_string)
+
+    def test_topdb_long_resid(self):
+        atom = BaseAtom(name="CA", resname="ALA", chain="A",
+                        index=42, resid=11000, charge=2.0, coords=(1, 2, 3))
+        reference_string = ("ATOM     42  CA  ALA A2af8       "
+                            "1.000   2.000   3.000  1.00  0.00           "
+                            "C")
+        self.assertEqual(atom.topdb(), reference_string)
+
+    def test_topdb_long_atom_name(self):
+        atom = BaseAtom(name="CA1", resname="ALA", chain="A",
+                        index=42, resid=17, charge=2.0, coords=(1, 2, 3))
+        reference_string = ("ATOM     42  CA1 ALA A  17       "
+                            "1.000   2.000   3.000  1.00  0.00           "
+                            "C")
         self.assertEqual(atom.topdb(), reference_string)
 
 
