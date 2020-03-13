@@ -2,6 +2,7 @@
 """test_atom - Tests for `pyptools.atom` module."""
 
 import unittest
+import tempfile
 
 import numpy as np
 
@@ -286,6 +287,22 @@ class TestAtomCollection(unittest.TestCase):
         I = atoms.principal_axes()
         assert_array_almost_equal(I, ref)
 
+    def test_to_pdb(self):
+        s = self.atoms.topdb()
+        for i, line in enumerate(s.splitlines()):
+            self.assertEqual(line, self.atoms[i].topdb())
 
+    def test_writepdb(self):
+        # Write PDB to temporary file.
+        f = tempfile.NamedTemporaryFile()
+        self.atoms.writepdb(f.name)
 
+        # Read file back to check what's been written.
+        with open(f.name, "rt") as f:
+            s = f.read().rstrip()
+
+        self.assertEqual(s, self.atoms.topdb())
+
+        # Close (and delete) temporary file.
+        f.close()
 
