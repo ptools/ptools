@@ -10,6 +10,8 @@ from pyptools.atom import BaseAtom, Atom, AtomCollection
 
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal
 
+from . import TEST_LIGAND
+
 
 class TestBaseAtom(unittest.TestCase):
 
@@ -181,10 +183,6 @@ class TestAtomCollection(unittest.TestCase):
     def test_size(self):
         self.assertEqual(self.atoms.size(), 10)
 
-
-    def test_size(self):
-        self.assertEqual(len(self.atoms), 10)
-
     def test_isiterable(self):
         # If an exeception is raised here, AtomCollection is not iterable
         # which is not what we want.
@@ -267,5 +265,27 @@ class TestAtomCollection(unittest.TestCase):
     def test_masses(self):
         # atoms name "XXX" should weight 0
         assert_array_equal(self.atoms.masses(), np.ones(10))
+
+    def test_moment_of_inertia(self):
+        # Calculated with MDAnalysis 0.20.1:
+        # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
+        atoms = pyptools.io.read_pdb(TEST_LIGAND)
+        ref = [[3679339.47775172,  694837.16289436, -263651.10452372],
+               [ 694837.16289436, 3803047.59374612, -194611.71739629],
+               [-263651.10452372, -194611.71739629, 3425042.27240564]]
+        I = atoms.moment_of_inertia()
+        assert_array_almost_equal(I, ref, decimal=2)
+
+    def test_principal_axes(self):
+        atoms = pyptools.io.read_pdb(TEST_LIGAND)
+        # Calculated with MDAnalysis 0.20.1:
+        # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()
+        ref = [[ 0.65682984,  0.70033642, -0.27946997],
+               [ 0.04052252,  0.33731064,  0.94052084],
+               [ 0.7529492 , -0.62908698,  0.1931763 ]]
+        I = atoms.principal_axes()
+        assert_array_almost_equal(I, ref)
+
+
 
 
