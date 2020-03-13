@@ -309,41 +309,52 @@ class TestTransformation(unittest.TestCase):
 
 
 class TestCoord3D(unittest.TestCase):
-
-    def test_empty_constructor(self):
+    def test_initialization_default(self):
         c = spatial.coord3d()
         self.assertEqual(c.shape, (3, ))
         assert_array_almost_equal(c, (0, 0, 0))
 
-    def test_constructor_scalar(self):
+    def test_initialization_scalar(self):
         c = spatial.coord3d(1)
         self.assertEqual(c.shape, (3, ))
         assert_array_almost_equal(c, (1, 1, 1))
 
-    def test_constructor_vector(self):
+    def test_initialization_vector(self):
         c = spatial.coord3d([1, 2, 3])
         self.assertEqual(c.shape, (3, ))
         assert_array_almost_equal(c, (1, 2, 3))
 
-    def test_constructor_vector_fails(self):
+    def test_initialization_mixed(self):
+        err = "Bad coord3d initialization"
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d(12, 1)
+
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d(12, 1, 2, 3)
+
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.coord3d((1, 2), 3)
+
+
+    def test_initialization_bad_dimensions(self):
         err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d([2, 2])
 
-    def test_constructor_array(self):
+    def test_initialization_array(self):
         array = ((0, 0, 0), (1, 1, 1))
         c = spatial.coord3d(array)
         self.assertEqual(c.shape, (2, 3))
         assert_array_almost_equal(c[0], (0, 0, 0))
         assert_array_almost_equal(c[1], (1, 1, 1))
 
-    def test_constructor_array_fails(self):
+    def test_initialization_array_bad_dimensions(self):
         array = ((0, 0, 0, 0), (1, 1, 1, 1))
         err = '3-d coordinate array should be N x 3'
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(array)
 
-    def test_constructor_array_fails2(self):
+    def test_initialization_array_fails_more_than_2_dimensions(self):
         """Test raises the appropriate exeception when array has more that
         2 dimensions."""
         array = (((0, 0, 0, 0), (1, 1, 1, 1)),
