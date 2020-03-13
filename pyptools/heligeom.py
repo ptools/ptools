@@ -43,10 +43,7 @@ def extend(hp, mono1, N, Z=False):
     return final
 
 
-
-
-
-def main():
+def main():  # pragma: no cover
     import pyptools
 
     mono1 = pyptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
@@ -58,7 +55,5 @@ def main():
     print(result.topdb())
 
 
-
-
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

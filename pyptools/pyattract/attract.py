@@ -48,5 +48,5 @@ def main(args=None):
 #             print("Rotation {}/{}".format(rotnb, len(rotations)))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

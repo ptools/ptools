@@ -335,7 +335,6 @@ class TestCoord3D(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d((1, 2), 3)
 
-
     def test_initialization_bad_dimensions(self):
         err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
         with self.assertRaisesRegex(ValueError, err):
@@ -376,7 +375,6 @@ class TestSpatialObjectTransformations(unittest.TestCase):
         matrix = spatial.rotation_by(alpha=10)
         self.obj.rotate(matrix)
         assert_array_almost_equal(self.obj.coords, ref)
-
 
 
 class TestSpatial(unittest.TestCase):

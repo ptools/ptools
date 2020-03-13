@@ -317,7 +317,7 @@ def ab_rotate(coords, A, B, angle):
     rotate(coords, m)
 
 
-def main():
+def main():  # pragma: no cover
     euler_angles = [-12, 7, 13.5]
     r_ptools = attract_euler_rotation(*euler_angles)
 
@@ -340,4 +340,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main() # pragma: no cover
