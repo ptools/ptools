@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use pyptools in a project::
+To use ptools in a project::
 
-    import pyptools
+    import ptools

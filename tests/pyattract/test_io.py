@@ -3,7 +3,7 @@
 
 import unittest
 
-import pyptools.pyattract.io as io
+import ptools.pyattract.io as io
 
 from . import (TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND,
                TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT,
@@ -66,7 +66,7 @@ class TestAttractIO(unittest.TestCase):
 
     def test_read_forcefield_from_reduced_bad_ff(self):
         # Replace force field name with a bad one i.e. not defined
-        # in `pyptools.pyattract.PYATTRACT_FORCEFIELDS`.
+        # in `ptools.pyattract.PYATTRACT_FORCEFIELDS`.
         content = TEST_DUM_RED_CONTENT.replace('ATTRACT1', 'FOO')
         # Make sure the proper exeception is raised.
         tmpfile = mk_tmp_file(content=content)

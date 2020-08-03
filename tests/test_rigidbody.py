@@ -1,9 +1,9 @@
 
-"""test_rigidbody - Tests for `pyptools.rigidbody module."""
+"""test_rigidbody - Tests for `ptools.rigidbody module."""
 
 import unittest
 
-from pyptools.rigidbody import RigidBody, AttractRigidBody
+from ptools.rigidbody import RigidBody, AttractRigidBody
 
 from . import TEST_PDB, TEST_RED
 from .testing.io import mk_tmp_file

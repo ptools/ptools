@@ -3,10 +3,10 @@ import math
 import os
 import unittest
 
-import pyptools
-from pyptools import RigidBody
-from pyptools.heligeom import heli_analyze
-from pyptools.spatial import coord3d
+import ptools
+from ptools import RigidBody
+from ptools.heligeom import heli_analyze
+from ptools.spatial import coord3d
 
 
 TEST_1A74_PROT_RED = os.path.join(os.path.dirname(__file__), 'data', '1A74_prot.red')

@@ -51,7 +51,7 @@ clean-test: ## remove test and coverage artifacts
 lint: lint-package lint-tests ## check style with flake8
 
 lint-package:
-	flake8 --ignore=E501 pyptools
+	flake8 --ignore=E501 ptools
 
 lint-tests:
 	# Ignore whitespaces in matrix definitinos
@@ -64,13 +64,13 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	py.test --cov-report term-missing --cov=pyptools tests/
+	py.test --cov-report term-missing --cov=ptools tests/
 
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/pyptools.rst
+	rm -f docs/ptools.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ pyptools
+	sphinx-apidoc -o docs/ ptools
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html

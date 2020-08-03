@@ -1,8 +1,8 @@
 
 import unittest
 
-from pyptools.rigidbody import AttractRigidBody
-from pyptools.forcefield import ForceField, AttractForceField1
+from ptools.rigidbody import AttractRigidBody
+from ptools.forcefield import ForceField, AttractForceField1
 
 from .pyattract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_equal

@@ -3,8 +3,8 @@
 Some more documentation coming soon.
 """
 
-import pyptools
-from pyptools.superpose import mat_trans_2_screw, fit_matrix
+import ptools
+from ptools.superpose import mat_trans_2_screw, fit_matrix
 
 import string
 
@@ -20,7 +20,7 @@ def heli_construct(mono1, hp, N, Z=False):
 
 
 def extend(hp, mono1, N, Z=False):
-    final = pyptools.RigidBody()
+    final = ptools.RigidBody()
     monoTest = mono1.copy()
     i = 0
     O = hp.point
@@ -44,10 +44,10 @@ def extend(hp, mono1, N, Z=False):
 
 
 def main():  # pragma: no cover
-    import pyptools
+    import ptools
 
-    mono1 = pyptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    mono2 = pyptools.RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
+    mono1 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
+    mono2 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
     hp = heli_analyze(mono1, mono2)
     result = heli_construct(mono1, hp, 10)

@@ -4,7 +4,7 @@
 
 import argparse
 
-# from pyptools.rigidbody import AttractRigidBody
+# from ptools.rigidbody import AttractRigidBody
 
 
 def parse_command_line(args=None):

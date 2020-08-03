@@ -1,9 +1,9 @@
 
-"""test_io - Tests for `pyptools.io` module."""
+"""test_io - Tests for `ptools.io` module."""
 
 import unittest
 
-import pyptools.io as io
+import ptools.io as io
 
 from . import TEST_PDB, TEST_PDB_ATOM_NAMES
 from .testing.io import random_filename

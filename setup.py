@@ -18,19 +18,19 @@ test_requirements = [
 ]
 
 setup(
-    name='pyptools',
+    name='ptools',
     version='0.1.0',
     description="New PTools: a fully pythonic PTools",
     long_description=readme + '\n\n' + history,
     author="Benoist LAURENT",
     author_email='benoistlaurent@gmail.com',
-    url='https://github.com/benoistlaurent/pyptools',
+    url='https://github.com/benoistlaurent/ptools-python',
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
     license="GNU General Public License v3",
     zip_safe=False,
-    keywords='pyptools',
+    keywords='ptools',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

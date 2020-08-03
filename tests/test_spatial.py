@@ -1,5 +1,5 @@
 
-"""test_spatial - Tests for `pyptools.spatial` module."""
+"""test_spatial - Tests for `ptools.spatial` module."""
 
 import math
 import unittest
@@ -8,7 +8,7 @@ import numpy
 import pytest
 
 
-import pyptools.spatial as spatial
+import ptools.spatial as spatial
 
 
 from .testing.moreassert import assert_array_almost_equal

@@ -1,13 +1,13 @@
 
-"""test_atom - Tests for `pyptools.atom` module."""
+"""test_atom - Tests for `ptools.atom` module."""
 
 import unittest
 import tempfile
 
 import numpy as np
 
-import pyptools
-from pyptools.atom import (BaseAtom, Atom, AtomCollection, guess_atom_element,
+import ptools
+from ptools.atom import (BaseAtom, Atom, AtomCollection, guess_atom_element,
                            guess_atom_mass)
 
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal
@@ -217,7 +217,7 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual("".join(at.element for at in self.atoms),
                          "C" * len(self.atoms))
 
-        mass_ref = pyptools.tables.masses["C"]
+        mass_ref = ptools.tables.masses["C"]
         assert_array_almost_equal(self.atoms.masses(),
                                   np.ones(len(self.atoms)) * mass_ref)
 
@@ -271,7 +271,7 @@ class TestAtomCollection(unittest.TestCase):
     def test_moment_of_inertia(self):
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
-        atoms = pyptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
         ref = [[3679339.47775172,  694837.16289436, -263651.10452372],
                [ 694837.16289436, 3803047.59374612, -194611.71739629],
                [-263651.10452372, -194611.71739629, 3425042.27240564]]
@@ -279,7 +279,7 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(I, ref, decimal=2)
 
     def test_principal_axes(self):
-        atoms = pyptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()
         ref = [[ 0.65682984,  0.70033642, -0.27946997],

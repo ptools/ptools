@@ -1,10 +1,10 @@
 
-"""test_pairlist - Tests for `pyptools.pairlist` module."""
+"""test_pairlist - Tests for `ptools.pairlist` module."""
 
 import unittest
 
-from pyptools.rigidbody import RigidBody
-from pyptools.pairlist import PairList
+from ptools.rigidbody import RigidBody
+from ptools.pairlist import PairList
 
 from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal

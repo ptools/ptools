@@ -1,5 +1,5 @@
 
-"""pyptools.spatial - Defines classes and functions to work on spatial
+"""ptools.spatial - Defines classes and functions to work on spatial
 (mostly 3D) data."""
 
 

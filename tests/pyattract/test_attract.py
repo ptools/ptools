@@ -1,12 +1,12 @@
 
-"""test_attract - Tests for `pyptools.pyattract.attract`."""
+"""test_attract - Tests for `ptools.pyattract.attract`."""
 
 import sys
 import unittest
 
 import pytest
 
-import pyptools.pyattract.attract as attract
+import ptools.pyattract.attract as attract
 
 from . import TEST_RECEPTOR_RED, TEST_LIGAND_RED
 

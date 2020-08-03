@@ -4,10 +4,10 @@ import sys
 import unittest
 
 
-from pyptools.rigidbody import RigidBody
-import pyptools.superpose as superpose
-from pyptools.superpose import Screw
-from pyptools.spatial import coord3d
+from ptools.rigidbody import RigidBody
+import ptools.superpose as superpose
+from ptools.superpose import Screw
+from ptools.spatial import coord3d
 
 from scipy.spatial.transform import Rotation
 

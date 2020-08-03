@@ -5,8 +5,8 @@ Superposition methods.
 
 import math
 
-from pyptools import spatial
-from pyptools.rigidbody import RigidBody
+from ptools import spatial
+from ptools.rigidbody import RigidBody
 
 import numpy as np
 

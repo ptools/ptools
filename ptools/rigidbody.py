@@ -1,5 +1,5 @@
 
-"""pyptools.rigidbody - Defines the RigidBody class and children."""
+"""ptools.rigidbody - Defines the RigidBody class and children."""
 
 import numpy
 

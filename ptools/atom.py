@@ -1,5 +1,5 @@
 
-"""pyptools.atom - Defines classes and function that handle atom and
+"""ptools.atom - Defines classes and function that handle atom and
 atom groups."""
 
 import copy
@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 
-from pyptools.spatial import SpatialObject, coord3d
+from ptools.spatial import SpatialObject, coord3d
 from . import tables
 
 

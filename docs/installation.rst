@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install pyptools, run this command in your terminal:
+To install ptools, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install pyptools
+    $ pip install ptools
 
-This is the preferred method to install pyptools, as it will always install the most recent stable release. 
+This is the preferred method to install ptools, as it will always install the most recent stable release. 
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for pyptools can be downloaded from the `Github repo`_.
+The sources for ptools can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/benoistlaurent/pyptools
+    $ git clone git://github.com/benoistlaurent/ptools
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/benoistlaurent/pyptools/tarball/master
+    $ curl  -OL https://github.com/benoistlaurent/ptools/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/benoistlaurent/pyptools
-.. _tarball: https://github.com/benoistlaurent/pyptools/tarball/master
+.. _Github repo: https://github.com/benoistlaurent/ptools
+.. _tarball: https://github.com/benoistlaurent/ptools/tarball/master
