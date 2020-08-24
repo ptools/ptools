@@ -26,9 +26,9 @@ class Screw:
 
     def copy(self):
         s = Screw()
-        s.unit = self.unit
+        s.unit = self.unit.copy()
         s.normtranslation = self.normtranslation
-        s.point = self.point
+        s.point = self.point.copy()
         s.angle = self.angle
         return s
 

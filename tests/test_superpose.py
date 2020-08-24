@@ -64,6 +64,21 @@ class TestScrew(unittest.TestCase):
         self.s.point = u
         assert_array_almost_equal(self.s.point, u)
 
+    def test_copy(self):
+        target = self.s.copy()
+        self.assertAlmostEqual(target.angle, self.s.angle)
+        self.assertAlmostEqual(target.normtranslation, self.s.normtranslation)
+        assert_array_almost_equal(target.unit, self.s.unit)
+        assert_array_almost_equal(target.point, self.s.point)
+
+        # Make sure changing one does not change the other
+        target.angle += 12
+        self.assertAlmostEqual(target.angle, self.s.angle + 12)
+
+        target.unit += 3
+        assert_array_almost_equal(target.unit, self.s.unit + 3)
+
+
 
 def random_float():
     """Return a random floatting point number in the range
