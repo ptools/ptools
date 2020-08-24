@@ -59,12 +59,14 @@ lint-tests:
 
 test: ## run tests quickly with the default Python
 	py.test --ignore=tests/pyattract/test_attract.py
+	@echo "\033[33m** WARNING: didn't test tests/pyattract/test_attract.py **\033[0m"
 
 test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	py.test --cov-report term-missing --cov=ptools tests/
+	py.test --ignore=tests/pyattract/test_attract.py --cov-report term-missing --cov=ptools tests/
+	@echo "\033[33m** WARNING: didn't test tests/pyattract/test_attract.py **\033[0m"
 
 
 docs: ## generate Sphinx HTML documentation, including API docs
