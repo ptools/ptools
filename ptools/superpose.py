@@ -24,6 +24,14 @@ class Screw:
                 f"point={self.point}), "
                 f"angle={self.angle})")
 
+    def copy(self):
+        s = Screw()
+        s.unit = self.unit
+        s.normtranslation = self.normtranslation
+        s.point = self.point
+        s.angle = self.angle
+        return s
+
 
 def kabsch_matrix(P, Q):
     """Calculates a rotation matrice using Kabsch algorithm.
