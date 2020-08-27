@@ -22,11 +22,11 @@ class TestAttractForceField1(unittest.TestCase):
     def setUp(self):
         self.receptor = AttractRigidBody(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody(TEST_LIGAND_RED)
-        self.ff = AttractForceField1(self.receptor, self.ligand)
+        self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
     def test_read_ff_params(self):
         ff = AttractForceField1(self.receptor, self.ligand,
-                                paramfile=TEST_AMINON)
+                                paramfile=TEST_AMINON, cutoff=5.0)
         assert_array_equal(ff._repulsive, self.ff._repulsive)
         assert_array_equal(ff._attractive, self.ff._attractive)
 
