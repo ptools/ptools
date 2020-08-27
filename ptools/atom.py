@@ -159,6 +159,16 @@ class AtomCollection(SpatialObject):
             coords = np.zeros((0, 3))
         super().__init__(coords)
 
+    def __len__(self):
+        """Gets the number of atoms in the collection."""
+        return len(self.atoms)
+
+    def __repr__(self):
+        """String representation."""
+        modulename = self.__module__
+        classname = self.__class__.__name__
+        return f"<{modulename}.{classname} with {len(self)} atoms>"
+
     def masses(self):
         """Returns the array of atom masses."""
         return np.array([atom.mass for atom in self.atoms])
@@ -166,10 +176,6 @@ class AtomCollection(SpatialObject):
     def copy(self):
         """Returns a copy of the current collection."""
         return self.__class__(self.atoms)
-
-    def __len__(self):
-        """Gets the number of atoms in the collection."""
-        return len(self.atoms)
 
     def size(self):
         """Gets the number of atoms in the collection.
