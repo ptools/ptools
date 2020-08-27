@@ -39,15 +39,14 @@ class SpatialObject:
         """
         translate(self.coords, v)
 
-    def rotate_by(self, alpha=0.0, beta=0.0, gamma=0.0):
+    def rotate_by(self, angles):
         """Rotate object coordinates around X, Y and Z axes.
 
         Args:
-            alpha (float): rotation angle around the X-axis
-            beta (float): rotation angle around the Y-axis
-            gamma (float): rotation angle around the Z-axis
+            angles ([float, float, float]): rotation angle around
+                the X-, Y- and Z-axes
         """
-        rotate_by(self.coords, alpha, beta, gamma)
+        rotate_by(self.coords, angles)
 
     def rotate(self, matrix):
         """Rotate object using rotation matrix."""
@@ -135,22 +134,21 @@ def translate(coords, v):
     np.add(coords, v, coords)
 
 
-def rotation_by(alpha=0.0, beta=0.0, gamma=0.0):
+def rotation_matrix(angles=[0.0, 0.0, 0.0]):
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
 
     Args:
-        alpha (float): rotation angle around the X-axis (in degrees)
-        beta (float): rotation angle around the Y-axis (in degrees)
-        gamma (float): rotation angle around the Z-axis (in degrees)
+        angles ([float, float, float]): rotation angle around
+                the X-, Y- and Z-axes
 
     Returns:
         numpy.ndarray: 4x4 rotation matrix.
     """
-    alpha = math.radians(alpha)
-    beta = math.radians(beta)
-    gamma = math.radians(gamma)
+    alpha = math.radians(angles[0])
+    beta = math.radians(angles[1])
+    gamma = math.radians(angles[2])
     r = np.identity(4)
     r[0, 0] = math.cos(beta) * math.cos(gamma)
     r[0, 1] = -math.cos(beta) * math.sin(gamma)
@@ -166,16 +164,15 @@ def rotation_by(alpha=0.0, beta=0.0, gamma=0.0):
     return r
 
 
-def rotate_by(coords, alpha=0.0, beta=0.0, gamma=0.0):
+def rotate_by(coords, angles=[0.0, 0.0, 0.0]):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
         coords (numpy.ndarray): N x 3 shaped array
-        alpha (float): rotation angle around the X-axis
-        beta (float): rotation angle around the Y-axis
-        gamma (float): rotation angle around the Z-axis
+        angles ([float, float, float]): rotation angle around
+                the X-, Y- and Z-axes
     """
-    matrix = rotation_by(alpha, beta, gamma)
+    matrix = rotation_matrix(angles)
     rotate(coords, matrix)
 
 
@@ -194,7 +191,7 @@ def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
     Returns:
         np.array(4, 4)
     """
-    m = rotation_by(*rotation)
+    m = rotation_matrix(rotation)
     m[:3, 3] = translation
     return m
 
@@ -305,7 +302,7 @@ def angle(u, v):
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
 
 
-def rotation_matrix(axis, angle):
+def rotation_matrix_around_axis(axis, angle):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
     Args:
@@ -323,12 +320,12 @@ def rotation_matrix(axis, angle):
 
 def ab_rotation_matrix(A, B, angle):
     """Returns the rotation matrix to rotate around axis (A, B) by angle (in radians)."""
-    return rotation_matrix(B - A, angle)
+    return rotation_matrix_around_axis(B - A, angle)
 
 
 def ab_rotate(coords, A, B, angle):
     """Rotates coords around axis (A, B) by angle theta (in radians)."""
-    m = rotation_matrix(B - A, angle)
+    m = rotation_matrix_around_axis(B - A, angle)
     rotate(coords, m)
 
 
