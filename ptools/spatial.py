@@ -31,13 +31,14 @@ class SpatialObject:
     def centroid(self):
         return centroid(self._coords)
 
-    def translate(self, v):
-        """Translate object coordinates using vector `v`.
+    def translate(self, t):
+        """Translate object coordinates using vector `t`.
 
         Args:
-            v (array[float, int], int): 1 x 3 shaped vector or scalar
+            t ((int, float) or np.array): scalar, 1 x 3 shaped vector or
+                4 x 4 matrix
         """
-        translate(self.coords, v)
+        translate(self.coords, t)
 
     def rotate_by(self, angles):
         """Rotate object coordinates around X, Y and Z axes.
@@ -124,14 +125,31 @@ def coord3d(value=(0, 0, 0), *args):
     return value
 
 
-def translate(coords, v):
+def translate(coords, t):
     """In-place translation of coordinates by a vector.
 
     Args:
         coords (numpy.ndarray): N x 3 shaped array
-        v (iterable[float, int]): 1 x 3 shaped vector
+        t ((int, float) or np.array): scalar, 1 x 3 shaped vector or
+            4 x 4 matrix
     """
-    np.add(coords, v, coords)
+    def _translate_scalar(x):
+        np.add(coords, t, coords)
+
+    def isscalar(s):
+        return isinstance(t, (float, int))
+
+    if isscalar(t):
+        _translate_scalar(t)
+    else:
+        t = np.array(t)
+        if t.shape == (4, 4):
+            t = t[:3, 3]
+        elif t.shape != (3, ):
+            raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
+                            "(got ({t.shape[0]}, {t.shape[1]})) ")
+        np.add(coords, t, coords)
+
 
 
 def rotation_matrix(angles=[0.0, 0.0, 0.0]):
@@ -277,7 +295,7 @@ def attract_euler_rotate(coords, phi, ssi, rot):
     coords[:] = np.inner(coords, matrix)
 
 
-def translation_matrix(direction):
+def translation_matrix(direction=[0, 0, 0]):
     """Return the matrix to translate by direction vector."""
     m = np.identity(4)
     m[:3, 3] = direction[:3]
