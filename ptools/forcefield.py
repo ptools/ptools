@@ -31,9 +31,10 @@ class ForceField:
     classes.
     """
 
-    def __init__(self, receptor, ligand):
+    def __init__(self, receptor, ligand, cutoff=10):
         self.receptor = receptor
         self.ligand = ligand
+        self.cutoff = cutoff
         self._vdw_energy = 0.0
         self._electrostatic_energy = 0.0
 
@@ -63,8 +64,8 @@ class ForceField:
 
 class AttractForceField1(ForceField):
 
-    def __init__(self, receptor, ligand, paramfile=None):
-        super().__init__(receptor, ligand)
+    def __init__(self, receptor, ligand, cutoff=10, paramfile=None):
+        super().__init__(receptor, ligand, cutoff)
         self._repulsive = []
         self._attractive = []
         self._init_parameters(paramfile)
@@ -88,7 +89,7 @@ class AttractForceField1(ForceField):
         vdw = 0.0
         elec = 0.0
 
-        pairlist = PairList(self.receptor, self.ligand, cutoff=10.0)
+        pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
         contacts = pairlist.contacts()
         norm2 = pairlist.sqdistances()
 
