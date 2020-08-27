@@ -184,6 +184,21 @@ def rotate(coords, matrix):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
+def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
+    """Returns a transformation matrix.
+
+    Args:
+        translation (np.array(3)): translation components in x,y,z
+        rotation (np.array(3)): rotation components along x,y,z
+
+    Returns:
+        np.array(4, 4)
+    """
+    m = rotation_by(*rotation)
+    m[:3, 3] = translation
+    return m
+
+
 def transform(coords, matrix):
     """In-place transformation of coordinates by a 4 x 4 matrix.
 
