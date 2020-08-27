@@ -88,7 +88,7 @@ class AttractForceField1(ForceField):
         vdw = 0.0
         elec = 0.0
 
-        pairlist = PairList(self.receptor, self.ligand, cutoff=5.0)
+        pairlist = PairList(self.receptor, self.ligand, cutoff=10.0)
         contacts = pairlist.contacts()
         norm2 = pairlist.sqdistances()
 
