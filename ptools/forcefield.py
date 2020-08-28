@@ -1,14 +1,14 @@
 
 import math
 
-import numpy
+import numpy as np
 
 from .pairlist import PairList
 from .pyattract.io import read_aminon
 
 
 # Attract force field default atom type radii and amplitudes.
-ATTRACT_DEFAULT_FF_PARAMS = numpy.array([
+ATTRACT_DEFAULT_FF_PARAMS = np.array([
     [2.000, 1.000], [1.900, 1.000], [1.950, 2.000], [1.900, 0.600],
     [1.900, 0.600], [1.900, 0.600], [1.990, 2.000], [1.990, 1.500],
     [1.900, 0.600], [1.990, 1.500], [1.900, 0.600], [1.990, 1.500],
@@ -75,15 +75,15 @@ class AttractForceField1(ForceField):
             params = read_aminon(path)
         else:
             params = ATTRACT_DEFAULT_FF_PARAMS
-        rad, amp = list(zip(*params))
-        n = len(params)
-        self._repulsive = numpy.zeros((n, n))
-        self._attractive = numpy.zeros((n, n))
 
-        for i in range(n):
-            for j in range(n):
-                self._repulsive[i][j] = amp[i] * amp[j] * math.pow(rad[i] + rad[j], 8)
-                self._attractive[i][j] = amp[i] * amp[j] * math.pow(rad[i] + rad[j], 6)
+        rad, amp = list(zip(*params))
+        rad = np.array(rad)
+        amp = np.array(amp)
+
+        self._repulsive = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
+        self._attractive = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
+
+
 
     def non_bonded_energy(self):
         vdw = 0.0
