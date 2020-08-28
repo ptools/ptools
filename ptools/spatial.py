@@ -49,9 +49,9 @@ class SpatialObject:
         """
         rotate_by(self.coords, angles)
 
-    def rotate(self, matrix):
-        """Rotate object using rotation matrix."""
-        rotate(self.coords, matrix)
+    def rotate(self, r):
+        """Rotate object using rotation matrix or 3 angles."""
+        rotate(self.coords, r)
 
     def ab_rotate(self, A, B, angle):
         """PTools rotation around axis."""
@@ -147,7 +147,7 @@ def translate(coords, t):
             t = t[:3, 3]
         elif t.shape != (3, ):
             raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
-                            "(got ({t.shape[0]}, {t.shape[1]})) ")
+                            f"(got {t.shape})")
         np.add(coords, t, coords)
 
 
@@ -194,8 +194,16 @@ def rotate_by(coords, angles=[0.0, 0.0, 0.0]):
     rotate(coords, matrix)
 
 
-def rotate(coords, matrix):
-    """In-place rotation of coordinates using a rotation matrix."""
+def rotate(coords, r):
+    """In-place rotation of coordinates using a rotation matrix or 3 angles."""
+    if r.shape == (3,):
+        matrix = rotation_matrix(r)
+    elif r.shape in ((4, 4), (3, 3)):
+        matrix = r
+    else:
+        raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
+                        f"(got {r.shape}) ")
+
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
