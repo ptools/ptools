@@ -196,6 +196,7 @@ def rotate_by(coords, angles=[0.0, 0.0, 0.0]):
 
 def rotate(coords, r):
     """In-place rotation of coordinates using a rotation matrix or 3 angles."""
+    r = np.array(r)
     if r.shape == (3,):
         matrix = rotation_matrix(r)
     elif r.shape in ((4, 4), (3, 3)):
