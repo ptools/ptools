@@ -1,7 +1,7 @@
 
-"""linalg - Defines functions to read/write files."""
+"""Protein Data Bank format I/O."""
 
-from .atom import BaseAtom, AtomCollection
+from ..atom import BaseAtom, AtomCollection
 
 
 def read_pdb(path):
