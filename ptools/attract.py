@@ -40,6 +40,15 @@ def run_attract(ligand, receptor, translations, rotations, minimlist):
         translations (dict)
         rotations (dict[int]->[float, float, float])
         minimlist (list[dict[str]->value])
+
+    Example:
+        >>> receptor = ptools.rigidbody.AttractRigidBody("receptor.red")
+        >>> ligand = ptools.rigidbody.AttractRigidBody("ligand.red")
+        >>> reference = ptools.rigidbody.AttractRigidBody("ligand.red")
+        >>> nbminim, lignames, minimlist, rstk = read_attract_parameters("attract.inp")
+        >>> translations = {0: ligand.center()}
+        >>> rotations = {0: (0, 0, 0)}
+        >>> ptools.attract.run_attract(ligand, receptor, translations, rotations, minimlist)
     """
 
     for transi, transnb in enumerate(sorted(translations.keys())):
