@@ -3,7 +3,7 @@
 
 import unittest
 
-import ptools.pyattract.io as io
+import ptools.io.attract as io
 
 from . import (TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND,
                TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT,

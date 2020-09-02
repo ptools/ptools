@@ -4,7 +4,7 @@ import math
 import numpy as np
 
 from .pairlist import PairList
-from .pyattract.io import read_aminon
+from .io.attract import read_aminon
 
 
 # Name of the force fields implemented in pyattract.

@@ -1,5 +1,5 @@
 
-"""pyattract.io - Read/Write pyattract files."""
+"""Read/Write Attract files."""
 
 
 def read_aminon(path):
