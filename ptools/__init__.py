@@ -8,6 +8,7 @@ __version__ = '0.1.0'
 
 from . import (
     atom,
+    attract,
     forcefield,
     heligeom,
     io,
