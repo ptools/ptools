@@ -7,6 +7,10 @@ from .pairlist import PairList
 from .pyattract.io import read_aminon
 
 
+# Name of the force fields implemented in pyattract.
+ATTRACT_FORCEFIELDS = ('scorpion', 'attract1', 'attract2')
+
+
 # Attract force field default atom type radii and amplitudes.
 ATTRACT_DEFAULT_FF_PARAMS = np.array([
     [2.000, 1.000], [1.900, 1.000], [1.950, 2.000], [1.900, 0.600],

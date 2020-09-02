@@ -64,17 +64,6 @@ class TestAttractIO(unittest.TestCase):
             io.read_forcefield_from_reduced(tmpfile.name)
         tmpfile.close()
 
-    def test_read_forcefield_from_reduced_bad_ff(self):
-        # Replace force field name with a bad one i.e. not defined
-        # in `ptools.pyattract.PYATTRACT_FORCEFIELDS`.
-        content = TEST_DUM_RED_CONTENT.replace('ATTRACT1', 'FOO')
-        # Make sure the proper exeception is raised.
-        tmpfile = mk_tmp_file(content=content)
-        err = '.* invalid force field name .*'
-        with self.assertRaisesRegex(ValueError, err):
-            io.read_forcefield_from_reduced(tmpfile.name)
-        tmpfile.close()
-
     def test_check_ff_version_match(self):
         tmpfile_receptor = mk_tmp_file(TEST_DUM_RED_CONTENT)
         tmpfile_ligand = mk_tmp_file(TEST_DUM_RED_CONTENT)

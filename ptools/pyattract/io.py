@@ -2,9 +2,6 @@
 """pyattract.io - Read/Write pyattract files."""
 
 
-from . import PYATTRACT_FORCEFIELDS
-
-
 def read_aminon(path):
     """Read Attract force field parameter file.
 
@@ -75,9 +72,8 @@ def read_forcefield_from_reduced(path):
         with open(path, 'rt') as f:
             line = f.readline()
         if not line.startswith('HEADER'):
-            err = '{}: reduced PDB file first line must be a HEADER line '\
-                  'specifying the chosen force field ({})'
-            err = err.format(path, PYATTRACT_FORCEFIELDS)
+            err = (f"{path}: reduced PDB file first line must be a HEADER line"
+                   "specifying the chosen force field")
             raise IOError(err)
         return line
 
@@ -92,10 +88,10 @@ def read_forcefield_from_reduced(path):
 
     def get_ffname():
         ff = get_header_tokens()[1].lower()
-        if ff not in PYATTRACT_FORCEFIELDS:
-            err = "{}: invalid force field name '{}': must choose between {}"
-            err = err.format(path, ff, PYATTRACT_FORCEFIELDS)
-            raise ValueError(err)
+        # if ff not in ATTRACT_FORCEFIELDS:
+        #     err = "{}: invalid force field name '{}': must choose between {}"
+        #     err = err.format(path, ff, ATTRACT_FORCEFIELDS)
+        #     raise ValueError(err)
         return ff
 
     return get_ffname()
