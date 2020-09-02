@@ -30,7 +30,7 @@ class PairList:
         self.receptor = receptor
         self.ligand = ligand
         self.sqcutoff = cutoff * cutoff
-        self._all_distances = None
+        self._all_sqdistances = None
         self._contacts = None
         self.update()
 
@@ -41,11 +41,11 @@ class PairList:
 
     def all_sqdistances(self):
         """Return the matrix of squared distances between every atom pairs."""
-        return self._all_distances
+        return self._all_sqdistances
 
     def sqdistances(self):
         """Return the matrix of squared distances between atoms within cutoff."""
-        return self._all_distances[self._contacts]
+        return self._all_sqdistances[self._contacts]
 
     def all_distances(self):
         """Return the matrix of distances between every atom pairs."""
@@ -58,9 +58,9 @@ class PairList:
     def update(self):
         """Update contact and distance lists with the neighbor searching
         algorithm."""
-        self._all_distances = cdist(self.receptor.coords, self.ligand.coords,
+        self._all_sqdistances = cdist(self.receptor.coords, self.ligand.coords,
                                     metric='sqeuclidean')
-        self._contacts = numpy.where(self._all_distances <= self.sqcutoff)
+        self._contacts = numpy.where(self._all_sqdistances <= self.sqcutoff)
 
     @staticmethod
     def sort(receptor, ligand):
