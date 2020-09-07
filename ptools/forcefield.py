@@ -88,24 +88,16 @@ class AttractForceField1(ForceField):
         self._attractive = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
 
 
-    def foo(self):
-        mA = self.receptor.coords.shape[0]
-        mB = self.ligand.coords.shape[0]
-
-        dx = np.zeros((mA, mB, 3), dtype=float)
-        for i in range(mA):
-            for j in range(mB):
-                dx[i, j] = self.receptor.coords[i] - self.ligand.coords[j]
-
-
-    def bar(self):
-        pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
-        contacts = pairlist.contacts()
-        norm2 = pairlist.sqdistances()
+    def non_bonded_energy(self):
+        """Non-bonded energy calculation."""
+        # -- Numpy flavor --
 
         dx = self.receptor.coords[:, None] - self.ligand.coords
+        distances = np.sqrt(np.power(dx, 2).sum(axis=2))
+        exclude = np.where(distances > self.cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
+        rr2[exclude] = 0.  # exclude pairs with distance > cutoff
         rr23 = np.power(rr2, 3)
 
         # Categories (matrix of pairs).
@@ -117,35 +109,23 @@ class AttractForceField1(ForceField):
         alen = self._attractive[C[..., 0], C[..., 1]]  # Numpy insane trickery
         rlen = self._repulsive[C[..., 0], C[..., 1]]
 
-
         dx = dx + rr2[:, :, None]
+
         rep = rlen * rr2
         vlj = (rep - alen) * rr23
         fb = 6.0 * vlj + 2.0 * rep * rr23
-        fdb = dx * fb[:,:, None]
+        fdb = dx * fb[:, :, None]
 
+        self.receptor.atom_forces += fdb.sum(axis=1)
+        self.ligand.atom_forces -= fdb.sum(axis=0)
 
-        print(fdb.sum(axis=1)[:5])
-        print()
-        print(fdb.sum(axis=0)[:5])
-
-        self.non_bonded_energy()
-        print()
-        print("ref: receptor")
-        print(self.receptor.atom_forces[:5])
-
-        print()
-        print("ref: ligand")
-        print(self.ligand.atom_forces[:5])
-
-
-        exit()
-
-
-
+        # Electrostatics.
         charge = self.receptor.atom_charges[:, None] * self.ligand.atom_charges * (332.053986 / 20.0)
         et = charge * rr2
+        fdb = dx * (2.0 * et)[:, :, None]
 
+        self.receptor.atom_forces += fdb.sum(axis=1)
+        self.ligand.atom_forces -= fdb.sum(axis=0)
 
         vdw = vlj.sum()
         elec = et.sum()
@@ -154,8 +134,7 @@ class AttractForceField1(ForceField):
         return vdw + elec
 
 
-
-    def non_bonded_energy(self):
+    def non_bonded_energy_legacy(self):
         vdw = 0.0
         elec = 0.0
 
@@ -202,6 +181,9 @@ class AttractForceField1(ForceField):
                 fdb = (2.0 * et) * dx
                 self.receptor.atom_forces[ir] += fdb
                 self.ligand.atom_forces[il] -= fdb
+
+        np.save("receptor_forces_total.npy", np.array(self.receptor.atom_forces))
+        np.save("ligand_forces_total.npy", np.array(self.ligand.atom_forces))
 
         self._vdw_energy = vdw
         self._electrostatic_energy = elec
