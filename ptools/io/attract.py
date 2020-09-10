@@ -19,10 +19,10 @@ def read_aminon(path):
         list[(float, float)]: radius and amplitude values for each line.
     """
     params = []
-    with open(path, 'rt') as f:
+    with open(path, "rt") as f:
         for line in f:
-            # Ignore empty lines and lines starting with '#'.
-            if line.strip() and not line.startswith('#'):
+            # Ignore empty lines and lines starting with "#".
+            if line.strip() and not line.startswith("#"):
                 tokens = line.split()
                 radius = float(tokens[1])
                 amplitude = float(tokens[2])
@@ -69,9 +69,9 @@ def read_forcefield_from_reduced(path):
         str: force field name in lower case.
     """
     def get_header_line():
-        with open(path, 'rt') as f:
+        with open(path, "rt") as f:
             line = f.readline()
-        if not line.startswith('HEADER'):
+        if not line.startswith("HEADER"):
             err = (f"{path}: reduced PDB file first line must be a HEADER line"
                    "specifying the chosen force field")
             raise IOError(err)
@@ -114,7 +114,7 @@ def read_attract_parameter(path):
         try:
             nbminim = int(lines.pop(0).split()[0])
         except:
-            error = 'Cannot read number of minimizations from attract parameter file'
+            error = "Cannot read number of minimizations from attract parameter file"
             raise ValueError(error)
         return nbminim
 
@@ -123,12 +123,12 @@ def read_attract_parameter(path):
             try:
                 tokens = lines.pop(0).split()
             except:
-                error = 'Unexpectedly reached end of attract parameter file'
+                error = "Unexpectedly reached end of attract parameter file"
                 raise ValueError(error)
             return tokens
         lignames = []
         tokens = get_tokens()
-        while tokens and tokens[0] == 'Lig':
+        while tokens and tokens[0] == "Lig":
             lignames.append(tokens[2])
             tokens = get_tokens()
         return lignames, tokens
@@ -137,7 +137,7 @@ def read_attract_parameter(path):
         try:
             rstk = float(tokens[3])
         except:
-            error = 'Cannot read rstk from attract parameter file'
+            error = "Cannot read rstk from attract parameter file"
             raise ValueError(error)
         return rstk
 
@@ -145,21 +145,21 @@ def read_attract_parameter(path):
         try:
             tokens = lines.pop(0).split()
         except:
-            error = 'Cannot read minimizations from attract parameter file: '\
-                    'expected {}, found {}'.format(nbminim, i)
+            error = "Cannot read minimizations from attract parameter file: "\
+                    "expected {}, found {}".format(nbminim, i)
             raise ValueError(error)
         if len(tokens) < 3:
-            error = 'Cannot read minimization line from attract parameter file: '\
-                    'expected at least 3 values, found {}'.format(len(tokens))
+            error = "Cannot read minimization line from attract parameter file: "\
+                    "expected at least 3 values, found {}".format(len(tokens))
             raise ValueError(error)
-        minim = {'maxiter': int(tokens[0]),
-                 'squarecutoff': float(tokens[-1]),
-                 'rstk': rstk if tokens[-2] == '1' else 0.0}
+        minim = {"maxiter": int(tokens[0]),
+                 "squarecutoff": float(tokens[-1]),
+                 "rstk": rstk if tokens[-2] == '1' else 0.0}
         return minim
 
     # Read file ignoring comments.
-    with open(path, 'rt') as f:
-        lines = [line for line in f if not line[0] in ('#', '!')]
+    with open(path, "rt") as f:
+        lines = [line for line in f if not line[0] in ("#", "!")]
 
     # First number is the number of minimizations to perform.
     nbminim = read_number_of_minimizations()
