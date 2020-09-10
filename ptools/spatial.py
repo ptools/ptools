@@ -171,7 +171,7 @@ def angle(u, v):
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
 
 
-def tensor_of_inertia(coords, weights):
+def _tensor_of_inertia_accurate(coords, weights):
     """Returns the inertia tensors of a set of atoms."""
     com = center_of_mass(coords, weights)
     X = coords - com
@@ -190,6 +190,28 @@ def tensor_of_inertia(coords, weights):
     ])
 
     return I
+
+
+def _tensor_of_inertia_fast(coords):
+    """Returns the inertia tensors of a set of atoms.
+
+    Fast: does not take into account the weights
+    """
+    com = centroid(coords)
+    X = coords - com
+    tensors = np.dot(X.transpose(), X)
+    return tensors
+
+
+def tensor_of_inertia(coords, weights=None, method="accurate"):
+    assert method in ("accurate", "fast")
+    if method == "accurate":
+        if weights is None:
+            raise ValueError("need weights to compute accurate tensor of "
+                             "inertia")
+        return _tensor_of_inertia_accurate(coords, weights)
+    return _tensor_of_inertia_fast(coords)
+
 
 
 def principal_axes(tensor, sort=True):

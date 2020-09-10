@@ -215,13 +215,13 @@ class AtomCollection(SpatialObject):
         """Return the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses())
 
-    def tensor_of_inertia(self):
+    def tensor_of_inertia(self, method="accurate"):
         """Returns the inertia tensors of a set of atoms."""
-        return ptools.spatial.tensor_of_inertia(self.coords, self.masses())
+        return ptools.spatial.tensor_of_inertia(self.coords, self.masses(), method)
 
-    def principal_axes(self, sort=True):
+    def principal_axes(self, sort=True, method="accurate"):
         """Returns an AtomCollection principal axes."""
-        return ptools.spatial.principal_axes(self.tensor_of_inertia(), sort)
+        return ptools.spatial.principal_axes(self.tensor_of_inertia(method), sort)
 
     def radius_of_gyration(self):
         """Returns the isometric radius of gyration (atom mass is not taken
