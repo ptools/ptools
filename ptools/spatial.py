@@ -125,6 +125,34 @@ def coord3d(value=(0, 0, 0), *args):
     return value
 
 
+def centroid(x):
+    """Return x centroid.
+
+    Centroid is the average coordinate along axis 0.
+    """
+    return np.mean(x, axis=0)
+
+
+def norm(u):
+    """Returns the norm of a vector."""
+    return np.linalg.norm(u)
+
+
+def angle(u, v):
+    """Returns the angle between two vectors in radians."""
+    return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
+
+
+#
+# Translation routines
+#
+def translation_matrix(direction=[0, 0, 0]):
+    """Return the matrix to translate by direction vector."""
+    m = np.identity(4)
+    m[:3, 3] = direction[:3]
+    return m
+
+
 def translate(coords, t):
     """In-place translation of coordinates by a vector.
 
@@ -152,6 +180,9 @@ def translate(coords, t):
 
 
 
+#
+#  Rotation routines
+#
 def rotation_matrix(angles=[0.0, 0.0, 0.0]):
     """Return the rotation matrix around the X, Y and Z axes.
 
@@ -208,47 +239,7 @@ def rotate(coords, r):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
-def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
-    """Returns a transformation matrix.
-
-    Args:
-        translation (np.array(3)): translation components in x,y,z
-        rotation (np.array(3)): rotation components along x,y,z
-
-    Returns:
-        np.array(4, 4)
-    """
-    m = rotation_matrix(rotation)
-    m[:3, 3] = translation
-    return m
-
-
-def transform(coords, matrix):
-    """In-place transformation of coordinates by a 4 x 4 matrix.
-
-    This function should be used only when the transformation matrix
-    last row and last column differ from (0, 0, 0, 1).
-    When its not the case, just convert the transformation matrix to 3 x 3
-    and multiply coordinates::
-
-        >>> coords[:] = numpy.inner(coords, matrix[:3, :3])
-
-    Args:
-        coords (numpy.ndarray): N x 3 shaped array
-        matrix (numpy.ndarray): 4 x 4 matrix
-    """
-    # Reshape coords to N x 4 with the last component being 1.
-    n = coords.shape[1]
-    a = np.ones((coords.shape[0], n + 1))
-    a[:, :-1] = coords
-
-    # Apply transformation matrix to coordinates.
-    a[:] = np.inner(a, matrix)
-
-    # Weight coordinates and reshape into N x 3 again.
-    coords[:] = (a[:, 0:n].T / a[:, n]).T
-
-
+# TODO: rename to attract_euler_rotation_matrix
 def attract_euler_rotation(phi, ssi, rot):
     """Return the rotation matrix for an Euler rotation with Attract
     convention.
@@ -304,29 +295,15 @@ def attract_euler_rotate(coords, phi, ssi, rot):
     coords[:] = np.inner(coords, matrix)
 
 
-def translation_matrix(direction=[0, 0, 0]):
-    """Return the matrix to translate by direction vector."""
-    m = np.identity(4)
-    m[:3, 3] = direction[:3]
-    return m
+def ab_rotation_matrix(A, B, angle):
+    """Returns the rotation matrix to rotate around axis (A, B) by angle (in radians)."""
+    return rotation_matrix_around_axis(B - A, angle)
 
 
-def centroid(x):
-    """Return x centroid.
-
-    Centroid is the average coordinate along axis 0.
-    """
-    return np.mean(x, axis=0)
-
-
-def norm(u):
-    """Returns the norm of a vector."""
-    return np.linalg.norm(u)
-
-
-def angle(u, v):
-    """Returns the angle between two vectors in radians."""
-    return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
+def ab_rotate(coords, A, B, angle):
+    """Rotates coords around axis (A, B) by angle theta (in radians)."""
+    m = rotation_matrix_around_axis(B - A, angle)
+    rotate(coords, m)
 
 
 def rotation_matrix_around_axis(axis, angle):
@@ -345,38 +322,50 @@ def rotation_matrix_around_axis(axis, angle):
     return m
 
 
-def ab_rotation_matrix(A, B, angle):
-    """Returns the rotation matrix to rotate around axis (A, B) by angle (in radians)."""
-    return rotation_matrix_around_axis(B - A, angle)
 
 
-def ab_rotate(coords, A, B, angle):
-    """Rotates coords around axis (A, B) by angle theta (in radians)."""
-    m = rotation_matrix_around_axis(B - A, angle)
-    rotate(coords, m)
+#
+#  Other transformation routines
+#
+
+def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
+    """Returns a transformation matrix.
+
+    Args:
+        translation (np.array(3)): translation components in x,y,z
+        rotation (np.array(3)): rotation components along x,y,z
+
+    Returns:
+        np.array(4, 4)
+    """
+    m = rotation_matrix(rotation)
+    m[:3, 3] = translation
+    return m
 
 
-def main():  # pragma: no cover
-    euler_angles = [-12, 7, 13.5]
-    r_ptools = attract_euler_rotation(*euler_angles)
+def transform(coords, matrix):
+    """In-place transformation of coordinates by a 4 x 4 matrix.
 
-    from itertools import permutations
+    This function should be used only when the transformation matrix
+    last row and last column differ from (0, 0, 0, 1).
+    When its not the case, just convert the transformation matrix to 3 x 3
+    and multiply coordinates::
 
-    np.set_printoptions(precision=2)
+        >>> coords[:] = numpy.inner(coords, matrix[:3, :3])
 
-    print("PTools:")
-    print(r_ptools)
-    print()
+    Args:
+        coords (numpy.ndarray): N x 3 shaped array
+        matrix (numpy.ndarray): 4 x 4 matrix
+    """
+    # Reshape coords to N x 4 with the last component being 1.
+    n = coords.shape[1]
+    a = np.ones((coords.shape[0], n + 1))
+    a[:, :-1] = coords
 
-    print("scipy.spatial.transform.Rotation.from_euler:")
+    # Apply transformation matrix to coordinates.
+    a[:] = np.inner(a, matrix)
 
-    for perm in permutations("xyz"):
-        perm = ''.join(perm)
-        r = Rotation.from_euler(perm, euler_angles).as_matrix()
-        print(f"perm={perm}:")
-        print(r)
-        print()
+    # Weight coordinates and reshape into N x 3 again.
+    coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
-if __name__ == '__main__':
-    main() # pragma: no cover
