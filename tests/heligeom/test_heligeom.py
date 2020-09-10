@@ -50,13 +50,14 @@ class TestHeligeom(unittest.TestCase):
         result = heli_construct(self.mono1, hp, N=15)
         assert_array_equal(result.coords, target.coords)
 
-    def test_Z_true_not_implemented(self):
-        """Tests that using heligeom.extend with Z=true raises an error."""
+    def test_Z_true_implemented(self):
+        """Tests that using heligeom.extend with Z=true does not raises an error."""
         hp = heli_analyze(self.mono1, self.mono2)  # N is random
         target = extend(hp, self.mono1, N=15)
-
-        with self.assertRaises(NotImplementedError):
+        try:
             result = heli_construct(self.mono1, hp, N=15, Z=True)
+        except:
+            self.fail("heli_construct with Z=True unexpectedly raised an exception")
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):

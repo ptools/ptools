@@ -26,7 +26,10 @@ def extend(hp, mono1, N, Z=False):
     O = hp.point
     axe = hp.unit
     if Z:
-        raise NotImplementedError("not implemented yet")
+        # Align on Z-axis
+        I = monoTest.inertia_tensors(sort=True)
+        T = monoTest.orient(I[0], [0, 0, 1])
+
     monoTest.set_chain(string.ascii_uppercase[i % 26])
 
     final += monoTest
