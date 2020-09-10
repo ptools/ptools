@@ -15,7 +15,9 @@ class RigidBody(AtomCollection):
         filename (str): path to topology file.
         atoms (list[Atom]): list of Atom instances or AtomCollection.
     """
-    def __init__(self, filename='', atoms=[]):
+    def __init__(self, filename='', atoms=None):
+        if atoms is None:
+            atoms = []
         if filename:
             atoms = read_pdb(filename)
         super().__init__(atoms)
@@ -59,14 +61,14 @@ class AttractRigidBody(RigidBody):
                 self.atom_categories = numpy.array([int(tokens[0]) - 1 for tokens in extra])
             except Exception as e:
                 err = 'cannot initialize atom category: {}'.format(e)
-                raise IOError(err)
+                raise IOError(err) from e
 
         def init_charges():
             try:
                 self.atom_charges = numpy.array([float(tokens[1]) for tokens in extra])
             except Exception as e:
                 err = 'cannot initialize atom charges: {}'.format(e)
-                raise IOError(err)
+                raise IOError(err) from e
 
         extra = [atom.meta['extra'].split() for atom in self.atoms]
         init_category()
