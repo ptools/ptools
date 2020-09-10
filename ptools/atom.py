@@ -217,6 +217,8 @@ class AtomCollection(SpatialObject):
 
     def tensor_of_inertia(self, method="accurate"):
         """Returns the inertia tensors of a set of atoms."""
+        if method == "fast":
+            return ptools.spatial.tensor_of_inertia(self.coords, None, method)
         return ptools.spatial.tensor_of_inertia(self.coords, self.masses(), method)
 
     def principal_axes(self, sort=True, method="accurate"):
