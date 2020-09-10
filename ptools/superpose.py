@@ -1,17 +1,15 @@
 
-"""
-Superposition methods.
-"""
+"""Superposition methods."""
 
 import math
 
-from ptools import spatial
-from ptools.rigidbody import RigidBody
-
 import numpy as np
+
+from ptools import spatial
 
 
 class Screw:
+    """A screw."""
     def __init__(self):
         self.unit = np.zeros(3)
         self.normtranslation = 0.0
@@ -25,6 +23,7 @@ class Screw:
                 f"angle={self.angle})")
 
     def copy(self):
+        """Copy constructor."""
         s = Screw()
         s.unit = self.unit.copy()
         s.normtranslation = self.normtranslation
@@ -90,6 +89,14 @@ def fit(mobile, target):
 
 
 def mat_trans_2_screw(matrix):
+    """Converts a transformation matrix to a Screw
+
+    Args:
+        matrix (np.ndarray): 4 x 4 matrix
+
+    Returns:
+        Screw
+    """
     assert matrix.shape == (4, 4)
 
     EPSILON = 1e-5
@@ -138,10 +145,10 @@ def mat_trans_2_screw(matrix):
         eigenvect[1] = z[1] + y[2]
         eigenvect[2] = z[2] + 1 - x[0] - y[1]
 
-        screw.unitVector = eigenvect / np.linalg.norm(eigenvect)
-        screw.normtranslation = np.dot(screw.unitVector, trans)
+        screw.unit = eigenvect / np.linalg.norm(eigenvect)
+        screw.normtranslation = np.dot(screw.unit, trans)
 
-        s = trans - screw.normtranslation * screw.unitVector
+        s = trans - screw.normtranslation * screw.unit
         screw.point[0] = s[1] * y[0] + s[0] * (1 - y[1])
         screw.point[1] = s[0] * x[1] + s[1] * (1 - x[0])
         screw.point[2] =  0
@@ -180,15 +187,3 @@ def mat_trans_2_screw(matrix):
         screw.angle = -screw.angle
 
     return screw
-
-
-def main():  # pragma: no cover
-    target = RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    mobile = RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
-
-    matrix = fit_matrix(mobile, target)
-    mat_trans_2_screw(matrix)
-
-
-if __name__ == '__main__':  # pragma: no cover
-    main()
