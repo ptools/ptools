@@ -48,14 +48,14 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .cache/
 
-lint: lint-package lint-tests ## check style with flake8
+lint: lint-package lint-tests ## check style with pylint
 
 lint-package:
-	flake8 --ignore=E501 ptools
+	pylint --ignore=E501 ptools
 
 lint-tests:
 	# Ignore whitespaces in matrix definitinos
-	flake8 --ignore=E501,E201,E241 tests
+	pylint --ignore=E501,E201,E241 tests
 
 test: ## run tests quickly with the default Python
 	py.test --ignore=tests/pyattract/test_attract.py
