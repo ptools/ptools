@@ -239,8 +239,7 @@ def rotate(coords, r):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
-# TODO: rename to attract_euler_rotation_matrix
-def attract_euler_rotation(phi, ssi, rot):
+def attract_euler_rotation_matrix(phi, ssi, rot):
     """Return the rotation matrix for an Euler rotation with Attract
     convention.
 
@@ -291,7 +290,7 @@ def attract_euler_rotate(coords, phi, ssi, rot):
         ssi (float):
         rot (float):
     """
-    matrix = attract_euler_rotation(phi, ssi, rot)
+    matrix = attract_euler_rotation_matrix(phi, ssi, rot)
     coords[:] = np.inner(coords, matrix)
 
 
