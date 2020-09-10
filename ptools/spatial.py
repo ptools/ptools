@@ -89,6 +89,12 @@ class SpatialObject:
         """Rotate object with Attract convention."""
         attract_euler_rotate(self.coords, phi, ssi, rot)
 
+    def orient(self, vector, target):
+        orient(self.coords, vector, target)
+
+    def inertia_tensors(self, sort=False):
+        return inertia_tensors(self.coords, sort)
+
 
 def coord3d(value=(0, 0, 0), *args):
     """Convert an object to a 1 x 3 shaped numpy array of floats."""
@@ -143,6 +149,31 @@ def angle(u, v):
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
 
 
+def inertia_tensors(coords, sort=False):
+    """Returns the matrix of inertia tensors.
+
+    IMPORTANT: does not take into account the center of mass.
+
+    Adapted from https://github.com/pierrepo/principal_axes.
+
+    Args:
+        sort (bool): sort vectors according to eigen values
+
+    Returns:
+        np.ndarray: 3 x 3 matrix
+    """
+    com = coords.mean(axis=0)
+    X = coords - com
+
+    I = np.dot(X.transpose(), X)
+    evalues, evectors = np.linalg.eig(I)
+    if sort:
+        order = np.argsort(evalues)
+        evectors = evectors[:, order].transpose()
+    return evectors
+
+
+
 #
 # Translation routines
 #
@@ -177,7 +208,6 @@ def translate(coords, t):
             raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
                             f"(got {t.shape})")
         np.add(coords, t, coords)
-
 
 
 #
@@ -401,3 +431,8 @@ def orientation_matrix(coords, vector, target):
     angle = math.atan2(sine, cosine)
 
     return rotation_matrix_around_axis(axis, angle, center=com)
+
+
+def orient(coords, vector, target):
+    t = orientation_matrix(coords, vector, target)
+    transform(coords, t)
