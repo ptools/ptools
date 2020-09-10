@@ -51,7 +51,7 @@ clean-test: ## remove test and coverage artifacts
 lint: lint-package lint-tests ## check style with pylint
 
 lint-package:
-	pylint --ignore=E501 ptools
+	pylint ptools
 
 lint-tests:
 	# Ignore whitespaces in matrix definitinos

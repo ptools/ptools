@@ -113,18 +113,18 @@ def read_attract_parameter(path):
     def read_number_of_minimizations():
         try:
             nbminim = int(lines.pop(0).split()[0])
-        except:
+        except Exception as e:
             error = "Cannot read number of minimizations from attract parameter file"
-            raise ValueError(error)
+            raise ValueError(error) from e
         return nbminim
 
     def read_lignames():
         def get_tokens():
             try:
                 tokens = lines.pop(0).split()
-            except:
+            except Exception as e:
                 error = "Unexpectedly reached end of attract parameter file"
-                raise ValueError(error)
+                raise ValueError(error) from e
             return tokens
         lignames = []
         tokens = get_tokens()
@@ -136,18 +136,18 @@ def read_attract_parameter(path):
     def read_rstk():
         try:
             rstk = float(tokens[3])
-        except:
+        except Exception as e:
             error = "Cannot read rstk from attract parameter file"
-            raise ValueError(error)
+            raise ValueError(error) from e
         return rstk
 
     def read_minimization():
         try:
             tokens = lines.pop(0).split()
-        except:
+        except Exception as e:
             error = "Cannot read minimizations from attract parameter file: "\
                     "expected {}, found {}".format(nbminim, i)
-            raise ValueError(error)
+            raise ValueError(error) from e
         if len(tokens) < 3:
             error = "Cannot read minimization line from attract parameter file: "\
                     "expected at least 3 values, found {}".format(len(tokens))
