@@ -160,31 +160,53 @@ def centroid(x):
     return np.mean(x, axis=0)
 
 
+def center_of_mass(coords, weights):
+    """Return the center of mass (barycenter)."""
+    weights = weights.reshape(-1, 1)
+    return (coords * weights).sum(axis=0)  / weights.sum()
+
+
 def angle(u, v):
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
 
 
-def inertia_tensors(coords, sort=False):
-    """Returns the matrix of inertia tensors.
+def tensor_of_inertia(coords, weights):
+    """Returns the inertia tensors of a set of atoms."""
+    com = center_of_mass(coords, weights)
+    X = coords - com
 
-    IMPORTANT: does not take into account the center of mass.
+    Ixx = np.sum(weights * (X[:, 1] ** 2 + X[:, 2] ** 2))
+    Iyy = np.sum(weights * (X[:, 0] ** 2 + X[:, 2] ** 2))
+    Izz = np.sum(weights * (X[:, 0] ** 2 + X[:, 1] ** 2))
+    Ixy = - np.sum(weights * X[:, 0] * X[:, 1])
+    Iyz = - np.sum(weights * X[:, 1] * X[:, 2])
+    Ixz = - np.sum(weights * X[:, 0] * X[:, 2])
 
-    Adapted from https://github.com/pierrepo/principal_axes.
+    I = np.array([
+        [Ixx, Ixy, Ixz],
+        [Ixy, Iyy, Iyz],
+        [Ixz, Iyz, Izz],
+    ])
+
+    return I
+
+
+def principal_axes(tensor, sort=True):
+    """Return the principal axes given the tensor of inertia.
+
+    Computes the eigenvalues and right eigenvectors of the tensor of inertia.
 
     Args:
-        sort (bool): sort vectors according to eigen values
+        tensor (np.ndarray): 3 x 3 matrix
+        sort (bool): sort axes by amplitude
 
     Returns:
         np.ndarray: 3 x 3 matrix
     """
-    com = coords.mean(axis=0)
-    X = coords - com
-
-    tensors = np.dot(X.transpose(), X)
-    evalues, evectors = np.linalg.eig(tensors)
+    evalues, evectors = np.linalg.eig(tensor)
     if sort:
-        order = np.argsort(evalues)
+        order = np.argsort(evalues)[::-1]  # descending order
         evectors = evectors[:, order].transpose()
     return evectors
 

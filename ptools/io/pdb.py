@@ -18,8 +18,8 @@ def read_pdb(path):
         return line[:6]
 
     def is_atom_line(line):
-        """Return True is the line header is 'ATOM  '."""
-        return get_header(line) == 'ATOM  '
+        """Return True is the line header is "ATOM  " or "HETATM"."""
+        return get_header(line) in ("ATOM  ", "HETATM")
 
     def read_atom_line(line):
         """Return an `atom.BaseAtom` instance initialized with data read from
@@ -39,11 +39,11 @@ def read_pdb(path):
                         resname=resname, resid=resid,
                         chain=chain,
                         coords=coords,
-                        meta={'extra': extra})
+                        meta={"extra": extra})
         return atom
 
     atoms = []
-    with open(path, 'rt') as f:
+    with open(path, "rt") as f:
         for line in f:
             if is_atom_line(line):
                 atoms.append(read_atom_line(line))

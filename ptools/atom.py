@@ -7,6 +7,7 @@ import math
 
 import numpy as np
 
+import ptools
 from ptools.spatial import SpatialObject, coord3d
 from . import tables
 
@@ -212,36 +213,15 @@ class AtomCollection(SpatialObject):
 
     def center_of_mass(self):
         """Return the center of mass (barycenter)."""
-        weights = self.masses().reshape(-1, 1)
-        return (self.coords * weights).sum(axis=0)  / weights.sum()
+        return ptools.spatial.center_of_mass(self.coords, self.masses())
 
-    def moment_of_inertia(self):
+    def tensor_of_inertia(self):
         """Returns the inertia tensors of a set of atoms."""
-        masses = self.masses()
-        com = self.center_of_mass()
-        pos = self.coords - com
+        return ptools.spatial.tensor_of_inertia(self.coords, self.masses())
 
-        tens = np.zeros((3, 3))
-
-        tens[0][0] = (masses * (pos[:, 1] ** 2 + pos[:, 2] ** 2)).sum()
-        tens[0][1] = - (masses * pos[:, 0] * pos[:, 1]).sum()
-        tens[0][2] = - (masses * pos[:, 0] * pos[:, 2]).sum()
-
-        tens[1][0] = tens[0][1]
-        tens[1][1] = (masses * (pos[:, 0] ** 2 + pos[:, 2] ** 2)).sum()
-        tens[1][2] = - (masses * pos[:, 1] * pos[:, 2]).sum()
-
-        tens[2][0] = tens[0][2]
-        tens[2][1] = tens[1][2]
-        tens[2][2] = (masses * (pos[:, 0] ** 2 + pos[:, 1] ** 2)).sum()
-
-        return tens
-
-    def principal_axes(self):
+    def principal_axes(self, sort=True):
         """Returns an AtomCollection principal axes."""
-        val, vec = np.linalg.eig(self.moment_of_inertia())
-        indices = np.argsort(val)[::-1]
-        return vec[:, indices].T
+        return ptools.spatial.principal_axes(self.tensor_of_inertia(), sort)
 
     def radius_of_gyration(self):
         """Returns the isometric radius of gyration (atom mass is not taken
