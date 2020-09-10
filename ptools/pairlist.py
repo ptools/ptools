@@ -26,7 +26,6 @@ class PairList:
         cutoff (float): cut-off for neighbor searching
     """
     def __init__(self, receptor, ligand, cutoff):
-        super(PairList, self).__init__()
         self.receptor = receptor
         self.ligand = ligand
         self.sqcutoff = cutoff * cutoff

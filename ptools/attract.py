@@ -1,4 +1,6 @@
 
+"""Attract docking."""
+
 import time
 
 import numpy as np
@@ -94,4 +96,3 @@ def run_attract(ligand, receptor, translations, rotations, minimlist):
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
-

@@ -3,10 +3,10 @@
 Some more documentation coming soon.
 """
 
+import string
+
 import ptools
 from ptools.superpose import mat_trans_2_screw, fit_matrix
-
-import string
 
 
 def heli_analyze(mono1, mono2):
@@ -47,8 +47,6 @@ def extend(hp, mono1, N, Z=False):
 
 
 def main():  # pragma: no cover
-    import ptools
-
     mono1 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
     mono2 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
 
