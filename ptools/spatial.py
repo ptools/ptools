@@ -35,7 +35,7 @@ class SpatialObject:
         """Translate object coordinates using vector `t`.
 
         Args:
-            t ((int, float) or np.array): scalar, 1 x 3 shaped vector or
+            t ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
                 4 x 4 matrix
         """
         translate(self.coords, t)
@@ -158,7 +158,7 @@ def translate(coords, t):
 
     Args:
         coords (numpy.ndarray): N x 3 shaped array
-        t ((int, float) or np.array): scalar, 1 x 3 shaped vector or
+        t ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
             4 x 4 matrix
     """
     def _translate_scalar(x):
@@ -305,22 +305,23 @@ def ab_rotate(coords, A, B, angle):
     rotate(coords, m)
 
 
-def rotation_matrix_around_axis(axis, angle):
+def rotation_matrix_around_axis(axis, angle, center=np.array([0, 0, 0])):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
     Args:
-        axis (np.array): N x 3
+        axis (np.ndarray (N x 3)): axis of rotation
         angle (float): angle in radians
+        center (np.ndarray (3 x 1)): center of rotation
 
     Returns:
-        numpy.array: 4 x 4 rotation matrix
+        np.ndarray: 4 x 4 rotation matrix
     """
+    origmat = translation_matrix(- center)
+    offsetmat = translation_matrix(+ center)
     r = expm(np.cross(np.identity(3), axis / norm(axis) * angle))
     m = np.identity(4)
     m[:3, :3] = r
-    return m
-
-
+    return np.matmul(np.matmul(offsetmat, m), origmat)
 
 
 #
@@ -331,11 +332,11 @@ def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
     """Returns a transformation matrix.
 
     Args:
-        translation (np.array(3)): translation components in x,y,z
-        rotation (np.array(3)): rotation components along x,y,z
+        translation (np.ndarray(3)): translation components in x,y,z
+        rotation (np.ndarray(3)): rotation components along x,y,z
 
     Returns:
-        np.array(4, 4)
+        np.ndarray(4, 4)
     """
     m = rotation_matrix(rotation)
     m[:3, 3] = translation
@@ -368,3 +369,35 @@ def transform(coords, matrix):
     coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
+def orientation_matrix(coords, vector, target):
+    """Calculates an orientation matrix.
+
+    Orients vector on target.
+
+    IMPORTANT: does not take into account the center of mass.
+
+    Args:
+        coords (np.ndarray <N x 3>): coordinates
+        vector (np.ndarray (1 x 3)): reference for rotation
+        target (np.ndarray (1 x 3)): target for rotation
+
+    Returns:
+        np.ndarray (4 x 4): transformation matrix
+
+    Example:
+        >>> # Align the 3rd principal axis of inertia on the Z-axis.
+        >>> I = inertia_tensors(rigidbody)
+        >>> T = orientation_matrix(rigidbody.coords, I[2], [0, 0, 1])
+        >>> receptor.transform(T)
+    """
+    com = coords.mean(axis=0)
+
+    vec1 = vector / np.linalg.norm(vector)
+    vec2 = target / np.linalg.norm(target)
+
+    axis = np.cross(vec1, vec2)
+    sine = np.linalg.norm(axis)
+    cosine = np.dot(vec1, vec2)
+    angle = math.atan2(sine, cosine)
+
+    return rotation_matrix_around_axis(axis, angle, center=com)
