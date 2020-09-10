@@ -209,7 +209,6 @@ class TestAtomCollection(unittest.TestCase):
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
-
     def test_update_name(self):
         # Updating an atom's name should also update its type and mass.
         for i in range(10):
@@ -268,14 +267,14 @@ class TestAtomCollection(unittest.TestCase):
         # atoms name "XXX" should weight 0
         assert_array_equal(self.atoms.masses(), np.ones(10))
 
-    def test_moment_of_inertia(self):
+    def test_tensor_of_inertia(self):
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         ref = [[3679339.47775172,  694837.16289436, -263651.10452372],
                [ 694837.16289436, 3803047.59374612, -194611.71739629],
                [-263651.10452372, -194611.71739629, 3425042.27240564]]
-        I = atoms.moment_of_inertia()
+        I = atoms.tensor_of_inertia()
         assert_array_almost_equal(I, ref, decimal=2)
 
     def test_principal_axes(self):
