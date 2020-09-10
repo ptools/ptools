@@ -29,10 +29,10 @@ class BaseAtom(SpatialObject):
         meta (dict[str, ()]): metadata dictionnary
         orig (BaseAtom): initialize from other BaseAtom (copy constructor)
     """
-
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
-                 resid=0, charge=0.0, coords=(0, 0, 0), meta={},
+                 resid=0, charge=0.0, coords=(0, 0, 0), meta=None,
                  orig=None):
+        super().__init__(coords)
         if orig is not None:
             self._init_copy(orig)
         else:
@@ -54,17 +54,18 @@ class BaseAtom(SpatialObject):
 
     @property
     def name(self):
+        """Gets/Sets atom's name."""
         return self._name
 
     @name.setter
-    def name(self, s):
-        self._name = s
+    def name(self, name):
+        self._name = name
         self.element = guess_atom_element(self.name)
         self.mass = guess_atom_mass(self.element)
 
     def _init_copy(self, other):
         super().__init__(other.coords)
-        self._name = other._name
+        self._name = other.name
         self.resname = other.resname
         self.chain = other.chain
         self.index = other.index
@@ -79,6 +80,7 @@ class BaseAtom(SpatialObject):
         return copy.copy(self)
 
     def topdb(self):
+        """Returns the atom's description in PDB format."""
         rec = "ATOM"
         indexbuf = "*****"
         residbuf = "****"
@@ -86,7 +88,7 @@ class BaseAtom(SpatialObject):
         insertion = " "
         chain = " " if not self.chain else self.chain
         occ = 1.0
-        b = 0.0
+        bfactor = 0.0
         element = self.element
 
         if self.index < 100000:
@@ -107,7 +109,7 @@ class BaseAtom(SpatialObject):
 
         return PDB_FMT % (rec, indexbuf, namebuf, altlocchar,
                           self.resname, chain[0], residbuf, insertion[0],
-                          x, y, z, occ, b, "", element)
+                          x, y, z, occ, bfactor, "", element)
 
 
 class Atom(BaseAtom):
@@ -150,9 +152,11 @@ class AtomCollection(SpatialObject):
     Args:
         atoms (list[BaseAtom]): list of atoms
     """
-    def __init__(self, atoms=[]):
+    def __init__(self, atoms=None):
+        if atoms is None:
+            atoms = []
         self.atoms = [Atom(atom, serial, self)
-                      for serial, atom in enumerate(atoms)]
+                        for serial, atom in enumerate(atoms)]
         if self.atoms:
             coords = [atom._coords for atom in self.atoms]
         else:
@@ -212,6 +216,7 @@ class AtomCollection(SpatialObject):
         return (self.coords * weights).sum(axis=0)  / weights.sum()
 
     def moment_of_inertia(self):
+        """Returns the inertia tensors of a set of atoms."""
         masses = self.masses()
         com = self.center_of_mass()
         pos = self.coords - com
@@ -233,7 +238,7 @@ class AtomCollection(SpatialObject):
         return tens
 
     def principal_axes(self):
-        """Calculate the principal axes."""
+        """Returns an AtomCollection principal axes."""
         val, vec = np.linalg.eig(self.moment_of_inertia())
         indices = np.argsort(val)[::-1]
         return vec[:, indices].T
@@ -265,9 +270,9 @@ def guess_atom_element(atom_name):
 
     Basically returns the first non-numeric character in atom_name.
     """
-    for c in atom_name:
-        if c.isalpha():
-            return c
+    for char in atom_name:
+        if char.isalpha():
+            return char
     return "X"
 
 

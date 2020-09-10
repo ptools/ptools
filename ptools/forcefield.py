@@ -1,5 +1,5 @@
 
-import math
+"""Ptools forcefield implementation."""
 
 import numpy as np
 
@@ -67,6 +67,7 @@ class ForceField:
 
 
 class AttractForceField1(ForceField):
+    """The AttractForceField1."""
 
     def __init__(self, receptor, ligand, cutoff=10, paramfile=None):
         super().__init__(receptor, ligand, cutoff)
@@ -87,11 +88,8 @@ class AttractForceField1(ForceField):
         self._repulsive = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
         self._attractive = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
 
-
     def non_bonded_energy(self):
         """Non-bonded energy calculation."""
-        # -- Numpy flavor --
-
         dx = self.receptor.coords[:, None] - self.ligand.coords
         distances = np.sqrt(np.power(dx, 2).sum(axis=2))
         exclude = np.where(distances > self.cutoff)
@@ -120,7 +118,8 @@ class AttractForceField1(ForceField):
         self.ligand.atom_forces -= fdb.sum(axis=0)
 
         # Electrostatics.
-        charge = self.receptor.atom_charges[:, None] * self.ligand.atom_charges * (332.053986 / 20.0)
+        charge = (self.receptor.atom_charges[:, None] *
+                  self.ligand.atom_charges * (332.053986 / 20.0))
         et = charge * rr2
         fdb = dx * (2.0 * et)[:, :, None]
 
@@ -133,8 +132,11 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = elec
         return vdw + elec
 
-
     def non_bonded_energy_legacy(self):
+        """Old-fashioned energy calculation.
+
+        Very slow
+        """
         vdw = 0.0
         elec = 0.0
 

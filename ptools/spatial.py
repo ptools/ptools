@@ -7,7 +7,6 @@ import math
 
 import numpy as np
 from scipy.linalg import expm, norm
-from scipy.spatial.transform import Rotation
 
 
 class SpatialObject:
@@ -29,6 +28,7 @@ class SpatialObject:
         self._coords = coord3d(pos)
 
     def centroid(self):
+        """Returns an spatial object geometric center."""
         return centroid(self._coords)
 
     def translate(self, t):
@@ -49,13 +49,23 @@ class SpatialObject:
         """
         rotate_by(self.coords, angles)
 
-    def rotate(self, r):
-        """Rotate object using rotation matrix or 3 angles."""
-        rotate(self.coords, r)
+    def rotate(self, rotation):
+        """Rotate object using rotation matrix or 3 angles.
 
-    def ab_rotate(self, A, B, angle):
-        """PTools rotation around axis."""
-        ab_rotate(self.coords, A, B, angle)
+        Args:
+            rotation (np.ndarray): 3 x 3 matrix of 3 x 1 vector of angles.
+        """
+        rotate(self.coords, rotation)
+
+    def ab_rotate(self, A, B, amount):
+        """PTools rotation around axis.
+
+        Args:
+            A (np.ndarray (3 x 1)): point A coordinates
+            B (np.ndarray (3 x 1)): point B coordinates
+            amount (float): angle of rotation
+        """
+        ab_rotate(self.coords, A, B, amount)
 
     def transform(self, matrix):
         """Transform object by 4x4 matrix.
@@ -90,9 +100,20 @@ class SpatialObject:
         attract_euler_rotate(self.coords, phi, ssi, rot)
 
     def orient(self, vector, target):
+        """Orients an AtomCollection.
+
+        Args:
+            vector (np.ndarray (3 x 1)): source vector
+            target (np.ndarray (3 x 1)): target vector
+        """
         orient(self.coords, vector, target)
 
     def inertia_tensors(self, sort=False):
+        """Returns an AtomCollection inertial tensors.
+
+        Args:
+            sort (bool): if True, tensors are sorted by amplitude.
+        """
         return inertia_tensors(self.coords, sort)
 
 
@@ -139,11 +160,6 @@ def centroid(x):
     return np.mean(x, axis=0)
 
 
-def norm(u):
-    """Returns the norm of a vector."""
-    return np.linalg.norm(u)
-
-
 def angle(u, v):
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
@@ -165,19 +181,18 @@ def inertia_tensors(coords, sort=False):
     com = coords.mean(axis=0)
     X = coords - com
 
-    I = np.dot(X.transpose(), X)
-    evalues, evectors = np.linalg.eig(I)
+    tensors = np.dot(X.transpose(), X)
+    evalues, evectors = np.linalg.eig(tensors)
     if sort:
         order = np.argsort(evalues)
         evectors = evectors[:, order].transpose()
     return evectors
 
 
-
 #
 # Translation routines
 #
-def translation_matrix(direction=[0, 0, 0]):
+def translation_matrix(direction=np.zeros(3)):
     """Return the matrix to translate by direction vector."""
     m = np.identity(4)
     m[:3, 3] = direction[:3]
@@ -193,10 +208,10 @@ def translate(coords, t):
             4 x 4 matrix
     """
     def _translate_scalar(x):
-        np.add(coords, t, coords)
+        np.add(coords, x, coords)
 
     def isscalar(s):
-        return isinstance(t, (float, int))
+        return isinstance(s, (float, int))
 
     if isscalar(t):
         _translate_scalar(t)
@@ -213,7 +228,7 @@ def translate(coords, t):
 #
 #  Rotation routines
 #
-def rotation_matrix(angles=[0.0, 0.0, 0.0]):
+def rotation_matrix(angles=np.zeros(3)):
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
@@ -243,7 +258,7 @@ def rotation_matrix(angles=[0.0, 0.0, 0.0]):
     return r
 
 
-def rotate_by(coords, angles=[0.0, 0.0, 0.0]):
+def rotate_by(coords, angles=np.zeros(3)):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -324,23 +339,23 @@ def attract_euler_rotate(coords, phi, ssi, rot):
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotation_matrix(A, B, angle):
-    """Returns the rotation matrix to rotate around axis (A, B) by angle (in radians)."""
-    return rotation_matrix_around_axis(B - A, angle)
+def ab_rotation_matrix(A, B, amount):
+    """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
+    return rotation_matrix_around_axis(B - A, amount)
 
 
-def ab_rotate(coords, A, B, angle):
-    """Rotates coords around axis (A, B) by angle theta (in radians)."""
-    m = rotation_matrix_around_axis(B - A, angle)
+def ab_rotate(coords, A, B, amount):
+    """Rotates coords around axis (A, B) by amount theta (in radians)."""
+    m = rotation_matrix_around_axis(B - A, amount)
     rotate(coords, m)
 
 
-def rotation_matrix_around_axis(axis, angle, center=np.array([0, 0, 0])):
+def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
     Args:
         axis (np.ndarray (N x 3)): axis of rotation
-        angle (float): angle in radians
+        amount (float): amount in radians
         center (np.ndarray (3 x 1)): center of rotation
 
     Returns:
@@ -348,7 +363,7 @@ def rotation_matrix_around_axis(axis, angle, center=np.array([0, 0, 0])):
     """
     origmat = translation_matrix(- center)
     offsetmat = translation_matrix(+ center)
-    r = expm(np.cross(np.identity(3), axis / norm(axis) * angle))
+    r = expm(np.cross(np.identity(3), axis / norm(axis) * amount))
     m = np.identity(4)
     m[:3, :3] = r
     return np.matmul(np.matmul(offsetmat, m), origmat)
@@ -358,7 +373,7 @@ def rotation_matrix_around_axis(axis, angle, center=np.array([0, 0, 0])):
 #  Other transformation routines
 #
 
-def transformation_matrix(translation=[0., 0., 0.], rotation=[0., 0., 0.]):
+def transformation_matrix(translation=np.zeros(3), rotation=np.zeros(3)):
     """Returns a transformation matrix.
 
     Args:
@@ -428,11 +443,17 @@ def orientation_matrix(coords, vector, target):
     axis = np.cross(vec1, vec2)
     sine = np.linalg.norm(axis)
     cosine = np.dot(vec1, vec2)
-    angle = math.atan2(sine, cosine)
+    amount = math.atan2(sine, cosine)
 
-    return rotation_matrix_around_axis(axis, angle, center=com)
+    return rotation_matrix_around_axis(axis, amount, center=com)
 
 
 def orient(coords, vector, target):
+    """Orients coordinates.
+
+        Args:
+            vector (np.ndarray (3 x 1)): source vector
+            target (np.ndarray (3 x 1)): target vector
+    """
     t = orientation_matrix(coords, vector, target)
     transform(coords, t)
