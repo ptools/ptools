@@ -236,13 +236,28 @@ class AtomCollection(SpatialObject):
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
     def tensor_of_inertia(self, method="accurate"):
-        """Returns the inertia tensors of a set of atoms."""
+        """Returns the inertia tensors of a set of atoms.
+
+        Args:
+            method (str): "fast" or "accurate"
+                The "fast" method does not take into account atom masses.
+        """
         if method == "fast":
             return ptools.spatial.tensor_of_inertia(self.coords, None, method)
         return ptools.spatial.tensor_of_inertia(self.coords, self.masses, method)
 
     def principal_axes(self, sort=True, method="accurate"):
-        """Returns an AtomCollection principal axes."""
+        """Returns an AtomCollection principal axes.
+
+        Args:
+            sort (bool): sort axes by importance
+            method (str): "fast" or "accurate"
+                The "fast" method does not take into account atom masses when
+                calculating the tensor of inertia, resulting in a less
+                accurate result.
+                The "fast" method is probably sufficient to calculate axes of
+                inertia.
+        """
         return ptools.spatial.principal_axes(self.tensor_of_inertia(method), sort)
 
     def radius_of_gyration(self):
