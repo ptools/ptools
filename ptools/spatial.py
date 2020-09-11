@@ -17,6 +17,9 @@ class SpatialObject:
     def __init__(self, coords=(0, 0, 0)):
         self._coords = coord3d(coords)
 
+    def copy(self):
+        return self.__class__(self._coords)
+
     @property
     def coords(self):
         """Get atom cartesian coordinates."""

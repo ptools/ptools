@@ -75,7 +75,9 @@ class BaseAtom(SpatialObject):
 
     def copy(self):
         """Returns a copy of the current atom."""
-        return copy.copy(self)
+        obj = copy.copy(self)
+        obj.coords = obj.coords.copy()
+        return obj
 
     def topdb(self):
         """Returns the atom's description in PDB format."""
@@ -149,8 +151,8 @@ class Atom(BaseAtom):
     def mass(self, mass):
         self.collection.masses[self.serial] = mass
 
-
-    # Override BaseAtom name setter (name getter override is mandatory).
+    # Override BaseAtom name setter to manually handle masses
+    # (name getter override is mandatory).
     @property
     def name(self):
         """Gets/Sets atom's name."""
@@ -221,10 +223,11 @@ class AtomCollection(SpatialObject):
     def __add__(self, other):
         """Concatenate two RigidBody instances."""
         output = self.copy()
-        for atom in other:
-            output.atoms.append(atom.copy())
-            output._coords = np.vstack((output._coords, atom._coords))
+        output.atoms += [atom.copy() for atom in other]
+        output.coords = np.vstack((output.coords, other.coords))
         return output
+
+
 
     def center(self):
         """Returns the isobarycenter (geometric center) of a collection of
