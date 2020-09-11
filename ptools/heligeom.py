@@ -22,7 +22,7 @@ def heli_construct(mono1, hp, N, Z=False):
 def extend(hp, mono1, N, Z=False):
     final = ptools.RigidBody()
     monoTest = mono1.copy()
-    i = 0
+    chain_id = 0
     O = hp.point
     axe = hp.unit
     if Z:
@@ -30,18 +30,18 @@ def extend(hp, mono1, N, Z=False):
         I = monoTest.tensor_of_inertia()
         T = monoTest.orient(I[0], [0, 0, 1])
 
-    monoTest.set_chain(string.ascii_uppercase[i % 26])
+    monoTest.set_chain(string.ascii_uppercase[chain_id % 26])
 
     final += monoTest
 
-    i += 1
+    chain_id += 1
 
     for j in range(N - 1):
         monoTest.ab_rotate(O, O + axe, hp.angle)
         monoTest.translate(axe * hp.normtranslation)
-        monoTest.set_chain(string.ascii_uppercase[i % 26])
+        monoTest.set_chain(string.ascii_uppercase[chain_id % 26])
         final += monoTest
-        i += 1
+        chain_id += 1
 
     return final
 
