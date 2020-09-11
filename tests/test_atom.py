@@ -217,7 +217,7 @@ class TestAtomCollection(unittest.TestCase):
                          "C" * len(self.atoms))
 
         mass_ref = ptools.tables.masses["C"]
-        assert_array_almost_equal(self.atoms.masses(),
+        assert_array_almost_equal(self.atoms.masses,
                                   np.ones(len(self.atoms)) * mass_ref)
 
     def test_center(self):
@@ -229,12 +229,12 @@ class TestAtomCollection(unittest.TestCase):
         center = self.atoms.center_of_mass()
         assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
-        # Set masses to 12 (in principle, updating an atom's name
-        # should also update its type).
+        # Update atoms name, therefore element, therefore mass.
         for i in range(5):
             self.atoms[i].name = "CA"
         for i in range(5, 10):
             self.atoms[i].name = "NZ"
+
         center = self.atoms.center_of_mass()
         assert_array_almost_equal(center, [4.69179, 4.69179, 4.69179])
 
@@ -265,7 +265,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_masses(self):
         # atoms name "XXX" should weight 0
-        assert_array_equal(self.atoms.masses(), np.ones(10))
+        assert_array_equal(self.atoms.masses, np.ones(10))
 
     def test_tensor_of_inertia(self):
         # Calculated with MDAnalysis 0.20.1:

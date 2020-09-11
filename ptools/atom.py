@@ -51,7 +51,6 @@ class BaseAtom(SpatialObject):
         self.charge = charge
         self.meta = meta
         self.element = guess_atom_element(self.name)
-        self.mass = guess_atom_mass(self.element)
 
     @property
     def name(self):
@@ -62,7 +61,6 @@ class BaseAtom(SpatialObject):
     def name(self, name):
         self._name = name
         self.element = guess_atom_element(self.name)
-        self.mass = guess_atom_mass(self.element)
 
     def _init_copy(self, other):
         super().__init__(other.coords)
@@ -74,7 +72,6 @@ class BaseAtom(SpatialObject):
         self.charge = other.charge
         self.meta = other.meta
         self.element = other.element
-        self.mass = other.mass
 
     def copy(self):
         """Returns a copy of the current atom."""
@@ -131,9 +128,9 @@ class Atom(BaseAtom):
 
     """
     def __init__(self, atom, serial, collection):
-        super().__init__(orig=atom)
         self.serial = serial
         self.collection = collection
+        super().__init__(orig=atom)
 
     @property
     def coords(self):
@@ -143,6 +140,27 @@ class Atom(BaseAtom):
     @coords.setter
     def coords(self, pos):
         self.collection.coords[self.serial] = coord3d(pos)
+
+    @property
+    def mass(self):
+        return self.collection.masses(self.serial)
+
+    @mass.setter
+    def mass(self, mass):
+        self.collection.masses[self.serial] = mass
+
+
+    # Override BaseAtom name setter (name getter override is mandatory).
+    @property
+    def name(self):
+        """Gets/Sets atom's name."""
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+        self.element = guess_atom_element(self.name)
+        self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
 class AtomCollection(SpatialObject):
@@ -163,6 +181,8 @@ class AtomCollection(SpatialObject):
         else:
             coords = np.zeros((0, 3))
         super().__init__(coords)
+        self.masses = np.zeros(len(self.atoms))
+        self.guess_masses()
 
     def __len__(self):
         """Gets the number of atoms in the collection."""
@@ -174,9 +194,9 @@ class AtomCollection(SpatialObject):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def masses(self):
-        """Returns the array of atom masses."""
-        return np.array([atom.mass for atom in self.atoms])
+    def guess_masses(self):
+        """Guess atom masses and store them."""
+        self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
 
     def copy(self):
         """Returns a copy of the current collection."""
@@ -213,13 +233,13 @@ class AtomCollection(SpatialObject):
 
     def center_of_mass(self):
         """Return the center of mass (barycenter)."""
-        return ptools.spatial.center_of_mass(self.coords, self.masses())
+        return ptools.spatial.center_of_mass(self.coords, self.masses)
 
     def tensor_of_inertia(self, method="accurate"):
         """Returns the inertia tensors of a set of atoms."""
         if method == "fast":
             return ptools.spatial.tensor_of_inertia(self.coords, None, method)
-        return ptools.spatial.tensor_of_inertia(self.coords, self.masses(), method)
+        return ptools.spatial.tensor_of_inertia(self.coords, self.masses, method)
 
     def principal_axes(self, sort=True, method="accurate"):
         """Returns an AtomCollection principal axes."""
