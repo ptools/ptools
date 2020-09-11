@@ -212,7 +212,7 @@ def tensor_of_inertia(coords, weights=None, method="accurate"):
         return _tensor_of_inertia_accurate(coords, weights)
     elif method == "fast":
         return _tensor_of_inertia_fast(coords)
-    raise ValueError('parameter "method" accepts only 2 values: "fast" "
+    raise ValueError('parameter "method" accepts only 2 values: "fast" '
                      f'or "accurate" (found {method})')
 
 
