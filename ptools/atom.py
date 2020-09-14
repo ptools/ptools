@@ -228,9 +228,6 @@ class AtomCollection(SpatialObject):
         """
         return len(self)
 
-
-
-
     def center(self):
         """Returns the isobarycenter (geometric center) of a collection of
         atoms."""
@@ -285,6 +282,16 @@ class AtomCollection(SpatialObject):
         """Sets all atom chain property."""
         for atom in self.atoms:
             atom.chain = chain
+
+    def select_atom_type(self, atom_type):
+        """Returns a sub-collection made of atoms with desired atom type."""
+        return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
+
+    def select_residue_range(self, residue_range):
+        """Returns a sub-collection made of atoms with desired which residue is within the range."""
+        start, end = residue_range
+        return self.__class__(atoms=[atom for atom in self if start <= atom.resid <= end])
+
 
 
 def guess_atom_element(atom_name):
