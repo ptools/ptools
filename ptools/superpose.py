@@ -88,6 +88,12 @@ def fit(mobile, target):
     mobile.move(matrix)
 
 
+def rmsd(mobile, target):
+    assert len(mobile) == len(target)
+    e = np.power((mobile.coords - target.coords), 2).sum(axis=1)
+    return (np.sqrt(np.mean(e)))
+
+
 def mat_trans_2_screw(matrix):
     """Converts a transformation matrix to a Screw
 
