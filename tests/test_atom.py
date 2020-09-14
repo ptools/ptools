@@ -68,6 +68,8 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom_copy.index, 42)
         self.assertEqual(atom_copy.resid, 17)
         self.assertEqual(atom_copy.charge, 2.0)
+        self.assertNotEqual(atom_copy.coords.__array_interface__['data'][0],
+                            atom.coords.__array_interface__['data'][0])
         assert_array_almost_equal(atom_copy.coords, (1, 2, 3))
         atom.coords = (0, 0, 0)
         assert_array_almost_equal(atom_copy.coords, (1, 2, 3))
@@ -262,6 +264,16 @@ class TestAtomCollection(unittest.TestCase):
         all_atoms = self.atoms + atoms2
         N = len(self.atoms) + len(atoms2)
         self.assertEqual(len(all_atoms), N)
+
+    def test_add_makes_copies(self):
+        atoms2 = AtomCollection([BaseAtom(coords=(i+100, i, i))
+                                 for i in range(10)])
+        assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
+        all_atoms = self.atoms + atoms2
+        atoms2[-1].coords = np.zeros(3)
+
+        assert_array_almost_equal(atoms2[-1].coords, [0, 0, 0])
+        assert_array_almost_equal(all_atoms[-1].coords, [109, 9, 9])
 
     def test_masses(self):
         # atoms name "XXX" should weight 0

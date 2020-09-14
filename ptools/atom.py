@@ -196,6 +196,23 @@ class AtomCollection(SpatialObject):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
+    def __iter__(self):
+        """Iterate over the collection atoms."""
+        return iter(self.atoms)
+
+    def __getitem__(self, serial):
+        """Accesses an atom by its serial number (which the internal index
+        starting at 0)."""
+        return self.atoms[serial]
+
+    def __add__(self, other):
+        """Concatenate two RigidBody instances."""
+        output = self.copy()
+        other = other.copy()
+        output.atoms += [atom for atom in other]
+        output.coords = np.concatenate((output.coords, other.coords), axis=0)
+        return output
+
     def guess_masses(self):
         """Guess atom masses and store them."""
         self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
@@ -211,21 +228,6 @@ class AtomCollection(SpatialObject):
         """
         return len(self)
 
-    def __iter__(self):
-        """Iterate over the collection atoms."""
-        return iter(self.atoms)
-
-    def __getitem__(self, serial):
-        """Accesses an atom by its serial number (which the internal index
-        starting at 0)."""
-        return self.atoms[serial]
-
-    def __add__(self, other):
-        """Concatenate two RigidBody instances."""
-        output = self.copy()
-        output.atoms += [atom.copy() for atom in other]
-        output.coords = np.vstack((output.coords, other.coords))
-        return output
 
 
 
