@@ -43,6 +43,17 @@ class TestSpatialObjectVector(unittest.TestCase):
         assert_array_almost_equal(target.coords, [0, 9, 12])
         assert_array_almost_equal(source.coords, [6, 9, 12])
 
+    def test_distance_to_axis(self):
+        o = spatial.SpatialObject((0, 0, 0))
+        axis = np.array((1, 0, 0))
+        self.assertAlmostEqual(o.distance_to_axis(axis), 0.0)
+
+        o.coords = (0, 1, 0)
+        self.assertAlmostEqual(o.distance_to_axis(axis), 1.0)
+
+        o.coords = (0, 1, 1)
+        self.assertAlmostEqual(o.distance_to_axis(axis), 2.0 ** 0.5)
+
 
 
 class TestSpatialObjectArray(unittest.TestCase):
