@@ -119,6 +119,14 @@ class SpatialObject:
         """
         return inertia_tensors(self.coords, sort)
 
+    def distance_to_axis(self, axis):
+        """Returns the SpatialObject distance to an arbitrary axis.
+
+        Args:
+            axis (np.array(3)): axis in 3-D
+        """
+        return np.linalg.norm(np.cross(self.coords, axis))
+
 
 def coord3d(value=(0, 0, 0), *args):
     """Convert an object to a 1 x 3 shaped numpy array of floats."""
