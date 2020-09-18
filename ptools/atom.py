@@ -287,9 +287,8 @@ class AtomCollection(SpatialObject):
         """Returns a sub-collection made of atoms with desired atom type."""
         return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
 
-    def select_residue_range(self, residue_range):
+    def select_residue_range(self, start, end):
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
-        start, end = residue_range
         return self.__class__(atoms=[atom for atom in self if start <= atom.resid <= end])
 
 
