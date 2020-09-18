@@ -88,9 +88,9 @@ def fit(mobile, target):
     mobile.move(matrix)
 
 
-def rmsd(mobile, target, fit=False):
+def rmsd(mobile, target, do_fit=False):
     assert len(mobile) == len(target)
-    if fit:
+    if do_fit:
         mobile = mobile.copy()
         fit(mobile, target)
     e = np.power((mobile.coords - target.coords), 2).sum(axis=1)
