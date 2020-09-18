@@ -164,19 +164,19 @@ def mat_trans_2_screw(matrix):
         screw.point = screw.point/(1 - x[0] - y[1] + z[2])
 
     else:     # angle=0
-        screw.point = spatial.coord3d(0, 0, 0)
+        screw.point = np.zeros(3)
         norm_trans = np.linalg.norm(trans)
         if norm_trans != 0:
             screw.unit = trans / norm_trans
         else:
-            screw.unit =  spatial.coord3d(0, 0, 1)
+            screw.unit =  np.arra((0, 0, 1))
         screw.normtranslation = np.linalg.norm(trans)
         screw.angle = 0
         return screw
 
-    v = spatial.coord3d((1, 0, 0))
+    v = np.array((1, 0, 0))
     if abs(spatial.angle(screw.unit, v)) < 0.1:
-        v = spatial.coord3d((0, 0, 1))
+        v = np.array((0, 0, 1))
 
     u = v - np.dot(v, screw.unit) * screw.unit
     u /= np.linalg.norm(u)

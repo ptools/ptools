@@ -8,7 +8,7 @@ import math
 import numpy as np
 
 import ptools
-from ptools.spatial import SpatialObject, coord3d
+from ptools.spatial import SpatialObject
 from . import tables
 
 
@@ -141,7 +141,7 @@ class Atom(BaseAtom):
 
     @coords.setter
     def coords(self, pos):
-        self.collection.coords[self.serial] = coord3d(pos)
+        self.collection.coords[self.serial] = np.array(pos)
 
     @property
     def mass(self):
