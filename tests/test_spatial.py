@@ -4,7 +4,7 @@
 import math
 import unittest
 
-import numpy
+import numpy as np
 import pytest
 
 
@@ -49,12 +49,17 @@ class TestSpatialObjectArray(unittest.TestCase):
     """Test spatial.SpatialObject methods on an array of vector."""
 
     def setUp(self):
-        array = numpy.array(((0, 0, 0), (1, 1, 1)), dtype=float)
+        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = spatial.SpatialObject(array)
 
     def test_constructor(self):
         self.assertEqual(self.obj.coords.shape, (2, 3))
         assert_array_almost_equal(self.obj.coords[1], (1, 1, 1))
+
+
+    def test_tensor_of_inertia(self):
+        assert_array_almost_equal(self.obj.tensor_of_inertia(),
+                                  np.full((3, 3), 0.5))
 
 
 class TestRotation(unittest.TestCase):
@@ -143,7 +148,7 @@ class TestRotation(unittest.TestCase):
 
     def test_rotate_by(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Rotate by 12° along X-axis.
         spatial.rotate_by(coords, [12, 0, 0])
@@ -167,7 +172,7 @@ class TestRotation(unittest.TestCase):
 
     def test_rotate_spatial_object(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Initialize SpatialObject.
         o = spatial.SpatialObject(coords)
@@ -194,7 +199,7 @@ class TestRotation(unittest.TestCase):
 
     def test_rotate_abstract_euler(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Initialize SpatialObject.
         o = spatial.SpatialObject(coords)
@@ -211,7 +216,7 @@ class TestRotation(unittest.TestCase):
         #     ...     c = r.getCoords(i)
         #     ...     print c.x, c.y, c.z
         #
-        ref = numpy.array([
+        ref = np.array([
             [1.92178620509, 0.634022491719, 23.6411664954],
             [1.10926523817, 1.12485261069, 25.0899230217],
             [0.296744271247, 1.61568272966, 26.5386795481],
@@ -237,7 +242,7 @@ class TestTransformation(unittest.TestCase):
         """
         # Matrix calculated with VMD that correspond to a rotation
         # in the X-axis by 10°.
-        m = numpy.array([
+        m = np.array([
             [1.0, 0.0, 0.0, 0.0],
             [0.0, 0.984807753012208, -0.17364817766693033, 0.0],
             [0.0, 0.17364817766693033, 0.984807753012208, 0.0],
@@ -245,7 +250,7 @@ class TestTransformation(unittest.TestCase):
         ])
 
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         ref = coords.copy()
         spatial.rotate_by(ref, [10, 0, 0])
@@ -256,17 +261,17 @@ class TestTransformation(unittest.TestCase):
     def test_transform(self):
         """Test transformation with a random matrix."""
         # Input transformation matrix (just a random matrix).
-        m = numpy.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
+        m = np.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
                          [ 0.74291592,  0.00244003,  0.20881428,  0.91014385],
                          [ 0.71045798,  0.85828462,  0.71570462,  0.96008097],
                          [ 0.43315630,  0.30949433,  0.93486660,  0.48177513]])
 
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Reference calculated with VMD
         # with input topology = tests/data/test_10atoms.pdb.
-        ref = numpy.array([
+        ref = np.array([
             [0.5175050497055054, 0.253219336271286, 1.0914303064346313],
             [0.5412969589233398, 0.2738751769065857, 1.1091270446777344],
             [0.5621657967567444, 0.291993111371994, 1.1246496438980103],
@@ -285,13 +290,13 @@ class TestTransformation(unittest.TestCase):
     def test_transform_spatial_object(self):
         """Test spatial.SpatialObject.transform."""
         # Input transformation matrix (just a random matrix).
-        m = numpy.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
+        m = np.array([[ 0.72898284,  0.43879558,  0.31011219,  0.32696626],
                          [ 0.74291592,  0.00244003,  0.20881428,  0.91014385],
                          [ 0.71045798,  0.85828462,  0.71570462,  0.96008097],
                          [ 0.43315630,  0.30949433,  0.93486660,  0.48177513]])
 
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
-        coords = numpy.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
+        coords = np.array(list([i + 1., i + 11., i + 21.] for i in range(10)))
 
         # Initialize SpatialObject.
         o = spatial.SpatialObject(coords)
@@ -301,7 +306,7 @@ class TestTransformation(unittest.TestCase):
 
         # Reference calculated with VMD
         # with input topology = tests/data/test_10atoms.pdb.
-        ref = numpy.array([
+        ref = np.array([
             [0.5175050497055054, 0.253219336271286, 1.0914303064346313],
             [0.5412969589233398, 0.2738751769065857, 1.1091270446777344],
             [0.5621657967567444, 0.291993111371994, 1.1246496438980103],
@@ -375,7 +380,7 @@ class TestCoord3D(unittest.TestCase):
 
 class TestSpatialObjectTransformations(unittest.TestCase):
     def setUp(self):
-        array = numpy.array(((0, 0, 0), (1, 1, 1)), dtype=float)
+        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = spatial.SpatialObject(array)
 
     def test_rotate(self):
