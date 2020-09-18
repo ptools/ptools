@@ -22,12 +22,12 @@ class SpatialObject:
 
     @property
     def coords(self):
-        """Get atom cartesian coordinates."""
+        """Get SpatialObject cartesian coordinates."""
         return self._coords
 
     @coords.setter
     def coords(self, pos):
-        """Set atom cartesian coordinates."""
+        """Set SpatialObject cartesian coordinates."""
         self._coords = coord3d(pos)
 
     def centroid(self):

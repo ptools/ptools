@@ -35,6 +35,15 @@ class TestSpatialObjectVector(unittest.TestCase):
         o.translate((1, 2, 3))
         assert_array_almost_equal(o.coords, (1, 2, 3))
 
+    def test_copy(self):
+        source = spatial.SpatialObject((6, 9, 12))
+        target = source.copy()
+        assert_array_almost_equal(target.coords, source.coords)
+        target.coords[0] = 0
+        assert_array_almost_equal(target.coords, [0, 9, 12])
+        assert_array_almost_equal(source.coords, [6, 9, 12])
+
+
 
 class TestSpatialObjectArray(unittest.TestCase):
     """Test spatial.SpatialObject methods on an array of vector."""
