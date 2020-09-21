@@ -401,6 +401,33 @@ class TestSpatialObjectTransformations(unittest.TestCase):
         self.obj.rotate(matrix)
         assert_array_almost_equal(self.obj.coords, ref)
 
+    def test_rotate_with_vector(self):
+        ref = [[0.0, 0.0, 0.0],
+               [1.0, 0.8111595511436462, 1.1584558486938477]]
+        spatial.rotate(self.obj.coords, (10, 0, 0))
+        assert_array_almost_equal(self.obj.coords, ref)
+
+    def test_rotate_with_bad_input(self):
+        err = r"Dimensions error: expected 3 x 1 or 4 x 4 \(got \(4,\)\)"
+        with self.assertRaisesRegex(ValueError, err):
+            self.obj.rotate((1, 0, 0, 0))
+
+    def test_translate(self):
+        self.obj.translate((1, 0, 0))
+        assert_array_almost_equal(self.obj.coords, [[1, 0, 0], [2, 1, 1]])
+
+    def test_translate_with_4_by_4(self):
+        m = spatial.transformation_matrix(translation=(1, 0, 0))
+        self.assertEqual(m.shape, (4, 4))
+        self.obj.translate(m)
+        assert_array_almost_equal(self.obj.coords, [[1, 0, 0], [2, 1, 1]])
+
+    def test_translate_with_impossible_shape(self):
+        err = r"Dimensions error: expected 3 x 1 or 4 x 4 \(got \(4,\)\)"
+        with self.assertRaisesRegex(ValueError, err):
+            self.obj.translate((1, 0, 0, 0))
+
+
 
 class TestSpatial(unittest.TestCase):
 
@@ -410,3 +437,24 @@ class TestSpatial(unittest.TestCase):
         angle = spatial.angle(u, v)
         self.assertAlmostEqual(math.degrees(angle), 45)
 
+    def test_tensor_of_inertia_accurate_fails_without_weights(self):
+        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
+        self.obj = spatial.SpatialObject(array)
+        err = "need weights to compute accurate tensor of inertia"
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.tensor_of_inertia(array, method="accurate")
+
+    def test_tensor_of_inertia_invalid_method(self):
+        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
+        self.obj = spatial.SpatialObject(array)
+        err = (r'parameter "method" accepts only 2 values: "fast" '
+               r'or "accurate" \(found foobar\)')
+        with self.assertRaisesRegex(ValueError, err):
+            spatial.tensor_of_inertia(array, method="foobar")
+
+
+
+
+
+
+# ptools/spatial.py         203      4    98%   280, 334, 338, 401

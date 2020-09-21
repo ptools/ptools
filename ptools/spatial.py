@@ -215,7 +215,6 @@ def _tensor_of_inertia_fast(coords):
 
 
 def tensor_of_inertia(coords, weights=None, method="accurate"):
-    assert method in ("accurate", "fast")
     if method == "accurate":
         if weights is None:
             raise ValueError("need weights to compute accurate tensor of "
