@@ -91,6 +91,12 @@ class TestBaseAtom(unittest.TestCase):
         parent.coords = (0, 0, 0)
         assert_array_almost_equal(atom.coords, (1, 2, 3))
 
+    def test_name_setter(self):
+        atom = BaseAtom()
+        self.assertEqual(atom.element, "X")
+        atom.name = "CA"
+        self.assertEqual(atom.element, "C")
+
     def test_topdb(self):
         atom = BaseAtom(name="CA", resname="ALA", chain="A",
                         index=42, resid=17, charge=2.0, coords=(1, 2, 3))
