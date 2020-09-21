@@ -34,6 +34,20 @@ class TestSuperpose(unittest.TestCase):
 
         assert_array_almost_equal(mobile.coords, self.target.coords)
 
+    def test_rmsd(self):
+        # RMSD with copy should be 0.0
+        mobile = self.target.copy()
+        self.assertAlmostEqual(superpose.rmsd(mobile, self.target), 0.0)
+
+        # RMSD after translation of 10 units should be 10.
+        mobile.translate((10, 0, 0))
+        self.assertAlmostEqual(superpose.rmsd(mobile, self.target), 10.0)
+
+        # RMSD after translation and fit should be 0.0.
+        self.assertAlmostEqual(superpose.rmsd(mobile, self.target, do_fit=True), 0)
+
+
+
 
 class TestScrew(unittest.TestCase):
 
