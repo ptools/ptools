@@ -145,7 +145,7 @@ class Atom(BaseAtom):
 
     @property
     def mass(self):
-        return self.collection.masses(self.serial)
+        return self.collection.masses[self.serial]
 
     @mass.setter
     def mass(self, mass):
