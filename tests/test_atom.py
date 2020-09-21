@@ -201,6 +201,11 @@ class TestAtomCollection(unittest.TestCase):
         thecopy = AtomCollection.copy(self.atoms)
         self._assert_copy_successful(thecopy)
 
+    def test_repr(self):
+        s = repr(self.atoms)
+        self.assertIn("AtomCollection", s)
+        self.assertIn(str(len(self.atoms)), s)
+
     def test_len(self):
         self.assertEqual(len(self.atoms), 10)
 
@@ -299,15 +304,25 @@ class TestAtomCollection(unittest.TestCase):
         # atoms name "XXX" should weight 0
         assert_array_equal(self.atoms.masses, np.ones(10))
 
-    def test_tensor_of_inertia(self):
-        # Calculated with MDAnalysis 0.20.1:
+    def test_tensor_of_inertia_accurate(self):
+        # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         ref = [[3679339.47775172,  694837.16289436, -263651.10452372],
                [ 694837.16289436, 3803047.59374612, -194611.71739629],
                [-263651.10452372, -194611.71739629, 3425042.27240564]]
-        I = atoms.tensor_of_inertia()
+        I = atoms.tensor_of_inertia(method="accurate")
         assert_array_almost_equal(I, ref, decimal=2)
+
+    def test_tensor_of_inertia_fast(self):
+        # Reference calculated with ptools-python d0b41dc (this is actually a
+        # non-regression test).
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        ref = [[147200.90378622, -57794.00682372,  21649.47873511],
+               [-57794.00682372, 136694.86723672,  16076.77968389],
+               [ 21649.47873511,  16076.77968389, 168066.83235232]]
+        I = atoms.tensor_of_inertia(method="fast")
+        assert_array_almost_equal(I, ref, decimal=8)
 
     def test_principal_axes(self):
         atoms = ptools.io.read_pdb(TEST_LIGAND)
@@ -318,6 +333,18 @@ class TestAtomCollection(unittest.TestCase):
                [ 0.7529492 , -0.62908698,  0.1931763 ]]
         I = atoms.principal_axes()
         assert_array_almost_equal(I, ref)
+
+    def test_select_atom_type(self):
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        sel = atoms.select_atom_type("CA")
+        self.assertEqual(len(sel), 426)
+        self.assertEqual([atom.name for atom in sel], ["CA"] * 426)
+
+    def test_select_residue_range(self):
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        sel = atoms.select_residue_range(10, 20)
+        self.assertEqual(len(sel), 23)
+        self.assertTrue(all(10 <= atom.resid <= 20 for atom in sel))
 
     def test_to_pdb(self):
         s = self.atoms.topdb()
