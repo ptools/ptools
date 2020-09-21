@@ -209,7 +209,7 @@ class AtomCollection(SpatialObject):
         """Concatenate two RigidBody instances."""
         output = self.copy()
         other = other.copy()
-        output.atoms += [atom for atom in other]
+        output.atoms += list(other)
         output.coords = np.concatenate((output.coords, other.coords), axis=0)
         return output
 
