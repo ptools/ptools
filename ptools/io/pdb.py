@@ -57,8 +57,10 @@ def read_pdb(path):
                 current_model = []
             elif header in ("ATOM  ", "HETATM"):
                 current_model.append(read_atom_line(line))
-    if len(models) >= 1:
-        if current_model and models[-1] != current_model:
+    if models:
+        if current_model:  # No "ENDMDL" flag for last model.
             models.append(current_model)
+        elif len(models) == 1:
+            return AtomCollection(models[0])
         return models
     return AtomCollection(current_model)

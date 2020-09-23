@@ -197,7 +197,7 @@ class AtomCollection(SpatialObject):
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
     def __iter__(self):
-        """Iterate over the collection atoms."""
+        """Iterates over the collection atoms."""
         return iter(self.atoms)
 
     def __getitem__(self, serial):
@@ -206,7 +206,7 @@ class AtomCollection(SpatialObject):
         return self.atoms[serial]
 
     def __add__(self, other):
-        """Concatenate two RigidBody instances."""
+        """Concatenates two RigidBody instances."""
         output = self.copy()
         other = other.copy()
         output.atoms += list(other)
@@ -214,7 +214,7 @@ class AtomCollection(SpatialObject):
         return output
 
     def guess_masses(self):
-        """Guess atom masses and store them."""
+        """Guesses atom masses and store them."""
         self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
 
     def copy(self):
@@ -234,7 +234,7 @@ class AtomCollection(SpatialObject):
         return self.centroid()
 
     def center_of_mass(self):
-        """Return the center of mass (barycenter)."""
+        """Returns the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
     def tensor_of_inertia(self, method="accurate"):
