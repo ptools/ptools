@@ -41,24 +41,3 @@ class TestIO(unittest.TestCase):
         self.assertEqual(len(models), 3)
         for atoms in models:
             self.assertTrue(len(atoms), 10)
-
-
-
-# ---------- coverage: platform darwin, python 3.8.1-final-0 -----------
-# Name                    Stmts   Miss  Cover   Missing
-# -----------------------------------------------------
-# ptools/__init__.py          5      0   100%
-# ptools/atom.py            159      0   100%
-# ptools/attract.py          46     38    17%   23-33, 56-98
-# ptools/forcefield.py      103     37    64%   140-193
-# ptools/heligeom.py         26      0   100%
-# ptools/io/__init__.py       2      0   100%
-# ptools/io/attract.py       88      0   100%
-# ptools/io/pdb.py           35      5    86%   56-57, 61-63
-# ptools/pairlist.py         27      0   100%
-# ptools/rigidbody.py        39      0   100%
-# ptools/spatial.py         203      1    99%   401
-# ptools/superpose.py       118     26    78%   54-55, 139-150, 153-164, 172, 190, 192, 196
-# ptools/tables.py            1      0   100%
-# -----------------------------------------------------
-# TOTAL                     852    108    87%
