@@ -23,8 +23,8 @@ def parse_command_line(args=None):
     return parser.parse_args(args)
 
 
-def main():
-    args = parse_command_line()
+def main(args=None):
+    args = parse_command_line(args)
     args.func(args)
 
 

@@ -6,9 +6,6 @@ import sys
 
 from .pdb import read_pdb
 
-
-
-
 def check_file_exists(path, message=False):
     """Checks that a file exists.
 
