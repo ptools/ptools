@@ -58,13 +58,10 @@ PTools revision {ptools.__version__}
     print(f"{nbminim} series of minimizations")
     print("rstk = ", rstk)
 
-
-
     ff_name = ptools.io.attract.check_ff_version_match(args.receptor_name, args.ligand_name)
-
-
+    if ff_name != "attract1":
+        raise NotImplementedError(f"force field '{ff_name}' not implemented yet")
     print(f"Detected forcefield: '{ff_name}'")
-
 
     # ff_specs = ptools.forcefield.PTOOLS_FORCEFIELDS[ff_name]
     if args.param:
@@ -77,8 +74,8 @@ PTools revision {ptools.__version__}
     print(f"Read ligand (mobile): {args.ligand_name} with {len(ligand)} particules")
 
     if args.reffile:
-        ref = ptools.Rigidbody(args.reffile)
-        print("Read reference file: {} with {} particules".format(args.reffile, len(ref)))
+        ref = ptools.RigidBody(args.reffile)
+        print(f"Read reference file: {args.reffile} with {len(ref)} particules")
     else:
         ref = None
 
