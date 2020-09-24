@@ -120,7 +120,12 @@ PTools revision {ptools.__version__}
 
 
     # core attract algorithm
-    attract.run_attract(ligand, receptor, translations, rotations, minimlist)
+    params = {
+        "translations": translations,
+        "rotations": rotations,
+        "minimlist": minimlist,
+    }
+    attract.run_attract(ligand, receptor, **params)
 
     # output compressed ligand and receptor:
     # if not single and printFiles:

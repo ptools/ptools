@@ -30,5 +30,3 @@ class TestAttract(CaptureStderrTest):
         args = ["attract", "-r", TEST_RECEPTOR_RED, "-l", "bar"]
         with self.assertRaises(FileNotFoundError):
             ptools_main(args)
-
-
