@@ -19,4 +19,4 @@ from . import (
     tables
 )
 
-from .rigidbody import RigidBody
+from .rigidbody import AttractRigidBody, RigidBody
