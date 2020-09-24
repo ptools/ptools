@@ -33,7 +33,7 @@ def _function(x, ff):
     return e
 
 
-def run_attract(ligand, receptor, translations, rotations, minimlist):
+def run_attract(ligand, receptor, **kwargs):
     """Run the Attract docking procedure.
 
     Args:
@@ -48,10 +48,27 @@ def run_attract(ligand, receptor, translations, rotations, minimlist):
         >>> ligand = ptools.rigidbody.AttractRigidBody("ligand.red")
         >>> reference = ptools.rigidbody.AttractRigidBody("ligand.red")
         >>> nbminim, lignames, minimlist, rstk = read_attract_parameters("attract.inp")
-        >>> translations = {0: ligand.center()}
-        >>> rotations = {0: (0, 0, 0)}
-        >>> ptools.attract.run_attract(ligand, receptor, translations, rotations, minimlist)
+        >>>
+        >>>
+        >>> options = {
+        ...   translations = {0: ligand.center()},
+        ...   rotations = {0: (0, 0, 0)},
+        ...   minimlist = minimlist,
+        }
+        >>> ptools.attract.run_attract(ligand, receptor, **options)
     """
+
+    minimlist = kwargs.pop("minimlist", None)
+    if minimlist is None:
+        raise ValueError("argument 'minimlist' is required")
+
+    translations = kwargs.pop("translations", None)
+    rotations = kwargs.pop("rotations", None)
+
+    if translations is None:
+        translations = {0: ligand.center()}
+    if rotations is None:
+        rotations = {0: (0, 0, 0)}
 
     for transi, transnb in enumerate(sorted(translations.keys())):
         trans = translations[transnb]
