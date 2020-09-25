@@ -33,7 +33,7 @@ def _function(x, ff):
     return e
 
 
-def run_attract(ligand, receptor, translations, rotations, minimlist):
+def run_attract(ligand, receptor, **kwargs):
     """Run the Attract docking procedure.
 
     Args:
@@ -48,10 +48,27 @@ def run_attract(ligand, receptor, translations, rotations, minimlist):
         >>> ligand = ptools.rigidbody.AttractRigidBody("ligand.red")
         >>> reference = ptools.rigidbody.AttractRigidBody("ligand.red")
         >>> nbminim, lignames, minimlist, rstk = read_attract_parameters("attract.inp")
-        >>> translations = {0: ligand.center()}
-        >>> rotations = {0: (0, 0, 0)}
-        >>> ptools.attract.run_attract(ligand, receptor, translations, rotations, minimlist)
+        >>>
+        >>>
+        >>> options = {
+        ...   translations = {0: ligand.center()},
+        ...   rotations = {0: (0, 0, 0)},
+        ...   minimlist = minimlist,
+        }
+        >>> ptools.attract.run_attract(ligand, receptor, **options)
     """
+
+    minimlist = kwargs.pop("minimlist", None)
+    if minimlist is None:
+        raise ValueError("argument 'minimlist' is required")
+
+    translations = kwargs.pop("translations", None)
+    rotations = kwargs.pop("rotations", None)
+
+    if translations is None:
+        translations = {0: ligand.center()}
+    if rotations is None:
+        rotations = {0: (0, 0, 0)}
 
     for transi, transnb in enumerate(sorted(translations.keys())):
         trans = translations[transnb]
@@ -65,34 +82,37 @@ def run_attract(ligand, receptor, translations, rotations, minimlist):
             ligand.translate(trans)
 
             for i, minim in enumerate(minimlist):
-                start = time.time()
-                cutoff = minim["squarecutoff"] ** 0.5
-                niter = minim["maxiter"]
-
-                ff = AttractForceField1(receptor, ligand, cutoff, "aminon.par")
-
                 print(f"- Minimization {i + 1}/{len(minimlist)}:")
-                print(f"  - cutoff: {cutoff:.2f} A")
-                print(f"  - maxiter: {niter}")
-                print(f"  - start energy: {ff.non_bonded_energy():.2f}", flush=True)
-
-
-                x0 = np.zeros(6)
-                res = minimize(_function, x0, args=(ff, ), method="L-BFGS-B",
-                            options={"maxiter": niter})
-
-
-                print("  - results:")
-                print(f"    - energy: {res.fun:6.2f}")
-                print(f"    - transformation matrix:")
-                m = transformation_matrix(res.x[3:], res.x[:3])
-                print(m)
-
-                # Moving ligand accordingly.
-                ligand.transform(m)
-
-                print(f"    - elapsed: {time.time() - start:.1f} seconds")
-                print("=" * 40, flush=True)
+                _run_minimization(minim, minimlist, receptor, ligand)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
+
+
+def _run_minimization(params, minimlist, receptor, ligand):
+    start = time.time()
+    cutoff = params["squarecutoff"] ** 0.5
+    niter = params["maxiter"]
+
+    ff = AttractForceField1(receptor, ligand, cutoff, "aminon.par")
+
+    print(f"  - cutoff: {cutoff:.2f} A")
+    print(f"  - maxiter: {niter}")
+    print(f"  - start energy: {ff.non_bonded_energy():.2f}", flush=True)
+
+    x0 = np.zeros(6)
+    res = minimize(_function, x0, args=(ff, ), method="L-BFGS-B",
+                   options={"maxiter": niter})
+
+    print("  - results:")
+    print(f"    - energy: {res.fun:6.2f}")
+    print(f"    - transformation matrix:")
+    m = transformation_matrix(res.x[3:], res.x[:3])
+    print(m)
+
+    # Moving ligand accordingly.
+    ligand.transform(m)
+
+    print(f"    - elapsed: {time.time() - start:.1f} seconds")
+    print("=" * 40, flush=True)
+

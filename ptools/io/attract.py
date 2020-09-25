@@ -1,6 +1,7 @@
 
 """Read/Write Attract files."""
 
+from ..rigidbody import RigidBody
 
 def read_aminon(path):
     """Read Attract force field parameter file.
@@ -176,3 +177,56 @@ def read_attract_parameter(path):
         minimlist.append(read_minimization())
 
     return nbminim, lignames, minimlist, rstk
+
+
+def read_translations(filename="translation.dat"):
+    """Reads a translation file and returns the dictionary of translations."""
+    rb = RigidBody("translation.dat")
+    print(f"Read {len(rb)} translations from translation.dat")
+    translations = [(atom.index, atom.coords) for atom in rb]
+    return dict(translations)
+
+
+def read_rotations(filename="rotation.dat"):
+    """Returns the  dictionary of rotations read from file.
+
+    Each rotation is a tuple (phi, theta, chi).
+
+    The rotations in the dictionary are keyed by their file line number
+    (1-based)."""
+    twopi = 2.0 * 3.14159265
+    nrot_per_trans = 0
+    theta = []
+    nphi = []
+    # read theta, phi, rot data
+    # nchi is number of steps to rotate about the axis joining the ligand/receptor centers
+    rotdat = open("rotation.dat", "r")
+    line = rotdat.readline().split()
+    ntheta = int(line[0])
+    nchi = int(line[1])
+    print(f"ntheta, nchi: {ntheta} {nchi}")
+    for i in range(ntheta):
+        line = rotdat.readline().split()
+        theta.append(float(line[0]))
+        nphi.append(int(line[1]))
+        nrot_per_trans += nphi[i] * nchi
+        theta[i] = twopi * theta[i] / 360.0
+        print(f"{theta[i]} {nphi[i]}")
+    rotdat.close()
+    rotations = []
+
+    print(f"Read {ntheta} rotation lines from rotation.dat")
+    print(f"{nrot_per_trans} rotations per translation")
+
+    rotnb = 0
+    for kkk in range(ntheta):
+        ssii = theta[kkk]
+        phii = twopi / nphi[kkk]
+        for jjj in range(nphi[kkk]):
+            phiii = (jjj + 1) * phii
+            for iii in range(nchi):
+                rotnb += 1
+                chi = (iii + 1) * twopi / nchi
+                rotations.append((rotnb, (phiii, ssii, chi)))
+
+    return dict(rotations)
