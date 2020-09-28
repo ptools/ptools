@@ -2,6 +2,7 @@
 """Ptools forcefield implementation."""
 
 import numpy as np
+from scipy.spatial.distance import cdist
 
 from .pairlist import PairList
 from .io.attract import read_aminon
@@ -114,10 +115,8 @@ class AttractForceField1(ForceField):
             vlj = (rep - self._attractive_pairs) * rr23
             fb = 6.0 * vlj + 2.0 * rep * rr23
             fdb = dx * fb[:, :, None]
-
             self.receptor.atom_forces += fdb.sum(axis=1)
             self.ligand.atom_forces -= fdb.sum(axis=0)
-
             return vlj.sum()
 
         def elecstrostatics(dx, rr2):
@@ -125,14 +124,14 @@ class AttractForceField1(ForceField):
                       self.ligand.atom_charges * (332.053986 / 20.0))
             et = charge * rr2
             fdb = dx * (2.0 * et)[:, :, None]
-
             self.receptor.atom_forces += fdb.sum(axis=1)
             self.ligand.atom_forces -= fdb.sum(axis=0)
-
             return et.sum()
 
         dx = self.receptor.coords[:, None] - self.ligand.coords
-        sq_distances = np.power(dx, 2).sum(axis=2)
+        sq_distances = cdist(self.receptor.coords, self.ligand.coords,
+                             metric="sqeuclidean")
+
         exclude = np.where(sq_distances > self.sq_cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
@@ -194,9 +193,6 @@ class AttractForceField1(ForceField):
                 fdb = (2.0 * et) * dx
                 self.receptor.atom_forces[ir] += fdb
                 self.ligand.atom_forces[il] -= fdb
-
-        np.save("receptor_forces_total.npy", np.array(self.receptor.atom_forces))
-        np.save("ligand_forces_total.npy", np.array(self.ligand.atom_forces))
 
         self._vdw_energy = vdw
         self._electrostatic_energy = elec
