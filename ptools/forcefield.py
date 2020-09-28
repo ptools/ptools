@@ -38,9 +38,17 @@ class ForceField:
     def __init__(self, receptor, ligand, cutoff=10):
         self.receptor = receptor
         self.ligand = ligand
-        self.cutoff = cutoff
+        self.sq_cutoff = cutoff * cutoff
         self._vdw_energy = 0.0
         self._electrostatic_energy = 0.0
+
+    @property
+    def cutoff(self):
+        return self.sq_cutoff ** 0.5
+
+    @cutoff.setter
+    def cutoff(self, value):
+        self.sq_cutoff = value * value
 
     def update(self):
         """Calculate all energy terms while returning nothing."""
@@ -124,8 +132,8 @@ class AttractForceField1(ForceField):
             return et.sum()
 
         dx = self.receptor.coords[:, None] - self.ligand.coords
-        distances = np.sqrt(np.power(dx, 2).sum(axis=2))
-        exclude = np.where(distances > self.cutoff)
+        sq_distances = np.power(dx, 2).sum(axis=2)
+        exclude = np.where(sq_distances > self.sq_cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
         rr2[exclude] = 0.  # exclude pairs with distance > cutoff
