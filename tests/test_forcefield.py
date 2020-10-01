@@ -27,8 +27,8 @@ class TestAttractForceField1(unittest.TestCase):
     def test_read_ff_params(self):
         ff = AttractForceField1(self.receptor, self.ligand,
                                 paramfile=TEST_AMINON, cutoff=5.0)
-        assert_array_equal(ff._repulsive, self.ff._repulsive)
-        assert_array_equal(ff._attractive, self.ff._attractive)
+        assert_array_equal(ff._repulsive_parameters, self.ff._repulsive_parameters)
+        assert_array_equal(ff._attractive_parameters, self.ff._attractive_parameters)
 
     def test_calculate_energy(self):
         self.ff.update()
