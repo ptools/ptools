@@ -106,6 +106,55 @@ class AttractForceField1(ForceField):
         self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]  # Numpy insane trickery
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
+
+    def nb_new(self):
+        self.non_bonded_energy()
+
+
+        sq_distances = cdist(self.receptor.coords, self.ligand.coords, metric="sqeuclidean")
+        keep = np.where(sq_distances < self.sq_cutoff)
+
+
+        XA = np.take(self.receptor.coords, keep[0], axis=0)
+        XB = np.take(self.ligand.coords, keep[1], axis=0)
+
+
+        dx = XA - XB
+        rr2 = 1.0 / np.power(dx, 2).sum(axis=1)
+
+
+        # Categorie pairs.
+        C = np.array(np.meshgrid(self.receptor.atom_categories,
+                                 self.ligand.atom_categories)).T
+
+
+
+
+        a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep)])
+        b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep)])
+        print(a.shape, b.shape)
+        exit()
+
+
+        rr23 = np.power(rr2, 3)
+        rep = self._repulsive_pairs * rr2
+        vlj = (rep - self._attractive_pairs) * rr23
+        fb = 6.0 * vlj + 2.0 * rep * rr23
+        fdb = dx * fb[:, :, None]
+        self.receptor.atom_forces += fdb.sum(axis=1)
+        self.ligand.atom_forces -= fdb.sum(axis=0)
+        return vlj.sum()
+
+
+
+        exit()
+
+
+
+
+
+
+
     def non_bonded_energy(self):
         """Non-bonded energy calculation."""
 
@@ -119,7 +168,7 @@ class AttractForceField1(ForceField):
             self.ligand.atom_forces -= fdb.sum(axis=0)
             return vlj.sum()
 
-        def elecstrostatics(dx, rr2):
+        def electrostatics(dx, rr2):
             charge = (self.receptor.atom_charges[:, None] *
                       self.ligand.atom_charges * (332.053986 / 20.0))
             et = charge * rr2
@@ -136,10 +185,16 @@ class AttractForceField1(ForceField):
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
         rr2[exclude] = 0.  # exclude pairs with distance > cutoff
+        print("Reference:")
+        print("dx.shape:", dx.shape)
+        print("rr2[rr2 != 0]:", rr2[rr2 != 0])
+        print("rr2[rr2 != 0].shape:", rr2[rr2 != 0].shape)
+        print()
         dx = dx + rr2[:, :, None]
 
+
         self._vdw_energy = van_der_waals(dx, rr2)
-        self._electrostatic_energy = elecstrostatics(dx, rr2)
+        self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
     def non_bonded_energy_legacy(self):
