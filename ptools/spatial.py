@@ -20,6 +20,9 @@ class SpatialObject:
     def copy(self):
         return self.__class__(self._coords)
 
+    def dist(self, other):
+        return dist(self, other)
+
     @property
     def coords(self):
         """Get SpatialObject cartesian coordinates."""
@@ -514,3 +517,8 @@ def orient(coords, vector, target):
     """
     t = orientation_matrix(coords, vector, target)
     transform(coords, t)
+
+
+def dist(a, b):
+    """Returns the distance between two SpatialObject instances."""
+    return (((a.coords - b.coords) ** 2.0).sum()) ** 0.5
