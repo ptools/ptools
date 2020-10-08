@@ -106,7 +106,65 @@ class AttractForceField1(ForceField):
         self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]  # Numpy insane trickery
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
+
     def non_bonded_energy(self):
+        if self.cutoff > 10:
+            return self._nb_energy_large_cutoff()
+        return self._nb_energy_small_cutoff()
+
+
+    def _nb_energy_small_cutoff(self):
+
+        def van_der_waals(dx, rr2):
+            a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep)])
+            b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep)])
+
+            rr23 = np.power(rr2, 3)
+            rep = b * rr2
+            vlj = (rep - a) * rr23
+            fb = 6.0 * vlj + 2.0 * rep * rr23
+            fdb = dx * fb[:, None]
+
+            forces = np.zeros((len(self.receptor), len(self.ligand), 3))
+            forces[keep] = fdb
+
+            self.receptor.atom_forces += forces.sum(axis=1)
+            self.ligand.atom_forces -= forces.sum(axis=0)
+
+            return vlj.sum()
+
+
+        def electrostatics(dx, rr2):
+            charge = (self.receptor.atom_charges[:, None] *
+                    self.ligand.atom_charges * (332.053986 / 20.0))
+            charge = charge[keep]
+
+            et = charge * rr2
+            fdb = dx * (2.0 * et)[:, None]
+
+            forces = np.zeros((len(self.receptor), len(self.ligand), 3))
+            forces[keep] = fdb
+
+            self.receptor.atom_forces += forces.sum(axis=1)
+            self.ligand.atom_forces -= forces.sum(axis=0)
+
+            return et.sum()
+
+        sq_distances = cdist(self.receptor.coords, self.ligand.coords, metric="sqeuclidean")
+        keep = np.where(sq_distances <= self.sq_cutoff)
+
+        XA = np.take(self.receptor.coords, keep[0], axis=0)
+        XB = np.take(self.ligand.coords, keep[1], axis=0)
+
+        dx = XA - XB
+        rr2 = 1.0 / np.power(dx, 2).sum(axis=1)
+        dx = dx + rr2[:, None]
+
+        self._vdw_energy = van_der_waals(dx, rr2)
+        self._electrostatic_energy = electrostatics(dx, rr2)
+        return self._vdw_energy + self._electrostatic_energy
+
+    def _nb_energy_large_cutoff(self):
         """Non-bonded energy calculation."""
 
         def van_der_waals(dx, rr2):
@@ -115,11 +173,12 @@ class AttractForceField1(ForceField):
             vlj = (rep - self._attractive_pairs) * rr23
             fb = 6.0 * vlj + 2.0 * rep * rr23
             fdb = dx * fb[:, :, None]
+
             self.receptor.atom_forces += fdb.sum(axis=1)
             self.ligand.atom_forces -= fdb.sum(axis=0)
             return vlj.sum()
 
-        def elecstrostatics(dx, rr2):
+        def electrostatics(dx, rr2):
             charge = (self.receptor.atom_charges[:, None] *
                       self.ligand.atom_charges * (332.053986 / 20.0))
             et = charge * rr2
@@ -139,7 +198,7 @@ class AttractForceField1(ForceField):
         dx = dx + rr2[:, :, None]
 
         self._vdw_energy = van_der_waals(dx, rr2)
-        self._electrostatic_energy = elecstrostatics(dx, rr2)
+        self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
     def non_bonded_energy_legacy(self):
@@ -161,8 +220,8 @@ class AttractForceField1(ForceField):
             category_rec = self.receptor.atom_categories[ir]
             category_lig = self.ligand.atom_categories[il]
 
-            self._attractive_pairs = self._attractive_parameters[category_rec][category_lig]
-            self._repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
+            attractive_pairs = self._attractive_parameters[category_rec][category_lig]
+            repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
 
             dx = alldx[i]
             r2 = norm2[i]
@@ -170,8 +229,8 @@ class AttractForceField1(ForceField):
             dx = dx + rr2
 
             rr23 = rr2 * rr2 * rr2
-            rep = self._repulsive_pairs * rr2
-            vlj = (rep - self._attractive_pairs) * rr23
+            rep = repulsive_pairs * rr2
+            vlj = (rep - attractive_pairs) * rr23
 
             vdw += vlj
 
