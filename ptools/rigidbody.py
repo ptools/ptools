@@ -77,3 +77,6 @@ class AttractRigidBody(RigidBody):
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""
         self.atom_forces.fill(0)
+
+    def apply_forces(self, forces):
+        self.atom_forces += forces
