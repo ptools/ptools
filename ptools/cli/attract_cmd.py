@@ -95,9 +95,9 @@ PTools revision {ptools.__version__}
     # run from a single configuration-- either the start config or a specified
     # transnb and rotnb.
 
-    single = args.startconfig or (args.transnb is not None and args.rotnb is not None)
+    # single = args.startconfig or (args.transnb is not None and args.rotnb is not None)
 
-    printFiles = True
+    print_files = True
     if args.transnb is not None:
         # Limit to desired translation (translations dictionary is keyed by translation number)
         ntrans = len(translations)
@@ -106,7 +106,7 @@ PTools revision {ptools.__version__}
         if args.transnb != ntrans - 1:
             # don't append (print?) ligand, receptor, etc.
             # unless this is the last translation point of the simulation
-            printFiles = False
+            print_files = False
 
     if args.rotnb is not None:
         # Limit to desired rotation (rotation dictionary is keyed by rotation number)
@@ -128,7 +128,7 @@ PTools revision {ptools.__version__}
     attract.run_attract(ligand, receptor, **params)
 
     # output compressed ligand and receptor:
-    # if not single and printFiles:
+    # if not single and print_files:
     #     print(docking.compress_file(args.receptor_name))
     #     print(docking.compress_file(args.ligand_name))
     #     print(docking.compress_file(ff_specs['ff_file']))
