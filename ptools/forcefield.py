@@ -108,12 +108,14 @@ class AttractForceField1(ForceField):
 
 
     def non_bonded_energy(self):
+        """Non-bonded energy calculation."""
         if self.cutoff > 10:
-            return self._nb_energy_large_cutoff()
-        return self._nb_energy_small_cutoff()
+            return self.__nb_energy_large_cutoff()
+        return self.__nb_energy_small_cutoff()
 
 
-    def _nb_energy_small_cutoff(self):
+    def __nb_energy_small_cutoff(self):
+        """Private method for non-bonded energy calculation with small cutoffs."""
 
         def van_der_waals(dx, rr2):
             a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep)])
@@ -164,8 +166,8 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
-    def _nb_energy_large_cutoff(self):
-        """Non-bonded energy calculation."""
+    def __nb_energy_large_cutoff(self):
+        """Private method for non-bonded energy calculation with large cutoffs."""
 
         def van_der_waals(dx, rr2):
             rr23 = np.power(rr2, 3)
