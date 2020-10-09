@@ -3,6 +3,97 @@
 
 from ..rigidbody import RigidBody
 
+
+
+class AttractFileParameters:
+    def __init__(self, path=""):
+        self.nbminim = 0
+        self.minimlist = []
+        self.rstk = 0.0
+        self.lignames = []
+        if path:
+            self._init_from_file(path)
+
+    def _init_from_file(self, path):
+        """Read attract parameter file.
+
+        Args:
+            path (str): path to attract parameter file.
+
+        Returns:
+            nbminim (int): number of minimizations to perform.
+            lignames (list[str])
+            minimlist (list[dict[str, (int or float)]])
+            rstk (float)
+        """
+        def read_number_of_minimizations():
+            try:
+                nbminim = int(lines.pop(0).split()[0])
+            except Exception as e:
+                error = "Cannot read number of minimizations from attract parameter file"
+                raise ValueError(error) from e
+            return nbminim
+
+        def read_lignames():
+            def get_tokens():
+                try:
+                    tokens = lines.pop(0).split()
+                except Exception as e:
+                    error = "Unexpectedly reached end of attract parameter file"
+                    raise ValueError(error) from e
+                return tokens
+            lignames = []
+            tokens = get_tokens()
+            while tokens and tokens[0] == "Lig":
+                lignames.append(tokens[2])
+                tokens = get_tokens()
+            return lignames, tokens
+
+        def read_rstk():
+            try:
+                rstk = float(tokens[3])
+            except Exception as e:
+                error = "Cannot read rstk from attract parameter file"
+                raise ValueError(error) from e
+            return rstk
+
+        def read_minimization():
+            try:
+                tokens = lines.pop(0).split()
+            except Exception as e:
+                error = "Cannot read minimizations from attract parameter file: "\
+                        "expected {}, found {}".format(self.nbminim, i)
+                raise ValueError(error) from e
+            if len(tokens) < 3:
+                error = "Cannot read minimization line from attract parameter file: "\
+                        "expected at least 3 values, found {}".format(len(tokens))
+                raise ValueError(error)
+            minim = {"maxiter": int(tokens[0]),
+                    "squarecutoff": float(tokens[-1]),
+                    "rstk": self.rstk if tokens[-2] == '1' else 0.0}
+            return minim
+
+        # Read file ignoring comments.
+        with open(path, "rt") as f:
+            lines = [line for line in f if not line[0] in ("#", "!")]
+
+        # First number is the number of minimizations to perform.
+        self.nbminim = read_number_of_minimizations()
+
+        # Read ligand list which are all lines starting with 'Lig'.
+        self.lignames, tokens = read_lignames()
+
+        # Read rstk.
+        self.rstk = read_rstk()
+
+        # Read minimization list.
+        self.minimlist = []
+        for i in range(self.nbminim):
+            self.minimlist.append(read_minimization())
+
+
+
+
 def read_aminon(path):
     """Read Attract force field parameter file.
 
@@ -99,84 +190,7 @@ def read_forcefield_from_reduced(path):
 
 
 def read_attract_parameter(path):
-    """Read attract parameter file.
-
-    Args:
-        path (str): path to attract parameter file.
-
-    Returns:
-        nbminim (int): number of minimizations to perform.
-        lignames (list[str])
-        minimlist (list[dict[str, (int or float)]])
-        rstk (float)
-    """
-
-    def read_number_of_minimizations():
-        try:
-            nbminim = int(lines.pop(0).split()[0])
-        except Exception as e:
-            error = "Cannot read number of minimizations from attract parameter file"
-            raise ValueError(error) from e
-        return nbminim
-
-    def read_lignames():
-        def get_tokens():
-            try:
-                tokens = lines.pop(0).split()
-            except Exception as e:
-                error = "Unexpectedly reached end of attract parameter file"
-                raise ValueError(error) from e
-            return tokens
-        lignames = []
-        tokens = get_tokens()
-        while tokens and tokens[0] == "Lig":
-            lignames.append(tokens[2])
-            tokens = get_tokens()
-        return lignames, tokens
-
-    def read_rstk():
-        try:
-            rstk = float(tokens[3])
-        except Exception as e:
-            error = "Cannot read rstk from attract parameter file"
-            raise ValueError(error) from e
-        return rstk
-
-    def read_minimization():
-        try:
-            tokens = lines.pop(0).split()
-        except Exception as e:
-            error = "Cannot read minimizations from attract parameter file: "\
-                    "expected {}, found {}".format(nbminim, i)
-            raise ValueError(error) from e
-        if len(tokens) < 3:
-            error = "Cannot read minimization line from attract parameter file: "\
-                    "expected at least 3 values, found {}".format(len(tokens))
-            raise ValueError(error)
-        minim = {"maxiter": int(tokens[0]),
-                 "squarecutoff": float(tokens[-1]),
-                 "rstk": rstk if tokens[-2] == '1' else 0.0}
-        return minim
-
-    # Read file ignoring comments.
-    with open(path, "rt") as f:
-        lines = [line for line in f if not line[0] in ("#", "!")]
-
-    # First number is the number of minimizations to perform.
-    nbminim = read_number_of_minimizations()
-
-    # Read ligand list which are all lines starting with 'Lig'.
-    lignames, tokens = read_lignames()
-
-    # Read rstk.
-    rstk = read_rstk()
-
-    # Read minimization list.
-    minimlist = []
-    for i in range(nbminim):
-        minimlist.append(read_minimization())
-
-    return nbminim, lignames, minimlist, rstk
+    return AttractFileParameters(path)
 
 
 def read_translations(filename="translation.dat"):

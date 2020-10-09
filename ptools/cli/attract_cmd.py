@@ -54,9 +54,8 @@ PTools revision {ptools.__version__}
     print("Start time:", time_start)
 
     print(f"Reading parameters file: {args.conf}")
-    nbminim, lignames, minimlist, rstk = ptools.io.attract.read_attract_parameter(args.conf)
-    print(f"{nbminim} series of minimizations")
-    print("rstk = ", rstk)
+    parameters = ptools.io.attract.read_attract_parameter(args.conf)
+    print(f"{parameters.nbminim} series of minimizations")
 
     ff_name = ptools.io.attract.check_ff_version_match(args.receptor_name, args.ligand_name)
     if ff_name != "attract1":
@@ -65,7 +64,8 @@ PTools revision {ptools.__version__}
 
     # ff_specs = ptools.forcefield.PTOOLS_FORCEFIELDS[ff_name]
     if args.param:
-        ff_specs["ff_file"] = args.param
+        raise NotImplementedError("not implemented yet")
+        # ff_specs["ff_file"] = args.param
 
     # Load receptor and ligand.
     receptor = ptools.AttractRigidBody(args.receptor_name)
@@ -123,7 +123,7 @@ PTools revision {ptools.__version__}
     params = {
         "translations": translations,
         "rotations": rotations,
-        "minimlist": minimlist,
+        "minimlist": parameters.minimlist,
     }
     attract.run_attract(ligand, receptor, **params)
 
