@@ -48,3 +48,19 @@ def assert_file_exists(path, message=""):
         raise FileNotFoundError(message)
     elif os.path.isdir(path):
         raise IsADirectoryError(message)
+
+
+def backup_if_exists(source):
+    def new_backup_name():
+        return os.path.join(dirname, f"{basename}.{idx}")
+
+    if os.path.exists(source):
+        dirname = os.path.dirname(source)
+        basename = os.path.basename(source)
+        idx = 1
+        target = new_backup_name()
+
+        while os.path.exists(target):
+            idx += 1
+            target = new_backup_name()
+        os.rename(source, target)

@@ -1,6 +1,7 @@
 
 """test_io - Tests for `ptools.io` module."""
 
+import os
 import string
 import tempfile
 import random
@@ -68,3 +69,40 @@ class TestFileExists(unittest.TestCase):
             with self.assertRaisesRegex(IsADirectoryError, tmpdirname):
                 io.assert_file_exists(tmpdirname)
 
+    def test_backup_if_exists(self):
+        # Create empty source file.
+        source = "/tmp/test_ptools_backup.tmp"
+        create_empty_file(source)
+
+        # Backup and check backup exists.
+        io.backup_if_exists(source)
+        self.assertTrue(os.path.exists(source + ".1"))
+
+        # Remove backup file.
+        os.remove(source + ".1")
+
+    def test_backup_if_exists_two_times(self):
+        # Create empty source file.
+        source = "/tmp/test_ptools_backup.tmp"
+        create_empty_file(source)
+
+        # Backup and check backup exists.
+        io.backup_if_exists(source)
+
+        # Do it again (need to create source file again, since it's been
+        # renamed at last step).
+        create_empty_file(source)
+        io.backup_if_exists(source)
+
+        # Check two backup files have been created.
+        self.assertTrue(os.path.exists(source + ".1"))
+        self.assertTrue(os.path.exists(source + ".2"))
+
+        # Tear down: remove backup files.
+        os.remove(source + ".1")
+        os.remove(source + ".2")
+
+
+def create_empty_file(path):
+    with open(path, "wt"):
+        pass
