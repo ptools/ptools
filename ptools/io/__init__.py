@@ -32,8 +32,19 @@ def check_file_exists(path, message=False):
 
 
 def assert_file_exists(path, message=""):
-    """Raises a FileNotFound error if a file does not exists."""
-    if not check_file_exists(path):
-        if not message:
-            message = path
-        raise FileNotFoundError(message.format(path))
+    """Makes sure a file does exists.
+
+    Args:
+        path (str): path to file that supposedly exists
+        message (str): exception message (default: file path)
+
+    Raises:
+        FileNotFoundError: if file does not exists
+        IsADirectoryError: if `path` is a directory
+    """
+    if not message:
+        message = path
+    if not os.path.exists(path):
+        raise FileNotFoundError(message)
+    elif os.path.isdir(path):
+        raise IsADirectoryError(message)

@@ -1,15 +1,19 @@
 
 """test_io - Tests for `ptools.io` module."""
 
+import string
+import tempfile
+import random
 import unittest
 
+import ptools.io as io
 import ptools.io.pdb as pdb
 
 from . import TEST_PDB, TEST_PDB_3MODELS, TEST_PDB_ATOM_NAMES
 from .testing.io import random_filename
 
 
-class TestIO(unittest.TestCase):
+class TestPDBIO(unittest.TestCase):
 
     def test_read_pdb_does_not_exist(self):
         filename = random_filename()
@@ -41,3 +45,26 @@ class TestIO(unittest.TestCase):
         self.assertEqual(len(models), 3)
         for atoms in models:
             self.assertTrue(len(atoms), 10)
+
+
+class TestFileExists(unittest.TestCase):
+    def test_assert_file_actually_exists(self):
+        f = tempfile.NamedTemporaryFile()
+        try:
+            io.assert_file_exists(f.name)
+        except Exception as exc:
+            self.fail(f"exception of type {type(exc).__name__} "
+                      f"raised unexpectedly: '{exc}'")
+        f.close()
+
+    def test_assert_file_does_not_exists(self):
+        basename = ''.join(random.choices(string.ascii_letters, k=8))
+        path = "/foo/bar/baz/" + basename
+        with self.assertRaisesRegex(FileNotFoundError, path):
+            io.assert_file_exists(path)
+
+    def test_assert_file_is_directory(self):
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            with self.assertRaisesRegex(IsADirectoryError, tmpdirname):
+                io.assert_file_exists(tmpdirname)
+
