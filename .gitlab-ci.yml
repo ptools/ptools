@@ -1,0 +1,22 @@
+image: "python:3.7"
+
+before_script:
+  - python --version
+  - pip install -r requirements/base.txt -r requirements/development.txt
+  - pip install -e .
+
+
+stages:
+  - Check
+  - Test
+
+pylint:
+  stage: Check
+  allow_failure: true
+  script:
+    - make lint
+
+unit_test:
+  stage: Test
+  script:
+    - make tests
