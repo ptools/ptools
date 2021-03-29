@@ -7,9 +7,10 @@ import unittest
 from ptools.rigidbody import RigidBody
 import ptools.superpose as superpose
 from ptools.superpose import Screw
-from ptools.spatial import coord3d
+from ptools.spatial import coord3d, transformation_matrix
 
 from scipy.spatial.transform import Rotation
+import numpy as np
 
 
 from . import TEST_LIGAND
@@ -47,6 +48,50 @@ class TestSuperpose(unittest.TestCase):
         self.assertAlmostEqual(superpose.rmsd(mobile, self.target, do_fit=True), 0)
 
 
+    def test_mat_trans_to_screw(self):
+
+        # abs(1 + a - b - c) > EPSILON
+        m = np.zeros((4, 4))
+        s = superpose.mat_trans_2_screw(m)
+        self.assertTrue(isinstance(s, Screw))
+
+        self.assertAlmostEqual(s.angle, 1.57079632679)
+        self.assertAlmostEqual(s.normtranslation, 0.0)
+        assert_array_almost_equal(s.unit, coord3d(1.0, 0.0, 0.0))
+        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+
+
+        # abs(1 - a + b - c) > EPSILON
+        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, -34, 0])))
+        self.assertAlmostEqual(s.angle, -0.59341194)
+        self.assertAlmostEqual(s.normtranslation, 0.0)
+        assert_array_almost_equal(s.unit, coord3d(0.0, 1.0, 0.0))
+        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+
+
+        # abs(1 - a - b + c) > EPSILON
+        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, 0, 90])))
+        self.assertAlmostEqual(s.angle, 1.5707963)
+        self.assertAlmostEqual(s.normtranslation, 0.0)
+        assert_array_almost_equal(s.unit, coord3d(0.0, 0.0, 1.0))
+        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+
+
+        # angle = 0
+        t = transformation_matrix(rotation=np.zeros(3), translation=np.array([-3, 2, 1]))
+        s = superpose.mat_trans_2_screw(t)
+        self.assertAlmostEqual(s.angle, 0.0)
+        self.assertAlmostEqual(s.normtranslation, 3.74165738)
+        assert_array_almost_equal(s.unit, coord3d(-0.80178373, 0.53452248, 0.26726124))
+        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+
+
+        t = transformation_matrix(rotation=np.array([11, 19, 87]), translation=np.array([-1, 8, 11]))
+        s = superpose.mat_trans_2_screw(t)
+        self.assertAlmostEqual(s.angle, 1.58731230)
+        self.assertAlmostEqual(s.normtranslation, 10.95636347)
+        assert_array_almost_equal(s.unit, coord3d(0.25480885, 0.07588361, 0.9640094))
+        assert_array_almost_equal(s.point, coord3d( 0.0, 3.30358643, 21.22781297))
 
 
 class TestScrew(unittest.TestCase):

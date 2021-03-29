@@ -113,7 +113,7 @@ def mat_trans_2_screw(matrix):
     trans = matrix[:3, 3]
     rotmatrix = matrix[:3, :3]
 
-    x, y, z = rotmatrix[0], rotmatrix[1], rotmatrix[2]
+    x, y, z = rotmatrix[:, 0], rotmatrix[:, 1], rotmatrix[:, 2]
 
     a = rotmatrix[0][0]
     b = rotmatrix[1][1]
@@ -144,7 +144,7 @@ def mat_trans_2_screw(matrix):
         screw.normtranslation = np.dot(screw.unit, trans)
 
         s = trans - screw.normtranslation * screw.unit
-        screw.point[0] =  s.z * z[0] + s[0] * (1 - z[2])
+        screw.point[0] =  s[2] * z[0] + s[0] * (1 - z[2])
         screw.point[1] =  0
         screw.point[2] =  s[0] * x[2] + s[2] * (1 - x[0])
         screw.point = screw.point / (1 - x[0] + y[1] - z[2])
@@ -169,7 +169,7 @@ def mat_trans_2_screw(matrix):
         if norm_trans != 0:
             screw.unit = trans / norm_trans
         else:
-            screw.unit =  np.arra((0, 0, 1))
+            screw.unit =  np.array((0, 0, 1))
         screw.normtranslation = np.linalg.norm(trans)
         screw.angle = 0
         return screw
