@@ -47,6 +47,15 @@ class TestSuperpose(unittest.TestCase):
         self.assertAlmostEqual(superpose.rmsd(mobile, self.target, do_fit=True), 0)
 
 
+    def test_mat_trans_to_screw(self):
+        m = np.zeros((4, 4))
+        s = superpose.mat_trans_2_screw(m)
+        self.assertTrue(isinstance(s, Screw))
+
+        self.assertAlmostEqual(s.angle, 1.57079632679)
+        self.assertAlmostEqual(s.normtranslation, 0.0)
+        assert_array_almost_equal(s.unit, coord3d(1.0, 0.0, 0.0))
+        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
 
 
 class TestScrew(unittest.TestCase):
