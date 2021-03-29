@@ -169,7 +169,7 @@ def mat_trans_2_screw(matrix):
         if norm_trans != 0:
             screw.unit = trans / norm_trans
         else:
-            screw.unit =  np.arra((0, 0, 1))
+            screw.unit =  np.array((0, 0, 1))
         screw.normtranslation = np.linalg.norm(trans)
         screw.angle = 0
         return screw
