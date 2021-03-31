@@ -48,9 +48,8 @@ def kabsch_matrix(mobile, target):
     Returns
         numpy.ndarray: (3, 3) matrix
     """
-    r = Rotation.align_vectors(mobile, target)[0].as_matrix()
-    # Got to transpose because we align mobile on target (should do the opposite)
-    return np.transpose(r)
+    rotation, rmsd = Rotation.align_vectors(target, mobile)
+    return rotation.as_matrix()
 
 
 def fit_matrix(mobile, target):
