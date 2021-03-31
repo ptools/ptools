@@ -4,6 +4,7 @@
 import math
 
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from ptools import spatial
 
@@ -32,31 +33,24 @@ class Screw:
         return s
 
 
-def kabsch_matrix(P, Q):
-    """Calculates a rotation matrice using Kabsch algorithm.
+def kabsch_matrix(mobile, target):
+    """Calculates a rotation to optimally align two sets of coordinates.
 
-    Calculates the rotations matrix between two sets of points.
-    The points are expected to be centered on the origin.
+    Uses Kabsch algorithm.
+    The coordinates are expected to be centered on the origin.
+
+    This is an alias for `scipy.spatial.transform.Rotation.align_vectors`.
 
     Args:
-        P (numpy.ndarray (N x D))
-        Q (numpy.ndarray (N x D))
+        mobile (numpy.ndarray (N, 3))
+        target (numpy.ndarray (N, 3))
 
     Returns
-        numpy.ndarray: D x D rotation matrix
+        numpy.ndarray: (3, 3) matrix
     """
-    C = np.dot(np.transpose(P), Q)
-
-    V, S, W = np.linalg.svd(C)
-    d = (np.linalg.det(V) * np.linalg.det(W)) < 0
-
-    if d:
-        S[-1] = -S[-1]
-        V[:, -1] = -V[:, -1]
-
-    U = np.dot(V, W)
-
-    return np.transpose(U)
+    r = Rotation.align_vectors(mobile, target)[0].as_matrix()
+    # Got to transpose because we align mobile on target (should do the opposite)
+    return np.transpose(r)
 
 
 def fit_matrix(mobile, target):
