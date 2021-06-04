@@ -19,4 +19,4 @@ pylint:
 unit_test:
   stage: Test
   script:
-    - make tests
+    - make test
