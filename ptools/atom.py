@@ -7,7 +7,7 @@ import math
 
 import numpy as np
 
-import ptools
+import ptools.spatial
 from ptools.spatial import SpatialObject
 from . import tables
 

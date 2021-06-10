@@ -5,7 +5,7 @@ Some more documentation coming soon.
 
 import string
 
-import ptools
+import ptools.rigidbody
 from ptools.superpose import mat_trans_2_screw, fit_matrix
 
 
