@@ -4,6 +4,7 @@ Some more documentation coming soon.
 """
 
 import string
+import numpy as np
 
 import ptools.rigidbody
 from ptools.superpose import mat_trans_2_screw, fit_matrix
@@ -23,22 +24,24 @@ def extend(hp, mono1, N, Z=False):
     final = ptools.RigidBody()
     monoTest = mono1.copy()
     chain_id = 0
-    O = hp.point
-    axe = hp.unit
+    origin = hp.point
+    axis = hp.unit
     if Z:
-        # Align on Z-axis
-        I = monoTest.tensor_of_inertia()
-        T = monoTest.orient(I[0], [0, 0, 1])
+        # Redefine origin and axis to Z
+        origin = np.zeros(3)
+        axis = np.array([0.0,0,1])
+
+        # Align the screw axis on Z-axis and apply the transformation on monoTest
+        monoTest.orient(hp.unit, [0.,0.,1.0])
+
 
     monoTest.set_chain(string.ascii_uppercase[chain_id % 26])
-
     final += monoTest
-
     chain_id += 1
 
     for j in range(N - 1):
-        monoTest.ab_rotate(O, O + axe, hp.angle)
-        monoTest.translate(axe * hp.normtranslation)
+        monoTest.ab_rotate(origin, origin + axis, hp.angle)
+        monoTest.translate(axis * hp.normtranslation)
         monoTest.set_chain(string.ascii_uppercase[chain_id % 26])
         final += monoTest
         chain_id += 1
