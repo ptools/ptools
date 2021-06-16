@@ -401,13 +401,13 @@ def attract_euler_rotate(coords, phi, ssi, rot):
 
 def ab_rotation_matrix(A, B, amount):
     """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
-    return rotation_matrix_around_axis(B - A, amount)
+    return rotation_matrix_around_axis(B - A, amount, A)
 
 
 def ab_rotate(coords, A, B, amount):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
-    m = rotation_matrix_around_axis(B - A, amount)
-    rotate(coords, m)
+    m = rotation_matrix_around_axis(B - A, amount, A)
+    transform(coords, m)
 
 
 def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
