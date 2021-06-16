@@ -15,6 +15,7 @@ TEST_1A74_PROT_RED = os.path.join(os.path.dirname(__file__), 'data', '1A74_prot.
 TEST_2GLSA = os.path.join(os.path.dirname(__file__), 'data', '2GLS_A.pdb')
 TEST_2GLSB = os.path.join(os.path.dirname(__file__), 'data', '2GLS_B.pdb')
 TEST_REF_2GLSAB_N6 = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N6.pdb')
+TEST_REF_2GLSAB_N3_Z = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N3-Zalign.pdb')
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -90,6 +91,16 @@ class TestHeligeom(unittest.TestCase):
         result = heli_construct(self.mono1, hp, N=self.n_monomers)
 
         self.assertEqual(result.topdb(), self.ref.topdb())
+
+    def test_heli_construct_Zalign(self):
+        """Tests that heligeom.heli_construct """
+
+        ref = RigidBody(TEST_REF_2GLSAB_N3_Z)
+
+        hp = heli_analyze(self.mono1, self.mono2)
+        result = heli_construct(self.mono1, hp, N=3, Z=True)
+
+        self.assertEqual(result.topdb(), ref.topdb())
 
 
 if __name__ == "__main__":
