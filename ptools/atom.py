@@ -291,6 +291,10 @@ class AtomCollection(SpatialObject):
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
         return self.__class__(atoms=[atom for atom in self if start <= atom.resid <= end])
 
+    def select_chain(self, chain_id):
+        """Returns a sub-collection made of atoms with desired chain."""
+        return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
+
 
 
 def guess_atom_element(atom_name):

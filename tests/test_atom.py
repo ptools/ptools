@@ -346,6 +346,12 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(sel), 23)
         self.assertTrue(all(10 <= atom.resid <= 20 for atom in sel))
 
+    def test_select_chain(self):
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        sel = atoms.select_chain("B")
+        self.assertEqual(len(sel), 974)
+        self.assertTrue(all(atom.chain == "B" for atom in sel))
+
     def test_to_pdb(self):
         s = self.atoms.topdb()
         for i, line in enumerate(s.splitlines()):
