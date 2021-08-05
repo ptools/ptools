@@ -132,7 +132,16 @@ class SpatialObject:
 
 
 def coord3d(value=(0, 0, 0), *args):
-    """Convert an object to a 1 x 3 shaped numpy array of floats."""
+    """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
+    
+    Can be called either with an iterable, either with 3 arguments.
+
+    Examples:
+        >>> coord3d((1,2,3))
+        array([1., 2., 3.])
+        >>> coord3d((1,2,3))
+        array([1., 2., 3.])
+    """
     def bad_coord3d_initialization():
         args_s = ", ".join(f"{str(a)}" for a in args)
         raise ValueError(f"Bad coord3d initialization: coord3d({value}, {args_s})")
