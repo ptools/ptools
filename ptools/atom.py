@@ -59,6 +59,7 @@ class BaseAtom(SpatialObject):
 
     @name.setter
     def name(self, name):
+        """Name setter simultaneously updates element name."""
         self._name = name
         self.element = guess_atom_element(self.name)
 
