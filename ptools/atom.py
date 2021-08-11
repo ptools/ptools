@@ -73,6 +73,17 @@ class BaseAtom(SpatialObject):
         self.charge = other.charge
         self.meta = other.meta
         self.element = other.element
+    
+    def __repr__(self):
+        """BaseAtom string representation."""
+        attrs = {k: v for k, v in sorted(self.__dict__.items())}
+        for key in attrs:
+            if key[0] == "_" and key[1] != "_":
+                attrs[key[1:]] = attrs.pop(key)
+        modulename = self.__module__
+        classname = self.__class__.__name__
+        desc = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
+        return f"<{modulename}.{classname}({desc})>"
 
     def copy(self):
         """Returns a copy of the current atom."""
