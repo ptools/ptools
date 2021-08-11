@@ -10,7 +10,7 @@ from scipy.linalg import expm, norm
 
 
 class SpatialObject:
-    """A object which coordinates.
+    """An object with coordinates.
 
     Implements basic spatial operations such as translation, rotation, etc.
     """
@@ -138,42 +138,54 @@ def coord3d(value=(0, 0, 0), *args):
     Can be called either with an iterable, either with 3 arguments.
 
     Examples:
-        >>> coord3d((1,2,3))
+        >>> coord3d((1, 2, 3))
         array([1., 2., 3.])
-        >>> coord3d((1,2,3))
+        >>> coord3d(1, 2, 3)
         array([1., 2., 3.])
+        >>> coord3d(2)
+        array([2., 2., 2.])
     """
-    def bad_coord3d_initialization():
-        args_s = ", ".join(f"{str(a)}" for a in args)
-        raise ValueError(f"Bad coord3d initialization: coord3d({value}, {args_s})")
-
+    # Checks function was called with adequate number of arguments.
     if args:
-        if not isinstance(value, (int, float)):
-            bad_coord3d_initialization()
-        elif len(args) != 2:
-            bad_coord3d_initialization()
-        value = (value, args[0], args[1])
+        if len(args) != 2:
+            raise TypeError(f"Coordinates must be initialized either "
+                f"with 1 or 3 arguments (found {value=}, {args=})")
 
-    if isinstance(value, (int, float)):
-        return np.full((3,), value, dtype=float)
-    value = np.array(value, dtype=float)
+    # Initialization from a single value.
+    if not args:
+        # value is a scalar.
+        if isinstance(value, (int, float)):
+            return _coordinates_from_scalar(value)
+        if isinstance(value, (list, tuple, np.ndarray)):
+            return _coordinates_from_vector(value)
+        # value is some invalid type.
+        raise TypeError(f"Invalid coordinates initialization from {value}")
 
-    if len(value.shape) == 1:
-        if value.shape[0] != 3:
-            err = '3-d coordinates should be a scalar or '\
-                  '1 x 3 shaped-array ({} shaped-array found)'
-            err = err.format(value.shape)
-            raise ValueError(err)
-    elif len(value.shape) == 2:
-        if value.shape[1] != 3:
-            err = '3-d coordinate array should be N x 3 '\
-                  '({} found)'.format(value.shape)
-            raise ValueError(err)
-    else:
-        err = '3-d coordinate array should have at most 2 dimensions '\
-              '({} found)'.format(len(value.shape))
-        raise ValueError(err)
-    return value
+    # Initialization from 3 values.
+    return np.array((value, *args))
+
+
+def _coordinates_from_scalar(value):
+    """Returns a numpy array of size 3 filled with value."""
+    return np.full((3, ), value, dtype=float)
+
+
+def _coordinates_from_vector(value):
+    """Returns a numpy array of size 3 initialized with a vector."""
+    # value is an iterable: numpy will raise a ValueError if some element is not compatible with float.
+    if isinstance(value, (list, tuple)):
+        array = np.array(value, dtype=float)
+    elif isinstance(value, np.ndarray):
+        array = value.astype("float64")
+    # Checks array corresponds to 3D coordinates
+    if len(array.shape) > 2:
+        raise ValueError("3D coordinate array should have at "
+            f"most 2 dimensions (found {array.shape}")
+    if ((len(array.shape) == 2 and array.shape[1] != 3) or
+        (len(array.shape) == 1 and array.shape[0] != 3)):
+        raise ValueError("3D coordinate array should be N x 3 "
+                f"(found {array.shape})")
+    return array
 
 
 def centroid(x):

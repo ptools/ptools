@@ -39,13 +39,13 @@ class TestBaseAtom(unittest.TestCase):
         assert_array_almost_equal(atom.coords, (1, 2, 3))
 
     def test_initialize_with_bad_coordinates(self):
-        err = "3-d coordinates should be a scalar or 1 x 3 shaped-array"
+        err = "3D coordinate array should be N x 3"
         with self.assertRaisesRegex(ValueError, err):
             BaseAtom(coords=(1, 2))
 
     def test_set_bad_coordinates(self):
         atom = BaseAtom()
-        err = "3-d coordinates should be a scalar or 1 x 3 shaped-array"
+        err = "3D coordinate array should be N x 3"
         with self.assertRaisesRegex(ValueError, err):
             atom.coords = (1, 2)
 

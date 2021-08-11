@@ -349,19 +349,19 @@ class TestCoord3D(unittest.TestCase):
         self.assertEqual(c.shape, (3, ))
         assert_array_almost_equal(c, (1, 2, 3))
 
-    def test_initialization_mixed(self):
-        err = "Bad coord3d initialization"
-        with self.assertRaisesRegex(ValueError, err):
+    def test_initialization_with_wrong_number_of_arguments(self):
+        err = "Coordinates must be initialized either with 1 or 3 arguments"
+        with self.assertRaisesRegex(TypeError, err):
             spatial.coord3d(12, 1)
 
-        with self.assertRaisesRegex(ValueError, err):
+        with self.assertRaisesRegex(TypeError, err):
             spatial.coord3d(12, 1, 2, 3)
 
-        with self.assertRaisesRegex(ValueError, err):
+        with self.assertRaisesRegex(TypeError, err):
             spatial.coord3d((1, 2), 3)
 
     def test_initialization_bad_dimensions(self):
-        err = '3-d coordinates should be a scalar or 1 x 3 shaped-array'
+        err = "3D coordinate array should be N x 3"
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d([2, 2])
 
@@ -374,7 +374,7 @@ class TestCoord3D(unittest.TestCase):
 
     def test_initialization_array_bad_dimensions(self):
         array = ((0, 0, 0, 0), (1, 1, 1, 1))
-        err = '3-d coordinate array should be N x 3'
+        err = "3D coordinate array should be N x 3"
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(array)
 
@@ -384,7 +384,7 @@ class TestCoord3D(unittest.TestCase):
         array = (((0, 0, 0, 0), (1, 1, 1, 1)),
                  ((0, 0, 0, 0), (1, 1, 1, 1)),
                  ((0, 0, 0, 0), (1, 1, 1, 1)))
-        err = '3-d coordinate array should have at most 2 dimensions'
+        err = '3D coordinate array should have at most 2 dimensions'
         with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(array)
 
