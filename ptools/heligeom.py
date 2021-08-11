@@ -39,7 +39,7 @@ def extend(hp, mono1, N, Z=False):
     final += monoTest
     chain_id += 1
 
-    for j in range(N - 1):
+    for _ in range(N - 1):
         monoTest.ab_rotate(origin, origin + axis, hp.angle)
         monoTest.translate(axis * hp.normtranslation)
         monoTest.set_chain(string.ascii_uppercase[chain_id % 26])

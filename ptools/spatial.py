@@ -18,8 +18,9 @@ class SpatialObject:
         self._coords = coord3d(coords)
 
     def dist(self, other):
+        """Returns the euclidean distance between two objects."""
         return dist(self, other)
-    
+
     def copy(self):
         """Returns a copy of itself."""
         return self.__class__(self.coords)
@@ -134,7 +135,7 @@ class SpatialObject:
 
 def coord3d(value=(0, 0, 0), *args):
     """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
-    
+
     Can be called either with an iterable, either with 3 arguments.
 
     Examples:
@@ -172,7 +173,8 @@ def _coordinates_from_scalar(value):
 
 def _coordinates_from_vector(value):
     """Returns a numpy array of size 3 initialized with a vector."""
-    # value is an iterable: numpy will raise a ValueError if some element is not compatible with float.
+    # value is an iterable: numpy will raise a ValueError if some element
+    # is not compatible with float.
     if isinstance(value, (list, tuple)):
         array = np.array(value, dtype=float)
     elif isinstance(value, np.ndarray):
@@ -240,16 +242,19 @@ def _tensor_of_inertia_fast(coords):
 
 
 def tensor_of_inertia(coords, weights=None, method="accurate"):
+    """Returns the inertia tensors of a set of atoms.
+
+    Allows to choose between "accurate" (weighted) and "fast" methods.
+    """
+    if method not in ("accurante", "fast"):
+        raise ValueError("parameter 'method' should be 'accurate' or 'fast' "
+            f"(found {method=!r})")
     if method == "accurate":
         if weights is None:
             raise ValueError("need weights to compute accurate tensor of "
                              "inertia")
         return _tensor_of_inertia_accurate(coords, weights)
-    elif method == "fast":
-        return _tensor_of_inertia_fast(coords)
-    raise ValueError('parameter "method" accepts only 2 values: "fast" '
-                     f'or "accurate" (found {method})')
-
+    return _tensor_of_inertia_fast(coords)  # method is "fast"
 
 
 def principal_axes(tensor, sort=True):

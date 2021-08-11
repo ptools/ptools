@@ -79,4 +79,5 @@ class AttractRigidBody(RigidBody):
         self.atom_forces.fill(0)
 
     def apply_forces(self, forces):
+        """Adds forces to atoms."""
         self.atom_forces += forces

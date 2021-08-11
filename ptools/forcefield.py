@@ -45,10 +45,12 @@ class ForceField:
 
     @property
     def cutoff(self):
+        """Gets/Sets the cutoff value for non-bonded interactions."""
         return self.sq_cutoff ** 0.5
 
     @cutoff.setter
     def cutoff(self, value):
+        """Gets/Sets the cutoff value for non-bonded interactions."""
         self.sq_cutoff = value * value
 
     def update(self):

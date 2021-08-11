@@ -48,7 +48,7 @@ def kabsch_matrix(mobile, target):
     Returns
         numpy.ndarray: (3, 3) matrix
     """
-    rotation, rmsd = Rotation.align_vectors(target, mobile)
+    rotation, _ = Rotation.align_vectors(target, mobile)
     return rotation.as_matrix()
 
 
@@ -82,12 +82,13 @@ def fit(mobile, target):
 
 
 def rmsd(mobile, target, do_fit=False):
+    """Returns the Root Mean Square Deviation between two groups of atoms."""
     assert len(mobile) == len(target)
     if do_fit:
         mobile = mobile.copy()
         fit(mobile, target)
     e = np.power((mobile.coords - target.coords), 2).sum(axis=1)
-    return (np.sqrt(np.mean(e)))
+    return np.sqrt(np.mean(e))
 
 
 def mat_trans_2_screw(matrix):

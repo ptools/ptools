@@ -1,11 +1,10 @@
-
 """Read/Write Attract files."""
 
 from ..rigidbody import RigidBody
 
 
-
 class AttractFileParameters:
+    """Stores parameters from an Attract parameter file."""
     def __init__(self, path=""):
         self.nbminim = 0
         self.minimlist = []
@@ -190,13 +189,14 @@ def read_forcefield_from_reduced(path):
 
 
 def read_attract_parameter(path):
+    """Reads an Attract parameter file."""
     return AttractFileParameters(path)
 
 
 def read_translations(filename="translation.dat"):
     """Reads a translation file and returns the dictionary of translations."""
-    rb = RigidBody("translation.dat")
-    print(f"Read {len(rb)} translations from translation.dat")
+    rb = RigidBody(filename)
+    print(f"Read {len(rb)} translations from {filename}")
     translations = [(atom.index, atom.coords) for atom in rb]
     return dict(translations)
 
@@ -214,19 +214,19 @@ def read_rotations(filename="rotation.dat"):
     nphi = []
     # read theta, phi, rot data
     # nchi is number of steps to rotate about the axis joining the ligand/receptor centers
-    rotdat = open("rotation.dat", "r")
-    line = rotdat.readline().split()
-    ntheta = int(line[0])
-    nchi = int(line[1])
-    print(f"ntheta, nchi: {ntheta} {nchi}")
-    for i in range(ntheta):
+    with open(filename, "r") as rotdat:
         line = rotdat.readline().split()
-        theta.append(float(line[0]))
-        nphi.append(int(line[1]))
-        nrot_per_trans += nphi[i] * nchi
-        theta[i] = twopi * theta[i] / 360.0
-        print(f"{theta[i]} {nphi[i]}")
-    rotdat.close()
+        ntheta = int(line[0])
+        nchi = int(line[1])
+        print(f"ntheta, nchi: {ntheta} {nchi}")
+        for i in range(ntheta):
+            line = rotdat.readline().split()
+            theta.append(float(line[0]))
+            nphi.append(int(line[1]))
+            nrot_per_trans += nphi[i] * nchi
+            theta[i] = twopi * theta[i] / 360.0
+            print(f"{theta[i]} {nphi[i]}")
+
     rotations = []
 
     print(f"Read {ntheta} rotation lines from rotation.dat")
