@@ -17,6 +17,50 @@ from . import TEST_LIGAND
 from .testing import assert_array_almost_equal
 
 
+class TestScrew(unittest.TestCase):
+
+    def setUp(self):
+        self.screw = Screw()
+
+    def test_get_set_angle(self):
+        self.assertEqual(self.screw.angle, 0)
+        value = random_float()
+        self.screw.angle = value
+        self.assertAlmostEqual(self.screw.angle, value)
+
+    def test_get_set_normtranslation(self):
+        self.assertEqual(self.screw.normtranslation, 0)
+        value = random_float()
+        self.screw.normtranslation = value
+        self.assertAlmostEqual(self.screw.normtranslation, value)
+
+    def test_get_set_unit_vector(self):
+        assert_array_almost_equal(self.screw.unit, coord3d())
+        u = coord3d((random_float(), random_float(), random_float()))
+        self.screw.unit = u
+        assert_array_almost_equal(self.screw.unit, u)
+
+    def test_get_set_point(self):
+        assert_array_almost_equal(self.screw.point, coord3d())
+        u = coord3d((random_float(), random_float(), random_float()))
+        self.screw.point = u
+        assert_array_almost_equal(self.screw.point, u)
+
+    def test_copy(self):
+        target = self.screw.copy()
+        self.assertAlmostEqual(target.angle, self.screw.angle)
+        self.assertAlmostEqual(target.normtranslation, self.screw.normtranslation)
+        assert_array_almost_equal(target.unit, self.screw.unit)
+        assert_array_almost_equal(target.point, self.screw.point)
+
+        # Make sure changing one does not change the other
+        target.angle += 12
+        self.assertAlmostEqual(target.angle, self.screw.angle + 12)
+
+        target.unit += 3
+        assert_array_almost_equal(target.unit, self.screw.unit + 3)
+
+
 class TestSuperpose(unittest.TestCase):
     def setUp(self):
         self.target = RigidBody(TEST_LIGAND)
@@ -92,51 +136,6 @@ class TestSuperpose(unittest.TestCase):
         self.assertAlmostEqual(s.normtranslation, 10.95636347)
         assert_array_almost_equal(s.unit, coord3d(0.25480885, 0.07588361, 0.9640094))
         assert_array_almost_equal(s.point, coord3d( 0.0, 3.30358643, 21.22781297))
-
-
-class TestScrew(unittest.TestCase):
-
-    def setUp(self):
-        self.s = Screw()
-
-    def test_get_set_angle(self):
-        self.assertEqual(self.s.angle, 0)
-        value = random_float()
-        self.s.angle = value
-        self.assertAlmostEqual(self.s.angle, value)
-
-    def test_get_set_normtranslation(self):
-        self.assertEqual(self.s.normtranslation, 0)
-        value = random_float()
-        self.s.normtranslation = value
-        self.assertAlmostEqual(self.s.normtranslation, value)
-
-    def test_get_set_unit_vector(self):
-        assert_array_almost_equal(self.s.unit, coord3d())
-        u = coord3d((random_float(), random_float(), random_float()))
-        self.s.unit = u
-        assert_array_almost_equal(self.s.unit, u)
-
-    def test_get_set_point(self):
-        assert_array_almost_equal(self.s.point, coord3d())
-        u = coord3d((random_float(), random_float(), random_float()))
-        self.s.point = u
-        assert_array_almost_equal(self.s.point, u)
-
-    def test_copy(self):
-        target = self.s.copy()
-        self.assertAlmostEqual(target.angle, self.s.angle)
-        self.assertAlmostEqual(target.normtranslation, self.s.normtranslation)
-        assert_array_almost_equal(target.unit, self.s.unit)
-        assert_array_almost_equal(target.point, self.s.point)
-
-        # Make sure changing one does not change the other
-        target.angle += 12
-        self.assertAlmostEqual(target.angle, self.s.angle + 12)
-
-        target.unit += 3
-        assert_array_almost_equal(target.unit, self.s.unit + 3)
-
 
 
 def random_float():

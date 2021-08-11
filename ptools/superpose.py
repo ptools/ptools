@@ -1,6 +1,7 @@
-
 """Superposition methods."""
 
+
+from dataclasses import dataclass
 import math
 
 import numpy as np
@@ -9,27 +10,22 @@ from scipy.spatial.transform import Rotation
 from ptools import spatial
 
 
+@dataclass
 class Screw:
     """A screw."""
-    def __init__(self):
-        self.unit = np.zeros(3)
-        self.normtranslation = 0.0
-        self.point = np.zeros(3)
-        self.angle = 0.0
 
-    def __str__(self):  # pragma: no cover
-        return (f"Screw(unit={self.unit}, "
-                f"normtranslation={self.normtranslation}), "
-                f"point={self.point}), "
-                f"angle={self.angle})")
+    unit: np.ndarray = np.zeros(3)
+    point: np.ndarray = np.zeros(3)
+    normtranslation: float = 0.0
+    angle: float = 0.0
 
     def copy(self):
-        """Copy constructor."""
-        s = Screw()
-        s.unit = self.unit.copy()
-        s.normtranslation = self.normtranslation
-        s.point = self.point.copy()
-        s.angle = self.angle
+        """Returns a copy of itself."""
+        s = Screw(**self.__dict__)
+        # Makes sure numpy arrays are actually copied.
+        for key, value in s.__dict__.items():
+            if isinstance(value, np.ndarray):
+                setattr(s, key, value.copy())
         return s
 
 
