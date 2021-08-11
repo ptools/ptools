@@ -447,14 +447,10 @@ class TestSpatial(unittest.TestCase):
     def test_tensor_of_inertia_invalid_method(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = spatial.SpatialObject(array)
-        err = (r'parameter "method" accepts only 2 values: "fast" '
-               r'or "accurate" \(found foobar\)')
+        err = (r"parameter 'method' should be 'accurate' or 'fast' "
+            r"\(found method='foobar'\)")
         with self.assertRaisesRegex(ValueError, err):
             spatial.tensor_of_inertia(array, method="foobar")
 
 
-
-
-
-
-# ptools/spatial.py         203      4    98%   280, 334, 338, 401
+"parameter 'method' should be 'accurate' or 'fast' (found method='foobar')" == "parameter 'method' should be 'accurate' or 'fast' (found method='foobar')"

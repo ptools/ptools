@@ -9,13 +9,11 @@ For more specific help, provide the name of a positional argument, e.g.,
 
 import argparse
 
-import ptools
-
 from . import attract_cmd
 
 
-
 def parse_command_line(args=None):
+    """Main ptools command-line parsing."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version")
     subparsers = parser.add_subparsers()

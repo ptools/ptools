@@ -1,4 +1,3 @@
-
 """Attract docking."""
 
 import time
@@ -106,7 +105,7 @@ def _run_minimization(params, minimlist, receptor, ligand):
 
     print("  - results:")
     print(f"    - energy: {res.fun:6.2f}")
-    print(f"    - transformation matrix:")
+    print("    - transformation matrix:")
     m = transformation_matrix(res.x[3:], res.x[:3])
     print(m)
 

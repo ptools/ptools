@@ -73,10 +73,10 @@ class BaseAtom(SpatialObject):
         self.charge = other.charge
         self.meta = other.meta
         self.element = other.element
-    
+
     def __repr__(self):
         """BaseAtom string representation."""
-        attrs = {k: v for k, v in sorted(self.__dict__.items())}
+        attrs =  dict(sorted(self.__dict__.items()))
         for key in attrs:
             if key[0] == "_" and key[1] != "_":
                 attrs[key[1:]] = attrs.pop(key)
@@ -157,10 +157,12 @@ class Atom(BaseAtom):
 
     @property
     def mass(self):
+        """Gets/Sets an atom mass."""
         return self.collection.masses[self.serial]
 
     @mass.setter
     def mass(self, mass):
+        """Gets/Sets an atom mass."""
         self.collection.masses[self.serial] = mass
 
     # Override BaseAtom name setter to manually handle masses

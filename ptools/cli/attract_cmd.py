@@ -4,10 +4,11 @@
 import datetime
 
 import ptools
-import ptools.attract as attract
+from ptools import attract
 
 
 def create_subparser(parent):
+    """Creates command-line parser."""
     parser = parent.add_parser("attract", help=__doc__)
     parser.set_defaults(func=run)
     parser.add_argument("-r", "--receptor", dest="receptor_name", required=True,
@@ -40,6 +41,7 @@ def create_subparser(parent):
 
 
 def run(args):
+    """Runs attract."""
     print(f"""
 **********************************************************************
 **                                                                  **
