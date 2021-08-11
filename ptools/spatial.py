@@ -17,11 +17,12 @@ class SpatialObject:
     def __init__(self, coords=(0, 0, 0)):
         self._coords = coord3d(coords)
 
-    def copy(self):
-        return self.__class__(self._coords)
-
     def dist(self, other):
         return dist(self, other)
+    
+    def copy(self):
+        """Returns a copy of itself."""
+        return self.__class__(self.coords)
 
     @property
     def coords(self):
