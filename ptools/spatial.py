@@ -281,9 +281,9 @@ def principal_axes(tensor, sort=True):
 #
 def translation_matrix(direction=np.zeros(3)):
     """Return the matrix to translate by direction vector."""
-    m = np.identity(4)
-    m[:3, 3] = direction[:3]
-    return m
+    matrix = np.identity(4)
+    matrix[:3, 3] = direction[:3]
+    return matrix
 
 
 def translate(coords, t):
@@ -396,21 +396,21 @@ def attract_euler_rotation_matrix(phi, ssi, rot):
     sscp = ss * cp
     sssp = ss * sp
 
-    eulermat = np.identity(3)
+    matrix = np.identity(3)
 
-    eulermat[0][0] = crot * cscp + srot * sp
-    eulermat[0][1] = srot * cscp - crot * sp
-    eulermat[0][2] = sscp
+    matrix[0][0] = crot * cscp + srot * sp
+    matrix[0][1] = srot * cscp - crot * sp
+    matrix[0][2] = sscp
 
-    eulermat[1][0] = crot * cssp - srot * cp
-    eulermat[1][1] = srot * cssp + crot * cp
-    eulermat[1][2] = sssp
+    matrix[1][0] = crot * cssp - srot * cp
+    matrix[1][1] = srot * cssp + crot * cp
+    matrix[1][2] = sssp
 
-    eulermat[2][0] = -crot * ss
-    eulermat[2][1] = -srot * ss
-    eulermat[2][2] = cs
+    matrix[2][0] = -crot * ss
+    matrix[2][1] = -srot * ss
+    matrix[2][2] = cs
 
-    return eulermat
+    return matrix
 
 
 def attract_euler_rotate(coords, phi, ssi, rot):
@@ -433,8 +433,8 @@ def ab_rotation_matrix(A, B, amount):
 
 def ab_rotate(coords, A, B, amount):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
-    m = rotation_matrix_around_axis(B - A, amount, A)
-    transform(coords, m)
+    matrix = rotation_matrix_around_axis(B - A, amount, A)
+    transform(coords, matrix)
 
 
 def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
@@ -448,12 +448,17 @@ def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
     Returns:
         np.ndarray: 4 x 4 rotation matrix
     """
-    origmat = translation_matrix(- center)
-    offsetmat = translation_matrix(+ center)
-    r = expm(np.cross(np.identity(3), axis / norm(axis) * amount))
-    m = np.identity(4)
-    m[:3, :3] = r
-    return np.matmul(np.matmul(offsetmat, m), origmat)
+    def _translation_matrix(direction):
+        matrix = np.identity(4)
+        matrix[:3, 3] = direction[:3]
+        return matrix
+
+    origin_matrix = _translation_matrix(- center)
+    offset_matrix = _translation_matrix(+ center)
+    rotation = expm(np.cross(np.identity(3), axis / norm(axis) * amount))
+    matrix = np.identity(4)
+    matrix[:3, :3] = rotation
+    return np.matmul(np.matmul(offset_matrix, matrix), origin_matrix)
 
 
 #
@@ -470,9 +475,9 @@ def transformation_matrix(translation=np.zeros(3), rotation=np.zeros(3)):
     Returns:
         np.ndarray(4, 4)
     """
-    m = rotation_matrix(rotation)
-    m[:3, 3] = translation
-    return m
+    matrix = rotation_matrix(rotation)
+    matrix[:3, 3] = translation
+    return matrix
 
 
 def transform(coords, matrix):
