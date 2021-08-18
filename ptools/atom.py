@@ -31,17 +31,7 @@ class BaseAtom(SpatialObject):
         orig (BaseAtom): initialize from other BaseAtom (copy constructor)
     """
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
-                 resid=0, charge=0.0, coords=(0, 0, 0), meta=None,
-                 orig=None):
-        super().__init__(coords)
-        if orig is not None:
-            self._init_copy(orig)
-        else:
-            self._init_non_copy(index, name, resname, chain, resid, charge,
-                                coords, meta)
-
-    def _init_non_copy(self, index, name, resname, chain, resid, charge,
-                       coords, meta):
+                 resid=0, charge=0.0, coords=(0, 0, 0), meta=None):
         super().__init__(coords)
         self._name = name
         self.resname = resname
@@ -62,17 +52,6 @@ class BaseAtom(SpatialObject):
         """Name setter simultaneously updates element name."""
         self._name = name
         self.element = guess_atom_element(self.name)
-
-    def _init_copy(self, other):
-        super().__init__(other.coords)
-        self._name = other.name
-        self.resname = other.resname
-        self.chain = other.chain
-        self.index = other.index
-        self.resid = other.resid
-        self.charge = other.charge
-        self.meta = other.meta
-        self.element = other.element
 
     def __repr__(self):
         """BaseAtom string representation."""
@@ -144,7 +123,9 @@ class Atom(BaseAtom):
     def __init__(self, atom, serial, collection):
         self.serial = serial
         self.collection = collection
-        super().__init__(orig=atom)
+        attrs = ("name", "resname", "chain", "index", "resid", "charge", "meta", "coords")
+        kwargs = {k: getattr(atom, k) for k in attrs}
+        super().__init__(**kwargs)
 
     @property
     def coords(self):

@@ -74,23 +74,6 @@ class TestBaseAtom(unittest.TestCase):
         atom.coords = (0, 0, 0)
         assert_array_almost_equal(atom_copy.coords, (1, 2, 3))
 
-    def test_copy_constructor(self):
-        # Check that when using copy constructor, all arguments are
-        # adequatly set and that atom coordinates are not a reference to
-        # the initial atom coordinates.
-        parent = BaseAtom(name="CA", resname="ALA", chain="A",
-                          index=42, resid=17, charge=2.0, coords=(1, 2, 3))
-        atom = BaseAtom(orig=parent)
-        self.assertEqual(atom.name, "CA")
-        self.assertEqual(atom.resname, "ALA")
-        self.assertEqual(atom.chain, "A")
-        self.assertEqual(atom.index, 42)
-        self.assertEqual(atom.resid, 17)
-        self.assertEqual(atom.charge, 2.0)
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
-        parent.coords = (0, 0, 0)
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
-
     def test_name_setter(self):
         atom = BaseAtom()
         self.assertEqual(atom.element, "X")
