@@ -28,7 +28,6 @@ class BaseAtom(SpatialObject):
         charge (float): charge
         coords (numpy.ndarray): cartesian coordinates
         meta (dict[str, ()]): metadata dictionnary
-        orig (BaseAtom): initialize from other BaseAtom (copy constructor)
     """
     def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
                  resid=0, charge=0.0, coords=(0, 0, 0), meta=None):
