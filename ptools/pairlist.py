@@ -29,24 +29,24 @@ class PairList:
     def __post_init__(self):
         self.update()
 
-    def contacts(self):
+    def contacts(self) -> list[(int, int)]:
         """Get the indices of atoms pairs that are within a cutoff of
         each other."""
         return list(zip(*self._contacts))
 
-    def all_sqdistances(self):
+    def all_sqdistances(self) -> np.ndarray:
         """Return the matrix of squared distances between every atom pairs."""
         return self._all_sqdistances
 
-    def sqdistances(self):
+    def sqdistances(self) -> np.ndarray:
         """Return the matrix of squared distances between atoms within cutoff."""
         return self._all_sqdistances[self._contacts]
 
-    def all_distances(self):
+    def all_distances(self) -> np.ndarray:
         """Return the matrix of distances between every atom pairs."""
         return np.sqrt(self.all_sqdistances())
 
-    def distances(self):
+    def distances(self) -> np.ndarray:
         """Return the matrix of distances between atoms within cutoff."""
         return np.sqrt(self.sqdistances())
 
@@ -60,12 +60,8 @@ class PairList:
         self._contacts = np.where(self._all_sqdistances <= sqcutoff)
 
     @staticmethod
-    def sort(receptor, ligand):
+    def sort(receptor: list[int], ligand: list[int]) -> list[(int, int)]:
         """Sort a contact list.
-
-        Args:
-            receptor (list[int]): receptor atom indexes
-            ligand (list[int]): ligand atom indexes
 
         Returns:
             list[(int, int)]: pairs of atom indexes.
