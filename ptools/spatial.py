@@ -1,8 +1,12 @@
 """ptools.spatial - Defines classes and functions to work on spatial
 (mostly 3D) data."""
 
+# Allows to use type hinting of class within itself
+# e.g. SpatialObject.dist(self, other: SpatialObject)
+from __future__ import annotations
 
 import math
+from typing import Iterable
 
 import numpy as np
 from scipy.linalg import expm, norm
@@ -14,32 +18,32 @@ class SpatialObject:
     Implements basic spatial operations such as translation, rotation, etc.
     """
 
-    def __init__(self, coords=(0, 0, 0)):
+    def __init__(self, coords: np.ndarray = np.zeros(3)):
         self._coords = coord3d(coords)
 
-    def dist(self, other):
+    def dist(self, other: SpatialObject) -> float:
         """Returns the euclidean distance between two objects."""
         return dist(self, other)
 
-    def copy(self):
+    def copy(self) -> SpatialObject:
         """Returns a copy of itself."""
         return self.__class__(self.coords)
 
     @property
-    def coords(self):
+    def coords(self) -> np.ndarray:
         """Get SpatialObject cartesian coordinates."""
         return self._coords
 
     @coords.setter
-    def coords(self, pos):
+    def coords(self, pos: np.ndarray | list[float]):
         """Set SpatialObject cartesian coordinates."""
         self._coords = coord3d(pos)
 
-    def centroid(self):
+    def centroid(self) -> np.ndarray:
         """Returns an spatial object geometric center."""
         return centroid(self._coords)
 
-    def translate(self, t):
+    def translate(self, t: int | float | np.ndarray):
         """Translate object coordinates using vector `t`.
 
         Args:
@@ -48,7 +52,7 @@ class SpatialObject:
         """
         translate(self.coords, t)
 
-    def rotate_by(self, angles):
+    def rotate_by(self, angles: np.ndarray):
         """Rotate object coordinates around X, Y and Z axes.
 
         Args:
@@ -57,7 +61,7 @@ class SpatialObject:
         """
         rotate_by(self.coords, angles)
 
-    def rotate(self, rotation):
+    def rotate(self, rotation: np.ndarray):
         """Rotate object using rotation matrix or 3 angles.
 
         Args:
@@ -65,71 +69,46 @@ class SpatialObject:
         """
         rotate(self.coords, rotation)
 
-    def ab_rotate(self, A, B, amount):
-        """PTools rotation around axis.
-
-        Args:
-            A (np.ndarray (3 x 1)): point A coordinates
-            B (np.ndarray (3 x 1)): point B coordinates
-            amount (float): angle of rotation
-        """
+    def ab_rotate(self, A: np.ndarray, B: np.ndarray, amount: float):
+        """PTools rotation around axis."""
         ab_rotate(self.coords, A, B, amount)
 
-    def transform(self, matrix):
-        """Transform object by 4x4 matrix.
-
-        Args:
-            matrix (numpy.ndarray): 4 x 4 matrix.
-        """
+    def transform(self, matrix: np.ndarray):
+        """Transform object by 4x4 matrix."""
         transform(self.coords, matrix)
 
-    def move(self, matrix):
+    def move(self, matrix: np.ndarray):
         """Transform object by 4x4 matrix.
 
         This is an alias for `SpatialObject.transform`.
-
-        Args:
-            matrix (numpy.ndarray): 4 x 4 matrix.
         """
         self.transform(matrix)
 
-    def moveby(self, direction):
-        """Translate object coordinates using vector `v`.
+    def moveby(self, direction: np.ndarray | int):
+        """Translate object coordinates using vector `v` (can be a scalar).
 
         This is an alias for `SpatialObject.translate`.
-
-        Args:
-            v (array[float, int], int): 1 x 3 shaped vector or scalar
         """
         self.translate(direction)
 
-    def attract_euler_rotate(self, phi, ssi, rot):
+    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
         """Rotate object with Attract convention."""
         attract_euler_rotate(self.coords, phi, ssi, rot)
 
-    def orient(self, vector, target):
-        """Orients an AtomCollection.
-
-        Args:
-            vector (np.ndarray (3 x 1)): source vector
-            target (np.ndarray (3 x 1)): target vector
-        """
+    def orient(self, vector: np.ndarray, target: np.ndarray):
+        """Orients a SpatialObject."""
         orient(self.coords, vector, target)
 
-    def tensor_of_inertia(self):
+    def tensor_of_inertia(self) -> np.ndarray:
         """Returns a SpatialObject inertial tensors."""
         return tensor_of_inertia(self.coords, weights=None, method="fast")
 
-    def distance_to_axis(self, axis):
-        """Returns the SpatialObject distance to an arbitrary axis.
-
-        Args:
-            axis (np.array(3)): axis in 3-D
-        """
+    def distance_to_axis(self, axis: np.ndarray) -> float:
+        """Returns the SpatialObject distance to an arbitrary axis."""
         return np.linalg.norm(np.cross(self.coords, axis))
 
 
-def coord3d(value=(0, 0, 0), *args):
+def coord3d(value: np.ndarray = np.zeros(3), *args) -> np.ndarray:
     """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
 
     Can be called either with an iterable, either with 3 arguments.
@@ -164,12 +143,12 @@ def coord3d(value=(0, 0, 0), *args):
     return np.array((value, *args))
 
 
-def _coordinates_from_scalar(value):
+def _coordinates_from_scalar(value: int | float) -> np.ndarray:
     """Returns a numpy array of size 3 filled with value."""
     return np.full((3,), value, dtype=float)
 
 
-def _coordinates_from_vector(value):
+def _coordinates_from_vector(value: list[float] | np.ndarray) -> np.ndarray:
     """Returns a numpy array of size 3 initialized with a vector."""
     # value is an iterable: numpy will raise a ValueError if some element
     # is not compatible with float.
@@ -192,7 +171,7 @@ def _coordinates_from_vector(value):
     return array
 
 
-def centroid(x):
+def centroid(x: np.ndarray) -> np.ndarray:
     """Return x centroid.
 
     Centroid is the average coordinate along axis 0.
@@ -200,18 +179,18 @@ def centroid(x):
     return np.mean(x, axis=0)
 
 
-def center_of_mass(coords, weights):
+def center_of_mass(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """Return the center of mass (barycenter)."""
     weights = weights.reshape(-1, 1)
     return (coords * weights).sum(axis=0) / weights.sum()
 
 
-def angle(u, v):
+def angle(u: np.ndarray, v: np.ndarray) -> float:
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (norm(u) * norm(v)))
 
 
-def _tensor_of_inertia_accurate(coords, weights):
+def _tensor_of_inertia_accurate(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """Returns the inertia tensors of a set of atoms."""
     com = center_of_mass(coords, weights)
     X = coords - com
@@ -234,7 +213,7 @@ def _tensor_of_inertia_accurate(coords, weights):
     return I
 
 
-def _tensor_of_inertia_fast(coords):
+def _tensor_of_inertia_fast(coords: np.ndarray) -> np.ndarray:
     """Returns the inertia tensors of a set of atoms.
 
     Fast: does not take into account the weights
@@ -245,7 +224,9 @@ def _tensor_of_inertia_fast(coords):
     return tensors
 
 
-def tensor_of_inertia(coords, weights=None, method="accurate"):
+def tensor_of_inertia(
+    coords: np.ndarray, weights: np.ndarray = None, method: str = "accurate"
+):
     """Returns the inertia tensors of a set of atoms.
 
     Allows to choose between "accurate" (weighted) and "fast" methods.
@@ -261,7 +242,7 @@ def tensor_of_inertia(coords, weights=None, method="accurate"):
     return _tensor_of_inertia_fast(coords)  # method is "fast"
 
 
-def principal_axes(tensor, sort=True):
+def principal_axes(tensor: np.ndarray, sort: bool = True):
     """Return the principal axes given the tensor of inertia.
 
     Computes the eigenvalues and right eigenvectors of the tensor of inertia.
@@ -283,21 +264,15 @@ def principal_axes(tensor, sort=True):
 #
 # Translation routines
 #
-def translation_matrix(direction=np.zeros(3)):
+def translation_matrix(direction: np.ndarray = np.zeros(3)) -> np.ndarray:
     """Return the matrix to translate by direction vector."""
     matrix = np.identity(4)
     matrix[:3, 3] = direction[:3]
     return matrix
 
 
-def translate(coords, t):
-    """In-place translation of coordinates by a vector.
-
-    Args:
-        coords (numpy.ndarray): N x 3 shaped array
-        t ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
-            4 x 4 matrix
-    """
+def translate(coords: np.ndarray, t: np.ndarray | float | int):
+    """In-place translation of coordinates by a vector."""
 
     def _translate_scalar(x):
         np.add(coords, x, coords)
@@ -321,7 +296,7 @@ def translate(coords, t):
 #
 #  Rotation routines
 #
-def rotation_matrix(angles=np.zeros(3)):
+def rotation_matrix(angles: np.ndarray = np.zeros(3)) -> np.ndarray:
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
@@ -359,7 +334,7 @@ def rotation_matrix(angles=np.zeros(3)):
     return r
 
 
-def rotate_by(coords, angles=np.zeros(3)):
+def rotate_by(coords: np.ndarray, angles: np.ndarray = np.zeros(3)):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -371,7 +346,7 @@ def rotate_by(coords, angles=np.zeros(3)):
     rotate(coords, matrix)
 
 
-def rotate(coords, r):
+def rotate(coords: np.ndarray, r: np.ndarray):
     """In-place rotation of coordinates using a rotation matrix or 3 angles."""
     r = np.array(r)
     if r.shape == (3,):
@@ -386,7 +361,7 @@ def rotate(coords, r):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
-def attract_euler_rotation_matrix(phi, ssi, rot):
+def attract_euler_rotation_matrix(phi: float, ssi: float, rot: float):
     """Return the rotation matrix for an Euler rotation with Attract
     convention.
 
@@ -428,7 +403,7 @@ def attract_euler_rotation_matrix(phi, ssi, rot):
     return matrix
 
 
-def attract_euler_rotate(coords, phi, ssi, rot):
+def attract_euler_rotate(coords: np.ndarray, phi: float, ssi: float, rot: float):
     """In-place Euler rotation of coordinates with the Attract convention.
 
     Args:
@@ -441,18 +416,20 @@ def attract_euler_rotate(coords, phi, ssi, rot):
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotation_matrix(A, B, amount):
+def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float) -> np.ndarray:
     """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
     return rotation_matrix_around_axis(B - A, amount, A)
 
 
-def ab_rotate(coords, A, B, amount):
+def ab_rotate(coords: np.ndarray, A: np.ndarray, B: np.ndarray, amount: float):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
     matrix = rotation_matrix_around_axis(B - A, amount, A)
     transform(coords, matrix)
 
 
-def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
+def rotation_matrix_around_axis(
+    axis: np.ndarray, amount: float, center: np.ndarray = np.zeros(3)
+):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
     Args:
@@ -482,22 +459,16 @@ def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
 #
 
 
-def transformation_matrix(translation=np.zeros(3), rotation=np.zeros(3)):
-    """Returns a transformation matrix.
-
-    Args:
-        translation (np.ndarray(3)): translation components in x,y,z
-        rotation (np.ndarray(3)): rotation components along x,y,z
-
-    Returns:
-        np.ndarray(4, 4)
-    """
+def transformation_matrix(
+    translation: np.ndarray = np.zeros(3), rotation: np.ndarray = np.zeros(3)
+) -> np.ndarray:
+    """Returns a 4x4 transformation matrix."""
     matrix = rotation_matrix(rotation)
     matrix[:3, 3] = translation
     return matrix
 
 
-def transform(coords, matrix):
+def transform(coords: np.ndarray, matrix: np.ndarray):
     """In-place transformation of coordinates by a 4 x 4 matrix.
 
     This function should be used only when the transformation matrix
@@ -523,7 +494,9 @@ def transform(coords, matrix):
     coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
-def orientation_matrix(coords, vector, target):
+def orientation_matrix(
+    coords: np.ndarray, vector: np.ndarray, target: np.ndarray
+) -> np.ndarray:
     """Calculates an orientation matrix.
 
     Orients vector on target.
@@ -557,7 +530,7 @@ def orientation_matrix(coords, vector, target):
     return rotation_matrix_around_axis(axis, amount, center=com)
 
 
-def orient(coords, vector, target):
+def orient(coords: np.ndarray, vector: np.ndarray, target: np.ndarray):
     """Orients coordinates.
 
     Args:
@@ -568,6 +541,6 @@ def orient(coords, vector, target):
     transform(coords, t)
 
 
-def dist(a, b):
+def dist(a: np.ndarray, b: np.ndarray) -> float:
     """Returns the distance between two SpatialObject instances."""
     return (((a.coords - b.coords) ** 2.0).sum()) ** 0.5
