@@ -153,13 +153,13 @@ class AttractForceField1(ForceField):
         ]  # Numpy insane trickery
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
-    def non_bonded_energy(self):
+    def non_bonded_energy(self) -> float:
         """Non-bonded energy calculation."""
         if self.cutoff > 10:
             return self.__nb_energy_large_cutoff()
         return self.__nb_energy_small_cutoff()
 
-    def __nb_energy_small_cutoff(self):
+    def __nb_energy_small_cutoff(self) -> float:
         """Private method for non-bonded energy calculation with small cutoffs."""
 
         def van_der_waals(dx, rr2):
@@ -215,7 +215,7 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
-    def __nb_energy_large_cutoff(self):
+    def __nb_energy_large_cutoff(self) -> float:
         """Private method for non-bonded energy calculation with large cutoffs."""
 
         def van_der_waals(dx, rr2):
@@ -256,7 +256,7 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
-    def non_bonded_energy_legacy(self):
+    def non_bonded_energy_legacy(self) -> float:
         """Old-fashioned energy calculation.
 
         Very slow.
