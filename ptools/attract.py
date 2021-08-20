@@ -1,15 +1,17 @@
 """Attract docking."""
 
 import time
+from typing import Any, Callable
 
 import numpy as np
 from scipy.optimize import minimize
 
-from .forcefield import AttractForceField1
+from .forcefield import ForceField, AttractForceField1
 from .spatial import transformation_matrix
+from .rigidbody import RigidBody
 
 
-def _function(x, ff):
+def _function(x: Callable, ff: ForceField) -> float:
     """Function to minimize.
 
     Args:
@@ -32,7 +34,7 @@ def _function(x, ff):
     return e
 
 
-def run_attract(ligand, receptor, **kwargs):
+def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
     """Run the Attract docking procedure.
 
     Args:
@@ -88,7 +90,9 @@ def run_attract(ligand, receptor, **kwargs):
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
 
 
-def _run_minimization(params, minimlist, receptor, ligand):
+def _run_minimization(
+    params: dict[str, Any], minimlist: Any, receptor: RigidBody, ligand: RigidBody
+):
     start = time.time()
     cutoff = params["squarecutoff"] ** 0.5
     niter = params["maxiter"]
