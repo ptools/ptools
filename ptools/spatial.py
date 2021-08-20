@@ -116,13 +116,9 @@ class SpatialObject:
         """
         orient(self.coords, vector, target)
 
-    def tensor_of_inertia(self, sort=False):
-        """Returns an AtomCollection inertial tensors.
-
-        Args:
-            sort (bool): if True, tensors are sorted by amplitude.
-        """
-        return tensor_of_inertia(self.coords, sort, method="fast")
+    def tensor_of_inertia(self):
+        """Returns a SpatialObject inertial tensors."""
+        return tensor_of_inertia(self.coords, weights=None, method="fast")
 
     def distance_to_axis(self, axis):
         """Returns the SpatialObject distance to an arbitrary axis.
