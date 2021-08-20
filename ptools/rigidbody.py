@@ -1,6 +1,8 @@
 """ptools.rigidbody - Defines the RigidBody class and children."""
 
-import numpy
+from __future__ import annotations
+
+import numpy as np
 
 from .atom import AtomCollection
 from .io import read_pdb
@@ -22,7 +24,7 @@ class RigidBody(AtomCollection):
             atoms = read_pdb(filename)
         super().__init__(atoms)
 
-    def copy(self):
+    def copy(self) -> RigidBody:
         """Return a copy of the current RigidBody."""
         return self.__class__(atoms=self.atoms)
 
@@ -33,20 +35,20 @@ class AttractRigidBody(RigidBody):
     Attributes:
         with `N` being the number of atoms
 
-        atom_categories (numpy.ndarray(N, )):
+        atom_categories (np.ndarray(N, )):
             1 x N shaped array for atom categories
-        atom_charges (numpy.ndarray(N, )):
+        atom_charges (np.ndarray(N, )):
             1 x N shaped array for atom charges
-        atom_forces (numpy.ndarray(N, 3)):
+        atom_forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         N = len(self)
-        self.atom_categories = numpy.zeros(N, dtype=int)
-        self.atom_charges = numpy.zeros(N, dtype=float)
-        self.atom_forces = numpy.zeros((N, 3), dtype=float)
+        self.atom_categories = np.zeros(N, dtype=int)
+        self.atom_charges = np.zeros(N, dtype=float)
+        self.atom_forces = np.zeros((N, 3), dtype=float)
         self._init()
 
     def _init(self):
@@ -59,7 +61,7 @@ class AttractRigidBody(RigidBody):
 
         def init_category():
             try:
-                self.atom_categories = numpy.array(
+                self.atom_categories = np.array(
                     [int(tokens[0]) - 1 for tokens in extra]
                 )
             except Exception as e:
@@ -68,7 +70,7 @@ class AttractRigidBody(RigidBody):
 
         def init_charges():
             try:
-                self.atom_charges = numpy.array([float(tokens[1]) for tokens in extra])
+                self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
             except Exception as e:
                 err = "cannot initialize atom charges: {}".format(e)
                 raise IOError(err) from e
@@ -81,6 +83,6 @@ class AttractRigidBody(RigidBody):
         """Set all atom forces to (0, 0 0)."""
         self.atom_forces.fill(0)
 
-    def apply_forces(self, forces):
+    def apply_forces(self, forces: np.ndarray):
         """Adds forces to atoms."""
         self.atom_forces += forces
