@@ -1,10 +1,15 @@
 """pairlist - Iterate over atoms in interaction."""
 
+from dataclasses import dataclass, field
 
-import numpy
+import numpy as np
+from scipy.sparse import data
 from scipy.spatial.distance import cdist
 
+from ptools.atom import Atom, AtomCollection
 
+
+@dataclass
 class PairList:
     """Retrieve atoms that are within a certain cutoff in AtomCollections.
 
@@ -13,24 +18,15 @@ class PairList:
     This sort applies for the second element of the pair as well, meaning that
     if a pair list contains [[1, 2], [1, 3]], element [1, 2] will always come
     before element [1, 3].
-
-    Attrs:
-        receptor (AtomCollection)
-        ligand (AtomCollection)
-        sqcutoff (float): squared cutoff for neighbor search
-
-    Args:
-        receptor (AtomCollection)
-        ligand (AtomCollection)
-        cutoff (float): cut-off for neighbor searching
     """
 
-    def __init__(self, receptor, ligand, cutoff):
-        self.receptor = receptor
-        self.ligand = ligand
-        self.sqcutoff = cutoff * cutoff
-        self._all_sqdistances = None
-        self._contacts = None
+    receptor: AtomCollection
+    ligand: AtomCollection
+    cutoff: float
+    _all_sqdistances: np.ndarray = field(init=False, repr=False, default=None)
+    _contacts: np.ndarray = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
         self.update()
 
     def contacts(self):
@@ -48,11 +44,11 @@ class PairList:
 
     def all_distances(self):
         """Return the matrix of distances between every atom pairs."""
-        return numpy.sqrt(self.all_sqdistances())
+        return np.sqrt(self.all_sqdistances())
 
     def distances(self):
         """Return the matrix of distances between atoms within cutoff."""
-        return numpy.sqrt(self.sqdistances())
+        return np.sqrt(self.sqdistances())
 
     def update(self):
         """Update contact and distance lists with the neighbor searching
@@ -60,7 +56,8 @@ class PairList:
         self._all_sqdistances = cdist(
             self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
         )
-        self._contacts = numpy.where(self._all_sqdistances <= self.sqcutoff)
+        sqcutoff = self.cutoff * self.cutoff
+        self._contacts = np.where(self._all_sqdistances <= sqcutoff)
 
     @staticmethod
     def sort(receptor, ligand):
