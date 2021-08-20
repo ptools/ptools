@@ -117,18 +117,16 @@ class ForceField:
 ForceField.cutoff = property(ForceField.get_cutoff, ForceField.set_cutoff)
 
 
+@dataclass
 class AttractForceField1(ForceField):
     """The AttractForceField1."""
 
-    def __init__(self, receptor, ligand, cutoff=10, paramfile=None):
-        super().__init__(receptor, ligand, cutoff)
-        self._repulsive_parameters = None
-        self._attractive_parameters = None
-        self._attractive_pairs = None
-        self._repulsive_pairs = None
-        self._init_parameters(paramfile)
+    paramfile: str = None
 
-    def _init_parameters(self, path=None):
+    def __post_init__(self):
+        self._init_parameters(self.paramfile)
+
+    def _init_parameters(self, path: str = None):
         if path is not None:
             params = read_aminon(path)
         else:
