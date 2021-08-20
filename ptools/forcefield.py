@@ -1,8 +1,12 @@
 """Ptools forcefield implementation."""
 
+from dataclasses import dataclass, field
+
 import numpy as np
+from scipy.sparse import data
 from scipy.spatial.distance import cdist
 
+from ptools.rigidbody import RigidBody
 from .pairlist import PairList
 from .io.attract import read_aminon
 
@@ -61,6 +65,7 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 )
 
 
+@dataclass
 class ForceField:
     """Base class for calculating the energy between two molecules.
 
@@ -68,20 +73,20 @@ class ForceField:
     classes.
     """
 
-    def __init__(self, receptor, ligand, cutoff=10):
-        self.receptor = receptor
-        self.ligand = ligand
-        self.sq_cutoff = cutoff * cutoff
-        self._vdw_energy = 0.0
-        self._electrostatic_energy = 0.0
+    receptor: RigidBody
+    ligand: RigidBody
+    cutoff: float = 10
+    _vdw_energy: float = field(init=False, repr=False, default=0.0)
+    _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
 
-    @property
-    def cutoff(self):
+    def __post_init__(self):
+        self.sq_cutoff = self.cutoff * self.cutoff
+
+    def get_cutoff(self) -> float:
         """Gets/Sets the cutoff value for non-bonded interactions."""
         return self.sq_cutoff ** 0.5
 
-    @cutoff.setter
-    def cutoff(self, value):
+    def set_cutoff(self, value: float):
         """Gets/Sets the cutoff value for non-bonded interactions."""
         self.sq_cutoff = value * value
 
@@ -107,6 +112,9 @@ class ForceField:
         """Calculate the van der Waals energy (Lennard-Jones energy)
         between a receptor and a ligand."""
         return self._electrostatic_energy
+
+
+ForceField.cutoff = property(ForceField.get_cutoff, ForceField.set_cutoff)
 
 
 class AttractForceField1(ForceField):
