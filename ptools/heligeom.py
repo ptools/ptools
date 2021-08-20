@@ -29,11 +29,10 @@ def extend(hp, mono1, N, Z=False):
     if Z:
         # Redefine origin and axis to Z
         origin = np.zeros(3)
-        axis = np.array([0.0,0,1])
+        axis = np.array([0.0, 0, 1])
 
         # Align the screw axis on Z-axis and apply the transformation on monoTest
-        monoTest.orient(hp.unit, [0.,0.,1.0])
-
+        monoTest.orient(hp.unit, [0.0, 0.0, 1.0])
 
     monoTest.set_chain(string.ascii_uppercase[chain_id % 26])
     final += monoTest
@@ -59,5 +58,5 @@ def main():  # pragma: no cover
     print(result.topdb())
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

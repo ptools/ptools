@@ -1,4 +1,3 @@
-
 """Ptools forcefield implementation."""
 
 import numpy as np
@@ -9,24 +8,57 @@ from .io.attract import read_aminon
 
 
 # Name of the force fields implemented in pyattract.
-ATTRACT_FORCEFIELDS = ('scorpion', 'attract1', 'attract2')
+ATTRACT_FORCEFIELDS = ("scorpion", "attract1", "attract2")
 
 
 # Attract force field default atom type radii and amplitudes.
-ATTRACT_DEFAULT_FF_PARAMS = np.array([
-    [2.000, 1.000], [1.900, 1.000], [1.950, 2.000], [1.900, 0.600],
-    [1.900, 0.600], [1.900, 0.600], [1.990, 2.000], [1.990, 1.500],
-    [1.900, 0.600], [1.990, 1.500], [1.900, 0.600], [1.990, 1.500],
-    [1.900, 0.500], [2.200, 3.000], [2.200, 3.000], [2.000, 2.000],
-    [1.900, 0.600], [1.990, 2.000], [1.990, 2.900], [2.200, 2.000],
-    [2.200, 3.000], [1.900, 0.600], [1.900, 0.600], [1.900, 0.600],
-    [1.990, 1.500], [2.200, 2.600], [2.200, 2.000], [2.200, 2.600],
-    [1.990, 2.500], [2.640, 0.600], [2.900, 0.600], [2.650, 0.600],
-    [2.530, 0.600], [2.650, 0.600], [2.590, 0.600], [2.530, 0.600],
-    [2.650, 0.600], [2.830, 0.600], [2.840, 0.600], [2.650, 0.600],
-    [2.840, 0.600],
-    [2.940, 0.600]
-], dtype=float)
+ATTRACT_DEFAULT_FF_PARAMS = np.array(
+    [
+        [2.000, 1.000],
+        [1.900, 1.000],
+        [1.950, 2.000],
+        [1.900, 0.600],
+        [1.900, 0.600],
+        [1.900, 0.600],
+        [1.990, 2.000],
+        [1.990, 1.500],
+        [1.900, 0.600],
+        [1.990, 1.500],
+        [1.900, 0.600],
+        [1.990, 1.500],
+        [1.900, 0.500],
+        [2.200, 3.000],
+        [2.200, 3.000],
+        [2.000, 2.000],
+        [1.900, 0.600],
+        [1.990, 2.000],
+        [1.990, 2.900],
+        [2.200, 2.000],
+        [2.200, 3.000],
+        [1.900, 0.600],
+        [1.900, 0.600],
+        [1.900, 0.600],
+        [1.990, 1.500],
+        [2.200, 2.600],
+        [2.200, 2.000],
+        [2.200, 2.600],
+        [1.990, 2.500],
+        [2.640, 0.600],
+        [2.900, 0.600],
+        [2.650, 0.600],
+        [2.530, 0.600],
+        [2.650, 0.600],
+        [2.590, 0.600],
+        [2.530, 0.600],
+        [2.650, 0.600],
+        [2.830, 0.600],
+        [2.840, 0.600],
+        [2.650, 0.600],
+        [2.840, 0.600],
+        [2.940, 0.600],
+    ],
+    dtype=float,
+)
 
 
 class ForceField:
@@ -98,23 +130,28 @@ class AttractForceField1(ForceField):
         rad = np.array(rad)
         amp = np.array(amp)
 
-        self._repulsive_parameters = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
-        self._attractive_parameters = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
+        self._repulsive_parameters = (
+            amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
+        )
+        self._attractive_parameters = (
+            amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
+        )
 
         # Categorie pairs.
-        C = np.array(np.meshgrid(self.receptor.atom_categories,
-                                 self.ligand.atom_categories)).T
+        C = np.array(
+            np.meshgrid(self.receptor.atom_categories, self.ligand.atom_categories)
+        ).T
 
-        self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]  # Numpy insane trickery
+        self._attractive_pairs = self._attractive_parameters[
+            C[..., 0], C[..., 1]
+        ]  # Numpy insane trickery
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
-
 
     def non_bonded_energy(self):
         """Non-bonded energy calculation."""
         if self.cutoff > 10:
             return self.__nb_energy_large_cutoff()
         return self.__nb_energy_small_cutoff()
-
 
     def __nb_energy_small_cutoff(self):
         """Private method for non-bonded energy calculation with small cutoffs."""
@@ -137,10 +174,12 @@ class AttractForceField1(ForceField):
 
             return vlj.sum()
 
-
         def electrostatics(dx, rr2):
-            charge = (self.receptor.atom_charges[:, None] *
-                    self.ligand.atom_charges * (332.053986 / 20.0))
+            charge = (
+                self.receptor.atom_charges[:, None]
+                * self.ligand.atom_charges
+                * (332.053986 / 20.0)
+            )
             charge = charge[keep]
 
             et = charge * rr2
@@ -154,7 +193,9 @@ class AttractForceField1(ForceField):
 
             return et.sum()
 
-        sq_distances = cdist(self.receptor.coords, self.ligand.coords, metric="sqeuclidean")
+        sq_distances = cdist(
+            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+        )
         keep = np.where(sq_distances <= self.sq_cutoff)
 
         XA = np.take(self.receptor.coords, keep[0], axis=0)
@@ -183,8 +224,11 @@ class AttractForceField1(ForceField):
             return vlj.sum()
 
         def electrostatics(dx, rr2):
-            charge = (self.receptor.atom_charges[:, None] *
-                      self.ligand.atom_charges * (332.053986 / 20.0))
+            charge = (
+                self.receptor.atom_charges[:, None]
+                * self.ligand.atom_charges
+                * (332.053986 / 20.0)
+            )
             et = charge * rr2
             fdb = dx * (2.0 * et)[:, :, None]
             self.receptor.atom_forces += fdb.sum(axis=1)
@@ -192,13 +236,14 @@ class AttractForceField1(ForceField):
             return et.sum()
 
         dx = self.receptor.coords[:, None] - self.ligand.coords
-        sq_distances = cdist(self.receptor.coords, self.ligand.coords,
-                             metric="sqeuclidean")
+        sq_distances = cdist(
+            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+        )
 
         exclude = np.where(sq_distances > self.sq_cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
-        rr2[exclude] = 0.  # exclude pairs with distance > cutoff
+        rr2[exclude] = 0.0  # exclude pairs with distance > cutoff
         dx = dx + rr2[:, :, None]
 
         self._vdw_energy = van_der_waals(dx, rr2)
@@ -217,8 +262,9 @@ class AttractForceField1(ForceField):
         contacts = pairlist.contacts()
         norm2 = pairlist.sqdistances()
 
-        alldx = [self.receptor.coords[ir] - self.ligand.coords[il]
-                 for ir, il in contacts]
+        alldx = [
+            self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
+        ]
 
         for i, (ir, il) in enumerate(contacts):
             category_rec = self.receptor.atom_categories[ir]

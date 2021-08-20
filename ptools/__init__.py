@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 __author__ = """Benoist LAURENT"""
-__email__ = 'benoistlaurent@gmail.com'
-__version__ = '0.1.0'
-
+__email__ = "benoistlaurent@gmail.com"
+__version__ = "0.1.0"
 
 
 from . import (
@@ -16,7 +15,7 @@ from . import (
     rigidbody,
     spatial,
     superpose,
-    tables
+    tables,
 )
 
 from .rigidbody import AttractRigidBody, RigidBody

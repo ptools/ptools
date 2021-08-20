@@ -5,6 +5,7 @@ from ..rigidbody import RigidBody
 
 class AttractFileParameters:
     """Stores parameters from an Attract parameter file."""
+
     def __init__(self, path=""):
         self.nbminim = 0
         self.minimlist = []
@@ -25,11 +26,14 @@ class AttractFileParameters:
             minimlist (list[dict[str, (int or float)]])
             rstk (float)
         """
+
         def read_number_of_minimizations():
             try:
                 nbminim = int(lines.pop(0).split()[0])
             except Exception as e:
-                error = "Cannot read number of minimizations from attract parameter file"
+                error = (
+                    "Cannot read number of minimizations from attract parameter file"
+                )
                 raise ValueError(error) from e
             return nbminim
 
@@ -41,6 +45,7 @@ class AttractFileParameters:
                     error = "Unexpectedly reached end of attract parameter file"
                     raise ValueError(error) from e
                 return tokens
+
             lignames = []
             tokens = get_tokens()
             while tokens and tokens[0] == "Lig":
@@ -60,16 +65,22 @@ class AttractFileParameters:
             try:
                 tokens = lines.pop(0).split()
             except Exception as e:
-                error = "Cannot read minimizations from attract parameter file: "\
-                        "expected {}, found {}".format(self.nbminim, i)
+                error = (
+                    "Cannot read minimizations from attract parameter file: "
+                    "expected {}, found {}".format(self.nbminim, i)
+                )
                 raise ValueError(error) from e
             if len(tokens) < 3:
-                error = "Cannot read minimization line from attract parameter file: "\
-                        "expected at least 3 values, found {}".format(len(tokens))
+                error = (
+                    "Cannot read minimization line from attract parameter file: "
+                    "expected at least 3 values, found {}".format(len(tokens))
+                )
                 raise ValueError(error)
-            minim = {"maxiter": int(tokens[0]),
-                    "squarecutoff": float(tokens[-1]),
-                    "rstk": self.rstk if tokens[-2] == '1' else 0.0}
+            minim = {
+                "maxiter": int(tokens[0]),
+                "squarecutoff": float(tokens[-1]),
+                "rstk": self.rstk if tokens[-2] == "1" else 0.0,
+            }
             return minim
 
         # Read file ignoring comments.
@@ -89,8 +100,6 @@ class AttractFileParameters:
         self.minimlist = []
         for i in range(self.nbminim):
             self.minimlist.append(read_minimization())
-
-
 
 
 def read_aminon(path):
@@ -159,12 +168,15 @@ def read_forcefield_from_reduced(path):
     Returns:
         str: force field name in lower case.
     """
+
     def get_header_line():
         with open(path, "rt") as f:
             line = f.readline()
         if not line.startswith("HEADER"):
-            err = (f"{path}: reduced PDB file first line must be a HEADER line"
-                   "specifying the chosen force field")
+            err = (
+                f"{path}: reduced PDB file first line must be a HEADER line"
+                "specifying the chosen force field"
+            )
             raise IOError(err)
         return line
 

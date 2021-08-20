@@ -1,4 +1,3 @@
-
 """pairlist - Iterate over atoms in interaction."""
 
 
@@ -25,6 +24,7 @@ class PairList:
         ligand (AtomCollection)
         cutoff (float): cut-off for neighbor searching
     """
+
     def __init__(self, receptor, ligand, cutoff):
         self.receptor = receptor
         self.ligand = ligand
@@ -57,8 +57,9 @@ class PairList:
     def update(self):
         """Update contact and distance lists with the neighbor searching
         algorithm."""
-        self._all_sqdistances = cdist(self.receptor.coords, self.ligand.coords,
-                                    metric='sqeuclidean')
+        self._all_sqdistances = cdist(
+            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+        )
         self._contacts = numpy.where(self._all_sqdistances <= self.sqcutoff)
 
     @staticmethod

@@ -1,10 +1,10 @@
-
 """linalg - Defines functions to read/write files."""
 
 import os
 import sys
 
 from .pdb import read_pdb
+
 
 def check_file_exists(path, message=False):
     """Checks that a file exists.
@@ -52,9 +52,10 @@ def assert_file_exists(path, message=""):
 
 def backup_if_exists(source):
     """Creates a backup of a file if source already exists.
-    
+
     Files will be renamed file.1, file.2, etc.
     """
+
     def new_backup_name():
         return os.path.join(dirname, f"{basename}.{idx}")
 

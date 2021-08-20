@@ -1,4 +1,3 @@
-
 """ptools.rigidbody - Defines the RigidBody class and children."""
 
 import numpy
@@ -15,7 +14,8 @@ class RigidBody(AtomCollection):
         filename (str): path to topology file.
         atoms (list[Atom]): list of Atom instances or AtomCollection.
     """
-    def __init__(self, filename='', atoms=None):
+
+    def __init__(self, filename="", atoms=None):
         if atoms is None:
             atoms = []
         if filename:
@@ -56,21 +56,24 @@ class AttractRigidBody(RigidBody):
         Raises:
             IOError: if atom meta['extra'] attribute does not contain 2 entries.
         """
+
         def init_category():
             try:
-                self.atom_categories = numpy.array([int(tokens[0]) - 1 for tokens in extra])
+                self.atom_categories = numpy.array(
+                    [int(tokens[0]) - 1 for tokens in extra]
+                )
             except Exception as e:
-                err = 'cannot initialize atom category: {}'.format(e)
+                err = "cannot initialize atom category: {}".format(e)
                 raise IOError(err) from e
 
         def init_charges():
             try:
                 self.atom_charges = numpy.array([float(tokens[1]) for tokens in extra])
             except Exception as e:
-                err = 'cannot initialize atom charges: {}'.format(e)
+                err = "cannot initialize atom charges: {}".format(e)
                 raise IOError(err) from e
 
-        extra = [atom.meta['extra'].split() for atom in self.atoms]
+        extra = [atom.meta["extra"].split() for atom in self.atoms]
         init_category()
         init_charges()
 

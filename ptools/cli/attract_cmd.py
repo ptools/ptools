@@ -1,4 +1,3 @@
-
 """PTools attract command."""
 
 import datetime
@@ -11,38 +10,74 @@ def create_subparser(parent):
     """Creates command-line parser."""
     parser = parent.add_parser("attract", help=__doc__)
     parser.set_defaults(func=run)
-    parser.add_argument("-r", "--receptor", dest="receptor_name", required=True,
-                        help="name of the receptor file")
-    parser.add_argument("-l", "--ligand", dest="ligand_name", required=True,
-                        help="name of the ligand file")
-    parser.add_argument("--ref", dest="reffile",
-                        help="reference ligand for rmsd")
-    parser.add_argument("-c", "--conf", default="attract.inp",
-                        help="attract configuration file "
-                             "(default=attract.inp)")
-    parser.add_argument("-p", "--param",
-                        help="attract force field parameter file "
-                             "(default=default force field file)")
-    parser.add_argument("--ngroups", action="store", type=int,
-                        default=1,
-                        help="Desired number of divisions of translations file")
-    parser.add_argument("--ngroup", action="store", type=int,
-                        default=1,
-                        help="Which translation group (1 <= ngroup <= ngroups) "
-                             "to run (requires --ngroups)")
-    parser.add_argument("-s", "--start-config-only", dest="startconfig", action="store_true",
-                        help="minimize starting configuration only")
-    parser.add_argument("--translation", type=int, dest="transnb",
-                        default=None,
-                        help="minimize for the provided translation number")
-    parser.add_argument("--rotation", type=int, dest="rotnb",
-                        default=None,
-                        help="minimize for the given rotation number")
+    parser.add_argument(
+        "-r",
+        "--receptor",
+        dest="receptor_name",
+        required=True,
+        help="name of the receptor file",
+    )
+    parser.add_argument(
+        "-l",
+        "--ligand",
+        dest="ligand_name",
+        required=True,
+        help="name of the ligand file",
+    )
+    parser.add_argument("--ref", dest="reffile", help="reference ligand for rmsd")
+    parser.add_argument(
+        "-c",
+        "--conf",
+        default="attract.inp",
+        help="attract configuration file " "(default=attract.inp)",
+    )
+    parser.add_argument(
+        "-p",
+        "--param",
+        help="attract force field parameter file " "(default=default force field file)",
+    )
+    parser.add_argument(
+        "--ngroups",
+        action="store",
+        type=int,
+        default=1,
+        help="Desired number of divisions of translations file",
+    )
+    parser.add_argument(
+        "--ngroup",
+        action="store",
+        type=int,
+        default=1,
+        help="Which translation group (1 <= ngroup <= ngroups) "
+        "to run (requires --ngroups)",
+    )
+    parser.add_argument(
+        "-s",
+        "--start-config-only",
+        dest="startconfig",
+        action="store_true",
+        help="minimize starting configuration only",
+    )
+    parser.add_argument(
+        "--translation",
+        type=int,
+        dest="transnb",
+        default=None,
+        help="minimize for the provided translation number",
+    )
+    parser.add_argument(
+        "--rotation",
+        type=int,
+        dest="rotnb",
+        default=None,
+        help="minimize for the given rotation number",
+    )
 
 
 def run(args):
     """Runs attract."""
-    print(f"""
+    print(
+        f"""
 **********************************************************************
 **                                                                  **
 **                ATTRACT  (Python edition)                         **
@@ -51,7 +86,8 @@ def run(args):
 **********************************************************************
 PTools revision {ptools.__version__}
 
-""")
+"""
+    )
     time_start = datetime.datetime.now()
     print("Start time:", time_start)
 
@@ -59,7 +95,9 @@ PTools revision {ptools.__version__}
     parameters = ptools.io.attract.read_attract_parameter(args.conf)
     print(f"{parameters.nbminim} series of minimizations")
 
-    ff_name = ptools.io.attract.check_ff_version_match(args.receptor_name, args.ligand_name)
+    ff_name = ptools.io.attract.check_ff_version_match(
+        args.receptor_name, args.ligand_name
+    )
     if ff_name != "attract1":
         raise NotImplementedError(f"force field '{ff_name}' not implemented yet")
     print(f"Detected forcefield: '{ff_name}'")
@@ -72,7 +110,9 @@ PTools revision {ptools.__version__}
     # Load receptor and ligand.
     receptor = ptools.AttractRigidBody(args.receptor_name)
     ligand = ptools.AttractRigidBody(args.ligand_name)
-    print(f"Read receptor (fixed): {args.receptor_name} with {len(receptor)} particules")
+    print(
+        f"Read receptor (fixed): {args.receptor_name} with {len(receptor)} particules"
+    )
     print(f"Read ligand (mobile): {args.ligand_name} with {len(ligand)} particules")
 
     if args.reffile:
@@ -87,11 +127,14 @@ PTools revision {ptools.__version__}
         translations = {0: ligand.center()}
         rotations = {0: (0, 0, 0)}
     else:
-        ptools.io.assert_file_exists("rotation.dat", "rotation file 'rotation.dat' is required.")
-        ptools.io.assert_file_exists("translation.dat", "translation file 'translation.dat' is required.")
+        ptools.io.assert_file_exists(
+            "rotation.dat", "rotation file 'rotation.dat' is required."
+        )
+        ptools.io.assert_file_exists(
+            "translation.dat", "translation file 'translation.dat' is required."
+        )
         translations = ptools.io.attract.read_translations()
         rotations = ptools.io.attract.read_rotations()
-
 
     # CHR some logic re-worked. "single" now used to indicate any minimization
     # run from a single configuration-- either the start config or a specified
@@ -119,7 +162,6 @@ PTools revision {ptools.__version__}
         raise NotImplementedError("Not implemented yet")
         # print("Working on translations group {:d} of {:d}".format(args.ngroup, args.ngroups))
         # translations = docking.get_group(translations, args.ngroups, args.ngroup)
-
 
     # core attract algorithm
     params = {

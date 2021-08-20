@@ -1,4 +1,3 @@
-
 """Protein Data Bank format I/O."""
 
 from ..atom import BaseAtom, AtomCollection
@@ -28,14 +27,16 @@ def read_atom_line(line):
     coords = (x, y, z)
     extra = line[54:].strip()
 
-    atom = BaseAtom(index=index, name=name,
-                    resname=resname, resid=resid,
-                    chain=chain,
-                    coords=coords,
-                    meta={"extra": extra})
+    atom = BaseAtom(
+        index=index,
+        name=name,
+        resname=resname,
+        resid=resid,
+        chain=chain,
+        coords=coords,
+        meta={"extra": extra},
+    )
     return atom
-
-
 
 
 def read_pdb(path):

@@ -1,4 +1,3 @@
-
 """ptools.spatial - Defines classes and functions to work on spatial
 (mostly 3D) data."""
 
@@ -14,6 +13,7 @@ class SpatialObject:
 
     Implements basic spatial operations such as translation, rotation, etc.
     """
+
     def __init__(self, coords=(0, 0, 0)):
         self._coords = coord3d(coords)
 
@@ -149,8 +149,10 @@ def coord3d(value=(0, 0, 0), *args):
     # Checks function was called with adequate number of arguments.
     if args:
         if len(args) != 2:
-            raise TypeError(f"Coordinates must be initialized either "
-                f"with 1 or 3 arguments (found {value=}, {args=})")
+            raise TypeError(
+                f"Coordinates must be initialized either "
+                f"with 1 or 3 arguments (found {value=}, {args=})"
+            )
 
     # Initialization from a single value.
     if not args:
@@ -168,7 +170,7 @@ def coord3d(value=(0, 0, 0), *args):
 
 def _coordinates_from_scalar(value):
     """Returns a numpy array of size 3 filled with value."""
-    return np.full((3, ), value, dtype=float)
+    return np.full((3,), value, dtype=float)
 
 
 def _coordinates_from_vector(value):
@@ -181,12 +183,16 @@ def _coordinates_from_vector(value):
         array = value.astype("float64")
     # Checks array corresponds to 3D coordinates
     if len(array.shape) > 2:
-        raise ValueError("3D coordinate array should have at "
-            f"most 2 dimensions (found {array.shape}")
-    if ((len(array.shape) == 2 and array.shape[1] != 3) or
-        (len(array.shape) == 1 and array.shape[0] != 3)):
-        raise ValueError("3D coordinate array should be N x 3 "
-                f"(found {array.shape})")
+        raise ValueError(
+            "3D coordinate array should have at "
+            f"most 2 dimensions (found {array.shape}"
+        )
+    if (len(array.shape) == 2 and array.shape[1] != 3) or (
+        len(array.shape) == 1 and array.shape[0] != 3
+    ):
+        raise ValueError(
+            "3D coordinate array should be N x 3 " f"(found {array.shape})"
+        )
     return array
 
 
@@ -201,7 +207,7 @@ def centroid(x):
 def center_of_mass(coords, weights):
     """Return the center of mass (barycenter)."""
     weights = weights.reshape(-1, 1)
-    return (coords * weights).sum(axis=0)  / weights.sum()
+    return (coords * weights).sum(axis=0) / weights.sum()
 
 
 def angle(u, v):
@@ -217,15 +223,17 @@ def _tensor_of_inertia_accurate(coords, weights):
     Ixx = np.sum(weights * (X[:, 1] ** 2 + X[:, 2] ** 2))
     Iyy = np.sum(weights * (X[:, 0] ** 2 + X[:, 2] ** 2))
     Izz = np.sum(weights * (X[:, 0] ** 2 + X[:, 1] ** 2))
-    Ixy = - np.sum(weights * X[:, 0] * X[:, 1])
-    Iyz = - np.sum(weights * X[:, 1] * X[:, 2])
-    Ixz = - np.sum(weights * X[:, 0] * X[:, 2])
+    Ixy = -np.sum(weights * X[:, 0] * X[:, 1])
+    Iyz = -np.sum(weights * X[:, 1] * X[:, 2])
+    Ixz = -np.sum(weights * X[:, 0] * X[:, 2])
 
-    I = np.array([
-        [Ixx, Ixy, Ixz],
-        [Ixy, Iyy, Iyz],
-        [Ixz, Iyz, Izz],
-    ])
+    I = np.array(
+        [
+            [Ixx, Ixy, Ixz],
+            [Ixy, Iyy, Iyz],
+            [Ixz, Iyz, Izz],
+        ]
+    )
 
     return I
 
@@ -247,12 +255,12 @@ def tensor_of_inertia(coords, weights=None, method="accurate"):
     Allows to choose between "accurate" (weighted) and "fast" methods.
     """
     if method not in ("accurate", "fast"):
-        raise ValueError("parameter 'method' should be 'accurate' or 'fast' "
-            f"(found {method=!r})")
+        raise ValueError(
+            "parameter 'method' should be 'accurate' or 'fast' " f"(found {method=!r})"
+        )
     if method == "accurate":
         if weights is None:
-            raise ValueError("need weights to compute accurate tensor of "
-                             "inertia")
+            raise ValueError("need weights to compute accurate tensor of " "inertia")
         return _tensor_of_inertia_accurate(coords, weights)
     return _tensor_of_inertia_fast(coords)  # method is "fast"
 
@@ -294,6 +302,7 @@ def translate(coords, t):
         t ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
             4 x 4 matrix
     """
+
     def _translate_scalar(x):
         np.add(coords, x, coords)
 
@@ -306,9 +315,10 @@ def translate(coords, t):
         t = np.array(t)
         if t.shape == (4, 4):
             t = t[:3, 3]
-        elif t.shape != (3, ):
-            raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
-                            f"(got {t.shape})")
+        elif t.shape != (3,):
+            raise ValueError(
+                "Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {t.shape})"
+            )
         np.add(coords, t, coords)
 
 
@@ -335,12 +345,20 @@ def rotation_matrix(angles=np.zeros(3)):
     r[0, 1] = -math.cos(beta) * math.sin(gamma)
     r[0, 2] = math.sin(beta)
 
-    r[1, 0] = math.cos(alpha) * math.sin(gamma) + math.sin(alpha) * math.sin(beta) * math.cos(gamma)
-    r[1, 1] = math.cos(alpha) * math.cos(gamma) - math.sin(alpha) * math.sin(beta) * math.sin(gamma)
+    r[1, 0] = math.cos(alpha) * math.sin(gamma) + math.sin(alpha) * math.sin(
+        beta
+    ) * math.cos(gamma)
+    r[1, 1] = math.cos(alpha) * math.cos(gamma) - math.sin(alpha) * math.sin(
+        beta
+    ) * math.sin(gamma)
     r[1, 2] = -math.sin(alpha) * math.cos(beta)
 
-    r[2, 0] = math.sin(alpha) * math.sin(gamma) - math.cos(alpha) * math.sin(beta) * math.cos(gamma)
-    r[2, 1] = math.sin(alpha) * math.cos(gamma) + math.cos(alpha) * math.sin(beta) * math.sin(gamma)
+    r[2, 0] = math.sin(alpha) * math.sin(gamma) - math.cos(alpha) * math.sin(
+        beta
+    ) * math.cos(gamma)
+    r[2, 1] = math.sin(alpha) * math.cos(gamma) + math.cos(alpha) * math.sin(
+        beta
+    ) * math.sin(gamma)
     r[2, 2] = math.cos(alpha) * math.cos(beta)
     return r
 
@@ -365,8 +383,9 @@ def rotate(coords, r):
     elif r.shape in ((4, 4), (3, 3)):
         matrix = r
     else:
-        raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 "
-                        f"(got {r.shape}) ")
+        raise ValueError(
+            "Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {r.shape}) "
+        )
 
     coords[:] = np.inner(coords, matrix[:3, :3])
 
@@ -448,13 +467,14 @@ def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
     Returns:
         np.ndarray: 4 x 4 rotation matrix
     """
+
     def _translation_matrix(direction):
         matrix = np.identity(4)
         matrix[:3, 3] = direction[:3]
         return matrix
 
-    origin_matrix = _translation_matrix(- center)
-    offset_matrix = _translation_matrix(+ center)
+    origin_matrix = _translation_matrix(-center)
+    offset_matrix = _translation_matrix(+center)
     rotation = expm(np.cross(np.identity(3), axis / norm(axis) * amount))
     matrix = np.identity(4)
     matrix[:3, :3] = rotation
@@ -464,6 +484,7 @@ def rotation_matrix_around_axis(axis, amount, center=np.zeros(3)):
 #
 #  Other transformation routines
 #
+
 
 def transformation_matrix(translation=np.zeros(3), rotation=np.zeros(3)):
     """Returns a transformation matrix.
@@ -543,9 +564,9 @@ def orientation_matrix(coords, vector, target):
 def orient(coords, vector, target):
     """Orients coordinates.
 
-        Args:
-            vector (np.ndarray (3 x 1)): source vector
-            target (np.ndarray (3 x 1)): target vector
+    Args:
+        vector (np.ndarray (3 x 1)): source vector
+        target (np.ndarray (3 x 1)): target vector
     """
     t = orientation_matrix(coords, vector, target)
     transform(coords, t)

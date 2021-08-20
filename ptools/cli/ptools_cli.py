@@ -1,4 +1,3 @@
-
 """PTools command-line interface.
 
 For more specific help, provide the name of a positional argument, e.g.,

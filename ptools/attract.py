@@ -100,8 +100,9 @@ def _run_minimization(params, minimlist, receptor, ligand):
     print(f"  - start energy: {ff.non_bonded_energy():.2f}", flush=True)
 
     x0 = np.zeros(6)
-    res = minimize(_function, x0, args=(ff, ), method="L-BFGS-B",
-                   options={"maxiter": niter})
+    res = minimize(
+        _function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter}
+    )
 
     print("  - results:")
     print(f"    - energy: {res.fun:6.2f}")
@@ -114,4 +115,3 @@ def _run_minimization(params, minimlist, receptor, ligand):
 
     print(f"    - elapsed: {time.time() - start:.1f} seconds")
     print("=" * 40, flush=True)
-

@@ -1,4 +1,3 @@
-
 """ptools.atom - Defines classes and function that handle atom and
 atom groups."""
 
@@ -30,8 +29,18 @@ class BaseAtom(SpatialObject):
         coords (numpy.ndarray): cartesian coordinates
         meta (dict[str, ()]): metadata dictionnary
     """
-    def __init__(self, index=0, name='XXX', resname='XXX', chain='X',
-                 resid=0, charge=0.0, coords=(0, 0, 0), meta=None):
+
+    def __init__(
+        self,
+        index=0,
+        name="XXX",
+        resname="XXX",
+        chain="X",
+        resid=0,
+        charge=0.0,
+        coords=(0, 0, 0),
+        meta=None,
+    ):
         super().__init__(coords)
         self._name = name
         self.resname = resname
@@ -55,7 +64,7 @@ class BaseAtom(SpatialObject):
 
     def __repr__(self):
         """BaseAtom string representation."""
-        attrs =  dict(sorted(self.__dict__.items()))
+        attrs = dict(sorted(self.__dict__.items()))
         for key in attrs:
             if key[0] == "_" and key[1] != "_":
                 attrs[key[1:]] = attrs.pop(key)
@@ -98,9 +107,23 @@ class BaseAtom(SpatialObject):
 
         x, y, z = self.coords
 
-        return PDB_FMT % (rec, indexbuf, namebuf, altlocchar,
-                          self.resname, chain[0], residbuf, insertion[0],
-                          x, y, z, occ, bfactor, "", element)
+        return PDB_FMT % (
+            rec,
+            indexbuf,
+            namebuf,
+            altlocchar,
+            self.resname,
+            chain[0],
+            residbuf,
+            insertion[0],
+            x,
+            y,
+            z,
+            occ,
+            bfactor,
+            "",
+            element,
+        )
 
 
 class Atom(BaseAtom):
@@ -120,10 +143,20 @@ class Atom(BaseAtom):
             belongs to.
 
     """
+
     def __init__(self, atom, serial, collection):
         self.serial = serial
         self.collection = collection
-        attrs = ("name", "resname", "chain", "index", "resid", "charge", "meta", "coords")
+        attrs = (
+            "name",
+            "resname",
+            "chain",
+            "index",
+            "resid",
+            "charge",
+            "meta",
+            "coords",
+        )
         kwargs = {k: getattr(atom, k) for k in attrs}
         super().__init__(**kwargs)
 
@@ -168,11 +201,11 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
     Args:
         atoms (list[BaseAtom]): list of atoms
     """
+
     def __init__(self, atoms=None):
         if atoms is None:
             atoms = []
-        self.atoms = [Atom(atom, serial, self)
-                        for serial, atom in enumerate(atoms)]
+        self.atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
         if self.atoms:
             coords = [atom._coords for atom in self.atoms]
         else:
@@ -287,12 +320,13 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
 
     def select_residue_range(self, start, end):
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
-        return self.__class__(atoms=[atom for atom in self if start <= atom.resid <= end])
+        return self.__class__(
+            atoms=[atom for atom in self if start <= atom.resid <= end]
+        )
 
     def select_chain(self, chain_id):
         """Returns a sub-collection made of atoms with desired chain."""
         return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
-
 
 
 def guess_atom_element(atom_name):
