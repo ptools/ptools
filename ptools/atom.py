@@ -1,9 +1,14 @@
 """ptools.atom - Defines classes and function that handle atom and
 atom groups."""
 
+# Allows to use type hinting of class within itself
+# e.g. BaseAtom.copy(self) -> BaseAtom
+from __future__ import annotations
+
 import collections.abc
 import copy
 import math
+from typing import Iterator
 
 import numpy as np
 
@@ -32,14 +37,14 @@ class BaseAtom(SpatialObject):
 
     def __init__(
         self,
-        index=0,
-        name="XXX",
-        resname="XXX",
-        chain="X",
-        resid=0,
-        charge=0.0,
-        coords=(0, 0, 0),
-        meta=None,
+        index: int = 0,
+        name: str = "XXX",
+        resname: str = "XXX",
+        chain: str = "X",
+        resid: int = 0,
+        charge: float = 0.0,
+        coords: np.ndarray = np.zeros(3),
+        meta: dict = None,
     ):
         super().__init__(coords)
         self._name = name
@@ -52,17 +57,17 @@ class BaseAtom(SpatialObject):
         self.element = guess_atom_element(self.name)
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Gets/Sets atom's name."""
         return self._name
 
     @name.setter
-    def name(self, name):
+    def name(self, name: str):
         """Name setter simultaneously updates element name."""
         self._name = name
         self.element = guess_atom_element(self.name)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """BaseAtom string representation."""
         attrs = dict(sorted(self.__dict__.items()))
         for key in attrs:
@@ -73,13 +78,13 @@ class BaseAtom(SpatialObject):
         desc = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
         return f"<{modulename}.{classname}({desc})>"
 
-    def copy(self):
+    def copy(self) -> BaseAtom:
         """Returns a copy of the current atom."""
         obj = copy.copy(self)
         obj.coords = obj.coords.copy()
         return obj
 
-    def topdb(self):
+    def topdb(self) -> str:
         """Returns the atom's description in PDB format."""
         rec = "ATOM"
         indexbuf = "*****"
@@ -144,7 +149,7 @@ class Atom(BaseAtom):
 
     """
 
-    def __init__(self, atom, serial, collection):
+    def __init__(self, atom: BaseAtom, serial: int, collection: AtomCollection):
         self.serial = serial
         self.collection = collection
         attrs = (
@@ -161,33 +166,33 @@ class Atom(BaseAtom):
         super().__init__(**kwargs)
 
     @property
-    def coords(self):
+    def coords(self) -> np.ndarray:
         """Gets atom cartesian coordinates."""
         return self.collection.coords[self.serial].copy()
 
     @coords.setter
-    def coords(self, pos):
+    def coords(self, pos: np.ndarray):
         self.collection.coords[self.serial] = np.array(pos)
 
     @property
-    def mass(self):
+    def mass(self) -> float:
         """Gets/Sets an atom mass."""
         return self.collection.masses[self.serial]
 
     @mass.setter
-    def mass(self, mass):
+    def mass(self, mass: float):
         """Gets/Sets an atom mass."""
         self.collection.masses[self.serial] = mass
 
     # Override BaseAtom name setter to manually handle masses
     # (name getter override is mandatory).
     @property
-    def name(self):
+    def name(self) -> str:
         """Gets/Sets atom's name."""
         return self._name
 
     @name.setter
-    def name(self, name):
+    def name(self, name: str):
         self._name = name
         self.element = guess_atom_element(self.name)
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
@@ -202,7 +207,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         atoms (list[BaseAtom]): list of atoms
     """
 
-    def __init__(self, atoms=None):
+    def __init__(self, atoms: list[BaseAtom] = None):
         if atoms is None:
             atoms = []
         self.atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
@@ -214,29 +219,29 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         self.masses = np.zeros(len(self.atoms))
         self.guess_masses()
 
-    def __contains__(self, __x: object) -> bool:
+    def __contains__(self, __x: Atom) -> bool:
         return __x in self.atoms
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Gets the number of atoms in the collection."""
         return len(self.atoms)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """String representation."""
         modulename = self.__module__
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Atom]:
         """Iterates over the collection atoms."""
         return iter(self.atoms)
 
-    def __getitem__(self, serial):
+    def __getitem__(self, serial: int) -> Atom:
         """Accesses an atom by its serial number (which the internal index
         starting at 0)."""
         return self.atoms[serial]
 
-    def __add__(self, other):
+    def __add__(self, other: AtomCollection) -> AtomCollection:
         """Concatenates two RigidBody instances."""
         output = self.copy()
         other = other.copy()
@@ -248,27 +253,27 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """Guesses atom masses and store them."""
         self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
 
-    def copy(self):
+    def copy(self) -> AtomCollection:
         """Returns a copy of the current collection."""
         return self.__class__(self.atoms)
 
-    def size(self):
+    def size(self) -> int:
         """Gets the number of atoms in the collection.
 
         Alias for len(AtomCollection).
         """
         return len(self)
 
-    def center(self):
+    def center(self) -> np.ndarray:
         """Returns the isobarycenter (geometric center) of a collection of
         atoms."""
         return self.centroid()
 
-    def center_of_mass(self):
+    def center_of_mass(self) -> np.ndarray:
         """Returns the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
-    def tensor_of_inertia(self, method="accurate"):
+    def tensor_of_inertia(self, method: str = "accurate") -> np.ndarray:
         """Returns the inertia tensors of a set of atoms.
 
         Args:
@@ -278,7 +283,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         weights = self.masses if method == "accurate" else None
         return ptools.spatial.tensor_of_inertia(self.coords, weights, method)
 
-    def principal_axes(self, sort=True, method="accurate"):
+    def principal_axes(self, sort: bool = True, method: str = "accurate") -> np.ndarray:
         """Returns an AtomCollection principal axes.
 
         Args:
@@ -292,43 +297,43 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """
         return ptools.spatial.principal_axes(self.tensor_of_inertia(method), sort)
 
-    def radius_of_gyration(self):
+    def radius_of_gyration(self) -> float:
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
         centered = self.coords - self.center()
         rgyr2 = np.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
 
-    def topdb(self):
+    def topdb(self) -> str:
         """Returns a string representing the AtomCollection in PDB format."""
         return "\n".join(atom.topdb() for atom in self)
 
-    def writepdb(self, path):
+    def writepdb(self, path: str):
         """Writes the AtomCollection to a PDB formatted file."""
         with open(path, "wt") as f:
             print(self.topdb(), file=f)
 
-    def set_chain(self, chain):
+    def set_chain(self, chain: str):
         """Sets all atom chain property."""
         for atom in self.atoms:
             atom.chain = chain
 
-    def select_atom_type(self, atom_type):
+    def select_atom_type(self, atom_type: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom type."""
         return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
 
-    def select_residue_range(self, start, end):
+    def select_residue_range(self, start: int, end: int) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
         return self.__class__(
             atoms=[atom for atom in self if start <= atom.resid <= end]
         )
 
-    def select_chain(self, chain_id):
+    def select_chain(self, chain_id: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired chain."""
         return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
 
 
-def guess_atom_element(atom_name):
+def guess_atom_element(atom_name: str) -> str:
     """Returns the atom element based on its name.
 
     Basically returns the first non-numeric character in atom_name.
@@ -339,6 +344,6 @@ def guess_atom_element(atom_name):
     return "X"
 
 
-def guess_atom_mass(element):
+def guess_atom_mass(element: str) -> float:
     """Returns the atom mass based on the element name."""
     return tables.masses.get(element, 1.0)
