@@ -2,6 +2,7 @@
 """ptools.atom - Defines classes and function that handle atom and
 atom groups."""
 
+import collections.abc
 import copy
 import math
 
@@ -159,7 +160,7 @@ class Atom(BaseAtom):
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
-class AtomCollection(SpatialObject):
+class AtomCollection(SpatialObject, collections.abc.Collection):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -179,6 +180,9 @@ class AtomCollection(SpatialObject):
         super().__init__(coords)
         self.masses = np.zeros(len(self.atoms))
         self.guess_masses()
+
+    def __contains__(self, __x: object) -> bool:
+        return __x in self.atoms
 
     def __len__(self):
         """Gets the number of atoms in the collection."""
