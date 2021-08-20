@@ -94,21 +94,21 @@ class ForceField:
         """Calculate all energy terms while returning nothing."""
         self.non_bonded_energy()
 
-    def energy(self):
+    def energy(self) -> float:
         """Return the total energy between the two molecules, which basically
         corresponds to the non-bonded energy."""
         return self.non_bonded_energy()
 
-    def non_bonded_energy(self):
+    def non_bonded_energy(self) -> float:
         """Calculate non-bonded energy between a receptor and a ligand."""
         return self.vdw_energy() + self.electrostatic_energy()
 
-    def vdw_energy(self):
+    def vdw_energy(self) -> float:
         """Calculate the van der Waals energy (Lennard-Jones energy)
         between a receptor and a ligand."""
         return self._vdw_energy
 
-    def electrostatic_energy(self):
+    def electrostatic_energy(self) -> float:
         """Calculate the van der Waals energy (Lennard-Jones energy)
         between a receptor and a ligand."""
         return self._electrostatic_energy
