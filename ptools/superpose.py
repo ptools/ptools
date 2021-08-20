@@ -7,6 +7,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+from ptools.atom import AtomCollection
 from ptools import spatial
 
 
@@ -29,7 +30,7 @@ class Screw:
         return s
 
 
-def kabsch_matrix(mobile, target):
+def kabsch_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     """Calculates a rotation to optimally align two sets of coordinates.
 
     Uses Kabsch algorithm.
@@ -48,7 +49,7 @@ def kabsch_matrix(mobile, target):
     return rotation.as_matrix()
 
 
-def fit_matrix(mobile, target):
+def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     """Return the fit matrix between two RigidBody."""
     t0 = target.center()
     t1 = mobile.center()
@@ -71,13 +72,13 @@ def fit_matrix(mobile, target):
     return result
 
 
-def fit(mobile, target):
+def fit(mobile: AtomCollection, target: AtomCollection):
     """Fit two RigidBody."""
     matrix = fit_matrix(mobile, target)
     mobile.move(matrix)
 
 
-def rmsd(mobile, target, do_fit=False):
+def rmsd(mobile: AtomCollection, target: AtomCollection, do_fit: bool = False) -> float:
     """Returns the Root Mean Square Deviation between two groups of atoms."""
     assert len(mobile) == len(target)
     if do_fit:
@@ -87,7 +88,7 @@ def rmsd(mobile, target, do_fit=False):
     return np.sqrt(np.mean(e))
 
 
-def mat_trans_2_screw(matrix):
+def mat_trans_2_screw(matrix: np.ndarray) -> Screw:
     """Converts a transformation matrix to a Screw
 
     Args:
