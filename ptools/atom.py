@@ -275,9 +275,8 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
             method (str): "fast" or "accurate"
                 The "fast" method does not take into account atom masses.
         """
-        if method == "fast":
-            return ptools.spatial.tensor_of_inertia(self.coords, None, method)
-        return ptools.spatial.tensor_of_inertia(self.coords, self.masses, method)
+        weights = self.masses if method == "accurate" else None
+        return ptools.spatial.tensor_of_inertia(self.coords, weights, method)
 
     def principal_axes(self, sort=True, method="accurate"):
         """Returns an AtomCollection principal axes.
