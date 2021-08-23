@@ -1,4 +1,3 @@
-
 import random
 import sys
 import unittest
@@ -18,7 +17,6 @@ from .testing import assert_array_almost_equal
 
 
 class TestScrew(unittest.TestCase):
-
     def setUp(self):
         self.screw = Screw()
 
@@ -91,7 +89,6 @@ class TestSuperpose(unittest.TestCase):
         # RMSD after translation and fit should be 0.0.
         self.assertAlmostEqual(superpose.rmsd(mobile, self.target, do_fit=True), 0)
 
-
     def test_mat_trans_to_screw(self):
 
         # abs(1 + a - b - c) > EPSILON
@@ -104,38 +101,42 @@ class TestSuperpose(unittest.TestCase):
         assert_array_almost_equal(s.unit, coord3d(1.0, 0.0, 0.0))
         assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
 
-
         # abs(1 - a + b - c) > EPSILON
-        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, -34, 0])))
+        s = superpose.mat_trans_2_screw(
+            transformation_matrix(rotation=np.array([0, -34, 0]))
+        )
         self.assertAlmostEqual(s.angle, -0.59341194)
         self.assertAlmostEqual(s.normtranslation, 0.0)
         assert_array_almost_equal(s.unit, coord3d(0.0, 1.0, 0.0))
         assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
 
-
         # abs(1 - a - b + c) > EPSILON
-        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, 0, 90])))
+        s = superpose.mat_trans_2_screw(
+            transformation_matrix(rotation=np.array([0, 0, 90]))
+        )
         self.assertAlmostEqual(s.angle, 1.5707963)
         self.assertAlmostEqual(s.normtranslation, 0.0)
         assert_array_almost_equal(s.unit, coord3d(0.0, 0.0, 1.0))
         assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
 
-
         # angle = 0
-        t = transformation_matrix(rotation=np.zeros(3), translation=np.array([-3, 2, 1]))
+        t = transformation_matrix(
+            rotation=np.zeros(3), translation=np.array([-3, 2, 1])
+        )
         s = superpose.mat_trans_2_screw(t)
         self.assertAlmostEqual(s.angle, 0.0)
         self.assertAlmostEqual(s.normtranslation, 3.74165738)
         assert_array_almost_equal(s.unit, coord3d(-0.80178373, 0.53452248, 0.26726124))
         assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
 
-
-        t = transformation_matrix(rotation=np.array([11, 19, 87]), translation=np.array([-1, 8, 11]))
+        t = transformation_matrix(
+            rotation=np.array([11, 19, 87]), translation=np.array([-1, 8, 11])
+        )
         s = superpose.mat_trans_2_screw(t)
         self.assertAlmostEqual(s.angle, 1.58731230)
         self.assertAlmostEqual(s.normtranslation, 10.95636347)
         assert_array_almost_equal(s.unit, coord3d(0.25480885, 0.07588361, 0.9640094))
-        assert_array_almost_equal(s.point, coord3d( 0.0, 3.30358643, 21.22781297))
+        assert_array_almost_equal(s.point, coord3d(0.0, 3.30358643, 21.22781297))
 
 
 def random_float():
@@ -143,4 +144,3 @@ def random_float():
     [-max_float; +max_float]."""
     max_float = sys.float_info.max
     return random.randrange(-max_float, +max_float)
-

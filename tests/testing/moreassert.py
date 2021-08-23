@@ -1,4 +1,3 @@
-
 """testing.moreassert - Defines more assert functions."""
 
 import numpy

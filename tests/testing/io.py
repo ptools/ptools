@@ -1,4 +1,3 @@
-
 """testing.io - I/O testing utilities."""
 
 import tempfile
@@ -11,7 +10,7 @@ def random_filename():
     return tmpfile.name
 
 
-def mk_tmp_file(content='', mode='wt', **kwargs):
+def mk_tmp_file(content="", mode="wt", **kwargs):
     """Create a temporary empty file.
     Returns:
         tempfile.NamedTemporaryFile
@@ -24,4 +23,4 @@ def mk_tmp_file(content='', mode='wt', **kwargs):
 
 
 def mk_empty_file(**kwargs):
-    return mk_tmp_file(content='', **kwargs)
+    return mk_tmp_file(content="", **kwargs)

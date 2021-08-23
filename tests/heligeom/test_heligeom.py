@@ -1,4 +1,3 @@
-
 import math
 import os
 import unittest
@@ -11,11 +10,15 @@ from ptools.spatial import coord3d
 from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
 
 
-TEST_1A74_PROT_RED = os.path.join(os.path.dirname(__file__), 'data', '1A74_prot.red')
-TEST_2GLSA = os.path.join(os.path.dirname(__file__), 'data', '2GLS_A.pdb')
-TEST_2GLSB = os.path.join(os.path.dirname(__file__), 'data', '2GLS_B.pdb')
-TEST_REF_2GLSAB_N6 = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N6.pdb')
-TEST_REF_2GLSAB_N3_Z = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N3-Zalign.pdb')
+TEST_1A74_PROT_RED = os.path.join(os.path.dirname(__file__), "data", "1A74_prot.red")
+TEST_2GLSA = os.path.join(os.path.dirname(__file__), "data", "2GLS_A.pdb")
+TEST_2GLSB = os.path.join(os.path.dirname(__file__), "data", "2GLS_B.pdb")
+TEST_REF_2GLSAB_N6 = os.path.join(
+    os.path.dirname(__file__), "data", "ref_2GLSAB-N6.pdb"
+)
+TEST_REF_2GLSAB_N3_Z = os.path.join(
+    os.path.dirname(__file__), "data", "ref_2GLSAB-N3-Zalign.pdb"
+)
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -29,7 +32,6 @@ class TestHeligeomSimple(unittest.TestCase):
         self.mono1 = RigidBody(TEST_1A74_PROT_RED)
         self.dx = 15
         self.mono2 = move_rigidbody(self.mono1, x=self.dx)
-
 
     def test_analyze_x_translate(self):
         hp = heli_analyze(self.mono1, self.mono2)
@@ -73,27 +75,26 @@ class TestHeligeom(unittest.TestCase):
     def setUp(self):
         self.mono1 = RigidBody(TEST_2GLSA)
         self.mono2 = RigidBody(TEST_2GLSB)
-        self.ref   = RigidBody(TEST_REF_2GLSAB_N6)
+        self.ref = RigidBody(TEST_REF_2GLSAB_N6)
         self.n_monomers = 6
-
 
     def test_hp_data(self):
         """Test heligeom.heli_analyze results"""
         hp = heli_analyze(self.mono1, self.mono2)
 
-        self.assertAlmostEqual(hp.angle,  1.04719867)
+        self.assertAlmostEqual(hp.angle, 1.04719867)
         assert_array_almost_equal(hp.point, [0.000436, -0.000296, 0])
-        assert_array_almost_equal(hp.unit, [ 8.47123119e-07, -2.80109302e-06, 1])
+        assert_array_almost_equal(hp.unit, [8.47123119e-07, -2.80109302e-06, 1])
 
     def test_heli_construct(self):
-        """Tests that heligeom.heli_construct """
+        """Tests that heligeom.heli_construct"""
         hp = heli_analyze(self.mono1, self.mono2)
         result = heli_construct(self.mono1, hp, N=self.n_monomers)
 
         self.assertEqual(result.topdb(), self.ref.topdb())
 
     def test_heli_construct_Zalign(self):
-        """Tests that heligeom.heli_construct """
+        """Tests that heligeom.heli_construct"""
 
         ref = RigidBody(TEST_REF_2GLSAB_N3_Z)
 

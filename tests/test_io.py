@@ -1,4 +1,3 @@
-
 """test_io - Tests for `ptools.io` module."""
 
 import os
@@ -15,7 +14,6 @@ from .testing.io import random_filename
 
 
 class TestPDBIO(unittest.TestCase):
-
     def test_read_pdb_does_not_exist(self):
         filename = random_filename()
         with self.assertRaises(FileNotFoundError):
@@ -35,8 +33,8 @@ class TestPDBIO(unittest.TestCase):
             self.assertEqual(atom.index, i + 1)
             self.assertEqual(atom.name, TEST_PDB_ATOM_NAMES[i])
             self.assertEqual(atom.resid, 1)
-            self.assertEqual(atom.resname, 'LYS')
-            self.assertEqual(atom.chain, 'A')
+            self.assertEqual(atom.resname, "LYS")
+            self.assertEqual(atom.chain, "A")
             self.assertAlmostEqual(atom.coords[0], i + 1)
             self.assertAlmostEqual(atom.coords[1], 10 + i + 1)
             self.assertAlmostEqual(atom.coords[2], 20 + i + 1)
@@ -54,12 +52,14 @@ class TestFileExists(unittest.TestCase):
         try:
             io.assert_file_exists(f.name)
         except Exception as exc:
-            self.fail(f"exception of type {type(exc).__name__} "
-                      f"raised unexpectedly: '{exc}'")
+            self.fail(
+                f"exception of type {type(exc).__name__} "
+                f"raised unexpectedly: '{exc}'"
+            )
         f.close()
 
     def test_assert_file_does_not_exists(self):
-        basename = ''.join(random.choices(string.ascii_letters, k=8))
+        basename = "".join(random.choices(string.ascii_letters, k=8))
         path = "/foo/bar/baz/" + basename
         with self.assertRaisesRegex(FileNotFoundError, path):
             io.assert_file_exists(path)

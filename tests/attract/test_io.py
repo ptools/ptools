@@ -1,13 +1,16 @@
-
 """test_io - tests for `pyattract.io`."""
 
 import unittest
 
 import ptools.io.attract as io
 
-from . import (TEST_ATTRACT_PARAMS, TEST_ATTRACT_PARAMS_WITH_LIGAND,
-               TEST_DUM_RED_CONTENT, TEST_DUM_PDB_CONTENT,
-               TEST_AMINON_CONTENT)
+from . import (
+    TEST_ATTRACT_PARAMS,
+    TEST_ATTRACT_PARAMS_WITH_LIGAND,
+    TEST_DUM_RED_CONTENT,
+    TEST_DUM_PDB_CONTENT,
+    TEST_AMINON_CONTENT,
+)
 from ..testing.io import random_filename, mk_tmp_file, mk_empty_file
 
 
@@ -16,7 +19,6 @@ with open(TEST_ATTRACT_PARAMS, "rt") as f:
 
 
 class TestAttractIO(unittest.TestCase):
-
     def test_read_aminon(self):
         tmpfile = mk_tmp_file(content=TEST_AMINON_CONTENT)
         params = io.read_aminon(tmpfile.name)
@@ -84,7 +86,6 @@ class TestAttractIO(unittest.TestCase):
 
 
 class TestReadAttractParameters(unittest.TestCase):
-
     def test_file_does_not_exist(self):
         filename = random_filename()
         err = f"No such file or directory: '{filename}'"
@@ -124,7 +125,9 @@ class TestReadAttractParameters(unittest.TestCase):
         content = "\n".join(lines)
         tmpfile = mk_tmp_file(content=content)
         filename = tmpfile.name
-        err = "Cannot read minimizations from attract parameter file: expected 4, found 0"
+        err = (
+            "Cannot read minimizations from attract parameter file: expected 4, found 0"
+        )
         with self.assertRaisesRegex(ValueError, err):
             io.read_attract_parameter(filename)
         tmpfile.close()
@@ -135,8 +138,10 @@ class TestReadAttractParameters(unittest.TestCase):
         content = "\n".join(lines)
         tmpfile = mk_tmp_file(content=content)
         filename = tmpfile.name
-        err = "Cannot read minimization line from attract parameter file: "\
-              "expected at least 3 values, found 2"
+        err = (
+            "Cannot read minimization line from attract parameter file: "
+            "expected at least 3 values, found 2"
+        )
         with self.assertRaisesRegex(ValueError, err):
             io.read_attract_parameter(filename)
         tmpfile.close()
@@ -152,7 +157,19 @@ class TestReadAttractParameters(unittest.TestCase):
         self.assertEqual(parameters.nbminim, 4)
         self.assertEqual(parameters.lignames, [])
         self.assertEqual(len(parameters.minimlist), 4)
-        self.assertEqual(parameters.minimlist[0], {"maxiter": 30, "squarecutoff": 3000.00, "rstk": 0.00050})
-        self.assertEqual(parameters.minimlist[1], {"maxiter": 50, "squarecutoff": 500.00, "rstk": 0.0})
-        self.assertEqual(parameters.minimlist[2], {"maxiter": 100, "squarecutoff": 50.00, "rstk": 0.0})
-        self.assertEqual(parameters.minimlist[3], {"maxiter": 500, "squarecutoff": 1150.00, "rstk": 0.0})
+        self.assertEqual(
+            parameters.minimlist[0],
+            {"maxiter": 30, "squarecutoff": 3000.00, "rstk": 0.00050},
+        )
+        self.assertEqual(
+            parameters.minimlist[1],
+            {"maxiter": 50, "squarecutoff": 500.00, "rstk": 0.0},
+        )
+        self.assertEqual(
+            parameters.minimlist[2],
+            {"maxiter": 100, "squarecutoff": 50.00, "rstk": 0.0},
+        )
+        self.assertEqual(
+            parameters.minimlist[3],
+            {"maxiter": 500, "squarecutoff": 1150.00, "rstk": 0.0},
+        )

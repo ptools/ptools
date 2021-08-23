@@ -13,12 +13,10 @@ from . import TEST_LIGAND
 
 
 class TestAtomCollection(unittest.TestCase):
-
     def setUp(self):
         # Create an AtomCollection with 10 atoms.
         # Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
-        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i))
-                                     for i in range(10)])
+        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(10)])
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms.atoms), 10)
@@ -87,12 +85,14 @@ class TestAtomCollection(unittest.TestCase):
         # Updating an atom's name should also update its type and mass.
         for i in range(10):
             self.atoms[i].name = "CA"
-        self.assertEqual("".join(at.element for at in self.atoms),
-                         "C" * len(self.atoms))
+        self.assertEqual(
+            "".join(at.element for at in self.atoms), "C" * len(self.atoms)
+        )
 
         mass_ref = ptools.tables.masses["C"]
-        assert_array_almost_equal(self.atoms.masses,
-                                  np.ones(len(self.atoms)) * mass_ref)
+        assert_array_almost_equal(
+            self.atoms.masses, np.ones(len(self.atoms)) * mass_ref
+        )
 
     def test_center(self):
         center = self.atoms.center()
@@ -131,15 +131,13 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
 
     def test_add(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i+100, i, i))
-                                 for i in range(10)])
+        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(10)])
         all_atoms = self.atoms + atoms2
         N = len(self.atoms) + len(atoms2)
         self.assertEqual(len(all_atoms), N)
 
     def test_add_makes_copies(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i+100, i, i))
-                                 for i in range(10)])
+        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(10)])
         assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
         all_atoms = self.atoms + atoms2
         atoms2[-1].coords = np.zeros(3)
@@ -155,9 +153,11 @@ class TestAtomCollection(unittest.TestCase):
         # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
         atoms = ptools.io.read_pdb(TEST_LIGAND)
-        ref = [[3679339.47775172,  694837.16289436, -263651.10452372],
-               [ 694837.16289436, 3803047.59374612, -194611.71739629],
-               [-263651.10452372, -194611.71739629, 3425042.27240564]]
+        ref = [
+            [3679339.47775172, 694837.16289436, -263651.10452372],
+            [694837.16289436, 3803047.59374612, -194611.71739629],
+            [-263651.10452372, -194611.71739629, 3425042.27240564],
+        ]
         I = atoms.tensor_of_inertia(method="accurate")
         assert_array_almost_equal(I, ref, decimal=2)
 
@@ -165,9 +165,11 @@ class TestAtomCollection(unittest.TestCase):
         # Reference calculated with ptools-python d0b41dc (this is actually a
         # non-regression test).
         atoms = ptools.io.read_pdb(TEST_LIGAND)
-        ref = [[147200.90378622, -57794.00682372,  21649.47873511],
-               [-57794.00682372, 136694.86723672,  16076.77968389],
-               [ 21649.47873511,  16076.77968389, 168066.83235232]]
+        ref = [
+            [147200.90378622, -57794.00682372, 21649.47873511],
+            [-57794.00682372, 136694.86723672, 16076.77968389],
+            [21649.47873511, 16076.77968389, 168066.83235232],
+        ]
         I = atoms.tensor_of_inertia(method="fast")
         assert_array_almost_equal(I, ref, decimal=8)
 
@@ -175,9 +177,11 @@ class TestAtomCollection(unittest.TestCase):
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()
-        ref = [[ 0.65682984,  0.70033642, -0.27946997],
-               [ 0.04052252,  0.33731064,  0.94052084],
-               [ 0.7529492 , -0.62908698,  0.1931763 ]]
+        ref = [
+            [0.65682984, 0.70033642, -0.27946997],
+            [0.04052252, 0.33731064, 0.94052084],
+            [0.7529492, -0.62908698, 0.1931763],
+        ]
         I = atoms.principal_axes()
         assert_array_almost_equal(I, ref)
 

@@ -1,4 +1,3 @@
-
 import unittest
 
 from ptools.rigidbody import AttractRigidBody
@@ -11,22 +10,21 @@ import numpy as np
 
 
 class TestForceField(unittest.TestCase):
-
     def test_energy_is_zero(self):
         ff = ForceField(receptor=None, ligand=None)
         self.assertEqual(ff.energy(), 0.0)
 
 
 class TestAttractForceField1(unittest.TestCase):
-
     def setUp(self):
         self.receptor = AttractRigidBody(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
     def test_read_ff_params(self):
-        ff = AttractForceField1(self.receptor, self.ligand,
-                                paramfile=TEST_AMINON, cutoff=5.0)
+        ff = AttractForceField1(
+            self.receptor, self.ligand, paramfile=TEST_AMINON, cutoff=5.0
+        )
         assert_array_equal(ff._repulsive_parameters, self.ff._repulsive_parameters)
         assert_array_equal(ff._attractive_parameters, self.ff._attractive_parameters)
 
@@ -57,5 +55,9 @@ class TestAttractForceField1(unittest.TestCase):
     def test_non_bonded_energy_methods_return_same_result(self):
         # Reference values calculated from PTools 8439c40.
         self.assertAlmostEqual(self.ff.non_bonded_energy(), -4.85626395114)
-        self.assertAlmostEqual(self.ff._AttractForceField1__nb_energy_small_cutoff(), -4.85626395114)
-        self.assertAlmostEqual(self.ff._AttractForceField1__nb_energy_large_cutoff(), -4.85626395114)
+        self.assertAlmostEqual(
+            self.ff._AttractForceField1__nb_energy_small_cutoff(), -4.85626395114
+        )
+        self.assertAlmostEqual(
+            self.ff._AttractForceField1__nb_energy_large_cutoff(), -4.85626395114
+        )
