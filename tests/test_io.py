@@ -47,6 +47,22 @@ class TestPDBIO(unittest.TestCase):
         for atoms in models:
             self.assertTrue(len(atoms), 10)
 
+    def test_read_pdb_single_model(self):
+        with open(TEST_PDB, "rt") as f:
+            atoms_lines = [line for line in f if line.startswith("ATOM  ")]
+        lines = ["MODEL        1"]
+        lines += atoms_lines
+        lines += ["ENDMDL"]
+        tmp_pdb = tempfile.NamedTemporaryFile()
+        tmp_pdb.write(bytes("\n".join(lines), encoding="utf-8"))
+        tmp_pdb.flush()
+
+        atoms = pdb.read_pdb(tmp_pdb.name)
+        self.assertEqual(len(atoms), 10)
+
+        tmp_pdb.close()
+
+
 
 class TestFileExists(unittest.TestCase):
     def test_assert_file_actually_exists(self):
