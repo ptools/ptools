@@ -58,7 +58,7 @@ lint-tests:
 	pylint --ignore=E501,E201,E241 tests
 
 test: ## run tests quickly with the default Python
-	py.test --ignore=tests/pyattract/test_attract.py
+	py.test --ignore=tests/pyattract/test_attract.py --ignore=tests/heligeom/data --ignore=tests/data --ignore/tests/attract/data
 	@echo "\033[33m** WARNING: didn't test tests/pyattract/test_attract.py **\033[0m"
 
 test-all: ## run tests on every Python version with tox
