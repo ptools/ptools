@@ -3,10 +3,9 @@
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.sparse import data
 from scipy.spatial.distance import cdist
 
-from ptools.atom import Atom, AtomCollection
+from ptools.atom import AtomCollection
 
 
 @dataclass
