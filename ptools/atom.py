@@ -49,7 +49,11 @@ class BaseAtom(SpatialObject):
         self.resid = resid
         self.charge = charge
         self.meta = meta
-        self.element = guess_atom_element(self.name)
+ 
+    @property
+    def element(self):
+        """Returns an atom element name (read-only)."""
+        return guess_atom_element(self.name)
 
     @property
     def name(self):
@@ -60,7 +64,6 @@ class BaseAtom(SpatialObject):
     def name(self, name):
         """Name setter simultaneously updates element name."""
         self._name = name
-        self.element = guess_atom_element(self.name)
 
     def __repr__(self):
         """BaseAtom string representation."""
@@ -189,7 +192,6 @@ class Atom(BaseAtom):
     @name.setter
     def name(self, name):
         self._name = name
-        self.element = guess_atom_element(self.name)
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
