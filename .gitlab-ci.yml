@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r requirements/base.txt -r requirements/development.txt
+  - pip install -r requirements/development.txt
   - pip install -e .
 
 
