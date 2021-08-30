@@ -21,6 +21,7 @@ def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> Rigi
 
 
 def extend(hp: Screw, mono1: RigidBody, N: int, Z: bool = False):
+    """Main heligeom algorithm."""
     final = RigidBody()
     mono_test = mono1.copy()
     chain_id = 0
@@ -46,17 +47,3 @@ def extend(hp: Screw, mono1: RigidBody, N: int, Z: bool = False):
         chain_id += 1
 
     return final
-
-
-def main():  # pragma: no cover
-    mono1 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    mono2 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
-
-    hp = heli_analyze(mono1, mono2)
-    result = heli_construct(mono1, hp, 10)
-
-    print(result.topdb())
-
-
-if __name__ == "__main__":  # pragma: no cover
-    main()

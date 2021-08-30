@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
 
 import numpy as np
 from scipy.linalg import expm, norm
@@ -99,15 +98,16 @@ class SpatialObject:
         """Orients a SpatialObject."""
         orient(self.coords, vector, target)
 
-    def tensor_of_inertia(self) -> np.ndarray:
+    def tensor_of_inertia(self, weight: np.ndarray = None, method: str = "fast") -> np.ndarray:
         """Returns a SpatialObject inertial tensors."""
-        return tensor_of_inertia(self.coords, weights=None, method="fast")
+        return tensor_of_inertia(self.coords, weight, method)
 
     def distance_to_axis(self, axis: np.ndarray) -> float:
         """Returns the SpatialObject distance to an arbitrary axis."""
         return np.linalg.norm(np.cross(self.coords, axis))
 
 
+# pylint: disable-msg=W1113
 def coord3d(value: np.ndarray = np.zeros(3), *args) -> np.ndarray:
     """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
 
@@ -226,7 +226,7 @@ def _tensor_of_inertia_fast(coords: np.ndarray) -> np.ndarray:
 
 def tensor_of_inertia(
     coords: np.ndarray, weights: np.ndarray = None, method: str = "accurate"
-):
+) -> np.ndarray:
     """Returns the inertia tensors of a set of atoms.
 
     Allows to choose between "accurate" (weighted) and "fast" methods.
@@ -242,7 +242,7 @@ def tensor_of_inertia(
     return _tensor_of_inertia_fast(coords)  # method is "fast"
 
 
-def principal_axes(tensor: np.ndarray, sort: bool = True):
+def principal_axes(tensor: np.ndarray, sort: bool = True) -> np.ndarray:
     """Return the principal axes given the tensor of inertia.
 
     Computes the eigenvalues and right eigenvectors of the tensor of inertia.

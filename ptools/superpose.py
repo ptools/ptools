@@ -179,7 +179,7 @@ def mat_trans_2_screw(matrix: np.ndarray) -> Screw:
 
     if cost < -1:
         cost = -1
-    if cost > 1:
+    elif cost > 1:
         cost = 1
 
     screw.angle = math.acos(cost)

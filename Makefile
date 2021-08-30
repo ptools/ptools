@@ -51,11 +51,11 @@ clean-test: ## remove test and coverage artifacts
 lint: lint-package lint-tests ## check style with pylint
 
 lint-package:
-	pylint ptools
+	pylint --disable=C0103 ptools
 
 lint-tests:
 	# Ignore whitespaces in matrix definitinos
-	pylint --ignore=E501,E201,E241 tests
+	pylint tests
 
 test: ## run tests quickly with the default Python
 	py.test --ignore=tests/pyattract/test_attract.py --ignore=tests/pyattract/test_attract.py

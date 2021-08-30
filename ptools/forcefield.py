@@ -3,11 +3,9 @@
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.sparse import data
 from scipy.spatial.distance import cdist
 
 from ptools.rigidbody import RigidBody
-from .pairlist import PairList
 from .io.attract import read_aminon
 
 
@@ -256,60 +254,60 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
-    def non_bonded_energy_legacy(self) -> float:
-        """Old-fashioned energy calculation.
+    # def non_bonded_energy_legacy(self) -> float:
+    #     """Old-fashioned energy calculation.
 
-        Very slow.
-        """
-        vdw = 0.0
-        elec = 0.0
+    #     Very slow.
+    #     """
+    #     vdw = 0.0
+    #     elec = 0.0
 
-        pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
-        contacts = pairlist.contacts()
-        norm2 = pairlist.sqdistances()
+    #     pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
+    #     contacts = pairlist.contacts()
+    #     norm2 = pairlist.sqdistances()
 
-        alldx = [
-            self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
-        ]
+    #     alldx = [
+    #         self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
+    #     ]
 
-        for i, (ir, il) in enumerate(contacts):
-            category_rec = self.receptor.atom_categories[ir]
-            category_lig = self.ligand.atom_categories[il]
+    #     for i, (ir, il) in enumerate(contacts):
+    #         category_rec = self.receptor.atom_categories[ir]
+    #         category_lig = self.ligand.atom_categories[il]
 
-            attractive_pairs = self._attractive_parameters[category_rec][category_lig]
-            repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
+    #         attractive_pairs = self._attractive_parameters[category_rec][category_lig]
+    #         repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
 
-            dx = alldx[i]
-            r2 = norm2[i]
-            rr2 = 1.0 / r2
-            dx = dx + rr2
+    #         dx = alldx[i]
+    #         r2 = norm2[i]
+    #         rr2 = 1.0 / r2
+    #         dx = dx + rr2
 
-            rr23 = rr2 * rr2 * rr2
-            rep = repulsive_pairs * rr2
-            vlj = (rep - attractive_pairs) * rr23
+    #         rr23 = rr2 * rr2 * rr2
+    #         rep = repulsive_pairs * rr2
+    #         vlj = (rep - attractive_pairs) * rr23
 
-            vdw += vlj
+    #         vdw += vlj
 
-            fb = 6.0 * vlj + 2.0 * rep * rr23
-            fdb = fb * dx
+    #         fb = 6.0 * vlj + 2.0 * rep * rr23
+    #         fdb = fb * dx
 
-            self.receptor.atom_forces[ir] += fdb
-            self.ligand.atom_forces[il] -= fdb
+    #         self.receptor.atom_forces[ir] += fdb
+    #         self.ligand.atom_forces[il] -= fdb
 
-            # Electrostatics.
-            charge_rec = self.receptor.atom_charges[ir]
-            charge_lig = self.ligand.atom_charges[il]
-            charge = charge_rec * charge_lig * (332.053986 / 20.0)
+    #         # Electrostatics.
+    #         charge_rec = self.receptor.atom_charges[ir]
+    #         charge_lig = self.ligand.atom_charges[il]
+    #         charge = charge_rec * charge_lig * (332.053986 / 20.0)
 
-            if abs(charge) > 0.0:
-                et = charge * rr2
-                elec += et
+    #         if abs(charge) > 0.0:
+    #             et = charge * rr2
+    #             elec += et
 
-                fdb = (2.0 * et) * dx
-                self.receptor.atom_forces[ir] += fdb
-                self.ligand.atom_forces[il] -= fdb
+    #             fdb = (2.0 * et) * dx
+    #             self.receptor.atom_forces[ir] += fdb
+    #             self.ligand.atom_forces[il] -= fdb
 
-        self._vdw_energy = vdw
-        self._electrostatic_energy = elec
+    #     self._vdw_energy = vdw
+    #     self._electrostatic_energy = elec
 
-        return vdw + elec
+    #     return vdw + elec
