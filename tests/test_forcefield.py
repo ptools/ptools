@@ -2,19 +2,12 @@
 import unittest
 
 from ptools.rigidbody import AttractRigidBody
-from ptools.forcefield import ForceField, AttractForceField1
+from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_equal
 
 import numpy as np
-
-
-class TestForceField(unittest.TestCase):
-
-    def test_energy_is_zero(self):
-        ff = ForceField(receptor=None, ligand=None)
-        self.assertEqual(ff.energy(), 0.0)
 
 
 class TestAttractForceField1(unittest.TestCase):
