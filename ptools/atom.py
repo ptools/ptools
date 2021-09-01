@@ -16,6 +16,8 @@ from . import tables
 PDB_FMT = "%-6s%5s %4s%c%-4s%c%4s%s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s"
 
 
+# pylint: disable=R0902,R0913
+# A lot of instant attributes... Is it really an issue?
 class BaseAtom(SpatialObject):
     """Base class for an Atom.
 
@@ -49,7 +51,7 @@ class BaseAtom(SpatialObject):
         self.resid = resid
         self.charge = charge
         self.meta = meta
- 
+
     @property
     def element(self):
         """Returns an atom element name (read-only)."""
@@ -270,6 +272,8 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """Returns the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
+    # pylint: disable=W0221
+    # Actually not the same number of arguments as spatial.SpatialObject.
     def tensor_of_inertia(self, method="accurate"):
         """Returns the inertia tensors of a set of atoms.
 
@@ -278,7 +282,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
                 The "fast" method does not take into account atom masses.
         """
         weights = self.masses if method == "accurate" else None
-        return ptools.spatial.tensor_of_inertia(self.coords, weights, method)
+        return super().tensor_of_inertia(weights, method)
 
     def principal_axes(self, sort=True, method="accurate"):
         """Returns an AtomCollection principal axes.

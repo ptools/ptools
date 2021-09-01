@@ -116,9 +116,9 @@ class SpatialObject:
         """
         orient(self.coords, vector, target)
 
-    def tensor_of_inertia(self):
+    def tensor_of_inertia(self, weights=None, method="fast"):
         """Returns a SpatialObject inertial tensors."""
-        return tensor_of_inertia(self.coords, weights=None, method="fast")
+        return tensor_of_inertia(self.coords, weights, method)
 
     def distance_to_axis(self, axis):
         """Returns the SpatialObject distance to an arbitrary axis.
