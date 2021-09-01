@@ -311,7 +311,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
 
     def writepdb(self, path):
         """Writes the AtomCollection to a PDB formatted file."""
-        with open(path, "wt") as f:
+        with open(path, "wt", encoding="utf-8") as f:
             print(self.topdb(), file=f)
 
     def set_chain(self, chain):
