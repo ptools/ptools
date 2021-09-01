@@ -31,7 +31,6 @@ class TestHeligeomSimple(unittest.TestCase):
         self.dx = 15
         self.mono2 = move_rigidbody(self.mono1, x=self.dx)
 
-
     def test_analyze_x_translate(self):
         hp = heli_analyze(self.mono1, self.mono2)
         self.assertAlmostEqual(hp.angle, 0.0)
@@ -66,8 +65,8 @@ class TestHeligeomSimple(unittest.TestCase):
         hp = heli_analyze(self.mono1, self.mono2)  # N is random
         try:
             heli_construct(self.mono1, hp, N=15, Z=True)
-        except:
-            self.fail("heli_construct with Z=True unexpectedly raised an exception")
+        except Exception as error:
+            self.fail(f"heli_construct with Z=True unexpectedly raised an exception: '{error}'")
 
 
 class TestHeligeom(unittest.TestCase):

@@ -83,7 +83,7 @@ class ForceFieldBase(ABC):
 
     @abstractmethod
     def update(self):
-        """Calculate all energy terms."""
+        """Calculates all energy terms."""
 
 
 @dataclass
@@ -122,19 +122,23 @@ class AttractForceField1(ForceFieldBase):
         ).T
 
         # Numpy insane trickery
-        self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]  
+        self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
     def vdw_energy(self):
+        """Returns the van der Waals energy."""
         return self._vdw_energy
 
     def electrostatic_energy(self):
+        """Returns the electrostatic energy."""
         return self._electrostatic_energy
 
     def energy(self) -> float:
+        """Returns the total energy between two molecules."""
         return self.non_bonded_energy()
 
     def update(self):
+        """Calculates all energy terms (returns nothing)."""
         self.non_bonded_energy()
 
     def non_bonded_energy(self):
@@ -240,6 +244,8 @@ class AttractForceField1(ForceFieldBase):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
+    # pylint: disable=R0914
+    # too many local variables
     def non_bonded_energy_legacy(self):
         """Old-fashioned energy calculation.
 

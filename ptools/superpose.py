@@ -87,6 +87,9 @@ def rmsd(mobile, target, do_fit=False):
     return np.sqrt(np.mean(e))
 
 
+# pylint: disable=R0914,R0915,R1730
+# This function is actually too long, has too many variables, and cannot be
+# understood.
 def mat_trans_2_screw(matrix):
     """Converts a transformation matrix to a Screw
 
@@ -97,6 +100,7 @@ def mat_trans_2_screw(matrix):
         Screw
 
     """
+
     def initialize_screw(eigenvect):
         screw = Screw()
         screw.unit = eigenvect / np.linalg.norm(eigenvect)
@@ -113,7 +117,6 @@ def mat_trans_2_screw(matrix):
     x, y, z = rotation[:, 0], rotation[:, 1], rotation[:, 2]
     a, b, c = np.diag(rotation)
 
-
     if abs(1 + a - b - c) > EPSILON:
         eigenvect = np.array([x[0] + 1 - b - c, x[1] + y[0], x[2] + z[0]])
         screw = initialize_screw(eigenvect)
@@ -125,7 +128,7 @@ def mat_trans_2_screw(matrix):
         screw.point = screw.point / (1 + x[0] - y[1] - z[2])
 
     elif abs(1 - a + b - c) > EPSILON:
-        eigenvect = np.array([y[0] + x[1], y[1] + 1 - x[0] - z[2],  y[2] + z[1]])
+        eigenvect = np.array([y[0] + x[1], y[1] + 1 - x[0] - z[2], y[2] + z[1]])
         screw = initialize_screw(eigenvect)
 
         s = translation - screw.normtranslation * screw.unit

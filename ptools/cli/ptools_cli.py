@@ -21,6 +21,7 @@ def parse_command_line(args=None):
 
 
 def main(args=None):
+    """Main ptools command."""
     args = parse_command_line(args)
     args.func(args)
 

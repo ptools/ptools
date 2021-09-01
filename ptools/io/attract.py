@@ -1,5 +1,8 @@
 """Read/Write Attract files."""
 
+# pylint: disable=R0903
+# Only 1 public method... so what?
+
 from ..rigidbody import RigidBody
 
 
@@ -213,6 +216,8 @@ def read_translations(filename="translation.dat"):
     return dict(translations)
 
 
+# pylint: disable=R0914
+# Not so many local variables
 def read_rotations(filename="rotation.dat"):
     """Returns the  dictionary of rotations read from file.
 

@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .cache/
 
-lint: lint-package lint-tests ## check style with pylint
+lint: lint-package ## check style with pylint
 
 lint-package:
 	pylint --disable=C0103 ptools

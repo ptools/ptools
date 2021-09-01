@@ -82,13 +82,16 @@ def run_attract(ligand, receptor, **kwargs):
 
             for i, minim in enumerate(minimlist):
                 print(f"- Minimization {i + 1}/{len(minimlist)}:")
-                _run_minimization(minim, minimlist, receptor, ligand)
+                _run_minimization(minim, receptor, ligand, minimlist)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
 
 
-def _run_minimization(params, minimlist, receptor, ligand):
+def _run_minimization(params, receptor, ligand, minimlist=None):
+    """Actual minimization method."""
+    if minimlist is not None:
+        print("** WARNING: minimlist is not used in this function")
     start = time.time()
     cutoff = params["squarecutoff"] ** 0.5
     niter = params["maxiter"]
