@@ -129,6 +129,8 @@ class SpatialObject:
         return np.linalg.norm(np.cross(self.coords, axis))
 
 
+# pylint: disable=W1113
+# Not really a keyword argument beforce a positionnal argument.
 def coord3d(value=(0, 0, 0), *args):
     """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
 

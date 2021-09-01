@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+"""Top-level package for PTools"""
 
 __author__ = """Benoist LAURENT"""
 __email__ = "benoistlaurent@gmail.com"
