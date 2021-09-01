@@ -95,72 +95,63 @@ def mat_trans_2_screw(matrix):
 
     Returns:
         Screw
+
     """
+    def initialize_screw(eigenvect):
+        screw = Screw()
+        screw.unit = eigenvect / np.linalg.norm(eigenvect)
+        screw.normtranslation = np.dot(screw.unit, translation)
+        return screw
+
     assert matrix.shape == (4, 4)
 
     EPSILON = 1e-5
 
-    trans = matrix[:3, 3]
-    rotmatrix = matrix[:3, :3]
+    translation = matrix[:3, 3]
+    rotation = matrix[:3, :3]
 
-    x, y, z = rotmatrix[:, 0], rotmatrix[:, 1], rotmatrix[:, 2]
+    x, y, z = rotation[:, 0], rotation[:, 1], rotation[:, 2]
+    a, b, c = np.diag(rotation)
 
-    a = rotmatrix[0][0]
-    b = rotmatrix[1][1]
-    c = rotmatrix[2][2]
-
-    eigenvect = np.zeros(3)
-    screw = Screw()
 
     if abs(1 + a - b - c) > EPSILON:
-        eigenvect[0] = x[0] + 1 - b - c
-        eigenvect[1] = x[1] + y[0]
-        eigenvect[2] = x[2] + z[0]
-        screw.unit = eigenvect / np.linalg.norm(eigenvect)
-        screw.normtranslation = np.dot(screw.unit, trans)
+        eigenvect = np.array([x[0] + 1 - b - c, x[1] + y[0], x[2] + z[0]])
+        screw = initialize_screw(eigenvect)
 
-        s = trans - screw.normtranslation * screw.unit
+        s = translation - screw.normtranslation * screw.unit
         screw.point[0] = 0
         screw.point[1] = s[2] * z[1] + s[1] * (1 - z[2])
         screw.point[2] = s[1] * y[2] + s[2] * (1 - y[1])
         screw.point = screw.point / (1 + x[0] - y[1] - z[2])
 
     elif abs(1 - a + b - c) > EPSILON:
-        eigenvect[0] = y[0] + x[1]
-        eigenvect[1] = y[1] + 1 - x[0] - z[2]
-        eigenvect[2] = y[2] + z[1]
+        eigenvect = np.array([y[0] + x[1], y[1] + 1 - x[0] - z[2],  y[2] + z[1]])
+        screw = initialize_screw(eigenvect)
 
-        screw.unit = eigenvect / np.linalg.norm(eigenvect)
-        screw.normtranslation = np.dot(screw.unit, trans)
-
-        s = trans - screw.normtranslation * screw.unit
+        s = translation - screw.normtranslation * screw.unit
         screw.point[0] = s[2] * z[0] + s[0] * (1 - z[2])
         screw.point[1] = 0
         screw.point[2] = s[0] * x[2] + s[2] * (1 - x[0])
         screw.point = screw.point / (1 - x[0] + y[1] - z[2])
 
     elif abs(1 - a - b + c) > EPSILON:
-        eigenvect[0] = z[0] + x[2]
-        eigenvect[1] = z[1] + y[2]
-        eigenvect[2] = z[2] + 1 - x[0] - y[1]
+        eigenvect = np.array([z[0] + x[2], z[1] + y[2], z[2] + 1 - x[0] - y[1]])
+        screw = initialize_screw(eigenvect)
 
-        screw.unit = eigenvect / np.linalg.norm(eigenvect)
-        screw.normtranslation = np.dot(screw.unit, trans)
-
-        s = trans - screw.normtranslation * screw.unit
+        s = translation - screw.normtranslation * screw.unit
         screw.point[0] = s[1] * y[0] + s[0] * (1 - y[1])
         screw.point[1] = s[0] * x[1] + s[1] * (1 - x[0])
         screw.point[2] = 0
         screw.point = screw.point / (1 - x[0] - y[1] + z[2])
 
     else:  # angle=0
-        screw.point = np.zeros(3)
-        norm_trans = np.linalg.norm(trans)
+        screw = Screw()
+        norm_trans = np.linalg.norm(translation)
         if norm_trans != 0:
-            screw.unit = trans / norm_trans
+            screw.unit = translation / norm_trans
         else:
             screw.unit = np.array((0, 0, 1))
-        screw.normtranslation = np.linalg.norm(trans)
+        screw.normtranslation = np.linalg.norm(translation)
         screw.angle = 0
         return screw
 
@@ -171,7 +162,7 @@ def mat_trans_2_screw(matrix):
     u = v - np.dot(v, screw.unit) * screw.unit
     u /= np.linalg.norm(u)
 
-    uprime = np.dot(rotmatrix, u)
+    uprime = np.dot(rotation, u)
     cost = np.dot(u, uprime)
     usec = np.cross(screw.unit, u)
     sint = np.dot(usec, uprime)
