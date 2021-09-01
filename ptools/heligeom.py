@@ -17,10 +17,6 @@ def heli_analyze(mono1, mono2):
 
 def heli_construct(mono1, hp, N, Z=False):
     """Constructs a N-mer by repeating the screw transormation hp."""
-    return extend(hp, mono1, N, Z)
-
-
-def extend(hp, mono1, N, Z=False):
     final = ptools.RigidBody()
     monoTest = mono1.copy()
     chain_id = 0
@@ -46,17 +42,3 @@ def extend(hp, mono1, N, Z=False):
         chain_id += 1
 
     return final
-
-
-def main():  # pragma: no cover
-    mono1 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-new.pdb")
-    mono2 = ptools.RigidBody("/Users/benoist/Desktop/1BTA-2.pdb")
-
-    hp = heli_analyze(mono1, mono2)
-    result = heli_construct(mono1, hp, 10)
-
-    print(result.topdb())
-
-
-if __name__ == "__main__":  # pragma: no cover
-    main()

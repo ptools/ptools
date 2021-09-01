@@ -3,19 +3,20 @@ import math
 import os
 import unittest
 
+import numpy as np
 
 from ptools import RigidBody
-from ptools.heligeom import extend, heli_analyze, heli_construct
+from ptools.heligeom import heli_analyze, heli_construct
 from ptools.spatial import coord3d
 
 from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
 
-
-TEST_1A74_PROT_RED = os.path.join(os.path.dirname(__file__), 'data', '1A74_prot.red')
-TEST_2GLSA = os.path.join(os.path.dirname(__file__), 'data', '2GLS_A.pdb')
-TEST_2GLSB = os.path.join(os.path.dirname(__file__), 'data', '2GLS_B.pdb')
-TEST_REF_2GLSAB_N6 = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N6.pdb')
-TEST_REF_2GLSAB_N3_Z = os.path.join(os.path.dirname(__file__), 'data', 'ref_2GLSAB-N3-Zalign.pdb')
+TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+TEST_1A74_PROT_RED = os.path.join(TEST_DATA_DIR, '1A74_prot.red')
+TEST_2GLSA = os.path.join(TEST_DATA_DIR, '2GLS_A.pdb')
+TEST_2GLSB = os.path.join(TEST_DATA_DIR, '2GLS_B.pdb')
+TEST_REF_2GLSAB_N6 = os.path.join(TEST_DATA_DIR, 'ref_2GLSAB-N6.pdb')
+TEST_REF_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, 'ref_2GLSAB-N3-Zalign.pdb')
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -53,18 +54,18 @@ class TestHeligeomSimple(unittest.TestCase):
         self.assertAlmostEqual(hp.unit[2], 0.0)
 
     def test_heli_construct(self):
-        """Tests that heligeom.heli_construct does the same thing as heligeom.extend."""
+        """Non-regression test for heligeom.heli_construct."""
         hp = heli_analyze(self.mono1, self.mono2)
-
-        target = extend(hp, self.mono1, N=15)  # N is random
         result = heli_construct(self.mono1, hp, N=15)
-        assert_array_equal(result.coords, target.coords)
+        reference_file = os.path.join(TEST_DATA_DIR, "test_heli_construct_simple_result.npy")
+        reference = np.load(reference_file)
+        assert_array_equal(result.coords, reference)
 
     def test_Z_true_implemented(self):
         """Tests that using heligeom.extend with Z=true does not raises an error."""
         hp = heli_analyze(self.mono1, self.mono2)  # N is random
         try:
-            result = heli_construct(self.mono1, hp, N=15, Z=True)
+            heli_construct(self.mono1, hp, N=15, Z=True)
         except:
             self.fail("heli_construct with Z=True unexpectedly raised an exception")
 
