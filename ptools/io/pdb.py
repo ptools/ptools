@@ -50,7 +50,7 @@ def read_pdb(path):
     """
     models = []
     current_model = []
-    with open(path, "rt") as f:
+    with open(path, "rt", encoding="utf-8") as f:
         for line in f:
             header = get_header(line)
             if header == "ENDMDL":

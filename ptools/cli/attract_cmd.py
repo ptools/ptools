@@ -142,16 +142,18 @@ PTools revision {ptools.__version__}
 
     # single = args.startconfig or (args.transnb is not None and args.rotnb is not None)
 
-    print_files = True
     if args.transnb is not None:
         # Limit to desired translation (translations dictionary is keyed by translation number)
-        ntrans = len(translations)
         translations = {args.transnb: translations[args.transnb]}
-        # CHR Keep the following, but I don't know what s for
-        if args.transnb != ntrans - 1:
-            # don't append (print?) ligand, receptor, etc.
-            # unless this is the last translation point of the simulation
-            print_files = False
+
+    # CHR Keep the following, but I don't know what s for
+    # print_files = True
+    # if args.transnb is not None:
+    #     ntrans = len(translations)
+    #     if args.transnb != ntrans - 1:
+    #         # don't append (print?) ligand, receptor, etc.
+    #         # unless this is the last translation point of the simulation
+    #         print_files = False
 
     if args.rotnb is not None:
         # Limit to desired rotation (rotation dictionary is keyed by rotation number)

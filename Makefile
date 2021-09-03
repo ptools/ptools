@@ -48,7 +48,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .cache/
 
-lint: lint-package lint-tests ## check style with pylint
+lint: lint-package ## check style with pylint
 
 lint-package:
 	pylint --disable=C0103 ptools
@@ -58,7 +58,7 @@ lint-tests:
 	pylint tests
 
 test: ## run tests quickly with the default Python
-	py.test --ignore=tests/pyattract/test_attract.py --ignore=tests/pyattract/test_attract.py
+	py.test --ignore=tests/pyattract/test_attract.py
 	@echo "\033[33m** WARNING: didn't test tests/pyattract/test_attract.py **\033[0m"
 
 test-all: ## run tests on every Python version with tox

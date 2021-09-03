@@ -18,9 +18,11 @@ from . import tables
 
 
 # The Protein Data Bank format for atom coordinates
-PDB_FMT = "%-6s%5s %4s%c%-4s%c%4s%s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s"
+PDB_FMT = "{record:<6s}{index:5s} {name:4s}{altloc}{resname:<4s}{chain:s}{resid:>4s}{insertion}   {x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{bfactor:6.2f}          {element:>2s}"
 
 
+# pylint: disable=R0902,R0913
+# A lot of instant attributes... Is it really an issue?
 class BaseAtom(SpatialObject):
     """Base class for an Atom.
 
@@ -54,7 +56,11 @@ class BaseAtom(SpatialObject):
         self.resid = resid
         self.charge = charge
         self.meta = meta
-        self.element = guess_atom_element(self.name)
+
+    @property
+    def element(self):
+        """Returns an atom element name (read-only)."""
+        return guess_atom_element(self.name)
 
     @property
     def name(self) -> str:
@@ -65,7 +71,6 @@ class BaseAtom(SpatialObject):
     def name(self, name: str):
         """Name setter simultaneously updates element name."""
         self._name = name
-        self.element = guess_atom_element(self.name)
 
     def __repr__(self) -> str:
         """BaseAtom string representation."""
@@ -112,22 +117,21 @@ class BaseAtom(SpatialObject):
 
         x, y, z = self.coords
 
-        return PDB_FMT % (
-            rec,
-            indexbuf,
-            namebuf,
-            altlocchar,
-            self.resname,
-            chain[0],
-            residbuf,
-            insertion[0],
-            x,
-            y,
-            z,
-            occ,
-            bfactor,
-            "",
-            element,
+        return PDB_FMT.format(
+            record=rec,
+            index=indexbuf,
+            name=namebuf,
+            altloc=altlocchar,
+            resname=self.resname,
+            chain=chain[0],
+            resid=residbuf,
+            insertion=insertion[0],
+            x=x,
+            y=y,
+            z=z,
+            occupancy=occ,
+            bfactor=bfactor,
+            element=element,
         )
 
 
@@ -194,7 +198,6 @@ class Atom(BaseAtom):
     @name.setter
     def name(self, name: str):
         self._name = name
-        self.element = guess_atom_element(self.name)
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
@@ -273,7 +276,9 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """Returns the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
-    def tensor_of_inertia(self, method: str = "accurate") -> np.ndarray:
+    # pylint: disable=W0221
+    # Actually not the same number of arguments as spatial.SpatialObject.
+    def tensor_of_inertia(self, method:str ="accurate"):
         """Returns the inertia tensors of a set of atoms.
 
         Args:
@@ -281,7 +286,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
                 The "fast" method does not take into account atom masses.
         """
         weights = self.masses if method == "accurate" else None
-        return ptools.spatial.tensor_of_inertia(self.coords, weights, method)
+        return super().tensor_of_inertia(weights, method)
 
     def principal_axes(self, sort: bool = True, method: str = "accurate") -> np.ndarray:
         """Returns an AtomCollection principal axes.
@@ -310,7 +315,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
 
     def writepdb(self, path: str):
         """Writes the AtomCollection to a PDB formatted file."""
-        with open(path, "wt") as f:
+        with open(path, "wt", encoding="utf-8") as f:
             print(self.topdb(), file=f)
 
     def set_chain(self, chain: str):

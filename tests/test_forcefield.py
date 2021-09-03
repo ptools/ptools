@@ -1,7 +1,7 @@
 import unittest
 
 from ptools.rigidbody import AttractRigidBody
-from ptools.forcefield import ForceField, AttractForceField1
+from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_equal

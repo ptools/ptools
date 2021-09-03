@@ -1,12 +1,15 @@
 """Ptools forcefield implementation."""
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from ptools.rigidbody import RigidBody
+
 from .io.attract import read_aminon
+from .pairlist import PairList
+from .rigidbody import AttractRigidBody
 
 
 # Name of the force fields implemented in pyattract.
@@ -64,69 +67,41 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 
 
 @dataclass
-class ForceField:
-    """Base class for calculating the energy between two molecules.
+class ForceFieldBase(ABC):
+    """Base class for a force field.
 
-    Methods for calculating energy terms should be overriden by children
-    classes.
+    All force field must be derivated from this class or child.
     """
 
-    receptor: RigidBody
-    ligand: RigidBody
+    receptor: AttractRigidBody
+    ligand: AttractRigidBody
     cutoff: float = 10
+
+    @abstractmethod
+    def energy(self) -> float:
+        """Return the total energy between the two molecules"""
+
+    @abstractmethod
+    def update(self):
+        """Calculates all energy terms."""
+
+
+@dataclass
+class AttractForceField1(ForceFieldBase):
+    """The AttractForceField1."""
+
+    paramfile: str = None
+    _repulsive_parameters: list = field(init=False, repr=False, default=None)
+    _attractive_parameters: list = field(init=False, repr=False, default=None)
+    _repulsive_pairs: list = field(init=False, repr=False, default=None)
+    _attractive_pairs: list = field(init=False, repr=False, default=None)
+
     _vdw_energy: float = field(init=False, repr=False, default=0.0)
     _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
 
     def __post_init__(self):
-        self.sq_cutoff = self.cutoff * self.cutoff
-
-    def get_cutoff(self) -> float:
-        """Gets/Sets the cutoff value for non-bonded interactions."""
-        return self.sq_cutoff ** 0.5
-
-    def set_cutoff(self, value: float):
-        """Gets/Sets the cutoff value for non-bonded interactions."""
-        self.sq_cutoff = value * value
-
-    def update(self):
-        """Calculate all energy terms while returning nothing."""
-        self.non_bonded_energy()
-
-    def energy(self) -> float:
-        """Return the total energy between the two molecules, which basically
-        corresponds to the non-bonded energy."""
-        return self.non_bonded_energy()
-
-    def non_bonded_energy(self) -> float:
-        """Calculate non-bonded energy between a receptor and a ligand."""
-        return self.vdw_energy() + self.electrostatic_energy()
-
-    def vdw_energy(self) -> float:
-        """Calculate the van der Waals energy (Lennard-Jones energy)
-        between a receptor and a ligand."""
-        return self._vdw_energy
-
-    def electrostatic_energy(self) -> float:
-        """Calculate the van der Waals energy (Lennard-Jones energy)
-        between a receptor and a ligand."""
-        return self._electrostatic_energy
-
-
-ForceField.cutoff = property(ForceField.get_cutoff, ForceField.set_cutoff)
-
-
-@dataclass
-class AttractForceField1(ForceField):
-    """The AttractForceField1."""
-
-    paramfile: str = None
-
-    def __post_init__(self):
-        self._init_parameters(self.paramfile)
-
-    def _init_parameters(self, path: str = None):
-        if path is not None:
-            params = read_aminon(path)
+        if self.paramfile is not None:
+            params = read_aminon(self.paramfile)
         else:
             params = ATTRACT_DEFAULT_FF_PARAMS
 
@@ -146,12 +121,27 @@ class AttractForceField1(ForceField):
             np.meshgrid(self.receptor.atom_categories, self.ligand.atom_categories)
         ).T
 
-        self._attractive_pairs = self._attractive_parameters[
-            C[..., 0], C[..., 1]
-        ]  # Numpy insane trickery
+        # Numpy insane trickery
+        self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
-    def non_bonded_energy(self) -> float:
+    def vdw_energy(self):
+        """Returns the van der Waals energy."""
+        return self._vdw_energy
+
+    def electrostatic_energy(self):
+        """Returns the electrostatic energy."""
+        return self._electrostatic_energy
+
+    def energy(self) -> float:
+        """Returns the total energy between two molecules."""
+        return self.non_bonded_energy()
+
+    def update(self):
+        """Calculates all energy terms (returns nothing)."""
+        self.non_bonded_energy()
+
+    def non_bonded_energy(self):
         """Non-bonded energy calculation."""
         if self.cutoff > 10:
             return self.__nb_energy_large_cutoff()
@@ -200,7 +190,7 @@ class AttractForceField1(ForceField):
         sq_distances = cdist(
             self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
         )
-        keep = np.where(sq_distances <= self.sq_cutoff)
+        keep = np.where(sq_distances <= self.cutoff * self.cutoff)
 
         XA = np.take(self.receptor.coords, keep[0], axis=0)
         XB = np.take(self.ligand.coords, keep[1], axis=0)
@@ -244,7 +234,7 @@ class AttractForceField1(ForceField):
             self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
         )
 
-        exclude = np.where(sq_distances > self.sq_cutoff)
+        exclude = np.where(sq_distances > self.cutoff * self.cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
         rr2[exclude] = 0.0  # exclude pairs with distance > cutoff
@@ -254,60 +244,62 @@ class AttractForceField1(ForceField):
         self._electrostatic_energy = electrostatics(dx, rr2)
         return self._vdw_energy + self._electrostatic_energy
 
-    # def non_bonded_energy_legacy(self) -> float:
-    #     """Old-fashioned energy calculation.
+    # pylint: disable=R0914
+    # too many local variables
+    def non_bonded_energy_legacy(self):
+        """Old-fashioned energy calculation.
 
-    #     Very slow.
-    #     """
-    #     vdw = 0.0
-    #     elec = 0.0
+        Very slow.
+        """
+        vdw = 0.0
+        elec = 0.0
 
-    #     pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
-    #     contacts = pairlist.contacts()
-    #     norm2 = pairlist.sqdistances()
+        pairlist = PairList(self.receptor, self.ligand, cutoff=self.cutoff)
+        contacts = pairlist.contacts()
+        norm2 = pairlist.sqdistances()
 
-    #     alldx = [
-    #         self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
-    #     ]
+        alldx = [
+            self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
+        ]
 
-    #     for i, (ir, il) in enumerate(contacts):
-    #         category_rec = self.receptor.atom_categories[ir]
-    #         category_lig = self.ligand.atom_categories[il]
+        for i, (ir, il) in enumerate(contacts):
+            category_rec = self.receptor.atom_categories[ir]
+            category_lig = self.ligand.atom_categories[il]
 
-    #         attractive_pairs = self._attractive_parameters[category_rec][category_lig]
-    #         repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
+            attractive_pairs = self._attractive_parameters[category_rec][category_lig]
+            repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]
 
-    #         dx = alldx[i]
-    #         r2 = norm2[i]
-    #         rr2 = 1.0 / r2
-    #         dx = dx + rr2
+            dx = alldx[i]
+            r2 = norm2[i]
+            rr2 = 1.0 / r2
+            dx = dx + rr2
 
-    #         rr23 = rr2 * rr2 * rr2
-    #         rep = repulsive_pairs * rr2
-    #         vlj = (rep - attractive_pairs) * rr23
+            rr23 = rr2 * rr2 * rr2
+            rep = repulsive_pairs * rr2
+            vlj = (rep - attractive_pairs) * rr23
 
-    #         vdw += vlj
+            vdw += vlj
 
-    #         fb = 6.0 * vlj + 2.0 * rep * rr23
-    #         fdb = fb * dx
+            fb = 6.0 * vlj + 2.0 * rep * rr23
+            fdb = fb * dx
 
-    #         self.receptor.atom_forces[ir] += fdb
-    #         self.ligand.atom_forces[il] -= fdb
+            self.receptor.atom_forces[ir] += fdb
+            self.ligand.atom_forces[il] -= fdb
 
-    #         # Electrostatics.
-    #         charge_rec = self.receptor.atom_charges[ir]
-    #         charge_lig = self.ligand.atom_charges[il]
-    #         charge = charge_rec * charge_lig * (332.053986 / 20.0)
+            # Electrostatics.
+            charge_rec = self.receptor.atom_charges[ir]
+            charge_lig = self.ligand.atom_charges[il]
+            charge = charge_rec * charge_lig * (332.053986 / 20.0)
 
-    #         if abs(charge) > 0.0:
-    #             et = charge * rr2
-    #             elec += et
+            if abs(charge) > 0.0:
+                et = charge * rr2
+                elec += et
 
-    #             fdb = (2.0 * et) * dx
-    #             self.receptor.atom_forces[ir] += fdb
-    #             self.ligand.atom_forces[il] -= fdb
+                fdb = (2.0 * et) * dx
+                self.receptor.atom_forces[ir] += fdb
+                self.ligand.atom_forces[il] -= fdb
 
-    #     self._vdw_energy = vdw
-    #     self._electrostatic_energy = elec
+        self._vdw_energy = vdw
+        self._electrostatic_energy = elec
 
-    #     return vdw + elec
+        return vdw + elec

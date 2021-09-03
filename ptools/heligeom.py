@@ -17,13 +17,8 @@ def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> np.ndarray:
 
 def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBody:
     """Constructs a N-mer by repeating the screw transormation hp."""
-    return extend(hp, mono1, N, Z)
-
-
-def extend(hp: Screw, mono1: RigidBody, N: int, Z: bool = False):
-    """Main heligeom algorithm."""
-    final = RigidBody()
-    mono_test = mono1.copy()
+    final = ptools.RigidBody()
+    monoTest = mono1.copy()
     chain_id = 0
     origin = hp.point
     axis = hp.unit

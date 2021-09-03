@@ -1,5 +1,8 @@
 """Read/Write Attract files."""
 
+# pylint: disable=R0903
+# Only 1 public method... so what?
+
 from ..rigidbody import RigidBody
 
 
@@ -84,7 +87,7 @@ class AttractFileParameters:
             return minim
 
         # Read file ignoring comments.
-        with open(path, "rt") as f:
+        with open(path, "rt", encoding="utf-8") as f:
             lines = [line for line in f if not line[0] in ("#", "!")]
 
         # First number is the number of minimizations to perform.
@@ -119,7 +122,7 @@ def read_aminon(path):
         list[(float, float)]: radius and amplitude values for each line.
     """
     params = []
-    with open(path, "rt") as f:
+    with open(path, "rt", encoding="utf-8") as f:
         for line in f:
             # Ignore empty lines and lines starting with "#".
             if line.strip() and not line.startswith("#"):
@@ -170,7 +173,7 @@ def read_forcefield_from_reduced(path):
     """
 
     def get_header_line():
-        with open(path, "rt") as f:
+        with open(path, "rt", encoding="utf-8") as f:
             line = f.readline()
         if not line.startswith("HEADER"):
             err = (
@@ -213,6 +216,8 @@ def read_translations(filename="translation.dat"):
     return dict(translations)
 
 
+# pylint: disable=R0914
+# Not so many local variables
 def read_rotations(filename="rotation.dat"):
     """Returns the  dictionary of rotations read from file.
 
@@ -226,7 +231,7 @@ def read_rotations(filename="rotation.dat"):
     nphi = []
     # read theta, phi, rot data
     # nchi is number of steps to rotate about the axis joining the ligand/receptor centers
-    with open(filename, "r") as rotdat:
+    with open(filename, "rt", encoding="utf-8") as rotdat:
         line = rotdat.readline().split()
         ntheta = int(line[0])
         nchi = int(line[1])
