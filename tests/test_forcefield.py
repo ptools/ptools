@@ -9,11 +9,6 @@ from .testing.moreassert import assert_array_equal
 import numpy as np
 
 
-class TestForceField(unittest.TestCase):
-    def test_energy_is_zero(self):
-        ff = ForceField(receptor=None, ligand=None)
-        self.assertEqual(ff.energy(), 0.0)
-
 
 class TestAttractForceField1(unittest.TestCase):
     def setUp(self):

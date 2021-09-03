@@ -17,8 +17,8 @@ def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> np.ndarray:
 
 def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBody:
     """Constructs a N-mer by repeating the screw transormation hp."""
-    final = ptools.RigidBody()
-    monoTest = mono1.copy()
+    final = RigidBody()
+    mono_test = mono1.copy()
     chain_id = 0
     origin = hp.point
     axis = hp.unit

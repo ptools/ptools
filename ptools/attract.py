@@ -6,17 +6,17 @@ from typing import Any, Callable
 import numpy as np
 from scipy.optimize import minimize
 
-from .forcefield import ForceField, AttractForceField1
+from .forcefield import AttractForceField1
 from .spatial import transformation_matrix
 from .rigidbody import RigidBody
 
 
-def _function(x: Callable, ff: ForceField) -> float:
+def _function(x: Callable, ff: AttractForceField1) -> float:
     """Function to minimize.
 
     Args:
         x (np.array, list): 6 elements: rotation angles and translation vector
-        ff (ptools.forcefield.ForceField)
+        ff (ptools.forcefield.AttractForceField1)
 
     Returns:
         float: energy
