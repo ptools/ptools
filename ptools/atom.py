@@ -13,7 +13,7 @@ from . import tables
 
 
 # The Protein Data Bank format for atom coordinates
-PDB_FMT = "%-6s%5s %4s%c%-4s%c%4s%s   %8.3f%8.3f%8.3f%6.2f%6.2f      %-4s%2s"
+PDB_FMT = "{record:<6s}{index:5s} {name:4s}{altloc}{resname:<4s}{chain:s}{resid:>4s}{insertion}   {x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{bfactor:6.2f}          {element:>2s}"
 
 
 # pylint: disable=R0902,R0913
@@ -112,22 +112,21 @@ class BaseAtom(SpatialObject):
 
         x, y, z = self.coords
 
-        return PDB_FMT % (
-            rec,
-            indexbuf,
-            namebuf,
-            altlocchar,
-            self.resname,
-            chain[0],
-            residbuf,
-            insertion[0],
-            x,
-            y,
-            z,
-            occ,
-            bfactor,
-            "",
-            element,
+        return PDB_FMT.format(
+            record=rec,
+            index=indexbuf,
+            name=namebuf,
+            altloc=altlocchar,
+            resname=self.resname,
+            chain=chain[0],
+            resid=residbuf,
+            insertion=insertion[0],
+            x=x,
+            y=y,
+            z=z,
+            occupancy=occ,
+            bfactor=bfactor,
+            element=element,
         )
 
 
