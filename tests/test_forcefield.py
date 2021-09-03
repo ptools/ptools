@@ -9,7 +9,6 @@ from .testing.moreassert import assert_array_equal
 import numpy as np
 
 
-
 class TestAttractForceField1(unittest.TestCase):
     def setUp(self):
         self.receptor = AttractRigidBody(TEST_RECEPTOR_RED)

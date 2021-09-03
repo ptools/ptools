@@ -91,7 +91,10 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
 
 
 def _run_minimization(
-    params: dict[str, Any], receptor: RigidBody, ligand: RigidBody, minimlist: Any = None
+    params: dict[str, Any],
+    receptor: RigidBody,
+    ligand: RigidBody,
+    minimlist: Any = None,
 ):
     start = time.time()
     cutoff = params["squarecutoff"] ** 0.5

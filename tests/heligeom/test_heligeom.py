@@ -55,7 +55,9 @@ class TestHeligeomSimple(unittest.TestCase):
         """Non-regression test for heligeom.heli_construct."""
         hp = heli_analyze(self.mono1, self.mono2)
         result = heli_construct(self.mono1, hp, N=15)
-        reference_file = os.path.join(TEST_DATA_DIR, "test_heli_construct_simple_result.npy")
+        reference_file = os.path.join(
+            TEST_DATA_DIR, "test_heli_construct_simple_result.npy"
+        )
         reference = np.load(reference_file)
         assert_array_equal(result.coords, reference)
 
@@ -65,7 +67,9 @@ class TestHeligeomSimple(unittest.TestCase):
         try:
             heli_construct(self.mono1, hp, N=15, Z=True)
         except Exception as error:
-            self.fail(f"heli_construct with Z=True unexpectedly raised an exception: '{error}'")
+            self.fail(
+                f"heli_construct with Z=True unexpectedly raised an exception: '{error}'"
+            )
 
 
 class TestHeligeom(unittest.TestCase):

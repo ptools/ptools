@@ -278,7 +278,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
 
     # pylint: disable=W0221
     # Actually not the same number of arguments as spatial.SpatialObject.
-    def tensor_of_inertia(self, method:str ="accurate"):
+    def tensor_of_inertia(self, method: str = "accurate"):
         """Returns the inertia tensors of a set of atoms.
 
         Args:
