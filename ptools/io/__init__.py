@@ -1,9 +1,10 @@
 """linalg - Defines functions to read/write files."""
 
 import os
-import sys
 
 from .pdb import read_pdb
+
+__all__ = ["read_pdb"]
 
 
 def check_file_exists(path, message=False):
