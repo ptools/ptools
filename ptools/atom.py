@@ -96,29 +96,18 @@ class BaseAtom(SpatialObject):
 
     def topdb(self) -> str:
         """Returns the atom's description in PDB format."""
+
         rec = "ATOM"
-        indexbuf = "*****"
-        residbuf = "****"
         altlocchar = " "
         insertion = " "
-        chain = " " if not self.chain else self.chain
         occ = 1.0
         bfactor = 0.0
         element = self.element
 
-        if self.index < 100000:
-            indexbuf = "{0:5d}".format(self.index)
-        elif self.index < 1048576:
-            indexbuf = "{0:05x}".format(self.index)
-
-        if self.resid < 10000:
-            residbuf = "{0:4d}".format(self.resid)
-        elif self.resid < 65536:
-            residbuf = "{0:04x}".format(self.resid)
-
-        namebuf = self.name.center(4)
-        if len(self.name) > 2:
-            namebuf = "{0:>4s}".format(self.name)
+        chain = " " if not self.chain else self.chain
+        namebuf = f"{self.name:>4s}" if len(self.name) > 2 else self.name.center(4)
+        indexbuf = f"{self.index:5d}" if self.index < 100000 else f"{self.index:05x}"
+        residbuf = f"{self.resid:4d}" if self.resid < 10000 else f"{self.resid:04x}"
 
         x, y, z = self.coords
 
