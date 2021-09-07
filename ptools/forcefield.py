@@ -90,17 +90,17 @@ class ForceFieldBase(ABC):
 class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
 
-    paramfile: str = None
-    _repulsive_parameters: list = field(init=False, repr=False, default=None)
-    _attractive_parameters: list = field(init=False, repr=False, default=None)
-    _repulsive_pairs: list = field(init=False, repr=False, default=None)
-    _attractive_pairs: list = field(init=False, repr=False, default=None)
+    paramfile: str = ""
+    _repulsive_parameters: list = field(init=False, repr=False, default_factory=list)
+    _attractive_parameters: list = field(init=False, repr=False, default_factory=list)
+    _repulsive_pairs: list = field(init=False, repr=False, default_factory=list)
+    _attractive_pairs: list = field(init=False, repr=False, default_factory=list)
 
     _vdw_energy: float = field(init=False, repr=False, default=0.0)
     _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
 
     def __post_init__(self):
-        if self.paramfile is not None:
+        if self.paramfile != "":
             params = read_aminon(self.paramfile)
         else:
             params = ATTRACT_DEFAULT_FF_PARAMS
