@@ -94,7 +94,9 @@ class SpatialObject:
         """Rotate object with Attract convention."""
         attract_euler_rotate(self.coords, phi, ssi, rot)
 
-    def orient(self, vector: np.ndarray, target: np.ndarray):
+    def orient(
+        self, vector: np.ndarray | list[float], target: np.ndarray | list[float]
+    ):
         """Orients a SpatialObject."""
         orient(self.coords, vector, target)
 
@@ -532,7 +534,11 @@ def orientation_matrix(
     return rotation_matrix_around_axis(axis, amount, center=com)
 
 
-def orient(coords: np.ndarray, vector: np.ndarray, target: np.ndarray):
+def orient(
+    coords: np.ndarray,
+    vector: np.ndarray | list[float],
+    target: np.ndarray | list[float],
+):
     """Orients coordinates.
 
     Args:

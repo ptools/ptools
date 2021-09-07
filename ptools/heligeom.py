@@ -10,7 +10,7 @@ from ptools.rigidbody import RigidBody
 from ptools.superpose import Screw, mat_trans_2_screw, fit_matrix
 
 
-def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> np.ndarray:
+def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> Screw:
     """Returns the screw transformation from mono1 to mono2."""
     return mat_trans_2_screw(fit_matrix(mono1, mono2))
 
