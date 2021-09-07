@@ -270,9 +270,7 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """Returns the center of mass (barycenter)."""
         return ptools.spatial.center_of_mass(self.coords, self.masses)
 
-    # pylint: disable=W0221
-    # Actually not the same number of arguments as spatial.SpatialObject.
-    def tensor_of_inertia(self, method: str = "accurate"):
+    def tensor_of_inertia(self, weights=None, method: str = "accurate"):
         """Returns the inertia tensors of a set of atoms.
 
         Args:
