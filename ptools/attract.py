@@ -11,7 +11,7 @@ from .spatial import transformation_matrix
 from .rigidbody import RigidBody
 
 
-def _function(x: Callable, ff: AttractForceField1) -> float:
+def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     """Function to minimize.
 
     Args:
