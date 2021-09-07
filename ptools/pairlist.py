@@ -22,13 +22,13 @@ class PairList:
     receptor: AtomCollection
     ligand: AtomCollection
     cutoff: float
-    _all_sqdistances: np.ndarray = field(init=False, repr=False, default=None)
-    _contacts: np.ndarray = field(init=False, repr=False, default=None)
+    _all_sqdistances: np.ndarray = field(init=False, repr=False, default=np.zeros((0, 0)))
+    _contacts: np.ndarray = field(init=False, repr=False, default=np.zeros((0, 0)))
 
     def __post_init__(self):
         self.update()
 
-    def contacts(self) -> list[(int, int)]:
+    def contacts(self) -> list[tuple[int, int]]:
         """Get the indices of atoms pairs that are within a cutoff of
         each other."""
         return list(zip(*self._contacts))
@@ -59,7 +59,7 @@ class PairList:
         self._contacts = np.where(self._all_sqdistances <= sqcutoff)
 
     @staticmethod
-    def sort(receptor: list[int], ligand: list[int]) -> list[(int, int)]:
+    def sort(receptor: list[int], ligand: list[int]) -> list[tuple[int, int]]:
         """Sort a contact list.
 
         Returns:
