@@ -22,7 +22,7 @@ class SpatialObject:
 
     def dist(self, other: SpatialObject) -> float:
         """Returns the euclidean distance between two objects."""
-        return dist(self, other)
+        return dist(self.coords, other.coords)
 
     def copy(self) -> SpatialObject:
         """Returns a copy of itself."""
@@ -544,5 +544,5 @@ def orient(coords: np.ndarray, vector: np.ndarray, target: np.ndarray):
 
 
 def dist(a: np.ndarray, b: np.ndarray) -> float:
-    """Returns the distance between two SpatialObject instances."""
-    return (((a.coords - b.coords) ** 2.0).sum()) ** 0.5
+    """Returns the euclidean distance between two sets of coordinates."""
+    return (((a - b) ** 2.0).sum()) ** 0.5
