@@ -8,7 +8,7 @@ from __future__ import annotations
 import collections.abc
 import copy
 import math
-from typing import Iterator
+from typing import Iterator, Sequence
 
 import numpy as np
 
@@ -204,12 +204,12 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         atoms (list[BaseAtom]): list of atoms
     """
 
-    def __init__(self, atoms: list[BaseAtom] = None):
+    def __init__(self, atoms: Sequence[BaseAtom] = None):
         if atoms is None:
             atoms = []
         self.atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
         if self.atoms:
-            coords = [atom._coords for atom in self.atoms]
+            coords = np.array([atom._coords for atom in self.atoms])
         else:
             coords = np.zeros((0, 3))
         super().__init__(coords)
