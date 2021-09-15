@@ -11,6 +11,30 @@ from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform
 
 
+def distAxis(mono,hp):
+    """compute the distance between the axis of the screw and all the atoms of the monomer.
+    Return the smallest and biggest distances
+    """
+
+    dmin, dmax = -1,-1
+
+    for atom in mono:
+
+        v = atom.coords - hp.point
+        d = np.linalg.norm(np.cross(v, hp.unit))
+
+        if dmin == -1:
+            dmin = d
+        elif d < dmin:
+            dmin = d
+
+        if dmax == -1:
+            dmax = d
+        elif d > dmax:
+            dmax = d
+
+    return dmin, dmax
+
 def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> Screw:
     """Returns the screw transformation from mono1 to mono2."""
     return mat_trans_2_screw(fit_matrix(mono1, mono2))
