@@ -11,7 +11,7 @@ from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform
 
 
-def contact(receptor, ligand, cutoff=7):
+def contact(receptor, ligand, cutoff=5):
     """return residues in interaction, use ptools::pairlist"""
 
     pl = PairList(receptor, ligand, cutoff)
@@ -28,9 +28,11 @@ def contact(receptor, ligand, cutoff=7):
 def fnat(receptor1, ligcrist, receptor2, ligprobe):
     """return native fraction (fnat)"""
     corig = contact(receptor1, ligcrist)
+    print(len(corig))
     if len(corig) == 0:
         return 0
     cnew = contact(receptor2, ligprobe)
+    print(len(cnew))
     intersect = corig & cnew
     f = float(len(intersect)) / float(len(corig))
     return f
