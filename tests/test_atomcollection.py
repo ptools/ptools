@@ -88,6 +88,11 @@ class TestAtomCollection(unittest.TestCase):
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
+    def test_contains(self):
+        atom = self.atoms[0]
+        self.assertIn(atom, self.atoms)
+        atom = self.atoms[0].copy()  # should return True as well
+        self.assertIn(atom, self.atoms)
 
     def test_update_name(self):
         # Updating an atom's name should also update its type and mass.
