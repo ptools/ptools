@@ -59,3 +59,9 @@ class TestAtom(unittest.TestCase):
     def test_mass_setter(self):
         self.collection.atoms[0].mass = 42
         self.assertEqual(self.collection.atoms[0].mass, 42)
+
+    def test_equal(self):
+        # Identical atoms from different AtomCollection instances should be evaluated equal.
+        left = self.collection[0]
+        right = AtomCollection([left.copy()])[0]
+        self.assertEqual(left, right)

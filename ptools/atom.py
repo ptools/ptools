@@ -206,6 +206,18 @@ class Atom(BaseAtom):
     def name(self, name: str):
         self._name = name
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
+    
+    def __eq__(self, other: BaseAtom) -> bool:
+        """Compares two Atom instances."""
+        for key, value in self.__dict__.items():
+            if key.startswith("_") and not key.startswith("__"):
+                key = key[1:]
+            if key not in ("coords", "collection") and value != getattr(other, key):
+                return False
+            if key == "coords":
+                if np.abs(self.coords - other.coords).sum() > 1e-6:
+                    return False
+        return True
 
 
 class AtomCollection(SpatialObject, collections.abc.Sequence):
