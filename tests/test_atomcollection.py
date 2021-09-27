@@ -74,12 +74,20 @@ class TestAtomCollection(unittest.TestCase):
         self.atoms.atoms[0].coords = (42, 42, 42)
         assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
 
-    def test_getitem(self):
+    def test_getitem_single_atom(self):
         atom = self.atoms[0]
         self.assertIsInstance(atom, ptools.atom.Atom)
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+    
+    def test_getitem_slice(self):
+        atoms = self.atoms[:5]
+        self.assertIsInstance(atoms, AtomCollection)
+
+    def test_getitem_doesnt_make_copies(self):
+        atom = self.atoms[0]
         atom.coords = [42, 17, 323]
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+
 
     def test_update_name(self):
         # Updating an atom's name should also update its type and mass.

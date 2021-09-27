@@ -8,7 +8,7 @@ from __future__ import annotations
 import collections.abc
 import copy
 import math
-from typing import Iterator, Sequence
+from typing import Iterator, Sequence, Union
 
 import numpy as np
 
@@ -195,7 +195,7 @@ class Atom(BaseAtom):
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
-class AtomCollection(SpatialObject, collections.abc.Collection):
+class AtomCollection(SpatialObject, collections.abc.Sequence):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -233,9 +233,11 @@ class AtomCollection(SpatialObject, collections.abc.Collection):
         """Iterates over the collection atoms."""
         return iter(self.atoms)
 
-    def __getitem__(self, serial: int) -> Atom:
+    def __getitem__(self, serial: Union[int, slice]) -> Union[Atom, AtomCollection]:
         """Accesses an atom by its serial number (which the internal index
         starting at 0)."""
+        if isinstance(serial, slice):
+            return self.__class__(self.atoms[serial])
         return self.atoms[serial]
 
     def __add__(self, other: AtomCollection) -> AtomCollection:
