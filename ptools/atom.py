@@ -76,6 +76,18 @@ class BaseAtom(SpatialObject):
     def name(self, name: str):
         """Name setter simultaneously updates element name."""
         self._name = name
+    
+    def __eq__(self, other: BaseAtom) -> bool:
+        """Compares two BaseAtom instances."""
+        for key, value in self.__dict__.items():
+            if key.startswith("_") and not key.startswith("__"):
+                key = key[1:]
+            if key != "coords" and value != getattr(other, key):
+                return False
+            if key == "coords":
+                if np.abs(self.coords - other.coords).sum() > 1e-6:
+                    return False
+        return True
 
     def __repr__(self) -> str:
         """BaseAtom string representation."""
