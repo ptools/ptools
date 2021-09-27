@@ -237,7 +237,7 @@ class AtomCollection(SpatialObject, collections.abc.Sequence):
         """Accesses an atom by its serial number (which the internal index
         starting at 0)."""
         if isinstance(serial, slice):
-            return self.__class__(self.atoms[serial])
+            return self.__class__(atoms=self.atoms[serial])
         return self.atoms[serial]
 
     def __add__(self, other: AtomCollection) -> AtomCollection:

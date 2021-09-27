@@ -83,6 +83,10 @@ class TestRigidBody(unittest.TestCase):
     def test_copy_constructor2(self):
         thecopy = RigidBody.copy(self.rb)
         self._assert_copy_successful(thecopy)
+    
+    def test_getitem_returns_rigidbody(self):
+        atoms = self.rb[:5]
+        self.assertIsInstance(atoms, RigidBody)
 
 
 class TestAttractRigidBody(unittest.TestCase):
