@@ -51,6 +51,10 @@ class TestBaseAtom(unittest.TestCase):
         assert_array_almost_equal(atom.coords, (0, 0, 0))
         atom.coords = (1, 2, 3)
         assert_array_almost_equal(atom.coords, (1, 2, 3))
+    
+    def test_repr(self):
+        atom = BaseAtom()
+        self.assertNotIn("_", repr(atom))
 
     def test_copy(self):
         # Check that all arguments are adequatly set from original atom

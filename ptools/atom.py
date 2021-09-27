@@ -79,10 +79,11 @@ class BaseAtom(SpatialObject):
 
     def __repr__(self) -> str:
         """BaseAtom string representation."""
-        attrs = dict(sorted(self.__dict__.items()))
-        for key in attrs:
-            if key[0] == "_" and key[1] != "_":
-                attrs[key[1:]] = attrs.pop(key)
+        attrs = {}
+        for key, value in sorted(self.__dict__.items()):
+            if key.startswith("_") and not key.startswith("__"):
+                key = key[1:]
+            attrs[key] = value
         modulename = self.__module__
         classname = self.__class__.__name__
         desc = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
