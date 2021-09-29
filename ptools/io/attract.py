@@ -70,13 +70,13 @@ class AttractFileParameters:
             except Exception as e:
                 error = (
                     "Cannot read minimizations from attract parameter file: "
-                    "expected {}, found {}".format(self.nbminim, i)
+                    f"expected {self.nbminim}, found {i}"
                 )
                 raise ValueError(error) from e
             if len(tokens) < 3:
                 error = (
                     "Cannot read minimization line from attract parameter file: "
-                    "expected at least 3 values, found {}".format(len(tokens))
+                    f"expected at least 3 values, found {len(tokens)}"
                 )
                 raise ValueError(error)
             minim = {

@@ -58,14 +58,14 @@ class AttractRigidBody(RigidBody):
                     [int(tokens[0]) - 1 for tokens in extra]
                 )
             except Exception as e:
-                err = "cannot initialize atom category: {}".format(e)
+                err = f"cannot initialize atom category: {e}"
                 raise IOError(err) from e
 
         def init_charges():
             try:
                 self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
             except Exception as e:
-                err = "cannot initialize atom charges: {}".format(e)
+                err = f"cannot initialize atom charges: {e}"
                 raise IOError(err) from e
 
         extra = [atom.meta["extra"].split() for atom in self.atoms]

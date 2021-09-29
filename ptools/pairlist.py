@@ -22,7 +22,9 @@ class PairList:
     receptor: AtomCollection
     ligand: AtomCollection
     cutoff: float
-    _all_sqdistances: np.ndarray = field(init=False, repr=False, default=np.zeros((0, 0)))
+    _all_sqdistances: np.ndarray = field(
+        init=False, repr=False, default=np.zeros((0, 0))
+    )
     _contacts: np.ndarray = field(init=False, repr=False, default=np.zeros((0, 0)))
 
     def __post_init__(self):

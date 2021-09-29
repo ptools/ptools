@@ -1,7 +1,7 @@
 """Attract docking."""
 
 import time
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 from scipy.optimize import minimize

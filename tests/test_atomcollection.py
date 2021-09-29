@@ -18,7 +18,9 @@ class TestAtomCollection(unittest.TestCase):
         # Create an AtomCollection with 10 atoms.
         # Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
         self.n_atoms = 10
-        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(self.n_atoms)])
+        self.atoms = AtomCollection(
+            [BaseAtom(coords=(i, i, i)) for i in range(self.n_atoms)]
+        )
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms.atoms), self.n_atoms)
@@ -80,7 +82,7 @@ class TestAtomCollection(unittest.TestCase):
         atom = self.atoms[0]
         self.assertIsInstance(atom, ptools.atom.Atom)
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
-    
+
     def test_getitem_slice(self):
         self.assertIsInstance(self.atoms[:5], AtomCollection)
 
@@ -145,14 +147,18 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
 
     def test_add(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)])
+        atoms2 = AtomCollection(
+            [BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)]
+        )
         n_final = len(self.atoms) + len(atoms2)
-        all_atoms =  self.atoms + atoms2
+        all_atoms = self.atoms + atoms2
         self.assertEqual(len(all_atoms), n_final)
         self.assertEqual(all_atoms.coords.shape[0], n_final)
 
     def test_add_makes_copies(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)])
+        atoms2 = AtomCollection(
+            [BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)]
+        )
         assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
         all_atoms = self.atoms + atoms2
         atoms2[-1].coords = np.zeros(3)

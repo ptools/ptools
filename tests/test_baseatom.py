@@ -51,14 +51,14 @@ class TestBaseAtom(unittest.TestCase):
         assert_array_almost_equal(atom.coords, (0, 0, 0))
         atom.coords = (1, 2, 3)
         assert_array_almost_equal(atom.coords, (1, 2, 3))
-    
+
     def test_equals(self):
         self.assertEqual(BaseAtom(), BaseAtom())
-    
+
     def test_equals_attributes_differ(self):
         left, right = BaseAtom(name="X"), BaseAtom(name="Y")
         self.assertNotEqual(left, right)
-    
+
     def test_equals_coordinates_differ(self):
         left, right = BaseAtom(coords=(0, 0, 0)), BaseAtom(coords=(1, 1, 1))
         self.assertNotEqual(left, right)

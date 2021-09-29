@@ -76,7 +76,7 @@ class BaseAtom(SpatialObject):
     def name(self, name: str):
         """Name setter simultaneously updates element name."""
         self._name = name
-    
+
     def __eq__(self, other: BaseAtom) -> bool:
         """Compares two BaseAtom instances."""
         for key, value in self.__dict__.items():
@@ -206,7 +206,7 @@ class Atom(BaseAtom):
     def name(self, name: str):
         self._name = name
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
-    
+
     def __eq__(self, other: BaseAtom) -> bool:
         """Compares two Atom instances."""
         for key, value in self.__dict__.items():
@@ -218,8 +218,6 @@ class Atom(BaseAtom):
                 if np.abs(self.coords - other.coords).sum() > 1e-6:
                     return False
         return True
-
-
 
 
 class AtomCollection(SpatialObject, UserList):
@@ -258,7 +256,7 @@ class AtomCollection(SpatialObject, UserList):
         output = super().__add__(other.copy())
         output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
-    
+
     def __iadd__(self, other: AtomCollection) -> AtomCollection:
         return self.__add__(other)
 
