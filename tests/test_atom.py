@@ -19,16 +19,16 @@ class TestAtom(unittest.TestCase):
             charge=2.0,
             coords=(1, 2, 3),
         )
-        self.collection = AtomCollection([orig])
+        self.atoms = AtomCollection([orig])
 
     def test_constructor_initializes_an_Atom_instance(self):
-        self.assertIsInstance(self.collection.atoms[0], ptools.atom.Atom)
+        self.assertIsInstance(self.atoms[0], ptools.atom.Atom)
 
     def test_constructor(self):
         """Checks that when using copy constructor, all arguments are
         adequatly set and that atom coordinates are not a reference to
         the initial atom coordinates."""
-        atom = self.collection.atoms[0]
+        atom = self.atoms[0]
         self.assertEqual(atom.name, "CA")
         self.assertEqual(atom.resname, "ALA")
         self.assertEqual(atom.chain, "A")
@@ -48,20 +48,20 @@ class TestAtom(unittest.TestCase):
             coords=(1, 2, 3),
         )
         _ = AtomCollection([orig])
-        atom = self.collection.atoms[0]
+        atom = self.atoms[0]
         assert_array_almost_equal(atom.coords, (1, 2, 3))
         orig.coords = (0, 0, 0)
         assert_array_almost_equal(atom.coords, (1, 2, 3))
 
     def test_mass_getter(self):
-        self.assertEqual(self.collection.atoms[0].mass, 12.011)
+        self.assertEqual(self.atoms[0].mass, 12.011)
 
     def test_mass_setter(self):
-        self.collection.atoms[0].mass = 42
-        self.assertEqual(self.collection.atoms[0].mass, 42)
+        self.atoms[0].mass = 42
+        self.assertEqual(self.atoms[0].mass, 42)
 
     def test_equal(self):
         # Identical atoms from different AtomCollection instances should be evaluated equal.
-        left = self.collection[0]
+        left = self.atoms[0]
         right = AtomCollection([left.copy()])[0]
         self.assertEqual(left, right)

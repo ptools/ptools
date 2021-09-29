@@ -241,9 +241,9 @@ class AtomCollection(SpatialObject, UserList):
         self.masses = np.zeros(len(atoms))
         self.guess_masses()
 
-    @property
-    def atoms(self):
-        return self.data
+    # @property
+    # def atoms(self):
+    #     return self.data
 
     def __repr__(self) -> str:
         """String representation."""
@@ -266,7 +266,7 @@ class AtomCollection(SpatialObject, UserList):
 
     def copy(self) -> AtomCollection:
         """Returns a copy of the current collection."""
-        return self.__class__(self.atoms)
+        return self.__class__(self)
 
     def size(self) -> int:
         """Gets the number of atoms in the collection.
@@ -326,7 +326,7 @@ class AtomCollection(SpatialObject, UserList):
 
     def set_chain(self, chain: str):
         """Sets all atom chain property."""
-        for atom in self.atoms:
+        for atom in self:
             atom.chain = chain
 
     def select_atom_type(self, atom_type: str) -> AtomCollection:

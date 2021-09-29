@@ -68,7 +68,7 @@ class AttractRigidBody(RigidBody):
                 err = f"cannot initialize atom charges: {e}"
                 raise IOError(err) from e
 
-        extra = [atom.meta["extra"].split() for atom in self.atoms]
+        extra = [atom.meta["extra"].split() for atom in self]
         init_category()
         init_charges()
 

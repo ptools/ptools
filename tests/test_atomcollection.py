@@ -23,12 +23,12 @@ class TestAtomCollection(unittest.TestCase):
         )
 
     def test_initialization(self):
-        self.assertEqual(len(self.atoms.atoms), self.n_atoms)
+        self.assertEqual(len(self.atoms), self.n_atoms)
         self.assertEqual(self.atoms.coords.shape, (self.n_atoms, 3))
 
     def test_initialization_empty(self):
         atoms = AtomCollection()
-        self.assertEqual(len(atoms.atoms), 0)
+        self.assertEqual(len(atoms), 0)
         self.assertEqual(atoms.coords.shape, (0, 3))
 
     def _assert_copy_successful(self, thecopy):
@@ -72,10 +72,10 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_set_atom_coordinates_from_array(self):
         self.atoms.coords[0] = (42, 42, 42)
-        assert_array_almost_equal(self.atoms.atoms[0].coords, (42, 42, 42))
+        assert_array_almost_equal(self.atoms[0].coords, (42, 42, 42))
 
     def test_set_atom_coordinates_from_atom(self):
-        self.atoms.atoms[0].coords = (42, 42, 42)
+        self.atoms[0].coords = (42, 42, 42)
         assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
 
     def test_getitem_single_atom(self):
