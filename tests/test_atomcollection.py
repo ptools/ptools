@@ -1,5 +1,6 @@
 """test_atomcollection - Tests for `ptools.atom.AtomCollection`."""
 
+from ptools.rigidbody import RigidBody
 import unittest
 import tempfile
 
@@ -158,6 +159,12 @@ class TestAtomCollection(unittest.TestCase):
 
         assert_array_almost_equal(atoms2[-1].coords, [0, 0, 0])
         assert_array_almost_equal(all_atoms[-1].coords, [109, 9, 9])
+
+    def test_iadd(self):
+        atoms = self.atoms.copy()
+        atoms += self.atoms
+        self.assertEqual(len(atoms), self.n_atoms * 2)
+        self.assertEqual(atoms.coords.shape[0], self.n_atoms * 2)
 
     def test_masses(self):
         # atoms name "XXX" should weight 0

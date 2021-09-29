@@ -255,9 +255,12 @@ class AtomCollection(SpatialObject, UserList):
 
     def __add__(self, other: AtomCollection) -> AtomCollection:
         """Concatenates two RigidBody instances."""
-        output = UserList.__add__(self, other)
+        output = super().__add__(other.copy())
         output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
+    
+    def __iadd__(self, other: AtomCollection) -> AtomCollection:
+        return self.__add__(other)
 
     def guess_masses(self):
         """Guesses atom masses and store them."""

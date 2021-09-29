@@ -1,32 +1,25 @@
 """ptools.rigidbody - Defines the RigidBody class and children."""
 
 from __future__ import annotations
+from typing import Sequence, Union
 
 import numpy as np
 
-from .atom import AtomCollection
+from .atom import Atom, AtomCollection
 from .io import read_pdb
 
 
 class RigidBody(AtomCollection):
     """RigidBody is basically an AtomCollection that can be initialized
     from a file.
-
-    Args:
-        filename (str): path to topology file.
-        atoms (list[Atom]): list of Atom instances or AtomCollection.
     """
 
-    def __init__(self, filename="", atoms=None):
-        if atoms is None:
-            atoms = []
-        if filename:
-            atoms = read_pdb(filename)
+    def __init__(self, atoms_or_path: Union[Sequence[Atom], str] = []):
+        if isinstance(atoms_or_path, str):
+            atoms = read_pdb(atoms_or_path)
+        else:
+            atoms = atoms_or_path
         super().__init__(atoms)
-
-    def copy(self) -> RigidBody:
-        """Return a copy of the current RigidBody."""
-        return self.__class__(atoms=self.atoms)
 
 
 class AttractRigidBody(RigidBody):
