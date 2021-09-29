@@ -16,11 +16,12 @@ class TestAtomCollection(unittest.TestCase):
     def setUp(self):
         # Create an AtomCollection with 10 atoms.
         # Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
-        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(10)])
+        self.n_atoms = 10
+        self.atoms = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(self.n_atoms)])
 
     def test_initialization(self):
-        self.assertEqual(len(self.atoms.atoms), 10)
-        self.assertEqual(self.atoms.coords.shape, (10, 3))
+        self.assertEqual(len(self.atoms.atoms), self.n_atoms)
+        self.assertEqual(self.atoms.coords.shape, (self.n_atoms, 3))
 
     def test_initialization_empty(self):
         atoms = AtomCollection()
@@ -29,8 +30,8 @@ class TestAtomCollection(unittest.TestCase):
 
     def _assert_copy_successful(self, thecopy):
         # Check that both AtomCollections have the same dimensions.
-        self.assertEqual(len(thecopy), len(self.atoms))
-        self.assertEqual(thecopy.coords.shape, (10, 3))
+        self.assertEqual(len(thecopy), self.n_atoms)
+        self.assertEqual(thecopy.coords.shape, (self.n_atoms, 3))
 
         # Change parent AtomCollection coordinates and make sure it does not
         # affect the copy.
@@ -52,10 +53,10 @@ class TestAtomCollection(unittest.TestCase):
         self.assertIn(str(len(self.atoms)), s)
 
     def test_len(self):
-        self.assertEqual(len(self.atoms), 10)
+        self.assertEqual(len(self.atoms), self.n_atoms)
 
     def test_size(self):
-        self.assertEqual(self.atoms.size(), 10)
+        self.assertEqual(self.atoms.size(), self.n_atoms)
 
     def test_isiterable(self):
         # If an exeception is raised here, AtomCollection is not iterable
@@ -63,7 +64,7 @@ class TestAtomCollection(unittest.TestCase):
         iter(self.atoms)
 
     def test_coordinates(self):
-        ref_coords = np.array([[i, i, i] for i in range(10)], dtype=float)
+        ref_coords = np.array([[i, i, i] for i in range(self.n_atoms)], dtype=float)
         assert_array_almost_equal(self.atoms.coords, ref_coords)
 
     def test_set_atom_coordinates_from_array(self):
@@ -80,12 +81,11 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
     
     def test_getitem_slice(self):
-        atoms = self.atoms[:5]
-        self.assertIsInstance(atoms, AtomCollection)
+        self.assertIsInstance(self.atoms[:5], AtomCollection)
 
     def test_getitem_doesnt_make_copies(self):
         atom = self.atoms[0]
-        atom.coords = [42, 17, 323]
+        atom.coords += 10
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
     def test_contains(self):
@@ -96,7 +96,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_update_name(self):
         # Updating an atom's name should also update its type and mass.
-        for i in range(10):
+        for i in range(self.n_atoms):
             self.atoms[i].name = "CA"
         self.assertEqual(
             "".join(at.element for at in self.atoms), "C" * len(self.atoms)
@@ -144,13 +144,14 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
 
     def test_add(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(10)])
-        all_atoms = self.atoms + atoms2
-        N = len(self.atoms) + len(atoms2)
-        self.assertEqual(len(all_atoms), N)
+        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)])
+        n_final = len(self.atoms) + len(atoms2)
+        all_atoms =  self.atoms + atoms2
+        self.assertEqual(len(all_atoms), n_final)
+        self.assertEqual(all_atoms.coords.shape[0], n_final)
 
     def test_add_makes_copies(self):
-        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(10)])
+        atoms2 = AtomCollection([BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)])
         assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
         all_atoms = self.atoms + atoms2
         atoms2[-1].coords = np.zeros(3)
@@ -160,7 +161,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_masses(self):
         # atoms name "XXX" should weight 0
-        assert_array_equal(self.atoms.masses, np.ones(10))
+        assert_array_equal(self.atoms.masses, np.ones(self.n_atoms))
 
     def test_tensor_of_inertia_accurate(self):
         # Reference calculated with MDAnalysis 0.20.1:

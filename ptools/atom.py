@@ -5,10 +5,10 @@ atom groups."""
 # e.g. BaseAtom.copy(self) -> BaseAtom
 from __future__ import annotations
 
-import collections.abc
+from collections import UserList
 import copy
 import math
-from typing import Iterator, Sequence, Union
+from typing import Sequence
 
 import numpy as np
 
@@ -220,7 +220,9 @@ class Atom(BaseAtom):
         return True
 
 
-class AtomCollection(SpatialObject, collections.abc.Sequence):
+
+
+class AtomCollection(SpatialObject, UserList):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -229,24 +231,21 @@ class AtomCollection(SpatialObject, collections.abc.Sequence):
         atoms (list[BaseAtom]): list of atoms
     """
 
-    def __init__(self, atoms: Sequence[BaseAtom] = None):
-        if atoms is None:
-            atoms = []
-        self.atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
-        if self.atoms:
-            coords = np.array([atom._coords for atom in self.atoms])
+    def __init__(self, atoms: Sequence[BaseAtom] = []):
+        atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
+        if atoms:
+            coords = np.array([atom._coords for atom in atoms])
         else:
             coords = np.zeros((0, 3))
-        super().__init__(coords)
-        self.masses = np.zeros(len(self.atoms))
+
+        SpatialObject.__init__(self, coords)
+        UserList.__init__(self, atoms)
+        self.masses = np.zeros(len(atoms))
         self.guess_masses()
 
-    def __contains__(self, __x: Atom) -> bool:
-        return __x in self.atoms
-
-    def __len__(self) -> int:
-        """Gets the number of atoms in the collection."""
-        return len(self.atoms)
+    @property
+    def atoms(self):
+        return self.data
 
     def __repr__(self) -> str:
         """String representation."""
@@ -254,23 +253,10 @@ class AtomCollection(SpatialObject, collections.abc.Sequence):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __iter__(self) -> Iterator[Atom]:
-        """Iterates over the collection atoms."""
-        return iter(self.atoms)
-
-    def __getitem__(self, serial: Union[int, slice]) -> Union[Atom, AtomCollection]:
-        """Accesses an atom by its serial number (which the internal index
-        starting at 0)."""
-        if isinstance(serial, slice):
-            return self.__class__(atoms=self.atoms[serial])
-        return self.atoms[serial]
-
     def __add__(self, other: AtomCollection) -> AtomCollection:
         """Concatenates two RigidBody instances."""
-        output = self.copy()
-        other = other.copy()
-        output.atoms += list(other)
-        output.coords = np.concatenate((output.coords, other.coords), axis=0)
+        output = UserList.__add__(self, other)
+        output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
 
     def guess_masses(self):
