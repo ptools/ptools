@@ -14,12 +14,12 @@ class RigidBody(AtomCollection):
     from a file.
     """
 
-    def __init__(self, atoms_or_path: Union[Sequence[Atom], str] = []):
+    def __init__(self, atoms_or_path: Union[Sequence[Atom], str] = None):
         if isinstance(atoms_or_path, str):
-            atoms = read_pdb(atoms_or_path)
-        else:
-            atoms = atoms_or_path
-        super().__init__(atoms)
+            atoms_or_path = read_pdb(atoms_or_path)
+
+        # At this point, atoms_or_path is list[Atom] | None
+        super().__init__(atoms_or_path)
 
 
 class AttractRigidBody(RigidBody):

@@ -229,12 +229,13 @@ class AtomCollection(SpatialObject, UserList):
         atoms (list[BaseAtom]): list of atoms
     """
 
-    def __init__(self, atoms: Sequence[BaseAtom] = []):
-        atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
-        if atoms:
-            coords = np.array([atom._coords for atom in atoms])
-        else:
+    def __init__(self, atoms: Sequence[BaseAtom] = None):
+        if atoms is None:
+            atoms = []
             coords = np.zeros((0, 3))
+        else:
+            atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
+            coords = np.array([atom._coords for atom in atoms])
 
         SpatialObject.__init__(self, coords)
         UserList.__init__(self, atoms)
