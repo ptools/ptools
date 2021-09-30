@@ -2,51 +2,29 @@
 
 import unittest
 
-import ptools
-from ptools.atom import BaseAtom, AtomCollection
+from ptools.atom import Atom, AtomCollection
 
-from .testing.moreassert import assert_array_almost_equal
-
+from .testing.moreassert import (
+    assert_array_almost_equal,
+    assert_dummy_atom_initialization_ok,
+    dummy_atom
+)
 
 class TestAtom(unittest.TestCase):
     def setUp(self):
-        orig = BaseAtom(
-            name="CA",
-            resname="ALA",
-            chain="A",
-            index=42,
-            resid=17,
-            charge=2.0,
-            coords=(1, 2, 3),
-        )
-        self.atoms = AtomCollection([orig])
+        self.atoms = AtomCollection([dummy_atom()])
 
     def test_constructor_initializes_an_Atom_instance(self):
-        self.assertIsInstance(self.atoms[0], ptools.atom.Atom)
+        self.assertIsInstance(self.atoms[0], Atom)
 
     def test_constructor(self):
         """Checks that when using copy constructor, all arguments are
         adequatly set and that atom coordinates are not a reference to
         the initial atom coordinates."""
-        atom = self.atoms[0]
-        self.assertEqual(atom.name, "CA")
-        self.assertEqual(atom.resname, "ALA")
-        self.assertEqual(atom.chain, "A")
-        self.assertEqual(atom.index, 42)
-        self.assertEqual(atom.resid, 17)
-        self.assertEqual(atom.charge, 2.0)
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
+        assert_dummy_atom_initialization_ok(self, self.atoms[0])
 
     def test_constructor_copies_coordinates(self):
-        orig = BaseAtom(
-            name="CA",
-            resname="ALA",
-            chain="A",
-            index=42,
-            resid=17,
-            charge=2.0,
-            coords=(1, 2, 3),
-        )
+        orig = dummy_atom()
         _ = AtomCollection([orig])
         atom = self.atoms[0]
         assert_array_almost_equal(atom.coords, (1, 2, 3))
@@ -56,6 +34,9 @@ class TestAtom(unittest.TestCase):
     def test_mass_getter(self):
         self.assertEqual(self.atoms[0].mass, 12.011)
 
+    # pylint guesses type wrong (self.atoms[0] is an Atom)
+    # E1101: Instance of 'AtomCollection' has no 'mass' member
+    # pylint: disable=E1101
     def test_mass_setter(self):
         self.atoms[0].mass = 42
         self.assertEqual(self.atoms[0].mass, 42)

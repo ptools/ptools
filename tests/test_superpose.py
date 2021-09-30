@@ -2,15 +2,13 @@ import random
 import sys
 import unittest
 
-
-from ptools.rigidbody import RigidBody
-import ptools.superpose as superpose
-from ptools.superpose import Screw
-from ptools.spatial import coord3d, transformation_matrix
-
-from scipy.spatial.transform import Rotation
 import numpy as np
+from scipy.spatial.transform import Rotation
 
+from ptools import superpose
+from ptools.rigidbody import RigidBody
+from ptools.spatial import coord3d, transformation_matrix
+from ptools.superpose import Screw
 
 from . import TEST_LIGAND
 from .testing import assert_array_almost_equal

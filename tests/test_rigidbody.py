@@ -114,6 +114,8 @@ class TestAttractRigidBody(unittest.TestCase):
             AttractRigidBody(tmpfile.name)
         tmpfile.close()
 
+    # Ignores R0201: Method could be a function (no-self-use)
+    # pylint: disable=R0201
     def test_reset_forces(self):
         arb = AttractRigidBody(TEST_RED)
         assert_array_equal(arb.atom_forces, 0.0)

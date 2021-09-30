@@ -1,12 +1,12 @@
 import unittest
 
+import numpy as np
+
 from ptools.rigidbody import AttractRigidBody
 from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_equal
-
-import numpy as np
 
 
 class TestAttractForceField1(unittest.TestCase):
@@ -15,6 +15,8 @@ class TestAttractForceField1(unittest.TestCase):
         self.ligand = AttractRigidBody(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
+    # Ignores W0212: Access to a protected member of a client class
+    # pylint: disable=W0212
     def test_read_ff_params(self):
         ff = AttractForceField1(
             self.receptor, self.ligand, paramfile=TEST_AMINON, cutoff=5.0
@@ -46,6 +48,8 @@ class TestAttractForceField1(unittest.TestCase):
         self.ff.cutoff = 50.0
         self.assertAlmostEqual(self.ff.non_bonded_energy(), -56.10729372698934)
 
+    # Ignores W0212: Access to a protected member of a client class
+    # pylint: disable=W0212
     def test_non_bonded_energy_methods_return_same_result(self):
         # Reference values calculated from PTools 8439c40.
         self.assertAlmostEqual(self.ff.non_bonded_energy(), -4.85626395114)

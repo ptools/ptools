@@ -156,7 +156,7 @@ class TestPairList(unittest.TestCase):
 
     def test_all_distances(self):
         # Read reference distances.
-        with open(TEST_DISTANCES_RECEPTOR_LIGAND, "rt") as f:
+        with open(TEST_DISTANCES_RECEPTOR_LIGAND, "rt", encoding="utf-8") as f:
             ref = [
                 [float(value) for value in line.split()]
                 for line in f

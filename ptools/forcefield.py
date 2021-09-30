@@ -122,6 +122,7 @@ class AttractForceField1(ForceFieldBase):
         ).T
 
         # Numpy insane trickery
+        # pylint: disable=E1126
         self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
@@ -151,6 +152,7 @@ class AttractForceField1(ForceFieldBase):
         """Private method for non-bonded energy calculation with small cutoffs."""
 
         def van_der_waals(dx, rr2):
+            # pylint: disable=E1126
             a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep)])
             b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep)])
 

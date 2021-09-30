@@ -84,7 +84,7 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
 
             for i, minim in enumerate(minimlist):
                 print(f"- Minimization {i + 1}/{len(minimlist)}:")
-                _run_minimization(minim, receptor, ligand, minimlist)
+                _run_minimization(minim, receptor, ligand)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
@@ -94,7 +94,6 @@ def _run_minimization(
     params: dict[str, Any],
     receptor: RigidBody,
     ligand: RigidBody,
-    minimlist: Any = None,
 ):
     start = time.time()
     cutoff = params["squarecutoff"] ** 0.5

@@ -1,8 +1,8 @@
 """test_atomcollection - Tests for `ptools.atom.AtomCollection`."""
 
-from ptools.rigidbody import RigidBody
-import unittest
+
 import tempfile
+import unittest
 
 import numpy as np
 
@@ -13,6 +13,8 @@ from .testing.moreassert import assert_array_equal, assert_array_almost_equal
 from . import TEST_LIGAND
 
 
+# Ignores R0904: Too many public methods
+# pylint: disable=R0904
 class TestAtomCollection(unittest.TestCase):
     def setUp(self):
         # Create an AtomCollection with 10 atoms.
@@ -172,10 +174,13 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(atoms), self.n_atoms * 2)
         self.assertEqual(atoms.coords.shape[0], self.n_atoms * 2)
 
+    # Ignores R0201: Method could be a function (no-self-use)
+    # pylint: disable=R0201
     def test_masses(self):
         # atoms name "XXX" should weight 0
         assert_array_equal(self.atoms.masses, np.ones(self.n_atoms))
 
+    # pylint: disable=R0201
     def test_tensor_of_inertia_accurate(self):
         # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
@@ -188,6 +193,7 @@ class TestAtomCollection(unittest.TestCase):
         I = atoms.tensor_of_inertia(method="accurate")
         assert_array_almost_equal(I, ref, decimal=2)
 
+    # pylint: disable=R0201
     def test_tensor_of_inertia_fast(self):
         # Reference calculated with ptools-python d0b41dc (this is actually a
         # non-regression test).
@@ -200,6 +206,7 @@ class TestAtomCollection(unittest.TestCase):
         I = atoms.tensor_of_inertia(method="fast")
         assert_array_almost_equal(I, ref, decimal=8)
 
+    # pylint: disable=R0201
     def test_principal_axes(self):
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         # Calculated with MDAnalysis 0.20.1:
@@ -237,17 +244,14 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_writepdb(self):
         # Write PDB to temporary file.
-        f = tempfile.NamedTemporaryFile()
-        self.atoms.writepdb(f.name)
+        with tempfile.NamedTemporaryFile() as pdbfile:
+            self.atoms.writepdb(pdbfile.name)
 
-        # Read file back to check what's been written.
-        with open(f.name, "rt") as f:
-            s = f.read().rstrip()
+            # Read file back to check what's been written.
+            with open(pdbfile.name, "rt", encoding="utf-8") as f:
+                s = f.read().rstrip()
 
-        self.assertEqual(s, self.atoms.topdb())
-
-        # Close (and delete) temporary file.
-        f.close()
+            self.assertEqual(s, self.atoms.topdb())
 
     def test_set_chain(self):
         self.atoms.set_chain("A")

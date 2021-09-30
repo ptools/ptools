@@ -5,11 +5,11 @@ import tempfile
 
 def random_filename():
     """Return a random file name."""
-    tmpfile = tempfile.NamedTemporaryFile()
-    tmpfile.close()
-    return tmpfile.name
+    with tempfile.NamedTemporaryFile() as tmpfile:
+        return tmpfile.name
 
-
+# Ignores R1732: Consider using 'with' for resource-allocating operations
+# pylint: disable=R1732
 def mk_tmp_file(content="", mode="wt", **kwargs):
     """Create a temporary empty file.
     Returns:

@@ -1,13 +1,13 @@
 """test_io - Tests for `ptools.io` module."""
 
 import os
+import random
 import string
 import tempfile
-import random
 import unittest
 
-import ptools.io as io
-import ptools.io.pdb as pdb
+from ptools import io
+from ptools.io import pdb
 
 from . import TEST_PDB, TEST_PDB_3MODELS, TEST_PDB_ATOM_NAMES
 from .testing.io import random_filename
@@ -46,32 +46,30 @@ class TestPDBIO(unittest.TestCase):
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_single_model(self):
-        with open(TEST_PDB, "rt") as f:
+        with open(TEST_PDB, "rt", encoding="utf-8") as f:
             atoms_lines = [line for line in f if line.startswith("ATOM  ")]
         lines = ["MODEL        1"]
         lines += atoms_lines
         lines += ["ENDMDL"]
-        tmp_pdb = tempfile.NamedTemporaryFile()
-        tmp_pdb.write(bytes("\n".join(lines), encoding="utf-8"))
-        tmp_pdb.flush()
-
-        atoms = pdb.read_pdb(tmp_pdb.name)
-        self.assertEqual(len(atoms), 10)
-
-        tmp_pdb.close()
+        with tempfile.NamedTemporaryFile() as tmp_pdb:
+            tmp_pdb.write(bytes("\n".join(lines), encoding="utf-8"))
+            tmp_pdb.flush()
+            atoms = pdb.read_pdb(tmp_pdb.name)
+            self.assertEqual(len(atoms), 10)
 
 
 class TestFileExists(unittest.TestCase):
+
+
     def test_assert_file_actually_exists(self):
-        f = tempfile.NamedTemporaryFile()
-        try:
-            io.assert_file_exists(f.name)
-        except Exception as exc:
-            self.fail(
-                f"exception of type {type(exc).__name__} "
-                f"raised unexpectedly: '{exc}'"
-            )
-        f.close()
+        with tempfile.NamedTemporaryFile() as f:
+            try:
+                io.assert_file_exists(f.name)
+            except (FileNotFoundError, IsADirectoryError) as exc:
+                self.fail(
+                    f"exception of type {type(exc).__name__} "
+                    f"raised unexpectedly: '{exc}'"
+                )
 
     def test_assert_file_does_not_exists(self):
         basename = "".join(random.choices(string.ascii_letters, k=8))
@@ -119,5 +117,5 @@ class TestFileExists(unittest.TestCase):
 
 
 def create_empty_file(path):
-    with open(path, "wt"):
+    with open(path, "wt", encoding="utf-8"):
         pass

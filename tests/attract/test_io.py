@@ -14,7 +14,7 @@ from . import (
 from ..testing.io import random_filename, mk_tmp_file, mk_empty_file
 
 
-with open(TEST_ATTRACT_PARAMS, "rt") as f:
+with open(TEST_ATTRACT_PARAMS, "rt", encoding="utf-8") as f:
     TEST_ATTRACT_PARAMETER_CONTENT = f.read()
 
 
@@ -24,7 +24,7 @@ class TestAttractIO(unittest.TestCase):
         params = io.read_aminon(tmpfile.name)
         tmpfile.close()
         self.assertEqual(len(params), 5)
-        self.assertTrue(all([len(p) == 2 for p in params]))
+        self.assertTrue(all(len(p) == 2 for p in params))
 
         # Check radii read ok.
         self.assertEqual(params[0][0], 2.000)

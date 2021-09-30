@@ -48,14 +48,19 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .cache/
 
-lint: lint-package ## check style with pylint
+lint: lint-package lint-tests ## check style with pylint
 
+# Ignore C0103: Variable name "c" doesn't conform to snake_case naming style
 lint-package:
 	pylint --disable=C0103 ptools
 
+# Ignores:
+#   - C0103: Variable name "c" doesn't conform to snake_case naming style
+#   - C0114: Missing module docstring
+#   - C0115: Missing class docstring
+#   - C0116: Missing function or method docstring
 lint-tests:
-	# Ignore whitespaces in matrix definitinos
-	pylint tests
+	pylint --disable=C0103,C0114,C0115,C0116 tests
 
 test: ## run tests quickly with the default Python
 	py.test --ignore=tests/pyattract/test_attract.py

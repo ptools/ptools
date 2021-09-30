@@ -4,15 +4,13 @@ import math
 import unittest
 
 import numpy as np
-import pytest
 
-
-import ptools.spatial as spatial
-
+from ptools import spatial
 
 from .testing.moreassert import assert_array_almost_equal
 
-
+# Ignores R0201: Method could be a function (no-self-use)
+# pylint: disable=R0201
 class TestSpatialObjectVector(unittest.TestCase):
     """Test spatial.SpatialObject methods on a vector."""
 
@@ -34,6 +32,9 @@ class TestSpatialObjectVector(unittest.TestCase):
         o.translate((1, 2, 3))
         assert_array_almost_equal(o.coords, (1, 2, 3))
 
+    # pylint guesses type wrong
+    # E1137: 'target.coords' does not support item assignment
+    # pylint: disable=E1137
     def test_copy(self):
         source = spatial.SpatialObject((6, 9, 12))
         target = source.copy()
@@ -61,6 +62,9 @@ class TestSpatialObjectArray(unittest.TestCase):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = spatial.SpatialObject(array)
 
+    # pylint guesses type wrong (self.obj.coords is a np.ndarray)
+    # E1101: Instance of 'tuple' has no 'shape' member
+    # pylint: disable=E1101
     def test_constructor(self):
         self.assertEqual(self.obj.coords.shape, (2, 3))
         assert_array_almost_equal(self.obj.coords[1], (1, 1, 1))
@@ -474,20 +478,15 @@ class TestSpatial(unittest.TestCase):
 
     def test_tensor_of_inertia_accurate_fails_without_weights(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        self.obj = spatial.SpatialObject(array)
         err = "need weights to compute accurate tensor of inertia"
         with self.assertRaisesRegex(ValueError, err):
             spatial.tensor_of_inertia(array, method="accurate")
 
     def test_tensor_of_inertia_invalid_method(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        self.obj = spatial.SpatialObject(array)
         err = (
             r"parameter 'method' should be 'accurate' or 'fast' "
             r"\(found method='foobar'\)"
         )
         with self.assertRaisesRegex(ValueError, err):
             spatial.tensor_of_inertia(array, method="foobar")
-
-
-"parameter 'method' should be 'accurate' or 'fast' (found method='foobar')" == "parameter 'method' should be 'accurate' or 'fast' (found method='foobar')"

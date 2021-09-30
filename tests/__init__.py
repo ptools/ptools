@@ -1,5 +1,6 @@
 import os
 
+
 TEST_PDB = os.path.join(os.path.dirname(__file__), "data", "test_10atoms.pdb")
 TEST_PDB_3MODELS = os.path.join(
     os.path.dirname(__file__), "data", "test_10atoms_3models.pdb"
