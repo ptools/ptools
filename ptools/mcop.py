@@ -4,6 +4,7 @@ from typing import Sequence
 from dataclasses import dataclass, field
 
 from .atom import AtomCollection
+from .io import read_pdb
 
 
 @dataclass
@@ -32,10 +33,17 @@ class Mcop:
         """
         return self.size()
 
-    def __getitem__(self, key) -> AtomCollection:
+    def __getitem__(self, key: int) -> AtomCollection:
         """Returns the copy at key `key`."""
         return self.copies[key]
 
     def clear(self):
         """Clears the internal list of copies."""
         self.copies.clear()
+
+    def read_pdb(self, path: str):
+        models = read_pdb(path)
+        for mod in models:
+            self.add_copy(mod)
+
+

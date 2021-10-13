@@ -6,6 +6,7 @@ from ptools.atom import AtomCollection, BaseAtom
 from ptools.mcop import Mcop
 
 from .testing.moreassert import assert_array_almost_equal
+from . import TEST_PDB_3MODELS
 
 
 class TestMcop(unittest.TestCase):
@@ -50,6 +51,10 @@ class TestMcop(unittest.TestCase):
         mcop.clear()
         self.assertEqual(len(mcop), 0)
 
+    def test_read_pdb_mcop(self):
+        mcop = Mcop()
+        mcop.read_pdb(TEST_PDB_3MODELS)
+        self.assertEqual(len(mcop), 3)
 
 
 
