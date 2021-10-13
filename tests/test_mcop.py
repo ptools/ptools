@@ -24,8 +24,36 @@ class TestMcop(unittest.TestCase):
         col.coords += 12  # after modification, mcop copy should be different.
         self.assertFalse(assert_array_almost_equal(col.coords, mcop.copies[0].coords))
 
+    def test_size(self):
+        mcop = Mcop()
+        self.assertEqual(mcop.size(), 0)
+        mcop.add_copy(dummy_atom_collection())
+        self.assertEqual(mcop.size(), 1)
+
+    def test_len(self):
+        mcop = Mcop()
+        self.assertEqual(len(mcop), 0)
+        mcop.add_copy(dummy_atom_collection())
+        self.assertEqual(len(mcop), 1)
+
+    def test_getitem(self):
+        mcop = Mcop()
+        atoms = dummy_atom_collection()
+        mcop.add_copy(atoms)
+        atoms2 = mcop[0]
+        assert_array_almost_equal(atoms.coords, atoms2.coords)
+
+    def test_clear(self):
+        mcop = Mcop()
+        mcop.add_copy(dummy_atom_collection())
+        self.assertEqual(len(mcop), 1)
+        mcop.clear()
+        self.assertEqual(len(mcop), 0)
 
 
-def dummy_atom_collection(n_atoms=10):
+
+
+
+def dummy_atom_collection(n_atoms=10) -> AtomCollection:
     """Create a dummy AtomCollection composed of `n_atoms` atoms."""
     return AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(n_atoms)])
