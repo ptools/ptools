@@ -13,13 +13,12 @@ def get_header(line):
 
 
 def is_atom_line(line):
-    """Return True is the line header is "ATOM  " or "HETATM"."""
+    """Returns True is the line header is "ATOM  " or "HETATM"."""
     return get_header(line) in ("ATOM  ", "HETATM")
 
 
-def read_atom_line(line):
-    """Return an `atom.BaseAtom` instance initialized with data read from
-    line."""
+def parse_atom_line(line):
+    """Returns an `atom.BaseAtom` initialized with data read from line."""
     index = int(line[6:11])
     name = line[12:16].strip().upper()
     resname = line[17:20].strip().upper()
@@ -61,7 +60,7 @@ def read_pdb(path):
                 models.append(AtomCollection(current_model))
                 current_model = []
             elif header in ("ATOM  ", "HETATM"):
-                current_model.append(read_atom_line(line))
+                current_model.append(parse_atom_line(line))
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
             models.append(current_model)
