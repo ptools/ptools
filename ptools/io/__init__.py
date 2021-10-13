@@ -2,9 +2,9 @@
 
 import os
 
-from .pdb import read_pdb
+from .pdb import read_pdb, InvalidPDBFormatError
 
-__all__ = ["read_pdb"]
+__all__ = ["read_pdb", "InvalidPDBFormatError"]
 
 
 def check_file_exists(path, message=False):

@@ -3,6 +3,10 @@
 from ..atom import BaseAtom, AtomCollection
 
 
+class InvalidPDBFormatError(IOError):
+    """Raised when the PDB format is incorrect."""
+
+
 def get_header(line):
     """Returns PDB line header i.e. first 6 characters."""
     return line[:6]
