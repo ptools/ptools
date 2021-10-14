@@ -10,6 +10,7 @@ import ptools
 from ptools.atom import AtomCollection, BaseAtom
 
 from .testing.moreassert import assert_array_equal, assert_array_almost_equal
+from .testing.dummy import dummy_atomcollection
 from . import TEST_LIGAND
 
 
@@ -17,12 +18,8 @@ from . import TEST_LIGAND
 # pylint: disable=R0904
 class TestAtomCollection(unittest.TestCase):
     def setUp(self):
-        # Create an AtomCollection with 10 atoms.
-        # Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
         self.n_atoms = 10
-        self.atoms = AtomCollection(
-            [BaseAtom(coords=(i, i, i)) for i in range(self.n_atoms)]
-        )
+        self.atoms = dummy_atomcollection(self.n_atoms)
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms), self.n_atoms)
