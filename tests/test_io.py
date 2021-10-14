@@ -48,6 +48,14 @@ class TestPDBIO(unittest.TestCase):
             self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
+    def test_pdb_iter_models(self):
+        with open(TEST_PDB_3MODELS, "rt", encoding="utf-8") as f:
+            models = list(pdb.iter_models(f))
+            self.assertEqual(len(models), 3)
+            for atoms in models:
+                self.assertIsInstance(atoms, AtomCollection)
+                self.assertTrue(len(atoms), 10)
+
     def test_read_pdb_single_model(self):
         with open(TEST_PDB, "rt", encoding="utf-8") as f:
             atoms_lines = [line for line in f if line.startswith("ATOM  ")]

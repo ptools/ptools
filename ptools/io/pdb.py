@@ -1,5 +1,6 @@
 """Protein Data Bank format I/O."""
 
+from typing import Iterator, List, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
@@ -7,17 +8,17 @@ class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
 
-def get_header(line):
+def get_header(line: str) -> str:
     """Returns PDB line header i.e. first 6 characters stripped from white spaces."""
     return line[:6].strip()
 
 
-def is_atom_line(line):
+def is_atom_line(line: str) -> bool:
     """Returns True is the line header is "ATOM  " or "HETATM"."""
     return get_header(line) in ("ATOM", "HETATM")
 
 
-def parse_atom_line(line):
+def parse_atom_line(line: str) -> BaseAtom:
     """Returns an `atom.BaseAtom` initialized with data read from line."""
     index = int(line[6:11])
     name = line[12:16].strip().upper()
@@ -42,7 +43,7 @@ def parse_atom_line(line):
     return atom
 
 
-def read_pdb(path):
+def read_pdb(path: str) -> Union[List[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
@@ -68,3 +69,14 @@ def read_pdb(path):
             return AtomCollection(models[0])
         return models
     return AtomCollection(current_model)
+
+
+def iter_models(path: str) -> Iterator[Tuple(str, AtomCollection)]:
+    """Iterate over a PDB model.
+
+    Returns:
+        Iterator[(model_id), atoms]
+    """
+    models = read_pdb(path)
+    for model in models:
+        yield model
