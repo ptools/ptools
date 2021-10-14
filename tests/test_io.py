@@ -7,6 +7,7 @@ import tempfile
 import unittest
 
 from ptools import io
+from ptools.atom import AtomCollection
 from ptools.io import pdb
 
 from . import TEST_PDB, TEST_PDB_3MODELS, TEST_PDB_ATOM_NAMES
@@ -41,8 +42,10 @@ class TestPDBIO(unittest.TestCase):
 
     def test_read_pdb_multiple_models(self):
         models = pdb.read_pdb(TEST_PDB_3MODELS)
+        self.assertIsInstance(models, list)
         self.assertEqual(len(models), 3)
         for atoms in models:
+            self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_single_model(self):
@@ -117,5 +120,6 @@ class TestFileExists(unittest.TestCase):
 
 
 def create_empty_file(path):
+    """Creates an empty file located at `path`."""
     with open(path, "wt", encoding="utf-8"):
         pass
