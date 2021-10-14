@@ -6,8 +6,8 @@ from ptools.atom import BaseAtom
 from .testing.moreassert import (
     assert_array_almost_equal,
     assert_dummy_atom_initialization_ok,
-    dummy_atom,
 )
+from .testing.dummy import dummy_atom
 
 
 class TestBaseAtom(unittest.TestCase):
@@ -63,15 +63,16 @@ class TestBaseAtom(unittest.TestCase):
         # and that atom coordinates are not a reference to
         # the initial atom coordinates.
         atom = dummy_atom()
+        original_coordinates = atom.coords.copy()
         atom_copy = atom.copy()
         assert_dummy_atom_initialization_ok(self, atom_copy)
         self.assertNotEqual(
             atom_copy.coords.__array_interface__["data"][0],
             atom.coords.__array_interface__["data"][0],
         )
-        assert_array_almost_equal(atom_copy.coords, (1, 2, 3))
+        assert_array_almost_equal(atom_copy.coords, original_coordinates)
         atom.coords = (0, 0, 0)
-        assert_array_almost_equal(atom_copy.coords, (1, 2, 3))
+        assert_array_almost_equal(atom_copy.coords, original_coordinates)
 
     def test_name_setter(self):
         atom = BaseAtom()
