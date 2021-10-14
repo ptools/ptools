@@ -63,11 +63,12 @@ class TestAttractIO(unittest.TestCase):
             with self.assertRaisesRegex(IOError, err):
                 io.read_forcefield_from_reduced(tmpfile.name)
 
-
     def test_check_ff_version_match(self):
         with mk_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_receptor:
             with mk_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_ligand:
-                ff = io.check_ff_version_match(tmpfile_receptor.name, tmpfile_ligand.name)
+                ff = io.check_ff_version_match(
+                    tmpfile_receptor.name, tmpfile_ligand.name
+                )
                 self.assertEqual(ff, "attract1")
 
     def test_check_ff_version_match_fail(self):
@@ -76,7 +77,9 @@ class TestAttractIO(unittest.TestCase):
             with mk_tmp_file(content) as tmpfile_ligand:
                 err = "receptor and ligand force field names do not match"
                 with self.assertRaisesRegex(ValueError, err):
-                    io.check_ff_version_match(tmpfile_receptor.name, tmpfile_ligand.name)
+                    io.check_ff_version_match(
+                        tmpfile_receptor.name, tmpfile_ligand.name
+                    )
 
 
 class TestReadAttractParameters(unittest.TestCase):
@@ -93,7 +96,6 @@ class TestReadAttractParameters(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, err):
                 io.read_attract_parameter(filename)
 
-
     def test_file_contains_only_one_line(self):
         content = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[0]
         with mk_tmp_file(content=content) as tmpfile:
@@ -101,7 +103,6 @@ class TestReadAttractParameters(unittest.TestCase):
             err = "Unexpectedly reached end of attract parameter file"
             with self.assertRaisesRegex(ValueError, err):
                 io.read_attract_parameter(filename)
-
 
     def test_cannot_read_rstk(self):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:2]
@@ -113,18 +114,14 @@ class TestReadAttractParameters(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, err):
                 io.read_attract_parameter(filename)
 
-
     def test_cannot_read_too_many_minimizations(self):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:2]
         content = "\n".join(lines)
         with mk_tmp_file(content=content) as tmpfile:
             filename = tmpfile.name
-            err = (
-                "Cannot read minimizations from attract parameter file: expected 4, found 0"
-            )
+            err = "Cannot read minimizations from attract parameter file: expected 4, found 0"
             with self.assertRaisesRegex(ValueError, err):
                 io.read_attract_parameter(filename)
-
 
     def test_misformatted_minimization(self):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:3]

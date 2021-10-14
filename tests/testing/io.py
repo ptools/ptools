@@ -13,6 +13,7 @@ def random_filename() -> str:
 # Ignores R1732: Consider using 'with' for resource-allocating operations
 # pylint: disable=R1732
 
+
 @contextmanager
 def mk_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file."""

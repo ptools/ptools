@@ -62,8 +62,6 @@ class TestPDBIO(unittest.TestCase):
 
 
 class TestFileExists(unittest.TestCase):
-
-
     def test_assert_file_actually_exists(self):
         with tempfile.NamedTemporaryFile() as f:
             try:
