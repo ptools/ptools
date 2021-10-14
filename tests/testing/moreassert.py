@@ -10,6 +10,25 @@ assert_array_almost_equal = numpy.testing.assert_array_almost_equal
 assert_array_equal = numpy.testing.assert_array_equal
 
 
+def assert_array_not_equal(array1, array2):
+    """Asserts numpy arrays are not equal."""
+    try:
+        assert_array_equal(array1, array2)
+    except AssertionError:
+        return
+    raise AssertionError("arrays are equal")
+
+
+def assert_array_not_almost_equal(array1, array2):
+    """Asserts numpy arrays are not equal."""
+    try:
+        assert_array_almost_equal(array1, array2)
+    except AssertionError:
+        return
+    raise AssertionError("arrays are almost equal")
+
+
+
 def dummy_atom():
     """Creates a dummy atoms used in several tests."""
     return BaseAtom(
