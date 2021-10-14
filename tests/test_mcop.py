@@ -5,9 +5,11 @@ import unittest
 from ptools.atom import AtomCollection, BaseAtom
 from ptools.mcop import Mcop, McopRigid
 
-from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 from .testing.dummy import dummy_atomcollection, dummy_mcop, dummy_mcop_rigid
-from . import TEST_PDB_MCOPRIGID
+from .testing.io import mk_tmp_file
+from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
+
+from . import TEST_PDB_MCOPRIGID, TEST_PDB_3MODELS
 
 
 PDB_MCOPRIGID_NO_CORE = {
@@ -118,8 +120,15 @@ class TestMcopRigid(unittest.TestCase):
 
 
     def test_read_pdb_no_core_region_first(self):
-        pass
-        # McopRigid().read_pdb(TEST_PDB_MCOPRIGID)
+        with mk_tmp_file(content=PDB_MCOPRIGID_NO_CORE["content"]) as tmpfile:
+            with self.assertRaisesRegex(ValueError, "expecting core region first"):
+                McopRigid().read_pdb(tmpfile.name)
+
+
+    def test_read_pdb(self):
+        McopRigid().read_pdb(TEST_PDB_MCOPRIGID)
+
+
 
 
 def dummy_atomcollection(n_atoms: int = 10) -> AtomCollection:

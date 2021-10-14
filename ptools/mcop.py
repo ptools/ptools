@@ -76,23 +76,32 @@ class McopRigid:
 
     def read_pdb(self, path: str):
         """Initializez McopRigid from data read in PDB file."""
+        raise ValueError()
+
+
+
         # with open(path, "rt", encoding="utf-8") as f:
         #     core_region = None
-        #     for lineid, line in enumerate(f):
+        #     line_id = 0
+        #     end_of_file = False
+        #     for line_id, line in enumerate(f):
         #         if pdb.get_header(line) == "MODEL":
         #             region_id = int(line[12:13])
         #             copy_id = int(line[15:]) if len(line) > 15 else 0
 
-        #         # First we expect to read core: region_id should be 0.
-        #         if region_id == 0:
-        #             pass
-        #         else:
-        #             if core_region is None:
+        #             # First we expect to read core (region_id = 0)
+        #             if region_id == 0:
+        #                 core_region = AtomCollection()
+        #             elif core_region is None:
         #                 raise ValueError(
-        #                     f"{path}:{lineid + 1}: expecting core region first: model id should be 0 (found {region_id})"
+        #                     f"{path}:{line_id + 1}: expecting core region first: model id should be 0 (found {region_id})"
         #                 )
 
-        #         if pdb.is_atom_line(line):
+        #         elif pdb.is_atom_line(line):
         #             atom = pdb.parse_atom_line(line)
+        #             if region_id == 0:
+        #                 core_region.append(atom)
 
-        #             exit()
+
+        #     print(len(core_region))
+        #     exit()
