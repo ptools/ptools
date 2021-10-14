@@ -8,13 +8,13 @@ class InvalidPDBFormatError(IOError):
 
 
 def get_header(line):
-    """Returns PDB line header i.e. first 6 characters."""
-    return line[:6]
+    """Returns PDB line header i.e. first 6 characters stripped from white spaces."""
+    return line[:6].strip()
 
 
 def is_atom_line(line):
     """Returns True is the line header is "ATOM  " or "HETATM"."""
-    return get_header(line) in ("ATOM  ", "HETATM")
+    return get_header(line) in ("ATOM", "HETATM")
 
 
 def parse_atom_line(line):
@@ -59,7 +59,7 @@ def read_pdb(path):
             if header == "ENDMDL":
                 models.append(AtomCollection(current_model))
                 current_model = []
-            elif header in ("ATOM  ", "HETATM"):
+            elif is_atom_line(line):
                 current_model.append(parse_atom_line(line))
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
