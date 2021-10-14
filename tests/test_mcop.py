@@ -7,8 +7,24 @@ from ptools.mcop import Mcop, McopRigid
 
 from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 from .testing.dummy import dummy_atomcollection, dummy_mcop, dummy_mcop_rigid
-from . import TEST_PDB_3MODELS
+from . import TEST_PDB_MCOPRIGID
 
+
+PDB_MCOPRIGID_NO_CORE = {
+    "content": """\
+MODEL       1  1
+ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0
+ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0
+ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0
+ENDMDL    1  1
+MODEL       1  2
+ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0
+ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0
+ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0
+ENDMDL    1  2
+"""
+
+}
 
 class TestMcop(unittest.TestCase):
     """Tests for the Mcop class."""
@@ -99,6 +115,11 @@ class TestMcopRigid(unittest.TestCase):
         for region in self.rigid.regions:
             for kopy in region.copies:
                 assert_array_almost_equal(kopy.coords, copy_rotated)
+
+
+    def test_read_pdb_no_core_region_first(self):
+        pass
+        # McopRigid().read_pdb(TEST_PDB_MCOPRIGID)
 
 
 def dummy_atomcollection(n_atoms: int = 10) -> AtomCollection:
