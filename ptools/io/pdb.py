@@ -63,7 +63,7 @@ def read_pdb(path):
                 current_model.append(parse_atom_line(line))
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
-            models.append(current_model)
+            models.append(AtomCollection(current_model))
         elif len(models) == 1:
             return AtomCollection(models[0])
         return models
