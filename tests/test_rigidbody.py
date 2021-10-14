@@ -127,9 +127,9 @@ class TestRigidBody(unittest.TestCase):
 
 class TestAttractRigidBody(unittest.TestCase):
     def test_constructor(self):
-        tmpfile = mk_tmp_file(content=REDFILE["content"])
-        arb = AttractRigidBody(tmpfile.name)
-        tmpfile.close()
+        with mk_tmp_file(content=REDFILE["content"]) as tmpfile:
+            arb = AttractRigidBody(tmpfile.name)
+
         self.assertEqual(len(arb), 10)
         # !! atom categories store in AttractRigidBody are array indices,
         # !! therefore minored by one compared to what is in the RED file.
@@ -137,32 +137,29 @@ class TestAttractRigidBody(unittest.TestCase):
         assert_array_equal(arb.atom_charges, REDFILE["charges"])
 
     def test_constructor_fails_no_categories(self):
-        tmpfile = mk_tmp_file(content=REDFILE_NO_CATEGORY["content"])
-        err = "Expected atom categories and charges, found"
-        with self.assertRaisesRegex(InvalidPDBFormatError, err):
-            AttractRigidBody(tmpfile.name)
-        tmpfile.close()
+        with mk_tmp_file(content=REDFILE_NO_CATEGORY["content"]) as tmpfile:
+            err = "Expected atom categories and charges, found"
+            with self.assertRaisesRegex(InvalidPDBFormatError, err):
+                AttractRigidBody(tmpfile.name)
 
     def test_constructor_fails_no_charges(self):
-        tmpfile = mk_tmp_file(content=REDFILE_NO_CATEGORY["content"])
-        err = "Expected atom categories and charges, found"
-        with self.assertRaisesRegex(InvalidPDBFormatError, err):
-            AttractRigidBody(tmpfile.name)
-        tmpfile.close()
+        with mk_tmp_file(content=REDFILE_NO_CATEGORY["content"]) as tmpfile:
+            err = "Expected atom categories and charges, found"
+            with self.assertRaisesRegex(InvalidPDBFormatError, err):
+                AttractRigidBody(tmpfile.name)
 
     def test_constructor_fails_invalid_categories(self):
-        tmpfile = mk_tmp_file(content=REDFILE_INVALID_CATEGORY["content"])
-        err = "Atom category expects an int"
-        with self.assertRaisesRegex(InvalidPDBFormatError, err):
-            AttractRigidBody(tmpfile.name)
-        tmpfile.close()
+        with mk_tmp_file(content=REDFILE_INVALID_CATEGORY["content"]) as tmpfile:
+            err = "Atom category expects an int"
+            with self.assertRaisesRegex(InvalidPDBFormatError, err):
+                AttractRigidBody(tmpfile.name)
 
     def test_constructor_fails_invalid_charges(self):
-        tmpfile = mk_tmp_file(content=REDFILE_INVALID_CHARGES["content"])
-        err = "Atom charge expects a float"
-        with self.assertRaisesRegex(InvalidPDBFormatError, err):
-            AttractRigidBody(tmpfile.name)
-        tmpfile.close()
+        with mk_tmp_file(content=REDFILE_INVALID_CHARGES["content"]) as tmpfile:
+            err = "Atom charge expects a float"
+            with self.assertRaisesRegex(InvalidPDBFormatError, err):
+                AttractRigidBody(tmpfile.name)
+
 
     # Ignores R0201: Method could be a function (no-self-use)
     # pylint: disable=R0201
