@@ -92,8 +92,6 @@ ATOM     10  CSE TYR     4      -3.525  -1.079   3.005   28   TYR   0 0
 }
 
 
-
-
 class TestRigidBody(unittest.TestCase):
     def setUp(self):
         self.rb = RigidBody(TEST_PDB)
@@ -159,7 +157,6 @@ class TestAttractRigidBody(unittest.TestCase):
             err = "Atom charge expects a float"
             with self.assertRaisesRegex(InvalidPDBFormatError, err):
                 AttractRigidBody(tmpfile.name)
-
 
     # Ignores R0201: Method could be a function (no-self-use)
     # pylint: disable=R0201

@@ -22,7 +22,7 @@ def dummy_atom():
     return atom
 
 
-def dummy_atomcollection(n_atoms:int = 10):
+def dummy_atomcollection(n_atoms: int = 10):
     """Creates a dummy atom collection composed of `n_atoms` atoms.
 
     Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
