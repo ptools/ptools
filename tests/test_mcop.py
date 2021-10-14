@@ -6,6 +6,7 @@ from ptools.atom import AtomCollection, BaseAtom
 from ptools.mcop import Mcop, McopRigid
 
 from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
+from .testing.dummy import dummy_atomcollection, dummy_mcop, dummy_mcop_rigid
 from . import TEST_PDB_3MODELS
 
 
@@ -15,11 +16,11 @@ class TestMcop(unittest.TestCase):
     def test_add_copy(self):
         mcop = Mcop()
         self.assertEqual(len(mcop.copies), 0)
-        mcop.add_copy(dummy_atom_collection())
+        mcop.add_copy(dummy_atomcollection())
         self.assertEqual(len(mcop.copies), 1)
 
     def test_add_copy_makes_copies(self):
-        col = dummy_atom_collection()
+        col = dummy_atomcollection()
         mcop = Mcop()
         mcop.add_copy(col)
         col.coords += 12  # after modification, mcop copy should be different.
@@ -28,25 +29,25 @@ class TestMcop(unittest.TestCase):
     def test_size(self):
         mcop = Mcop()
         self.assertEqual(mcop.size(), 0)
-        mcop.add_copy(dummy_atom_collection())
+        mcop.add_copy(dummy_atomcollection())
         self.assertEqual(mcop.size(), 1)
 
     def test_len(self):
         mcop = Mcop()
         self.assertEqual(len(mcop), 0)
-        mcop.add_copy(dummy_atom_collection())
+        mcop.add_copy(dummy_atomcollection())
         self.assertEqual(len(mcop), 1)
 
     def test_getitem(self):
         mcop = Mcop()
-        atoms = dummy_atom_collection()
+        atoms = dummy_atomcollection()
         mcop.add_copy(atoms)
         atoms2 = mcop[0]
         assert_array_almost_equal(atoms.coords, atoms2.coords)
 
     def test_clear(self):
         mcop = Mcop()
-        mcop.add_copy(dummy_atom_collection())
+        mcop.add_copy(dummy_atomcollection())
         self.assertEqual(len(mcop), 1)
         mcop.clear()
         self.assertEqual(len(mcop), 0)
@@ -79,7 +80,7 @@ class TestMcopRigid(unittest.TestCase):
 
     def test_add_region(self):
         n = len(self.rigid.regions)
-        self.rigid.add_region(dummy_atom_collection())
+        self.rigid.add_region(dummy_atomcollection())
         self.assertEqual(len(self.rigid.regions), n + 1)
 
     def test_attract_euler_rotate(self):
@@ -100,23 +101,7 @@ class TestMcopRigid(unittest.TestCase):
                 assert_array_almost_equal(kopy.coords, copy_rotated)
 
 
-def dummy_atom_collection(n_atoms: int = 10) -> AtomCollection:
+def dummy_atomcollection(n_atoms: int = 10) -> AtomCollection:
     """Creates a dummy AtomCollection composed of `n_atoms` atoms."""
     return AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(n_atoms)])
 
-
-def dummy_mcop(n_copies: int = 10) -> Mcop:
-    """Creates a dummpy Mcop composed of `n_copies` dummy AtomCollection instances."""
-    mcop = Mcop()
-    for _ in range(n_copies):
-        mcop.add_copy(dummy_atom_collection())
-    return mcop
-
-
-def dummy_mcop_rigid(n_regions: int = 10) -> McopRigid:
-    """Creates a dummpy McopRigid composed of `n_regions` that are dummy Mcop instances."""
-    rigid = McopRigid()
-    rigid.core = dummy_atom_collection()
-    for _ in range(n_regions):
-        rigid.add_region(dummy_mcop())
-    return rigid
