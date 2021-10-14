@@ -1,9 +1,11 @@
 """Defines classes and functions used for the multicopy feature."""
 
-from typing import Sequence
-from dataclasses import dataclass, field
+import numpy as np
 
-from .atom import AtomCollection
+from dataclasses import dataclass, field
+from typing import Sequence
+
+from .atom import Atom, AtomCollection
 from .io import read_pdb
 
 
@@ -43,7 +45,33 @@ class Mcop:
 
     def read_pdb(self, path: str):
         models = read_pdb(path)
+        assert isinstance(models, list)
         for mod in models:
             self.add_copy(mod)
 
+    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
+        """Rotates copies with Attract Euler protocol."""
+        for kopy in self.copies:
+            kopy.attract_euler_rotate(phi, ssi, rot)
 
+
+
+@dataclass
+class McopRigid:
+    """Mcop RigidBody."""
+
+    core: AtomCollection = None
+    regions: Sequence[Mcop] = field(default_factory=list)
+    weights: Sequence[np.ndarray] = field(default_factory=list)
+
+    def add_region(self, region: Mcop):
+        """Add a region to the internal list of regions."""
+        self.regions.append(region)
+        self.weights.append(np.zeros(len(region)))
+
+
+    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
+        """Rotates core and copies with Attract Euler protocol."""
+        self.core.attract_euler_rotate(phi, ssi, rot)
+        for region in self.regions:
+            region.attract_euler_rotate(phi, ssi, rot)
