@@ -75,14 +75,3 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
             return dict(zip(model_id_list, models))
         return models
     return AtomCollection(current_model)
-
-
-def iter_models(path: str) -> Iterator[Tuple[str, AtomCollection]]:
-    """Iterate over a PDB model.
-
-    Returns:
-        Iterator[(model_id), atoms]
-    """
-    models = read_pdb(path)
-    for model in models:
-        yield model
