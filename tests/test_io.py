@@ -48,13 +48,6 @@ class TestPDBIO(unittest.TestCase):
             self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
-    def test_pdb_iter_models(self):
-        models = list(pdb.iter_models(TEST_PDB_3MODELS))
-        self.assertEqual(len(models), 3)
-        for atoms in models:
-            self.assertIsInstance(atoms, AtomCollection)
-            self.assertTrue(len(atoms), 10)
-
     def test_read_pdb_as_dict(self):
         models = pdb.read_pdb(TEST_PDB_3MODELS, as_dict=True)
         self.assertIsInstance(models, dict)
