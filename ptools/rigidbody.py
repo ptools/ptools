@@ -6,7 +6,7 @@ from typing import Sequence, Union
 import numpy as np
 
 from .atom import Atom, AtomCollection
-from .io import read_pdb
+from .io import read_pdb, InvalidPDBFormatError
 
 
 class RigidBody(AtomCollection):
@@ -51,26 +51,52 @@ class AttractRigidBody(RigidBody):
         Raises:
             IOError: if atom meta['extra'] attribute does not contain 2 entries.
         """
+        extra = self._parse_extra_from_atoms()
+        self._init_atom_categories(extra)
+        self._init_atom_charges(extra)
 
-        def init_category():
-            try:
-                self.atom_categories = np.array(
-                    [int(tokens[0]) - 1 for tokens in extra]
+    def _parse_extra_from_atoms(self):
+        """Parses extra atom field.
+
+        Raises:
+            InvalidPDBFormatError: if category or charge cannot be found or is invalid type
+        """
+
+        def assert_has_valid_category_and_charge(tokens):
+            if len(tokens) < 2:
+                raise InvalidPDBFormatError(
+                    f"Expected atom categories and charges, found {tokens}"
                 )
-            except Exception as e:
-                err = f"cannot initialize atom category: {e}"
-                raise IOError(err) from e
+            assert_is_valid_category(tokens[0])
+            assert_is_valid_charge(tokens[1])
 
-        def init_charges():
+        def assert_is_valid_category(token):
+            """Returns True if token is an integer."""
+            if not token.isdigit():
+                raise InvalidPDBFormatError(
+                    f"Atom category expects an int, found '{token}'"
+                )
+
+        def assert_is_valid_charge(token):
+            """Returns True if token is a float."""
             try:
-                self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
-            except Exception as e:
-                err = f"cannot initialize atom charges: {e}"
-                raise IOError(err) from e
+                float(token)
+            except ValueError:
+                raise InvalidPDBFormatError(
+                    f"Atom charge expects a float, found '{token}'"
+                )
 
         extra = [atom.meta["extra"].split() for atom in self]
-        init_category()
-        init_charges()
+        for tokens in extra:
+            assert_has_valid_category_and_charge(tokens)
+        return extra
+
+    def _init_atom_categories(self, extra):
+        """Initializes atom category array."""
+        self.atom_categories = np.array([int(tokens[0]) - 1 for tokens in extra])
+
+    def _init_atom_charges(self, extra):
+        self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
 
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""

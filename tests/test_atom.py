@@ -7,8 +7,10 @@ from ptools.atom import Atom, AtomCollection
 from .testing.moreassert import (
     assert_array_almost_equal,
     assert_dummy_atom_initialization_ok,
-    dummy_atom
 )
+
+from .testing.dummy import dummy_atom, DUMMY_ATOM_ATTRS
+
 
 class TestAtom(unittest.TestCase):
     def setUp(self):
@@ -27,9 +29,9 @@ class TestAtom(unittest.TestCase):
         orig = dummy_atom()
         _ = AtomCollection([orig])
         atom = self.atoms[0]
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
+        assert_array_almost_equal(atom.coords, DUMMY_ATOM_ATTRS["coords"])
         orig.coords = (0, 0, 0)
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
+        assert_array_almost_equal(atom.coords, DUMMY_ATOM_ATTRS["coords"])
 
     def test_mass_getter(self):
         self.assertEqual(self.atoms[0].mass, 12.011)

@@ -1,21 +1,25 @@
 """Protein Data Bank format I/O."""
 
+from typing import Iterator, List, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
-def get_header(line):
-    """Returns PDB line header i.e. first 6 characters."""
-    return line[:6]
+class InvalidPDBFormatError(IOError):
+    """Raised when the PDB format is incorrect."""
 
 
-def is_atom_line(line):
-    """Return True is the line header is "ATOM  " or "HETATM"."""
-    return get_header(line) in ("ATOM  ", "HETATM")
+def get_header(line: str) -> str:
+    """Returns PDB line header i.e. first 6 characters stripped from white spaces."""
+    return line[:6].strip()
 
 
-def read_atom_line(line):
-    """Return an `atom.BaseAtom` instance initialized with data read from
-    line."""
+def is_atom_line(line: str) -> bool:
+    """Returns True is the line header is "ATOM  " or "HETATM"."""
+    return get_header(line) in ("ATOM", "HETATM")
+
+
+def parse_atom_line(line: str) -> BaseAtom:
+    """Returns an `atom.BaseAtom` initialized with data read from line."""
     index = int(line[6:11])
     name = line[12:16].strip().upper()
     resname = line[17:20].strip().upper()
@@ -39,7 +43,7 @@ def read_atom_line(line):
     return atom
 
 
-def read_pdb(path):
+def read_pdb(path: str) -> Union[List[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
@@ -56,12 +60,23 @@ def read_pdb(path):
             if header == "ENDMDL":
                 models.append(AtomCollection(current_model))
                 current_model = []
-            elif header in ("ATOM  ", "HETATM"):
-                current_model.append(read_atom_line(line))
+            elif is_atom_line(line):
+                current_model.append(parse_atom_line(line))
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
-            models.append(current_model)
+            models.append(AtomCollection(current_model))
         elif len(models) == 1:
             return AtomCollection(models[0])
         return models
     return AtomCollection(current_model)
+
+
+def iter_models(path: str) -> Iterator[Tuple(str, AtomCollection)]:
+    """Iterate over a PDB model.
+
+    Returns:
+        Iterator[(model_id), atoms]
+    """
+    models = read_pdb(path)
+    for model in models:
+        yield model
