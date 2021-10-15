@@ -1,5 +1,6 @@
 """Protein Data Bank format I/O."""
 
+from typing import Iterator, List, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
@@ -7,17 +8,17 @@ class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
 
-def get_header(line):
+def get_header(line: str) -> str:
     """Returns PDB line header i.e. first 6 characters stripped from white spaces."""
     return line[:6].strip()
 
 
-def is_atom_line(line):
+def is_atom_line(line: str) -> bool:
     """Returns True is the line header is "ATOM  " or "HETATM"."""
     return get_header(line) in ("ATOM", "HETATM")
 
 
-def parse_atom_line(line):
+def parse_atom_line(line: str) -> BaseAtom:
     """Returns an `atom.BaseAtom` initialized with data read from line."""
     index = int(line[6:11])
     name = line[12:16].strip().upper()
@@ -42,20 +43,24 @@ def parse_atom_line(line):
     return atom
 
 
-def read_pdb(path):
+def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
         path (str): path to file.
+        as_dict (bool): if True, returns models in a dictionnary.
 
     Returns:
         AtomCollection: collection of Atoms
     """
     models = []
+    model_id_list = []
     current_model = []
     with open(path, "rt", encoding="utf-8") as f:
         for line in f:
             header = get_header(line)
+            if header == "MODEL":
+                model_id_list.append(line[10:].strip())
             if header == "ENDMDL":
                 models.append(AtomCollection(current_model))
                 current_model = []
@@ -64,7 +69,9 @@ def read_pdb(path):
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
             models.append(AtomCollection(current_model))
-        elif len(models) == 1:
+        if len(models) == 1:
             return AtomCollection(models[0])
+        if as_dict:
+            return dict(zip(model_id_list, models))
         return models
     return AtomCollection(current_model)
