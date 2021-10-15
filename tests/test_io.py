@@ -55,6 +55,14 @@ class TestPDBIO(unittest.TestCase):
             self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
+    def test_read_pdb_as_dict(self):
+        models = pdb.read_pdb(TEST_PDB_3MODELS, as_dict=True)
+        self.assertIsInstance(models, dict)
+        self.assertEqual(list(models.keys()), ["1", "2", "3"])
+        for atoms in models.values():
+            self.assertIsInstance(atoms, AtomCollection)
+            self.assertTrue(len(atoms), 10)
+
     def test_read_pdb_single_model(self):
         with open(TEST_PDB, "rt", encoding="utf-8") as f:
             atoms_lines = [line for line in f if line.startswith("ATOM  ")]
@@ -66,6 +74,7 @@ class TestPDBIO(unittest.TestCase):
             tmp_pdb.flush()
             atoms = pdb.read_pdb(tmp_pdb.name)
             self.assertEqual(len(atoms), 10)
+
 
 
 class TestFileExists(unittest.TestCase):

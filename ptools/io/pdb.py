@@ -43,20 +43,24 @@ def parse_atom_line(line: str) -> BaseAtom:
     return atom
 
 
-def read_pdb(path: str) -> Union[List[AtomCollection], AtomCollection]:
+def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
         path (str): path to file.
+        as_dict (bool): if True, returns models in a dictionnary.
 
     Returns:
         AtomCollection: collection of Atoms
     """
     models = []
+    model_id_list = []
     current_model = []
     with open(path, "rt", encoding="utf-8") as f:
         for line in f:
             header = get_header(line)
+            if header == "MODEL":
+                model_id_list.append(line[10:].strip())
             if header == "ENDMDL":
                 models.append(AtomCollection(current_model))
                 current_model = []
@@ -65,8 +69,10 @@ def read_pdb(path: str) -> Union[List[AtomCollection], AtomCollection]:
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
             models.append(AtomCollection(current_model))
-        elif len(models) == 1:
+        if len(models) == 1:
             return AtomCollection(models[0])
+        if as_dict:
+            return dict(zip(model_id_list, models))
         return models
     return AtomCollection(current_model)
 
