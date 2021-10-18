@@ -1,6 +1,6 @@
 """Protein Data Bank format I/O."""
 
-from typing import Iterator, List, Tuple, Union
+from typing import List, Union
 from ..atom import BaseAtom, AtomCollection
 
 
