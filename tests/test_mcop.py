@@ -11,36 +11,66 @@ from .testing.moreassert import assert_array_almost_equal, assert_array_not_almo
 
 
 
-PDB_MCOPRIGID = {
-    "core": """\
-MODEL       0
-ATOM      1 CA   CYS     1      12.025  21.956  13.016    1   0.000 0 0
-ATOM      2 CSE  CYS     1      11.702  23.345  13.055    7   0.000 0 0
-ATOM      3 CA   GLY     2      12.408  20.728  16.555    1   0.000 0 0
-ATOM      4 CA   VAL     3      11.501  17.132  16.643    1   0.000 0 0
-ATOM      5 CSE  VAL     3      10.112  16.917  16.247   29   0.000 0 0
-ATOM      6 CA   PRO     4      14.215  14.528  17.062    1   0.000 0 0
-ATOM      7 CSE  PRO     4      14.229  15.158  18.286   22   0.000 0 0
-ATOM      8 CA   ALA     5      13.919  11.330  15.124    1   0.000 0 0
-ATOM      9 CSE  ALA     5      14.424  11.148  14.581    2   0.000 0 0
-ATOM     10 CA   ILE     6      15.540  10.094  18.303    1   0.000 0 0
-ATOM     11 CSE  ILE     6      17.227   9.373  18.051   14   0.000 0 0
-""",
-    "region1": """\
-MODEL       1  1
-ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0
-ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0
-ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0
-ENDMDL    1  1
-""",
-    "region2": """\
-MODEL       1  2
-ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0
-ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0
-ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0
-ENDMDL    1  2
-"""
-}
+class TestMcopPDBBuilder:
+
+    @staticmethod
+    def model_header(model_id: str) -> str:
+        return f"MODEL     {model_id}"
+
+    @staticmethod
+    def model_footer() -> str:
+        return "ENDMDL"
+
+    @classmethod
+    def _generic_region(cls, model_id, atoms):
+        return "\n".join([cls.model_header(model_id)] + atoms + [cls.model_footer()])
+
+    @classmethod
+    def core(cls):
+        atoms = [
+            "ATOM      1 CA   CYS     1      12.025  21.956  13.016    1   0.000 0 0",
+            "ATOM      2 CSE  CYS     1      11.702  23.345  13.055    7   0.000 0 0",
+            "ATOM      3 CA   GLY     2      12.408  20.728  16.555    1   0.000 0 0",
+            "ATOM      4 CA   VAL     3      11.501  17.132  16.643    1   0.000 0 0",
+            "ATOM      5 CSE  VAL     3      10.112  16.917  16.247   29   0.000 0 0",
+            "ATOM      6 CA   PRO     4      14.215  14.528  17.062    1   0.000 0 0",
+            "ATOM      7 CSE  PRO     4      14.229  15.158  18.286   22   0.000 0 0",
+            "ATOM      8 CA   ALA     5      13.919  11.330  15.124    1   0.000 0 0",
+            "ATOM      9 CSE  ALA     5      14.424  11.148  14.581    2   0.000 0 0",
+            "ATOM     10 CA   ILE     6      15.540  10.094  18.303    1   0.000 0 0",
+            "ATOM     11 CSE  ILE     6      17.227   9.373  18.051   14   0.000 0 0",
+        ]
+        return cls._generic_region(model_id="0", atoms=atoms)
+
+    @classmethod
+    def region1(cls):
+        atoms = [
+            "ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0",
+            "ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0",
+            "ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0",
+        ]
+        return cls._generic_region(model_id="1  1", atoms=atoms)
+
+    @classmethod
+    def region2(cls):
+        atoms = [
+            "ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0",
+            "ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0",
+            "ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0",
+        ]
+        return cls._generic_region(model_id="1  2", atoms=atoms)
+
+    @classmethod
+    def mcop_pdb(cls, has_core: bool = True, has_region1: bool = True, has_region2: bool = True):
+        regions = []
+        if has_core:
+            regions.append(cls.core())
+        if has_region1:
+            regions.append(cls.region1())
+        if has_region2:
+            regions.append(cls.region2())
+        return "\n".join(regions)
+
 
 
 class TestMcop(unittest.TestCase):
@@ -135,13 +165,13 @@ class TestMcopRigid(unittest.TestCase):
                 assert_array_almost_equal(kopy.coords, copy_rotated)
 
     def test_read_pdb_no_core_region_first(self):
-        content = f"{PDB_MCOPRIGID['region1']}\n{PDB_MCOPRIGID['region2']}"
+        content = TestMcopPDBBuilder.mcop_pdb(has_core=False)
         with mk_tmp_file(content=content) as tmpfile:
             with self.assertRaisesRegex(McopRigidPDBError, "expecting core region first"):
                 McopRigid().read_pdb(tmpfile.name)
 
     def test_read_pdb_no_regions(self):
-        content = PDB_MCOPRIGID["core"]
+        content = TestMcopPDBBuilder.mcop_pdb(has_region1=False, has_region2=False)
         with mk_tmp_file(content=content) as tmpfile:
             with self.assertRaisesRegex(McopRigidPDBError, "no region found"):
                 McopRigid().read_pdb(tmpfile.name)

@@ -82,35 +82,11 @@ class McopRigid:
         """Initializez McopRigid from data read in PDB file."""
         models = pdb.read_pdb(path, as_dict=True)
         keys = [key.split() for key in models.keys()]
-        # Core should come first.
+
+        # Core region should come first.
         if len(keys[0]) > 1:
             raise McopRigidPDBError(f"expecting core region first (found f{keys[0]})")
 
-
-
-
-        # with open(path, "rt", encoding="utf-8") as f:
-        #     core_region = None
-        #     line_id = 0
-        #     end_of_file = False
-        #     for line_id, line in enumerate(f):
-        #         if pdb.get_header(line) == "MODEL":
-        #             region_id = int(line[12:13])
-        #             copy_id = int(line[15:]) if len(line) > 15 else 0
-
-        #             # First we expect to read core (region_id = 0)
-        #             if region_id == 0:
-        #                 core_region = AtomCollection()
-        #             elif core_region is None:
-        #                 raise ValueError(
-        #                     f"{path}:{line_id + 1}: expecting core region first: model id should be 0 (found {region_id})"
-        #                 )
-
-        #         elif pdb.is_atom_line(line):
-        #             atom = pdb.parse_atom_line(line)
-        #             if region_id == 0:
-        #                 core_region.append(atom)
-
-
-        #     print(len(core_region))
-        #     exit()
+        # Then should come regions.
+        if len(keys) < 2:
+            raise McopRigidPDBError(f"no region found")
