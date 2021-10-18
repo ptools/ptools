@@ -53,6 +53,19 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
     Returns:
         AtomCollection: collection of Atoms
     """
+    def register_model(atom_list: list[BaseAtom]):
+        """Stores `atom_list` into `models` as an AtomCollection."""
+        models.append(AtomCollection(atom_list))
+
+    def register_model_id(line: str):
+        """Extracts model id from model header line and stores `model_id` into `model_id_list`."""
+        model_id_list.append(line[10:].strip())
+
+    def register_new_atom(line: str):
+        """Parses an ATOM line and stores the atom into the current model."""
+        current_model.append(parse_atom_line(line))
+
+
     models = []
     model_id_list = []
     current_model = []
@@ -60,22 +73,29 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
         for line in f:
             header = get_header(line)
             if header == "MODEL":
-                model_id_list.append(line[10:].strip())
+                register_model_id(line)
             if header == "ENDMDL":
-                models.append(AtomCollection(current_model))
-                current_model = []
+                register_model(current_model)
+                current_model.clear()
             elif is_atom_line(line):
-                current_model.append(parse_atom_line(line))
-    if as_dict and len(model_id_list) == 0:
-        raise InvalidPDBFormatError(
-            "can't initialize dictionary without model identifier (no MODEL found)"
-        )
-    if models:
-        if current_model:  # No "ENDMDL" flag for last model.
-            models.append(AtomCollection(current_model))
-        if len(models) == 1 and not as_dict:
-            return AtomCollection(models[0])
-        if as_dict:
-            return dict(zip(model_id_list, models))
-        return models
-    return AtomCollection(current_model)
+                register_new_atom(line)
+
+    # No "ENDMDL" flag for last model.
+    if current_model:
+        register_model(current_model)
+
+    # Returns models into a dictionary.
+    if as_dict:
+        if len(model_id_list) == 0:
+            raise InvalidPDBFormatError(
+                "can't initialize dictionary without model identifier (no MODEL found)"
+            )
+        return dict(zip(model_id_list, models))
+
+    # Only 1 model: returns a simple AtomCollection
+    if len(models) == 1:
+        return AtomCollection(models[0])
+
+    # Multiple models: returns a list of AtomCollection instances.
+    return models
+

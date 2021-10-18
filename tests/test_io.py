@@ -55,7 +55,16 @@ class TestPDBIO(unittest.TestCase):
             self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
-    def test_read_pdb_as_dict(self):
+    def test_read_pdb_as_dict_single_model(self):
+        with mk_pdb_models(1) as tmp_pdb:
+            models = pdb.read_pdb(tmp_pdb.name, as_dict=True)
+        self.assertIsInstance(models, dict)
+        self.assertEqual(list(models.keys()), ["1"])
+        for atoms in models.values():
+            self.assertIsInstance(atoms, AtomCollection)
+            self.assertTrue(len(atoms), 10)
+
+    def test_read_pdb_as_dict_multiple_models(self):
         with mk_pdb_models(3) as tmp_pdb:
             models = pdb.read_pdb(tmp_pdb.name, as_dict=True)
         self.assertIsInstance(models, dict)
