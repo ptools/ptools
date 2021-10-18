@@ -83,7 +83,7 @@ class AttractRigidBody(RigidBody):
                 float(token)
             except ValueError as error:
                 raise InvalidPDBFormatError(
-                    f"Atom charge expe cts a float, found '{token}'"
+                    f"Atom charge expects a float, found '{token}'"
                 ) from error
 
         extra = [atom.meta["extra"].split() for atom in self]
