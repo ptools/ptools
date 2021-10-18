@@ -13,8 +13,7 @@ __all__ = [
     "mk_pdb_no_model",
     "mk_pdb_models",
     "TestPDBBuilder",
-
-    "mk_red"
+    "mk_red",
 ]
 
 

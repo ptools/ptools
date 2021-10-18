@@ -10,8 +10,6 @@ from .testing.io.red import mk_red, mk_red_invalid_charges, TestREDBuilder
 from .testing.moreassert import assert_array_equal
 
 
-
-
 class TestRigidBody(unittest.TestCase):
     def setUp(self):
         with mk_pdb_10_atoms() as tmp_pdb:

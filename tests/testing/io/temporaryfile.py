@@ -19,6 +19,4 @@ def mk_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
 
 def mk_empty_file(**kwargs) -> tempfile.NamedTemporaryFile:
     """Creates a temporary empty file."""
-    return mk_tmp_file(content="")
-
-
+    return mk_tmp_file(content="", **kwargs)

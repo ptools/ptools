@@ -3,6 +3,7 @@
 import tempfile
 from .temporaryfile import mk_tmp_file
 
+
 class TestREDBuilder:
     """Creates a standard RED file."""
 
@@ -47,7 +48,7 @@ class TestREDBuilder:
     @classmethod
     def charges(cls) -> list[float]:
         """Atom charges as presented in default atoms."""
-        return [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]
+        return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     @classmethod
     def redfile(cls, has_categories: bool = True, has_charges: bool = True) -> str:
@@ -61,7 +62,9 @@ class TestREDBuilder:
         return "\n".join(atoms)
 
 
-def mk_red(has_categories: bool = True, has_charges: bool = True) -> tempfile.NamedTemporaryFile:
+def mk_red(
+    has_categories: bool = True, has_charges: bool = True
+) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file (RED format) that contains 10 atoms."""
     return mk_tmp_file(content=TestREDBuilder.redfile(has_categories, has_charges))
 
