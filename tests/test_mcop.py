@@ -10,9 +10,7 @@ from .testing.io import mk_tmp_file, mk_pdb_models
 from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 
 
-
 class TestMcopPDBBuilder:
-
     @staticmethod
     def model_header(model_id: str) -> str:
         return f"MODEL     {model_id}"
@@ -61,7 +59,9 @@ class TestMcopPDBBuilder:
         return cls._generic_region(model_id="1  2", atoms=atoms)
 
     @classmethod
-    def mcop_pdb(cls, has_core: bool = True, has_region1: bool = True, has_region2: bool = True):
+    def mcop_pdb(
+        cls, has_core: bool = True, has_region1: bool = True, has_region2: bool = True
+    ):
         regions = []
         if has_core:
             regions.append(cls.core())
@@ -70,7 +70,6 @@ class TestMcopPDBBuilder:
         if has_region2:
             regions.append(cls.region2())
         return "\n".join(regions)
-
 
 
 class TestMcop(unittest.TestCase):
@@ -136,9 +135,7 @@ class TestMcop(unittest.TestCase):
             assert_array_almost_equal(kopy.coords, current_coordinates)
 
 
-
 class TestMcopRigid(unittest.TestCase):
-
     def setUp(self):
         self.rigid = dummy_mcop_rigid()
 
@@ -167,7 +164,10 @@ class TestMcopRigid(unittest.TestCase):
     def test_read_pdb_no_core_region_first(self):
         content = TestMcopPDBBuilder.mcop_pdb(has_core=False)
         with mk_tmp_file(content=content) as tmpfile:
-            with self.assertRaisesRegex(McopRigidPDBError, "expecting core region first"):
+            with self.assertRaisesRegex(
+                McopRigidPDBError,
+                "expecting core region first",
+            ):
                 McopRigid().read_pdb(tmpfile.name)
 
     def test_read_pdb_no_regions(self):
@@ -176,17 +176,11 @@ class TestMcopRigid(unittest.TestCase):
             with self.assertRaisesRegex(McopRigidPDBError, "no region found"):
                 McopRigid().read_pdb(tmpfile.name)
 
-
-
-
     # def test_read_pdb(self):
     #     McopRigid().read_pdb(TEST_PDB_MCOPRIGID)
     #     self.assertEqual("not implemented", "coucou")
 
 
-
-
 def dummy_atomcollection(n_atoms: int = 10) -> AtomCollection:
     """Creates a dummy AtomCollection composed of `n_atoms` atoms."""
     return AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(n_atoms)])
-

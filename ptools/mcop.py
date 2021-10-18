@@ -1,9 +1,9 @@
 """Defines classes and functions used for the multicopy feature."""
 
-import numpy as np
-
 from dataclasses import dataclass, field
 from typing import Sequence
+
+import numpy as np
 
 from .atom import AtomCollection
 from .io import pdb
@@ -89,4 +89,4 @@ class McopRigid:
 
         # Then should come regions.
         if len(keys) < 2:
-            raise McopRigidPDBError(f"no region found")
+            raise McopRigidPDBError("no region found")

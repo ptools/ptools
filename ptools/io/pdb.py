@@ -65,7 +65,6 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
         """Parses an ATOM line and stores the atom into the current model."""
         current_model.append(parse_atom_line(line))
 
-
     models = []
     model_id_list = []
     current_model = []
@@ -98,4 +97,3 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
 
     # Multiple models: returns a list of AtomCollection instances.
     return models
-
