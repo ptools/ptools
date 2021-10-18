@@ -64,6 +64,11 @@ class TestPDBIO(unittest.TestCase):
             self.assertIsInstance(atoms, AtomCollection)
             self.assertTrue(len(atoms), 10)
 
+    def test_read_pdb_as_dict_no_model(self):
+        with mk_pdb_no_model() as tmp_pdb:
+            with self.assertRaisesRegex(pdb.InvalidPDBFormatError, r"can't initialize dictionary without model identifier \(no MODEL found\)"):
+                pdb.read_pdb(tmp_pdb.name, as_dict=True)
+
     def test_read_pdb_single_model(self):
         with mk_pdb_10_atoms() as tmp_pdb:
             atoms = pdb.read_pdb(tmp_pdb.name)

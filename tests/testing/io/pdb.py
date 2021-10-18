@@ -16,7 +16,7 @@ class TestPDBBuilder:
     def title() -> str:
         return """\
 TITLE     DUMMY PDB FILE CONTAINING 10 ATOMS.
-TITLE    2 THIS IS THE TITLE LINE 2.
+TITLE    2 THIS IS THE TITLE LINE 2.\
 """
 
     @staticmethod
@@ -40,7 +40,6 @@ REMARK   1  TITL 3 P22 AS DETERMINED BY 2D 1H NMR SPECTROSCOPY
 REMARK   1  REF    BIOCHEMISTRY                  V.  28  9826 1989
 REMARK   1  REFN                   ISSN 0006-2960
 REMARK   1  PMID   2611268
-
 REMARK   1
 REMARK   1 REFERENCE 1
 REMARK   1  AUTH   J.MAREK,J.VEVODOVA,I.SMATANOVA,Y.NAGATA,
@@ -50,7 +49,7 @@ REMARK   1  TITL 2 FROM SPHINGOMONAS PAUCIMOBILIS UT26
 REMARK   1  REF    BIOCHEMISTRY                  V.  39 14082 2000
 REMARK   1  REFN                   ISSN 0006-2960
 REMARK   1  PMID   11087355
-REMARK   1  DOI    10.1021/bi001539c
+REMARK   1  DOI    10.1021/bi001539c\
 """
 
     @staticmethod
@@ -62,7 +61,7 @@ REMARK   1  DOI    10.1021/bi001539c
         return """\
 ORIGX1      1.000000  0.000000  0.000000        0.00000
 ORIGX2      0.000000  1.000000  0.000000        0.00000
-ORIGX3      0.000000  0.000000  1.000000        0.00000
+ORIGX3      0.000000  0.000000  1.000000        0.00000\
 """
 
     @staticmethod
@@ -70,7 +69,7 @@ ORIGX3      0.000000  0.000000  1.000000        0.00000
         return """\
 SCALE1      1.000000  0.000000  0.000000        0.00000
 SCALE2      0.000000  1.000000  0.000000        0.00000
-SCALE3      0.000000  0.000000  1.000000        0.00000
+SCALE3      0.000000  0.000000  1.000000        0.00000\
 """
 
     @staticmethod
@@ -123,6 +122,9 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
                 content += [cls.model_header(i + 1), cls.atom(), cls.model_footer()]
         else:
             content.append(cls.atom())
+
+        print("youpi")
+        print("\n".join(content))
         return "\n".join(content)
 
 
