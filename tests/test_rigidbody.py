@@ -5,8 +5,9 @@ import unittest
 from ptools.rigidbody import RigidBody, AttractRigidBody
 from ptools.io import InvalidPDBFormatError
 
-from . import TEST_PDB, TEST_RED
-from .testing.io import mk_tmp_file
+from . import TEST_RED
+
+from .testing.io import mk_tmp_file, mk_pdb_10_atoms
 from .testing.moreassert import assert_array_equal
 
 
@@ -94,7 +95,8 @@ ATOM     10  CSE TYR     4      -3.525  -1.079   3.005   28   TYR   0 0
 
 class TestRigidBody(unittest.TestCase):
     def setUp(self):
-        self.rb = RigidBody(TEST_PDB)
+        with mk_pdb_10_atoms() as tmp_pdb:
+            self.rb = RigidBody(tmp_pdb.name)
 
     def test_constructor(self):
         self.assertEqual(len(self.rb), 10)

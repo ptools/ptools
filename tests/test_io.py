@@ -10,8 +10,13 @@ from ptools import io
 from ptools.atom import AtomCollection
 from ptools.io import pdb
 
-from . import TEST_PDB, TEST_PDB_3MODELS, TEST_PDB_ATOM_NAMES
-from .testing.io import random_filename
+from .testing.io import (
+    mk_pdb_models,
+    mk_pdb_no_model,
+    mk_pdb_10_atoms,
+    random_filename,
+    TestPDBBuilder,
+)
 
 
 class TestPDBIO(unittest.TestCase):
@@ -27,12 +32,13 @@ class TestPDBIO(unittest.TestCase):
         self.assertFalse(pdb.is_atom_line("ANISOU"))
 
     def test_read_pdb(self):
-        atoms = pdb.read_pdb(TEST_PDB)
+        with mk_pdb_no_model() as pdb_file:
+            atoms = pdb.read_pdb(pdb_file.name)
         self.assertEqual(len(atoms), 10)
         for i in range(10):
             atom = atoms[i]
             self.assertEqual(atom.index, i + 1)
-            self.assertEqual(atom.name, TEST_PDB_ATOM_NAMES[i])
+            self.assertEqual(atom.name, TestPDBBuilder.atom_names()[i])
             self.assertEqual(atom.resid, 1)
             self.assertEqual(atom.resname, "LYS")
             self.assertEqual(atom.chain, "A")
@@ -41,7 +47,8 @@ class TestPDBIO(unittest.TestCase):
             self.assertAlmostEqual(atom.coords[2], 20 + i + 1)
 
     def test_read_pdb_multiple_models(self):
-        models = pdb.read_pdb(TEST_PDB_3MODELS)
+        with mk_pdb_models(3) as tmp_pdb:
+            models = pdb.read_pdb(tmp_pdb.name)
         self.assertIsInstance(models, list)
         self.assertEqual(len(models), 3)
         for atoms in models:
@@ -49,7 +56,8 @@ class TestPDBIO(unittest.TestCase):
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_as_dict(self):
-        models = pdb.read_pdb(TEST_PDB_3MODELS, as_dict=True)
+        with mk_pdb_models(3) as tmp_pdb:
+            models = pdb.read_pdb(tmp_pdb.name, as_dict=True)
         self.assertIsInstance(models, dict)
         self.assertEqual(list(models.keys()), ["1", "2", "3"])
         for atoms in models.values():
@@ -57,33 +65,18 @@ class TestPDBIO(unittest.TestCase):
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_single_model(self):
-        with tempfile.NamedTemporaryFile() as tmp_pdb:
-            tmp_pdb.write(bytes(pdb_single_model(), encoding="utf-8"))
-            tmp_pdb.flush()
+        with mk_pdb_10_atoms() as tmp_pdb:
             atoms = pdb.read_pdb(tmp_pdb.name)
             self.assertIsInstance(atoms, AtomCollection)
             self.assertEqual(len(atoms), 10)
 
     def test_read_pdb_single_model_as_dict(self):
-        with tempfile.NamedTemporaryFile() as tmp_pdb:
-            tmp_pdb.write(bytes(pdb_single_model(), encoding="utf-8"))
-            tmp_pdb.flush()
+        with mk_pdb_10_atoms() as tmp_pdb:
             models = pdb.read_pdb(tmp_pdb.name, as_dict=True)
             self.assertIsInstance(models, dict)
             keys = list(models.keys())
             self.assertEqual(keys, ["1"])
             self.assertEqual(len(models["1"]), 10)
-
-
-
-
-def pdb_single_model():
-    with open(TEST_PDB, "rt", encoding="utf-8") as f:
-        atoms_lines = [line for line in f if line.startswith("ATOM  ")]
-    lines = ["MODEL        1"]
-    lines += atoms_lines
-    lines += ["ENDMDL"]
-    return "\n".join(lines)
 
 
 class TestFileExists(unittest.TestCase):
