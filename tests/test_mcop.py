@@ -6,10 +6,9 @@ from ptools.atom import AtomCollection, BaseAtom
 from ptools.mcop import Mcop, McopRigid, McopRigidPDBError
 
 from .testing.dummy import dummy_atomcollection, dummy_mcop, dummy_mcop_rigid
-from .testing.io import mk_tmp_file
+from .testing.io import mk_tmp_file, mk_pdb_models
 from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 
-from . import TEST_PDB_MCOPRIGID, TEST_PDB_3MODELS
 
 
 PDB_MCOPRIGID = {
@@ -88,7 +87,8 @@ class TestMcop(unittest.TestCase):
 
     def test_read_pdb_mcop(self):
         mcop = Mcop()
-        mcop.read_pdb(TEST_PDB_3MODELS)
+        with mk_pdb_models(n_models=3) as pdb:
+            mcop.read_pdb(pdb.name)
         self.assertEqual(len(mcop), 3)
 
     def test_attract_euler_rotate(self):
