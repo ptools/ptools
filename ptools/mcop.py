@@ -9,6 +9,10 @@ from .atom import AtomCollection
 from .io import pdb
 
 
+class McopRigidPDBError(Exception):
+    """Raised when an error occurs while reading a McopRigid PDB."""
+
+
 @dataclass
 class Mcop:
     """Container for multiple copies of the same monomer."""
@@ -76,7 +80,12 @@ class McopRigid:
 
     def read_pdb(self, path: str):
         """Initializez McopRigid from data read in PDB file."""
-        raise ValueError()
+        models = pdb.read_pdb(path, as_dict=True)
+        keys = [key.split() for key in models.keys()]
+        # Core should come first.
+        if len(keys[0]) > 1:
+            raise McopRigidPDBError(f"expecting core region first (found f{keys[0]})")
+
 
 
 
