@@ -66,7 +66,10 @@ class TestPDBIO(unittest.TestCase):
 
     def test_read_pdb_as_dict_no_model(self):
         with mk_pdb_no_model() as tmp_pdb:
-            with self.assertRaisesRegex(pdb.InvalidPDBFormatError, r"can't initialize dictionary without model identifier \(no MODEL found\)"):
+            with self.assertRaisesRegex(
+                pdb.InvalidPDBFormatError,
+                r"can't initialize dictionary without model identifier \(no MODEL found\)",
+            ):
                 pdb.read_pdb(tmp_pdb.name, as_dict=True)
 
     def test_read_pdb_single_model(self):
