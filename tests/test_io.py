@@ -57,17 +57,33 @@ class TestPDBIO(unittest.TestCase):
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_single_model(self):
-        with open(TEST_PDB, "rt", encoding="utf-8") as f:
-            atoms_lines = [line for line in f if line.startswith("ATOM  ")]
-        lines = ["MODEL        1"]
-        lines += atoms_lines
-        lines += ["ENDMDL"]
         with tempfile.NamedTemporaryFile() as tmp_pdb:
-            tmp_pdb.write(bytes("\n".join(lines), encoding="utf-8"))
+            tmp_pdb.write(bytes(pdb_single_model(), encoding="utf-8"))
             tmp_pdb.flush()
             atoms = pdb.read_pdb(tmp_pdb.name)
+            self.assertIsInstance(atoms, AtomCollection)
             self.assertEqual(len(atoms), 10)
 
+    def test_read_pdb_single_model_as_dict(self):
+        with tempfile.NamedTemporaryFile() as tmp_pdb:
+            tmp_pdb.write(bytes(pdb_single_model(), encoding="utf-8"))
+            tmp_pdb.flush()
+            models = pdb.read_pdb(tmp_pdb.name, as_dict=True)
+            self.assertIsInstance(models, dict)
+            keys = list(models.keys())
+            self.assertEqual(keys, ["1"])
+            self.assertEqual(len(models["1"]), 10)
+
+
+
+
+def pdb_single_model():
+    with open(TEST_PDB, "rt", encoding="utf-8") as f:
+        atoms_lines = [line for line in f if line.startswith("ATOM  ")]
+    lines = ["MODEL        1"]
+    lines += atoms_lines
+    lines += ["ENDMDL"]
+    return "\n".join(lines)
 
 
 class TestFileExists(unittest.TestCase):

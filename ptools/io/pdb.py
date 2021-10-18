@@ -69,7 +69,7 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
             models.append(AtomCollection(current_model))
-        if len(models) == 1:
+        if len(models) == 1 and not as_dict:
             return AtomCollection(models[0])
         if as_dict:
             return dict(zip(model_id_list, models))
