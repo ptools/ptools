@@ -42,6 +42,9 @@ class BaseAtom(SpatialObject):
         meta (dict[str, ()]): metadata dictionnary
     """
 
+    # Atom equality evaluated on these attributes
+    _comparison_attributes = ["index", "name", "resname", "resid", "chain", "coords"]
+
     def __init__(
         self,
         index: int = 0,
@@ -79,14 +82,12 @@ class BaseAtom(SpatialObject):
 
     def __eq__(self, other: BaseAtom) -> bool:
         """Compares two BaseAtom instances."""
-        for key, value in self.__dict__.items():
-            if key.startswith("_") and not key.startswith("__"):
-                key = key[1:]
-            if key != "coords" and value != getattr(other, key):
-                return False
-            if key == "coords":
-                if np.abs(self.coords - other.coords).sum() > 1e-6:
+        for key in self._comparison_attributes:
+            if key != "coords":
+                if getattr(self, key) != getattr(other, key):
                     return False
+            elif np.abs(self.coords - other.coords).sum() > 1e-6:
+                return False
         return True
 
     def __repr__(self) -> str:
@@ -207,18 +208,6 @@ class Atom(BaseAtom):
         self._name = name
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
-    def __eq__(self, other: BaseAtom) -> bool:
-        """Compares two Atom instances."""
-        for key, value in self.__dict__.items():
-            if key.startswith("_") and not key.startswith("__"):
-                key = key[1:]
-            if key not in ("coords", "collection") and value != getattr(other, key):
-                return False
-            if key == "coords":
-                if np.abs(self.coords - other.coords).sum() > 1e-6:
-                    return False
-        return True
-
 
 class AtomCollection(SpatialObject, UserList):
     """Group of atoms.
@@ -230,7 +219,7 @@ class AtomCollection(SpatialObject, UserList):
     """
 
     def __init__(self, atoms: Sequence[BaseAtom] = None):
-        if atoms is None:
+        if atoms is None or len(atoms) == 0:
             atoms = []
             coords = np.zeros((0, 3))
         else:
