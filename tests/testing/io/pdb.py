@@ -1,12 +1,13 @@
-"""testing.io - I/O testing utilities."""
+"""Helper classes and functions for PDB format I/O testing."""
 
-from contextlib import contextmanager
-from os import stat
 import tempfile
-from typing import Union, Tuple
+
+from .temporaryfile import mk_tmp_file
 
 
 class TestPDBBuilder:
+    """Creates a standard PDB file."""
+
     @staticmethod
     def header() -> str:
         return "HEADER    TEST PDB                                27-SEP-06   XXXX"
@@ -126,30 +127,6 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
         else:
             content.append(cls.atom())
         return "\n".join(content)
-
-
-def random_filename() -> str:
-    """Returns a random file name."""
-    with tempfile.NamedTemporaryFile() as tmpfile:
-        return tmpfile.name
-
-
-@contextmanager
-def mk_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
-    """Creates a temporary file."""
-    try:
-        tmpfile = tempfile.NamedTemporaryFile("wt", **kwargs)
-        tmpfile.write(content)
-        tmpfile.flush()
-        tmpfile.seek(0)
-        yield tmpfile
-    finally:
-        tmpfile.close()
-
-
-def mk_empty_file(**kwargs) -> tempfile.NamedTemporaryFile:
-    """Creates a temporary empty file."""
-    return mk_tmp_file(content="")
 
 
 def mk_pdb_no_model() -> tempfile.NamedTemporaryFile:
