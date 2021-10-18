@@ -74,10 +74,7 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
 """
 
     @staticmethod
-    def atom(n_atoms: int = 10) -> str:
-        if n_atoms > 10:
-            raise ValueError("expecting n_atoms <= 10")
-
+    def atom() -> str:
         atoms = [
             "ATOM      1  N   LYS A   1       1.000  11.000  21.000  1.00  1.40           N",
             "ATOM      2  CA  LYS A   1       2.000  12.000  22.000  1.00  0.52           C",
@@ -90,7 +87,7 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
             "ATOM      9  NZ  LYS A   1       9.000  19.000  29.000  1.00  4.21           N",
             "ATOM     10  H1  LYS A   1      10.000  20.000  30.000  1.00  1.94           H",
         ]
-        return "\n".join(atoms[:n_atoms])
+        return "\n".join(atoms)
 
     @staticmethod
     def atom_names():
@@ -105,7 +102,7 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
         return "ENDMDL"
 
     @classmethod
-    def pdb(cls, has_model_header: bool = True, n_models: int = 1):
+    def pdbfile(cls, has_model_header: bool = True, n_models: int = 1) -> str:
         """Returns a standard pdb.
 
         By default 1 model, 10 atoms.
@@ -131,14 +128,14 @@ SCALE3      0.000000  0.000000  1.000000        0.00000
 
 def mk_pdb_no_model() -> tempfile.NamedTemporaryFile:
     """Creates a temporary file that contains 10 atoms with no 'MODEL' entry."""
-    return mk_tmp_file(content=TestPDBBuilder.pdb(has_model_header=False))
+    return mk_tmp_file(content=TestPDBBuilder.pdbfile(has_model_header=False))
 
 
 def mk_pdb_10_atoms() -> tempfile.NamedTemporaryFile:
     """Creates a temporary file that contains 10 atoms with a 'MODEL' entry."""
-    return mk_tmp_file(content=TestPDBBuilder.pdb())
+    return mk_tmp_file(content=TestPDBBuilder.pdbfile())
 
 
 def mk_pdb_models(n_models: int = 1) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file that contains 10 atoms, no 'MODEL' entry."""
-    return mk_tmp_file(content=TestPDBBuilder.pdb(n_models=n_models))
+    return mk_tmp_file(content=TestPDBBuilder.pdbfile(n_models=n_models))
