@@ -5,8 +5,6 @@ import unittest
 from ptools.rigidbody import RigidBody, AttractRigidBody
 from ptools.io import InvalidPDBFormatError
 
-from . import TEST_RED
-
 from .testing.io import mk_pdb_10_atoms
 from .testing.io.red import mk_red, mk_red_invalid_charges, TestREDBuilder
 from .testing.moreassert import assert_array_equal
@@ -78,7 +76,8 @@ class TestAttractRigidBody(unittest.TestCase):
     # Ignores R0201: Method could be a function (no-self-use)
     # pylint: disable=R0201
     def test_reset_forces(self):
-        arb = AttractRigidBody(TEST_RED)
+        with mk_red() as tmpfile:
+            arb = AttractRigidBody(tmpfile.name)
         assert_array_equal(arb.atom_forces, 0.0)
         arb.atom_forces[0] = [1, 2, 3]
         assert_array_equal(arb.atom_forces[0], [1, 2, 3])

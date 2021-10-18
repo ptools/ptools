@@ -1,8 +1,5 @@
 import os
 
-
-TEST_RED = os.path.join(os.path.dirname(__file__), "data", "test_10atoms.red")
-
 TEST_LIGAND = os.path.join(os.path.dirname(__file__), "data", "ligand.pdb")
 TEST_RECEPTOR = os.path.join(os.path.dirname(__file__), "data", "receptor.pdb")
 
