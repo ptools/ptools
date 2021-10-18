@@ -66,6 +66,10 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
                 current_model = []
             elif is_atom_line(line):
                 current_model.append(parse_atom_line(line))
+    if as_dict and len(model_id_list) == 0:
+        raise InvalidPDBFormatError(
+            "can't initialize dictionary without model identifier (no MODEL found)"
+        )
     if models:
         if current_model:  # No "ENDMDL" flag for last model.
             models.append(AtomCollection(current_model))
