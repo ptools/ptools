@@ -26,10 +26,10 @@ class TestPDBIO(unittest.TestCase):
             pdb.read_pdb(filename)
 
     def test_is_atom_line(self):
-        self.assertTrue(pdb.is_atom_line("ATOM  <rest_of_the_line>"))
-        self.assertTrue(pdb.is_atom_line("HETATM<rest_of_the_line>"))
-        self.assertFalse(pdb.is_atom_line("ATOMI"))
-        self.assertFalse(pdb.is_atom_line("ANISOU"))
+        self.assertTrue(pdb.PDBLine("ATOM  <rest_of_the_line>").is_atom())
+        self.assertTrue(pdb.PDBLine("HETATM<rest_of_the_line>").is_atom())
+        self.assertFalse(pdb.PDBLine("ATOMI").is_atom())
+        self.assertFalse(pdb.PDBLine("ANISOU").is_atom())
 
     def test_read_pdb(self):
         with mk_pdb_no_model() as pdb_file:

@@ -1,6 +1,8 @@
 """Protein Data Bank format I/O."""
 
-from typing import List, Union
+from dataclasses import dataclass, field
+
+from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
@@ -8,42 +10,122 @@ class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
 
-def get_header(line: str) -> str:
-    """Returns PDB line header i.e. first 6 characters stripped from white spaces."""
-    return line[:6].strip()
+@dataclass
+class PDBLine:
+    """Generic PDB formatted line.
+
+    Parses the line header and provides helper methods to determine the type of line
+    (i.e. atom, new model, end model, etc.).
+    """
+
+    line: str
+    header: str = field(init=False, repr=False)
+
+    def __post_init__(self):
+        self.header = self.line[0:6].strip()
+
+    def __getitem__(self, key):
+        return self.line[key]
+
+    def is_atom(self) -> bool:
+        """Returns True is the line describes an atom."""
+        return self.header in ("ATOM", "HETATM")
+
+    def is_new_model(self) -> bool:
+        """Returns True if the line describes a new model."""
+        return self.header == "MODEL"
+
+    def is_end_model(self) -> bool:
+        """Returns True if the line describes the end of the current model."""
+        return self.header == "ENDMDL"
 
 
-def is_atom_line(line: str) -> bool:
-    """Returns True is the line header is "ATOM  " or "HETATM"."""
-    return get_header(line) in ("ATOM", "HETATM")
+class ModelLine(PDBLine):
+    """Helper methods for a model line."""
+
+    @property
+    def model_id(self) -> str:
+        """Model identifier."""
+        return self.line[10:].strip()
 
 
-def parse_atom_line(line: str) -> BaseAtom:
+class AtomLine(PDBLine):
+    """Helper methods for an atom line."""
+
+    @property
+    def index(self) -> int:
+        """Atom index."""
+        return int(self.line[6:11])
+
+    @property
+    def name(self) -> str:
+        """Atom name."""
+        return self.line[12:16].strip().upper()
+
+    @property
+    def resname(self) -> str:
+        """Atom residue name."""
+        return self.line[17:20].strip().upper()
+
+    @property
+    def chain(self) -> str:
+        """Chain identifier."""
+        return self.line[21].strip()
+
+    @property
+    def resid(self) -> int:
+        """Residue identifer."""
+        return int(self.line[22:26])
+
+    @property
+    def x(self) -> float:
+        """X-coordinate"""
+        return float(self.line[30:38])
+
+    @property
+    def y(self) -> float:
+        """Y-coordinate"""
+        return float(self.line[38:46])
+
+    @property
+    def z(self) -> float:
+        """Z-coordinate"""
+        return float(self.line[46:54])
+
+    @property
+    def coordinates(self) -> Tuple[float, float, float]:
+        """Coordinates."""
+        return (self.x, self.y, self.z)
+
+    @property
+    def extra(self) -> str:
+        """Extra properties"""
+        return self.line[54:].strip()
+
+    def to_atom(self) -> BaseAtom:
+        """Creates a BaseAtom from an atom line."""
+        return BaseAtom(
+            index=self.index,
+            name=self.name,
+            resname=self.resname,
+            resid=self.resid,
+            chain=self.chain,
+            coords=self.coordinates,
+            meta={"extra": self.extra},
+        )
+
+
+def parse_atom_line(buffer: str) -> BaseAtom:
     """Returns an `atom.BaseAtom` initialized with data read from line."""
-    index = int(line[6:11])
-    name = line[12:16].strip().upper()
-    resname = line[17:20].strip().upper()
-    chain = line[21].strip()
-    resid = int(line[22:26])
-    x = float(line[30:38])
-    y = float(line[38:46])
-    z = float(line[46:54])
-    coords = (x, y, z)
-    extra = line[54:].strip()
-
-    atom = BaseAtom(
-        index=index,
-        name=name,
-        resname=resname,
-        resid=resid,
-        chain=chain,
-        coords=coords,
-        meta={"extra": extra},
-    )
-    return atom
+    line = AtomLine(buffer)
+    if not line.is_atom():
+        raise ValueError(f"Not a valid atom line: header is {line.header}")
+    return line.to_atom()
 
 
-def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollection]:
+def read_pdb(
+    path: str, as_dict=False
+) -> Union[dict[str, AtomCollection], Sequence[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
@@ -53,30 +135,31 @@ def read_pdb(path: str, as_dict=False) -> Union[List[AtomCollection], AtomCollec
     Returns:
         AtomCollection: collection of Atoms
     """
-    def register_model(atom_list: list[BaseAtom]):
+
+    def register_model(atom_list: Sequence[BaseAtom]):
         """Stores `atom_list` into `models` as an AtomCollection."""
         models.append(AtomCollection(atom_list))
 
     def register_model_id(line: str):
         """Extracts model id from model header line and stores `model_id` into `model_id_list`."""
-        model_id_list.append(line[10:].strip())
+        model_id_list.append(ModelLine(line).model_id)
 
     def register_new_atom(line: str):
         """Parses an ATOM line and stores the atom into the current model."""
-        current_model.append(parse_atom_line(line))
+        current_model.append(AtomLine(line).to_atom())
 
     models = []
     model_id_list = []
     current_model = []
     with open(path, "rt", encoding="utf-8") as f:
-        for line in f:
-            header = get_header(line)
-            if header == "MODEL":
+        for buffer in f:
+            line = PDBLine(buffer)
+            if line.is_new_model():
                 register_model_id(line)
-            if header == "ENDMDL":
+            elif line.is_end_model():
                 register_model(current_model)
                 current_model.clear()
-            elif is_atom_line(line):
+            elif line.is_atom():
                 register_new_atom(line)
 
     # No "ENDMDL" flag for last model.
