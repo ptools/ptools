@@ -72,11 +72,6 @@ class ForceFieldBase(ABC):
 
     All force field must be derivated from this class or child.
     """
-
-    receptor: AttractRigidBody
-    ligand: AttractRigidBody
-    cutoff: float = 10
-
     @abstractmethod
     def energy(self) -> float:
         """Return the total energy between the two molecules"""
@@ -90,7 +85,11 @@ class ForceFieldBase(ABC):
 class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
 
+    receptor: AttractRigidBody
+    ligand: AttractRigidBody
+    cutoff: float = 10
     paramfile: str = ""
+
     _repulsive_parameters: list = field(init=False, repr=False, default_factory=list)
     _attractive_parameters: list = field(init=False, repr=False, default_factory=list)
     _repulsive_pairs: list = field(init=False, repr=False, default_factory=list)

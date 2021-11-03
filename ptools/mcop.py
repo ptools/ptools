@@ -5,6 +5,8 @@ from typing import Sequence
 
 import numpy as np
 
+from ptools.forcefield import AttractForceField1, ForceFieldBase
+
 from .atom import AtomCollection
 from .io import pdb
 
@@ -90,3 +92,18 @@ class McopRigid:
         # Then should come regions.
         if len(keys) < 2:
             raise McopRigidPDBError("no region found")
+
+
+@dataclass
+class McopForceField(ForceFieldBase):
+
+    _ff: AttractForceField1 = field(init=False)
+    _centered_ligand: McopRigid = field(init=False)
+    _moved_ligand: McopRigid = field(init=False)
+    _receptor: McopRigid = field(init=False)
+
+    def energy(self) -> float:
+        return 0.0
+
+    def update(self):
+        self.energy()
