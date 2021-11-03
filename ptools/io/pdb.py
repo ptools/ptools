@@ -117,7 +117,10 @@ class AtomLine(PDBLine):
 
 def parse_atom_line(buffer: str) -> BaseAtom:
     """Returns an `atom.BaseAtom` initialized with data read from line."""
-    return AtomLine(buffer).to_atom()
+    line = AtomLine(buffer)
+    if not line.is_atom():
+        raise ValueError(f"Not a valid atom line: header is {line.header}")
+    return line.to_atom()
 
 
 def read_pdb(
