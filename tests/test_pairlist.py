@@ -134,8 +134,8 @@ CONTACTS_REF = [
 class TestPairList(unittest.TestCase):
     def setUp(self):
         self.cutoff = 5.0
-        self.ligand = RigidBody(TEST_LIGAND)
-        self.receptor = RigidBody(TEST_RECEPTOR)
+        self.ligand = RigidBody.from_pdb(TEST_LIGAND)
+        self.receptor = RigidBody.from_pdb(TEST_RECEPTOR)
         self.assertEqual(len(self.ligand), 974)
         self.assertEqual(len(self.receptor), 936)
         self.pairlist = PairList(self.receptor, self.ligand, self.cutoff)

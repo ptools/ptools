@@ -59,7 +59,7 @@ class TestScrew(unittest.TestCase):
 
 class TestSuperpose(unittest.TestCase):
     def setUp(self):
-        self.target = RigidBody(TEST_LIGAND)
+        self.target = RigidBody.from_pdb(TEST_LIGAND)
 
     def test_fit(self):
         mobile = self.target.copy()

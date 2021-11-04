@@ -11,8 +11,8 @@ from .testing.moreassert import assert_array_equal
 
 class TestAttractForceField1(unittest.TestCase):
     def setUp(self):
-        self.receptor = AttractRigidBody(TEST_RECEPTOR_RED)
-        self.ligand = AttractRigidBody(TEST_LIGAND_RED)
+        self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
+        self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
     # Ignores W0212: Access to a protected member of a client class
