@@ -9,7 +9,7 @@ import numpy as np
 import ptools
 from ptools.atom import AtomCollection, BaseAtom
 
-from .testing.moreassert import assert_array_equal, assert_array_almost_equal
+from .testing.moreassert import assert_array_equal, assert_array_almost_equal, assert_array_not_almost_equal
 from .testing.dummy import dummy_atomcollection
 from . import TEST_LIGAND
 
@@ -144,6 +144,13 @@ class TestAtomCollection(unittest.TestCase):
         scalar = -4.5
         self.atoms.translate(scalar)
         assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
+
+    def test_center(self):
+        origin = np.zeros(3)
+        for origin in (np.zeros(3), np.ones(3)):
+            assert_array_not_almost_equal(self.atoms.center_of_mass(), origin)
+            self.atoms.center(origin)
+            assert_array_almost_equal(self.atoms.center_of_mass(), origin)
 
     def test_add(self):
         atoms2 = AtomCollection(

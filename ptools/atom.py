@@ -265,11 +265,12 @@ class AtomCollection(SpatialObject, UserList):
         """
         return len(self)
 
-    def center(self) -> np.ndarray:
-        """Returns the isobarycenter (geometric center) of a collection of
-        atoms."""
-        raise NotImplementedError
-        return self.centroid()
+    def center(self, origin: np.ndarray = np.zeros(3), use_weights: bool = False):
+        """Centers AtomCollection on `origin`."""
+        if not use_weights:
+            super().center(origin)
+        else:
+            self.translate(np.array(origin) - self.center_of_mass())
 
     def center_of_mass(self) -> np.ndarray:
         """Returns the center of mass (barycenter)."""
