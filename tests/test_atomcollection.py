@@ -118,7 +118,7 @@ class TestAtomCollection(unittest.TestCase):
         center = self.atoms.center_of_mass()
         assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
-        # Update atoms name, therefore element, therefore mass.
+        # Changes atoms name, therefore element, therefore mass.
         for i in range(5):
             self.atoms[i].name = "CA"
         for i in range(5, 10):
@@ -145,11 +145,27 @@ class TestAtomCollection(unittest.TestCase):
         self.atoms.translate(scalar)
         assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
 
-    def test_center(self):
+    def test_center_without_weigths(self):
+        origin = np.zeros(3)
+        for origin in (np.zeros(3), np.ones(3)):
+            assert_array_not_almost_equal(self.atoms.centroid(), origin)
+            self.atoms.center(origin, use_weights=False)
+            assert_array_almost_equal(self.atoms.centroid(), origin)
+
+    def test_center_with_weights(self):
+        # Changes atom names, therefore elements, therefore masses.
+        for i in range(5):
+            self.atoms[i].name = "CA"
+        for i in range(5, 10):
+            self.atoms[i].name = "NZ"
+
+        # This test should pass for a valid test of masses impact on AtomCollection.center()
+        assert_array_not_almost_equal(self.atoms.centroid(), self.atoms.center_of_mass())
+
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):
             assert_array_not_almost_equal(self.atoms.center_of_mass(), origin)
-            self.atoms.center(origin)
+            self.atoms.center(origin, use_weights=True)
             assert_array_almost_equal(self.atoms.center_of_mass(), origin)
 
     def test_add(self):
