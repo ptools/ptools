@@ -13,7 +13,7 @@ from .testing.moreassert import assert_array_equal
 class TestRigidBody(unittest.TestCase):
     def setUp(self):
         with mk_pdb_10_atoms() as tmp_pdb:
-            self.rigid = RigidBody(tmp_pdb.name)
+            self.rigid = RigidBody.from_pdb(tmp_pdb.name)
 
     def test_constructor(self):
         self.assertEqual(len(self.rigid), 10)
@@ -45,7 +45,7 @@ class TestRigidBody(unittest.TestCase):
 class TestAttractRigidBody(unittest.TestCase):
     def test_constructor(self):
         with mk_red() as tmpfile:
-            arb = AttractRigidBody(tmpfile.name)
+            arb = AttractRigidBody.from_pdb(tmpfile.name)
 
         self.assertEqual(len(arb), 10)
         # !! atom categories stored in AttractRigidBody are array indices,
@@ -57,25 +57,25 @@ class TestAttractRigidBody(unittest.TestCase):
         with mk_red(has_categories=False) as tmpfile:
             err = "Expected atom categories and charges, found"
             with self.assertRaisesRegex(InvalidPDBFormatError, err):
-                AttractRigidBody(tmpfile.name)
+                AttractRigidBody.from_pdb(tmpfile.name)
 
     def test_constructor_fails_no_charges(self):
         with mk_red(has_charges=False) as tmpfile:
             err = "Expected atom categories and charges, found"
             with self.assertRaisesRegex(InvalidPDBFormatError, err):
-                AttractRigidBody(tmpfile.name)
+                AttractRigidBody.from_pdb(tmpfile.name)
 
     def test_constructor_fails_invalid_charges(self):
         with mk_red_invalid_charges() as tmpfile:
             err = "Atom charge expects a float"
             with self.assertRaisesRegex(InvalidPDBFormatError, err):
-                AttractRigidBody(tmpfile.name)
+                AttractRigidBody.from_pdb(tmpfile.name)
 
     # Ignores R0201: Method could be a function (no-self-use)
     # pylint: disable=R0201
     def test_reset_forces(self):
         with mk_red() as tmpfile:
-            arb = AttractRigidBody(tmpfile.name)
+            arb = AttractRigidBody.from_pdb(tmpfile.name)
         assert_array_equal(arb.atom_forces, 0.0)
         arb.atom_forces[0] = [1, 2, 3]
         assert_array_equal(arb.atom_forces[0], [1, 2, 3])

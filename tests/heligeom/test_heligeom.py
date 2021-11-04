@@ -26,7 +26,7 @@ def move_rigidbody(rb, x=0, y=0, z=0):
 
 class TestHeligeomSimple(unittest.TestCase):
     def setUp(self):
-        self.mono1 = RigidBody(TEST_1A74_PROT_RED)
+        self.mono1 = RigidBody.from_pdb(TEST_1A74_PROT_RED)
         self.dx = 15
         self.mono2 = move_rigidbody(self.mono1, x=self.dx)
 
@@ -76,9 +76,9 @@ class TestHeligeomSimple(unittest.TestCase):
 
 class TestHeligeom(unittest.TestCase):
     def setUp(self):
-        self.mono1 = RigidBody(TEST_2GLSA)
-        self.mono2 = RigidBody(TEST_2GLSB)
-        self.ref = RigidBody(TEST_REF_2GLSAB_N6)
+        self.mono1 = RigidBody.from_pdb(TEST_2GLSA)
+        self.mono2 = RigidBody.from_pdb(TEST_2GLSB)
+        self.ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N6)
         self.n_monomers = 6
 
     def test_hp_data(self):
@@ -99,7 +99,7 @@ class TestHeligeom(unittest.TestCase):
     def test_heli_construct_Zalign(self):
         """Tests that heligeom.heli_construct"""
 
-        ref = RigidBody(TEST_REF_2GLSAB_N3_Z)
+        ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N3_Z)
 
         hp = heli_analyze(self.mono1, self.mono2)
         result = heli_construct(self.mono1, hp, N=3, Z=True)

@@ -9,7 +9,11 @@ import numpy as np
 import ptools
 from ptools.atom import AtomCollection, BaseAtom
 
-from .testing.moreassert import assert_array_equal, assert_array_almost_equal, assert_array_not_almost_equal
+from .testing.moreassert import (
+    assert_array_equal,
+    assert_array_almost_equal,
+    assert_array_not_almost_equal,
+)
 from .testing.dummy import dummy_atomcollection
 from . import TEST_LIGAND
 
@@ -160,7 +164,9 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms[i].name = "NZ"
 
         # This test should pass for a valid test of masses impact on AtomCollection.center()
-        assert_array_not_almost_equal(self.atoms.centroid(), self.atoms.center_of_mass())
+        assert_array_not_almost_equal(
+            self.atoms.centroid(), self.atoms.center_of_mass()
+        )
 
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):

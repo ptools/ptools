@@ -1,25 +1,66 @@
 """ptools.rigidbody - Defines the RigidBody class and children."""
 
 from __future__ import annotations
-from typing import Sequence, Union
+
+from abc import ABC, abstractmethod
+import os
 
 import numpy as np
 
-from .atom import Atom, AtomCollection
-from .io import read_pdb, InvalidPDBFormatError
+from .atom import AtomCollection
+from .io.pdb import InvalidPDBFormatError
+from .io.pdb import read_pdb as io_read_pdb
 
 
-class RigidBody(AtomCollection):
+class _RigidBodyBase(ABC):
+    """Base Base class for RigidBody subclasses.
+
+    Ensures that child classes implement the `read_pdb` method.
+    """
+
+    @abstractmethod
+    def read_pdb(self, path: str | bytes | os.PathLike):
+        """Initializes internal components from data read in PDB file."""
+
+
+class RigidBodyBase(_RigidBodyBase, AtomCollection):
+    """Base class for RigidBody subclasses.
+
+    Implements RigidBodyBase.from_pdb which returns a new instance initialized
+    from a PDB file, read with `cls.read_pdb`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        if args and isinstance(args[0], str):
+            raise TypeError(
+                "RigidBody class can not longer be instantiated from a path. "
+                "Use RigidBody.from_pdb instead."
+            )
+        AtomCollection.__init__(self, *args, **kwargs)
+        self.__post_init__()
+
+    def __post_init__(self):
+        """Post initialization method.
+
+        Overriden if needed in child classes.
+        """
+
+    @classmethod
+    def from_pdb(cls, path: str | bytes | os.PathLike):
+        """Returns a new instance of the class initialized using `cls.read_pdb`."""
+        rigid = cls()
+        rigid.read_pdb(path)
+        return rigid
+
+
+class RigidBody(RigidBodyBase):
     """RigidBody is basically an AtomCollection that can be initialized
     from a file.
     """
 
-    def __init__(self, atoms_or_path: Union[Sequence[Atom], str] = None):
-        if isinstance(atoms_or_path, str):
-            atoms_or_path = read_pdb(atoms_or_path)
-
-        # At this point, atoms_or_path is list[Atom] | None
-        super().__init__(atoms_or_path)
+    def read_pdb(self, path: str | bytes | os.PathLike):
+        atoms = io_read_pdb(path)
+        super().__init__(atoms)
 
 
 class AttractRigidBody(RigidBody):
@@ -36,21 +77,18 @@ class AttractRigidBody(RigidBody):
             N x 3 shaped array for atom forces
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        N = len(self)
-        self.atom_categories = np.zeros(N, dtype=int)
-        self.atom_charges = np.zeros(N, dtype=float)
-        self.atom_forces = np.zeros((N, 3), dtype=float)
-        self._init()
-
-    def _init(self):
+    def __post_init__(self):
         """Read each atom 'extra' meta-data attribute to find atom charge
         and category.
 
         Raises:
             IOError: if atom meta['extra'] attribute does not contain 2 entries.
         """
+        N = len(self)
+        self.atom_categories = np.zeros(N, dtype=int)
+        self.atom_charges = np.zeros(N, dtype=float)
+        self.atom_forces = np.zeros((N, 3), dtype=float)
+
         extra = self._parse_extra_from_atoms()
         self._init_atom_categories(extra)
         self._init_atom_charges(extra)
