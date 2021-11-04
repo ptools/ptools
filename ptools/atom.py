@@ -268,6 +268,7 @@ class AtomCollection(SpatialObject, UserList):
     def center(self) -> np.ndarray:
         """Returns the isobarycenter (geometric center) of a collection of
         atoms."""
+        raise NotImplementedError
         return self.centroid()
 
     def center_of_mass(self) -> np.ndarray:
@@ -301,7 +302,7 @@ class AtomCollection(SpatialObject, UserList):
     def radius_of_gyration(self) -> float:
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
-        centered = self.coords - self.center()
+        centered = self.coords - self.centroid()
         rgyr2 = np.sum(centered ** 2) / len(self)
         return math.sqrt(rgyr2)
 

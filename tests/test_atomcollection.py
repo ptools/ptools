@@ -109,8 +109,8 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms.masses, np.ones(len(self.atoms)) * mass_ref
         )
 
-    def test_center(self):
-        center = self.atoms.center()
+    def test_centroid(self):
+        center = self.atoms.centroid()
         assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
     def test_center_of_masses(self):
@@ -136,14 +136,14 @@ class TestAtomCollection(unittest.TestCase):
         # Translate is a method herited from `spatial.SpatialObject`.
         # Basically is should work on any child class.
         origin = (0, 0, 0)
-        center = self.atoms.center()
+        center = self.atoms.centroid()
         self.atoms.translate(origin - center)
-        assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
+        assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
 
     def test_translate_scalar(self):
         scalar = -4.5
         self.atoms.translate(scalar)
-        assert_array_almost_equal(self.atoms.center(), (0, 0, 0))
+        assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
 
     def test_add(self):
         atoms2 = AtomCollection(
