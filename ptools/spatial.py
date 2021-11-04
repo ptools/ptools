@@ -53,7 +53,7 @@ class SpatialObject:
 
     def center(self, origin: np.ndarray = np.zeros(3)):
         """Center spatial object on `origin`."""
-        self.translate(origin - self.coords)
+        self.translate(np.array(origin) - self.centroid())
 
     def rotate_by(self, angles: np.ndarray):
         """Rotate object coordinates around X, Y and Z axes.
