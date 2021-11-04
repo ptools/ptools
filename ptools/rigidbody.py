@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 import os
-from typing import Sequence
 
 import numpy as np
 
-from .atom import Atom, AtomCollection
+from .atom import AtomCollection
 from .io.pdb import InvalidPDBFormatError
 from .io.pdb import read_pdb as io_read_pdb
 
@@ -48,6 +47,7 @@ class RigidBodyBase(_RigidBodyBase, AtomCollection):
 
     @classmethod
     def from_pdb(cls, path: str | bytes | os.PathLike):
+        """Returns a new instance of the class initialized using `cls.read_pdb`."""
         rigid = cls()
         rigid.read_pdb(path)
         return rigid
