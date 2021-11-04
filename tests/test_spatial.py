@@ -34,9 +34,13 @@ class TestSpatialObjectVector(unittest.TestCase):
 
     def test_center(self):
         obj = spatial.SpatialObject((1, 1, 1))
-        result = obj.center()
-        self.assertIsNone(result)
+        obj.center()
         assert_array_almost_equal(obj.coords, (0, 0, 0))
+
+    def test_center_custom_origin(self):
+        obj = spatial.SpatialObject((1, 1, 1))
+        obj.center(origin=(2, 2, 2))
+        assert_array_almost_equal(obj.coords, (2, 2, 2))
 
     # pylint guesses type wrong
     # E1137: 'target.coords' does not support item assignment
