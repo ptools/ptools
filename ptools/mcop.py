@@ -1,5 +1,7 @@
 """Defines classes and functions used for the multicopy feature."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from typing import Sequence
 
@@ -32,6 +34,12 @@ class Mcop:
             len(mcop)
         """
         return len(self.copies)
+
+    def copy(self) -> Mcop:
+        """Returns a copy of itself."""
+        output = Mcop()
+        output.copies = [atoms.copy() for atoms in self.copies]
+        return output
 
     def __len__(self):
         """Returns the number of copies.
@@ -69,10 +77,23 @@ class McopRigid:
     regions: Sequence[Mcop] = field(default_factory=list)
     weights: Sequence[np.ndarray] = field(default_factory=list)
 
+    def copy(self) -> McopRigid:
+        """Returns a copy of itself."""
+        output = McopRigid()
+        output.core = self.core.copy()
+        output.regions = [region.copy() for region in self.regions]
+        output.weights = [weights.copy() for weights in self.weights]
+
     def add_region(self, region: Mcop):
         """Add a region to the internal list of regions."""
         self.regions.append(region)
         self.weights.append(np.zeros(len(region)))
+
+    def center(self, origin: np.ndarray = np.zeros(3)):
+        """Center core and regions on `origin`."""
+        self.core.center(origin)
+        for region in self.regions:
+            region.center(origin)
 
     def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
         """Rotates core and copies with Attract Euler protocol."""
@@ -88,22 +109,55 @@ class McopRigid:
         # Core region should come first.
         if len(keys[0]) > 1:
             raise McopRigidPDBError(f"expecting core region first (found f{keys[0]})")
+        self.core = models[keys[0][0]]
 
         # Then should come regions.
         if len(keys) < 2:
             raise McopRigidPDBError("no region found")
+        for i, model in enumerate(models.values()):
+            if i > 0:
+                self.regions.append(model)
+
+
+class LigandNotInitializedError(ValueError):
+    """Raised where trying to set receptor but ligand has not been set previously."""
 
 
 @dataclass
 class McopForceField(ForceFieldBase):
 
-    _ff: AttractForceField1 = field(init=False)
-    _centered_ligand: McopRigid = field(init=False)
-    _moved_ligand: McopRigid = field(init=False)
-    _receptor: McopRigid = field(init=False)
+    cutoff: float = field(init=False, default=10.0)
+    _ff_core: AttractForceField1 = field(init=False, default=None)
+    _centered_ligand: McopRigid = field(init=False, default=None)
+    _moved_ligand: McopRigid = field(init=False, default=None)
+    _receptor: McopRigid = field(init=False, default=None)
 
     def energy(self) -> float:
         return 0.0
 
     def update(self):
         self.energy()
+
+    def set_receptor(self, receptor: McopRigid):
+        if self._moved_ligand is None:
+            raise LigandNotInitializedError("Trying to set receptor while ligand has not been set")
+        self._receptor = receptor.copy()
+        self._receptor.center(origin=self._moved_ligand.core.center_of_mass())
+        self._init_energies()
+
+    def set_ligand(self, ligand: McopRigid):
+        self._moved_ligand = ligand.copy()
+        self._centered_ligand = ligand.copy()
+        self._centered_ligand.center(origin=ligand.core.center_of_mass())
+
+
+    def _init_energies(self):
+        self._ff_core = AttractForceField1(self._receptor.core, self._moved_ligand.core, self.cutoff)
+
+    def non_bonded_energy(self) -> float:
+        energy_region = 0.0
+        energy_core = 0.0
+
+        print(self._ff_core.non_bonded_energy())
+
+

@@ -11,6 +11,16 @@ from .testing.moreassert import assert_array_almost_equal, assert_array_not_almo
 
 
 class TestMcopPDBBuilder:
+    """Helper class that builds dummy Mcop PDB files on demand.
+
+    Model properties:
+
+        - core : 11 atoms
+        - regions : 2
+            - region 1 : 4 atoms
+            - region 2 : 3 atoms
+    """
+
     @staticmethod
     def model_header(model_id: str) -> str:
         return f"MODEL     {model_id}"
@@ -20,7 +30,7 @@ class TestMcopPDBBuilder:
         return "ENDMDL"
 
     @classmethod
-    def _generic_region(cls, model_id, atoms):
+    def _generic_region(cls, model_id: str, atoms: list[str]) -> str:
         return "\n".join([cls.model_header(model_id)] + atoms + [cls.model_footer()])
 
     @classmethod
@@ -46,6 +56,7 @@ class TestMcopPDBBuilder:
             "ATOM      1 CA   GLY   142      31.056  22.061  28.780    1   0.000 0 0",
             "ATOM      2 CA   LEU   143      32.876  20.969  32.008    1   0.000 0 0",
             "ATOM      3 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0",
+            "ATOM      4 CSE  LEU   143      34.750  21.987  32.256   15   0.000 0 0",
         ]
         return cls._generic_region(model_id="1  1", atoms=atoms)
 
@@ -139,46 +150,53 @@ class TestMcopRigid(unittest.TestCase):
     def setUp(self):
         self.rigid = dummy_mcop_rigid()
 
-    def test_add_region(self):
-        n = len(self.rigid.regions)
-        self.rigid.add_region(dummy_atomcollection())
-        self.assertEqual(len(self.rigid.regions), n + 1)
+    # def test_add_region(self):
+    #     n = len(self.rigid.regions)
+    #     self.rigid.add_region(dummy_atomcollection())
+    #     self.assertEqual(len(self.rigid.regions), n + 1)
 
-    def test_attract_euler_rotate(self):
-        """Tests that coordinates of the core and each copy of each region actually
-        changed in the same fashion."""
-        core_original = self.rigid.core.coords.copy()
-        copy_original = self.rigid.regions[0][0].coords.copy()
-        self.rigid.attract_euler_rotate(10, 20, 30)
-        copy_rotated = self.rigid.regions[0][0].coords.copy()
+    # def test_attract_euler_rotate(self):
+    #     """Tests that coordinates of the core and each copy of each region actually
+    #     changed in the same fashion."""
+    #     core_original = self.rigid.core.coords.copy()
+    #     copy_original = self.rigid.regions[0][0].coords.copy()
+    #     self.rigid.attract_euler_rotate(10, 20, 30)
+    #     copy_rotated = self.rigid.regions[0][0].coords.copy()
 
-        # Checks coordinates have changed.
-        assert_array_not_almost_equal(self.rigid.core.coords, core_original)
-        assert_array_not_almost_equal(self.rigid.regions[0][0].coords, copy_original)
+    #     # Checks coordinates have changed.
+    #     assert_array_not_almost_equal(self.rigid.core.coords, core_original)
+    #     assert_array_not_almost_equal(self.rigid.regions[0][0].coords, copy_original)
 
-        # Checks all copies have the same coordinates.
-        for region in self.rigid.regions:
-            for kopy in region.copies:
-                assert_array_almost_equal(kopy.coords, copy_rotated)
+    #     # Checks all copies have the same coordinates.
+    #     for region in self.rigid.regions:
+    #         for kopy in region.copies:
+    #             assert_array_almost_equal(kopy.coords, copy_rotated)
 
-    def test_read_pdb_no_core_region_first(self):
-        content = TestMcopPDBBuilder.mcop_pdb(has_core=False)
+    # def test_read_pdb_no_core_region_first(self):
+    #     content = TestMcopPDBBuilder.mcop_pdb(has_core=False)
+    #     with mk_tmp_file(content=content) as tmpfile:
+    #         with self.assertRaisesRegex(
+    #             McopRigidPDBError,
+    #             "expecting core region first",
+    #         ):
+    #             McopRigid().read_pdb(tmpfile.name)
+
+    # def test_read_pdb_no_regions(self):
+    #     content = TestMcopPDBBuilder.mcop_pdb(has_region1=False, has_region2=False)
+    #     with mk_tmp_file(content=content) as tmpfile:
+    #         with self.assertRaisesRegex(McopRigidPDBError, "no region found"):
+    #             McopRigid().read_pdb(tmpfile.name)
+
+    def test_read_pdb(self):
+        content = TestMcopPDBBuilder.mcop_pdb()
         with mk_tmp_file(content=content) as tmpfile:
-            with self.assertRaisesRegex(
-                McopRigidPDBError,
-                "expecting core region first",
-            ):
-                McopRigid().read_pdb(tmpfile.name)
+            rigid = McopRigid()
+            rigid.read_pdb(tmpfile.name)
+        self.assertEqual(len(rigid.core), 11)
+        self.assertEqual(len(rigid.regions), 2)
+        self.assertEqual(len(rigid.regions[0]), 4)
+        self.assertEqual(len(rigid.regions[1]), 3)
 
-    def test_read_pdb_no_regions(self):
-        content = TestMcopPDBBuilder.mcop_pdb(has_region1=False, has_region2=False)
-        with mk_tmp_file(content=content) as tmpfile:
-            with self.assertRaisesRegex(McopRigidPDBError, "no region found"):
-                McopRigid().read_pdb(tmpfile.name)
-
-    # def test_read_pdb(self):
-    #     McopRigid().read_pdb(TEST_PDB_MCOPRIGID)
-    #     self.assertEqual("not implemented", "coucou")
 
 
 def dummy_atomcollection(n_atoms: int = 10) -> AtomCollection:
