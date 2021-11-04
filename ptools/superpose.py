@@ -51,8 +51,8 @@ def kabsch_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
 
 def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     """Return the fit matrix between two RigidBody."""
-    t0 = target.center()
-    t1 = mobile.center()
+    t0 = target.centroid()
+    t1 = mobile.centroid()
 
     # Center to origin.
     coords_target = target.coords - t0

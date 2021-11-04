@@ -124,7 +124,7 @@ PTools revision {ptools.__version__}
     if args.startconfig:
         print("Minimize from starting configuration")
         # Use transnb, rotnb = 0, 0 to indicate this
-        translations = {0: ligand.center()}
+        translations = {0: ligand.centroid()}
         rotations = {0: (0, 0, 0)}
     else:
         ptools.io.assert_file_exists(

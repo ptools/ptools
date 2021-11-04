@@ -42,14 +42,18 @@ class SpatialObject:
         """Returns an spatial object geometric center."""
         return centroid(self._coords)
 
-    def translate(self, t: int | float | np.ndarray):
-        """Translate object coordinates using vector `t`.
+    def translate(self, direction: int | float | np.ndarray):
+        """Translate object coordinates using vector `direction`.
 
         Args:
-            t ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
+            direction ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
                 4 x 4 matrix
         """
-        translate(self.coords, t)
+        translate(self.coords, direction)
+
+    def center(self, origin: np.ndarray = np.zeros(3)):
+        """Center spatial object on `origin`."""
+        self.translate(np.array(origin) - self.centroid())
 
     def rotate_by(self, angles: np.ndarray):
         """Rotate object coordinates around X, Y and Z axes.
@@ -84,7 +88,7 @@ class SpatialObject:
         self.transform(matrix)
 
     def moveby(self, direction: np.ndarray | int):
-        """Translate object coordinates using vector `v` (can be a scalar).
+        """Translate object coordinates using vector or scalar `direction`.
 
         This is an alias for `SpatialObject.translate`.
         """

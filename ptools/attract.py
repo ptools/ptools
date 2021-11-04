@@ -52,7 +52,7 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
         >>>
         >>>
         >>> options = {
-        ...   translations = {0: ligand.center()},
+        ...   translations = {0: ligand.centroid()},
         ...   rotations = {0: (0, 0, 0)},
         ...   minimlist = minimlist,
         }
@@ -67,7 +67,7 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
     rotations = kwargs.pop("rotations", None)
 
     if translations is None:
-        translations = {0: ligand.center()}
+        translations = {0: ligand.centroid()}
     if rotations is None:
         rotations = {0: (0, 0, 0)}
 
@@ -78,7 +78,7 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
             print(f"@@ Rotation #{rotnb} {roti + 1}/{len(rotations)}")
             rot = rotations[rotnb]
 
-            ligand.translate(-ligand.center())
+            ligand.translate(-ligand.centroid())
             ligand.attract_euler_rotate(rot[0], rot[1], rot[2])
             ligand.translate(trans)
 

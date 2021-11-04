@@ -15,22 +15,32 @@ class TestSpatialObjectVector(unittest.TestCase):
     """Test spatial.SpatialObject methods on a vector."""
 
     def test_empty_constructor(self):
-        o = spatial.SpatialObject()
-        assert_array_almost_equal(o.coords, (0, 0, 0))
+        obj = spatial.SpatialObject()
+        assert_array_almost_equal(obj.coords, (0, 0, 0))
 
     def test_constructor(self):
-        o = spatial.SpatialObject((1, 1, 1))
-        assert_array_almost_equal(o.coords, (1, 1, 1))
+        obj = spatial.SpatialObject((1, 1, 1))
+        assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_scalar(self):
-        o = spatial.SpatialObject((0, 0, 0))
-        o.translate(1)
-        assert_array_almost_equal(o.coords, (1, 1, 1))
+        obj = spatial.SpatialObject((0, 0, 0))
+        obj.translate(1)
+        assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_vector(self):
-        o = spatial.SpatialObject((0, 0, 0))
-        o.translate((1, 2, 3))
-        assert_array_almost_equal(o.coords, (1, 2, 3))
+        obj = spatial.SpatialObject((0, 0, 0))
+        obj.translate((1, 2, 3))
+        assert_array_almost_equal(obj.coords, (1, 2, 3))
+
+    def test_center(self):
+        obj = spatial.SpatialObject((1, 1, 1))
+        obj.center()
+        assert_array_almost_equal(obj.centroid(), (0, 0, 0))
+
+    def test_center_custom_origin(self):
+        obj = spatial.SpatialObject((1, 1, 1))
+        obj.center(origin=(2, 2, 2))
+        assert_array_almost_equal(obj.centroid(), (2, 2, 2))
 
     # pylint guesses type wrong
     # E1137: 'target.coords' does not support item assignment
@@ -44,15 +54,15 @@ class TestSpatialObjectVector(unittest.TestCase):
         assert_array_almost_equal(source.coords, [6, 9, 12])
 
     def test_distance_to_axis(self):
-        o = spatial.SpatialObject((0, 0, 0))
+        obj = spatial.SpatialObject((0, 0, 0))
         axis = np.array((1, 0, 0))
-        self.assertAlmostEqual(o.distance_to_axis(axis), 0.0)
+        self.assertAlmostEqual(obj.distance_to_axis(axis), 0.0)
 
-        o.coords = (0, 1, 0)
-        self.assertAlmostEqual(o.distance_to_axis(axis), 1.0)
+        obj.coords = (0, 1, 0)
+        self.assertAlmostEqual(obj.distance_to_axis(axis), 1.0)
 
-        o.coords = (0, 1, 1)
-        self.assertAlmostEqual(o.distance_to_axis(axis), 2.0 ** 0.5)
+        obj.coords = (0, 1, 1)
+        self.assertAlmostEqual(obj.distance_to_axis(axis), 2.0 ** 0.5)
 
 
 class TestSpatialObjectArray(unittest.TestCase):
