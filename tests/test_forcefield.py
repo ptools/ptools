@@ -1,28 +1,62 @@
+"""Test for ptools.forcefield module."""
+
+import os
 import unittest
 
 import numpy as np
 
-from ptools.rigidbody import AttractRigidBody
+from ptools.rigidbody import AttractRigidBody, RigidBody
 from ptools.forcefield import AttractForceField1
 
-from .attract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
-from .testing.moreassert import assert_array_equal
+from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED
+from .testing.moreassert import assert_array_almost_equal
+
+
+# Ignores W0212: Access to a protected member of a client class
+# pylint: disable=W0212
+class TestAttractForceField1DummyRigid(unittest.TestCase):
+    """Tests for AttractForceField1 that do not required an actual AttractRigidBody."""
+
+    path_ff_parameters = os.path.join(
+        os.path.dirname(__file__), "data", "ff_parameters.np"
+    )
+
+    def setUp(self):
+        self.receptor = RigidBody.from_pdb(TEST_RECEPTOR_RED)
+        self.ligand = RigidBody.from_pdb(TEST_LIGAND_RED)
+        self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
+
+        # Save forcefield parameters for later use in non-regression tests.
+        # Uncomment to save new file.
+        # self._save_forcefield_parameters()
+
+    def _save_forcefield_parameters(self):
+        """Save forcefield parameters for later use in regression tests."""
+        with open(self.path_ff_parameters, "wb") as f:
+            np.save(f, self.ff._attractive_parameters)
+            np.save(f, self.ff._repulsive_parameters)
+
+    def _load_forcefield_parameters(self) -> tuple[np.ndarray, np.ndarray]:
+        """Load forcefield parameters for regression tests."""
+        with open(self.path_ff_parameters, "rb") as f:
+            attractive = np.load(f)
+            repulsive = np.load(f)
+        return (attractive, repulsive)
+
+    def test_regression_ff_parameters(self):
+        """Regression test for forcefield parameters."""
+        attractive, repulsive = self._load_forcefield_parameters()
+        assert_array_almost_equal(self.ff._attractive_parameters, attractive)
+        assert_array_almost_equal(self.ff._repulsive_parameters, repulsive)
 
 
 class TestAttractForceField1(unittest.TestCase):
+    """Tests for AttractForceField that requires actual AttractRigidBody instances."""
+
     def setUp(self):
         self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
-
-    # Ignores W0212: Access to a protected member of a client class
-    # pylint: disable=W0212
-    def test_read_ff_params(self):
-        ff = AttractForceField1(
-            self.receptor, self.ligand, paramfile=TEST_AMINON, cutoff=5.0
-        )
-        assert_array_equal(ff._repulsive_parameters, self.ff._repulsive_parameters)
-        assert_array_equal(ff._attractive_parameters, self.ff._attractive_parameters)
 
     def test_calculate_energy(self):
         # Reference values calculated from PTools 1d4b930.

@@ -89,11 +89,14 @@ class AttractForceField1(ForceFieldBase):
     ligand: AttractRigidBody
     cutoff: float = 10
     paramfile: str = ""
-
-    _repulsive_parameters: list = field(init=False, repr=False, default_factory=list)
-    _attractive_parameters: list = field(init=False, repr=False, default_factory=list)
-    _repulsive_pairs: list = field(init=False, repr=False, default_factory=list)
-    _attractive_pairs: list = field(init=False, repr=False, default_factory=list)
+    _repulsive_parameters: np.ndarray = field(
+        init=False, repr=False, default=np.empty(0)
+    )
+    _attractive_parameters: np.ndarray = field(
+        init=False, repr=False, default=np.empty(0)
+    )
+    _repulsive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
+    _attractive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
 
     _vdw_energy: float = field(init=False, repr=False, default=0.0)
     _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
