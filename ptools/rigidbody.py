@@ -42,6 +42,7 @@ class RigidBody(RigidBodyBase, AtomCollection):
     """RigidBody is basically an AtomCollection that can be initialized
     from a file.
     """
+
     def __init__(self, *args, **kwargs):
         if args and isinstance(args[0], str):
             raise TypeError(

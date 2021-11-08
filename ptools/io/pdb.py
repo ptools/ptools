@@ -1,6 +1,5 @@
 """Protein Data Bank format I/O."""
 
-from dataclasses import dataclass, field
 
 from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
@@ -10,22 +9,16 @@ class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
 
-@dataclass
-class PDBLine:
+class PDBLine(str):
     """Generic PDB formatted line.
 
     Parses the line header and provides helper methods to determine the type of line
     (i.e. atom, new model, end model, etc.).
     """
 
-    line: str
-    header: str = field(init=False, repr=False)
-
-    def __post_init__(self):
-        self.header = self.line[0:6].strip()
-
-    def __getitem__(self, key):
-        return self.line[key]
+    def __init__(self, _) -> None:
+        super().__init__()
+        self.header = self[0:6].strip()
 
     def is_atom(self) -> bool:
         """Returns True is the line describes an atom."""
@@ -46,51 +39,75 @@ class ModelLine(PDBLine):
     @property
     def model_id(self) -> str:
         """Model identifier."""
-        return self.line[10:].strip()
+        return self[10:].strip()
 
 
 class AtomLine(PDBLine):
     """Helper methods for an atom line."""
 
     @property
-    def index(self) -> int:
-        """Atom index."""
-        return int(self.line[6:11])
+    def atom_index(self) -> int:
+        """Atom index.
+
+        Alias for AtomLine.atom_id.
+        """
+        return self.atom_id
+
+    @property
+    def atom_id(self):
+        """Atom identifier.
+
+        See also:
+            AtomLine.atom_index
+        """
+        return int(self[6:11])
 
     @property
     def name(self) -> str:
         """Atom name."""
-        return self.line[12:16].strip().upper()
+        return self[12:16].strip().upper()
 
     @property
     def resname(self) -> str:
         """Atom residue name."""
-        return self.line[17:20].strip().upper()
+        return self[17:20].strip().upper()
 
     @property
     def chain(self) -> str:
         """Chain identifier."""
-        return self.line[21].strip()
+        return self[21].strip()
 
     @property
     def resid(self) -> int:
-        """Residue identifer."""
-        return int(self.line[22:26])
+        """Residue identifer.
+
+        Alias for AtomLine.residue_id.
+        """
+        return self.residue_id
+
+    @property
+    def residue_id(self) -> int:
+        """Residue identifer.
+
+        See also:
+            AtomLine.resid
+        """
+        return int(self[22:26])
 
     @property
     def x(self) -> float:
         """X-coordinate"""
-        return float(self.line[30:38])
+        return float(self[30:38])
 
     @property
     def y(self) -> float:
         """Y-coordinate"""
-        return float(self.line[38:46])
+        return float(self[38:46])
 
     @property
     def z(self) -> float:
         """Z-coordinate"""
-        return float(self.line[46:54])
+        return float(self[46:54])
 
     @property
     def coordinates(self) -> Tuple[float, float, float]:
@@ -100,15 +117,15 @@ class AtomLine(PDBLine):
     @property
     def extra(self) -> str:
         """Extra properties"""
-        return self.line[54:].strip()
+        return self[54:].strip()
 
     def to_atom(self) -> BaseAtom:
         """Creates a BaseAtom from an atom line."""
         return BaseAtom(
-            index=self.index,
+            index=self.atom_id,
             name=self.name,
             resname=self.resname,
-            resid=self.resid,
+            resid=self.residue_id,
             chain=self.chain,
             coords=self.coordinates,
             meta={"extra": self.extra},
