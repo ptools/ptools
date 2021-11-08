@@ -8,6 +8,7 @@ from typing import Sequence
 import numpy as np
 
 from ptools.forcefield import AttractForceField1, ForceFieldBase
+from ptools.rigidbody import RigidBodyBase
 
 from .atom import AtomCollection
 from .io import pdb
@@ -18,8 +19,11 @@ class McopRigidPDBError(Exception):
 
 
 @dataclass
-class Mcop:
-    """Container for multiple copies of the same monomer."""
+class Mcop(RigidBodyBase):
+    """Container for multiple copies of the same monomer.
+
+    Inherits from RigidBodyBase which ensures that it implements the `from_pdb` method.
+    """
 
     copies: Sequence[AtomCollection] = field(default_factory=list)
 
@@ -70,7 +74,7 @@ class Mcop:
 
 
 @dataclass
-class McopRigid:
+class McopRigid(RigidBodyBase):
     """Mcop RigidBody."""
 
     core: AtomCollection = None
