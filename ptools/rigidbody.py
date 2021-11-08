@@ -8,37 +8,11 @@ import os
 import numpy as np
 
 from .atom import AtomCollection
-from .io.pdb import InvalidPDBFormatError
+from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
 
 
-class _RigidBodyBase(ABC):
-    """Base Base class for RigidBody subclasses.
-
-    Ensures that child classes implement the `init_from_pdb` method.
-    """
-
-    @abstractmethod
-    def init_from_pdb(self, path: str | bytes | os.PathLike):
-        """Initializes internal components from data read in PDB file."""
-
-
-class RigidBodyBase(_RigidBodyBase):
-    """Base class for RigidBody subclasses.
-
-    Implements RigidBodyBase.from_pdb which returns a new instance initialized
-    from a PDB file, read with `cls.init_from_pdb`.
-    """
-
-    @classmethod
-    def from_pdb(cls, path: str | bytes | os.PathLike):
-        """Returns a new instance of the class initialized using `cls.init_from_pdb`."""
-        rigid = cls()
-        rigid.init_from_pdb(path)
-        return rigid
-
-
-class RigidBody(RigidBodyBase, AtomCollection):
+class RigidBody(FromPDB, AtomCollection):
     """RigidBody is an AtomCollection on which one can calculate the energy.
 
     It has 3 additionnal arrays comparaed to AtomCollection:
