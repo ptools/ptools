@@ -1,16 +1,19 @@
+"""Test for ptools.forcefield module."""
+
 import os
 import unittest
 
-
 import numpy as np
 
-from ptools.rigidbody import AttractRigidBody
+from ptools.rigidbody import AttractRigidBody, RigidBody
 from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_almost_equal
 
 
+# Ignores W0212: Access to a protected member of a client class
+# pylint: disable=W0212
 class TestAttractForceField1DummyRigid(unittest.TestCase):
     """Tests for AttractForceField1 that do not required an actual AttractRigidBody."""
 
@@ -19,8 +22,8 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
     )
 
     def setUp(self):
-        self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
-        self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
+        self.receptor = RigidBody.from_pdb(TEST_RECEPTOR_RED)
+        self.ligand = RigidBody.from_pdb(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
         # Save forcefield parameters for later use in non-regression tests.
@@ -48,6 +51,8 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
 
 
 class TestAttractForceField1(unittest.TestCase):
+    """Tests for AttractForceField that requires actual AttractRigidBody instances."""
+
     def setUp(self):
         self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
