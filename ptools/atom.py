@@ -230,6 +230,13 @@ class AtomCollection(SpatialObject, UserList):
         UserList.__init__(self, atoms)
         self.masses = np.zeros(len(atoms))
         self.guess_masses()
+        self.__post_init__()
+
+    def __post_init__(self):
+        """Post initialization method.
+
+        Overriden if needed in child classes.
+        """
 
     # @property
     # def atoms(self):

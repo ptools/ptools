@@ -23,27 +23,12 @@ class _RigidBodyBase(ABC):
         """Initializes internal components from data read in PDB file."""
 
 
-class RigidBodyBase(_RigidBodyBase, AtomCollection):
+class RigidBodyBase(_RigidBodyBase):
     """Base class for RigidBody subclasses.
 
     Implements RigidBodyBase.from_pdb which returns a new instance initialized
     from a PDB file, read with `cls.read_pdb`.
     """
-
-    def __init__(self, *args, **kwargs):
-        if args and isinstance(args[0], str):
-            raise TypeError(
-                "RigidBody class can not longer be instantiated from a path. "
-                "Use RigidBody.from_pdb instead."
-            )
-        AtomCollection.__init__(self, *args, **kwargs)
-        self.__post_init__()
-
-    def __post_init__(self):
-        """Post initialization method.
-
-        Overriden if needed in child classes.
-        """
 
     @classmethod
     def from_pdb(cls, path: str | bytes | os.PathLike):
@@ -53,14 +38,21 @@ class RigidBodyBase(_RigidBodyBase, AtomCollection):
         return rigid
 
 
-class RigidBody(RigidBodyBase):
+class RigidBody(RigidBodyBase, AtomCollection):
     """RigidBody is basically an AtomCollection that can be initialized
     from a file.
     """
+    def __init__(self, *args, **kwargs):
+        if args and isinstance(args[0], str):
+            raise TypeError(
+                "RigidBody class can not longer be instantiated from a path. "
+                "Use RigidBody.from_pdb instead."
+            )
+        AtomCollection.__init__(self, *args, **kwargs)
 
     def read_pdb(self, path: str | bytes | os.PathLike):
         atoms = io_read_pdb(path)
-        super().__init__(atoms)
+        AtomCollection.__init__(self, atoms)
 
 
 class AttractRigidBody(RigidBody):
