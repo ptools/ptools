@@ -31,6 +31,14 @@ class Mcop(RigidBodyBase):
         """Append a copy to the list of copies."""
         self.copies.append(kopy)
 
+    def __len__(self):
+        """Returns the number of copies.
+
+        Alias:
+            mcop.size()
+        """
+        return self.size()
+
     def size(self):
         """Returns the number of copies.
 
@@ -45,14 +53,6 @@ class Mcop(RigidBodyBase):
         output.copies = [atoms.copy() for atoms in self.copies]
         return output
 
-    def __len__(self):
-        """Returns the number of copies.
-
-        Alias:
-            mcop.size()
-        """
-        return self.size()
-
     def __getitem__(self, key: int) -> AtomCollection:
         """Returns the copy at key `key`."""
         return self.copies[key]
@@ -61,7 +61,7 @@ class Mcop(RigidBodyBase):
         """Clears the internal list of copies."""
         self.copies.clear()
 
-    def read_pdb(self, path: str):
+    def init_from_pdb(self, path: str):
         """Initializes models from data read in a PDB file."""
         models = pdb.read_pdb(path)
         for mod in models:
@@ -80,6 +80,22 @@ class McopRigid(RigidBodyBase):
     core: AtomCollection = None
     regions: Sequence[Mcop] = field(default_factory=list)
     weights: Sequence[np.ndarray] = field(default_factory=list)
+
+    def __len__(self):
+        """Returns the number of regions.
+
+        Alias:
+            mcoprigid.size()
+        """
+        return self.size()
+
+    def size(self):
+        """Returns the number of regions.
+
+        Alias:
+            len(mcoprigid)
+        """
+        return len(self.regions)
 
     def copy(self) -> McopRigid:
         """Returns a copy of itself."""
@@ -105,7 +121,7 @@ class McopRigid(RigidBodyBase):
         for region in self.regions:
             region.attract_euler_rotate(phi, ssi, rot)
 
-    def read_pdb(self, path: str):
+    def init_from_pdb(self, path: str):
         """Initializez McopRigid from data read in PDB file."""
         models = pdb.read_pdb(path, as_dict=True)
         keys = [key.split() for key in models.keys()]

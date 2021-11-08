@@ -1,5 +1,6 @@
 """Tests for ptools.mcop"""
 
+import os
 from tempfile import TemporaryFile
 import unittest
 
@@ -129,7 +130,7 @@ class TestMcop(unittest.TestCase):
     def test_read_pdb_mcop(self):
         mcop = Mcop()
         with mk_pdb_models(n_models=3) as pdb:
-            mcop.read_pdb(pdb.name)
+            mcop.init_from_pdb(pdb.name)
         self._test_initialization_from_pdb(mcop)
 
     def test_from_pdb(self):
@@ -188,19 +189,19 @@ class TestMcopRigid(unittest.TestCase):
                 McopRigidPDBError,
                 "expecting core region first",
             ):
-                McopRigid().read_pdb(tmpfile.name)
+                McopRigid.from_pdb(tmpfile.name)
 
     def test_read_pdb_no_regions(self):
         content = TestMcopPDBBuilder.mcop_pdb(has_region1=False, has_region2=False)
         with mk_tmp_file(content=content) as tmpfile:
             with self.assertRaisesRegex(McopRigidPDBError, "no region found"):
-                McopRigid().read_pdb(tmpfile.name)
+                McopRigid().init_from_pdb(tmpfile.name)
 
     def test_read_pdb(self):
         content = TestMcopPDBBuilder.mcop_pdb()
         with mk_tmp_file(content=content) as tmpfile:
             rigid = McopRigid()
-            rigid.read_pdb(tmpfile.name)
+            rigid.init_from_pdb(tmpfile.name)
         self._test_initialization_from_pdb(rigid)
 
     def test_from_pdb(self):
@@ -215,6 +216,26 @@ class TestMcopRigid(unittest.TestCase):
         self.assertEqual(len(rigid.regions), 2)
         self.assertEqual(len(rigid.regions[0]), 4)
         self.assertEqual(len(rigid.regions[1]), 3)
+
+
+class TestMcopForceField(unittest.TestCase):
+    pass
+
+
+class TestMcopForReal(unittest.TestCase):
+    """From ptools C++."""
+
+    path_receptor = os.path.join(os.path.dirname(__file__), "data", "mcop", "receptor.red")
+
+    def test_read_core(self):
+        rec = McopRigid.from_pdb(self.path_receptor)
+        self.assertEqual(len(rec), 1)
+        self.assertEqual(len(rec.core), 492)
+
+    def test_read_loops(self):
+        rec = McopRigid.from_pdb(self.path_receptor)
+        loops = rec.regions[0]
+        self.assertEqual(len(loops), 2)
 
 
 
