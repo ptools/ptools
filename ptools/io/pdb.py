@@ -1,6 +1,7 @@
 """Protein Data Bank format I/O."""
 
 
+
 from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
@@ -16,7 +17,7 @@ class PDBLine(str):
     (i.e. atom, new model, end model, etc.).
     """
 
-    def __init__(self, _) -> None:
+    def __init__(self, *args) -> None:
         super().__init__()
         self.header = self[0:6].strip()
 
