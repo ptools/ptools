@@ -1,9 +1,37 @@
 """Protein Data Bank format I/O."""
 
-
+import abc
+import os
 
 from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
+
+
+class _FromPDBBase(abc.ABC):
+    """Abstract Base class for classes which can be initialized from PDB files.
+
+    Ensures that child classes implement the `init_from_pdb` method.
+    """
+
+    @abc.abstractmethod
+    def init_from_pdb(self, path: Union[str, bytes, os.PathLike]):
+        """Initializes internal components from data read in PDB file."""
+
+
+class FromPDB(_FromPDBBase):
+    """Base class for classes which can be initialized from PDB files.
+
+    Implements FromPDB.from_pdb which returns a new instance initialized
+    from a PDB file, read with `cls.init_from_pdb`.
+    """
+
+    @classmethod
+    def from_pdb(cls, path: Union[str, bytes, os.PathLike]):
+        """Returns a new instance of the class initialized using `cls.init_from_pdb`."""
+        rigid = cls()
+        rigid.init_from_pdb(path)
+        return rigid
+
 
 
 class InvalidPDBFormatError(IOError):
