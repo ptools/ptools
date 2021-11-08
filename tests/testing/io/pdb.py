@@ -123,8 +123,6 @@ SCALE3      0.000000  0.000000  1.000000        0.00000\
         else:
             content.append(cls.atom())
 
-        print("youpi")
-        print("\n".join(content))
         return "\n".join(content)
 
 
