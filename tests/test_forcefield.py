@@ -1,4 +1,3 @@
-
 import os
 import unittest
 
@@ -8,13 +7,16 @@ import numpy as np
 from ptools.rigidbody import AttractRigidBody
 from ptools.forcefield import AttractForceField1
 
-from .attract import TEST_AMINON, TEST_LIGAND_RED, TEST_RECEPTOR_RED
-from .testing.moreassert import assert_array_equal, assert_array_almost_equal
+from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED
+from .testing.moreassert import assert_array_almost_equal
 
 
 class TestAttractForceField1DummyRigid(unittest.TestCase):
     """Tests for AttractForceField1 that do not required an actual AttractRigidBody."""
-    path_ff_parameters = os.path.join(os.path.dirname(__file__), "data", "ff_parameters.np")
+
+    path_ff_parameters = os.path.join(
+        os.path.dirname(__file__), "data", "ff_parameters.np"
+    )
 
     def setUp(self):
         self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
@@ -46,7 +48,6 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
 
 
 class TestAttractForceField1(unittest.TestCase):
-
     def setUp(self):
         self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
         self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
@@ -87,4 +88,3 @@ class TestAttractForceField1(unittest.TestCase):
         self.assertAlmostEqual(
             self.ff._AttractForceField1__nb_energy_large_cutoff(), -4.85626395114
         )
-

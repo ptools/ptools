@@ -91,8 +91,12 @@ class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
 
     paramfile: str = ""
-    _repulsive_parameters: np.ndarray = field(init=False, repr=False, default=np.empty(0))
-    _attractive_parameters: np.ndarray = field(init=False, repr=False, default=np.empty(0))
+    _repulsive_parameters: np.ndarray = field(
+        init=False, repr=False, default=np.empty(0)
+    )
+    _attractive_parameters: np.ndarray = field(
+        init=False, repr=False, default=np.empty(0)
+    )
     _repulsive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
     _attractive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
 
