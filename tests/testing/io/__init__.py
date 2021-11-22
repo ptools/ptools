@@ -21,3 +21,9 @@ def random_filename() -> str:
     """Returns a random file name."""
     with tempfile.NamedTemporaryFile() as tmpfile:
         return tmpfile.name
+
+
+def create_empty_file(path):
+    """Creates an empty file located at `path`."""
+    with open(path, "wt", encoding="utf-8"):
+        pass
