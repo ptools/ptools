@@ -1,7 +1,9 @@
 """Protein Data Bank format I/O."""
 
 import abc
+from dataclasses import dataclass, field
 import os
+import re
 from typing import Protocol
 
 from typing import Sequence, Tuple, Union
@@ -226,3 +228,86 @@ def read_pdb(
 
     # Multiple models: returns a list of AtomCollection instances.
     return models
+
+
+class RobustPDBBuilder:
+
+    class _RecordBase(abc.ABC):
+        """Generic Record Handler Class."""
+
+        @property
+        @abc.abstractmethod
+        def pdb(self) -> str:
+            """Returns data as a PDB formatted string."""
+
+    @dataclass(frozen=True)
+    class RecordBase(_RecordBase):
+        """Base class for a Record formatter class.
+
+        Implements the `check_formats` methods which calls `self.check_format_<member>()`
+        for each member variable.
+        """
+
+        def __post_init__(self):
+            """Post initialization method.
+
+            Mandatory call to `self.check_formats()`.
+            """
+            # Probably a better way to do this using a metaclass.
+            for member_name in self.__dict__:
+                method = f"check_format_{member_name}"
+                if not hasattr(self, method):
+                    raise NotImplementedError(f"class {self.__class__.__name__} has no member '{method}'")
+            self.check_formats()
+
+        def check_formats(self):
+            """Makes sure data is well formatted.
+
+            Calls `check_format_<member>` for each member variable.
+            """
+            for member_name in self.__dict__:
+                getattr(self, f"check_format_{member_name}")()
+
+
+
+    @dataclass(frozen=True)
+    class HeaderRecord(RecordBase):
+        """Header Record.
+
+        Record Format
+        =============
+
+        COLUMNS       DATA  TYPE     FIELD             DEFINITION
+        ------------------------------------------------------------------------------------
+        1 -  6       Record name    "HEADER"
+        11 - 50       String(40)     classification    Classifies the molecule(s).
+        51 - 59       Date           depDate           Deposition date. This is the date the coordinates were received at the PDB.
+        63 - 66       IDcode         idCode            This identifier is unique within the PDB.
+        """
+
+        name: str = field(init=False, default="HEADER")
+        classification: str
+        date: str
+        idcode: str
+
+        date_pattern = re.compile("[0-9]{2}-[A-Z]{3}-[0-9]{2}$")
+
+        def check_format_classification(self):
+            """Checks the format for member `classification`."""
+            assert len(self.classification) < 41
+
+        def check_format_date(self):
+            """Checks the format for member `date`."""
+            assert self.date_pattern.match(self.date) is not None
+
+        def check_format_idcode(self):
+            """Checks the format for member `idcode`."""
+            # raise NotImplementedError
+
+
+        @property
+        def pdb(self) -> str:
+            """Returns the record formatted as a valid PDB string."""
+            return f"{self.name:<6}    {self.classification:<40}{self.date:<9}   {self.idcode:<3}"
+
+
