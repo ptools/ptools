@@ -302,7 +302,7 @@ class RobustPDBBuilder:
 
         def check_format_idcode(self):
             """Checks the format for member `idcode`."""
-            # raise NotImplementedError
+            assert len(self.idcode) == 4
 
 
         @property

@@ -2,72 +2,95 @@
 
 Reference strings are taken from the PDB format documentation:
     https://www.wwpdb.org/documentation/file-format-content/format33/v3.3.html
+
+
+Important
+---------
+
+Test detection using pytest: classes do not inherit from unittest.TestCase
+because of the inheritance scheme.
 """
 
 import unittest
 
+import pytest
+
 from ptools.io.pdb import RobustPDBBuilder
 
 
-class TestHeader(unittest.TestCase):
-    """Tests for the HEADER record creation."""
 
-    def test_header_record_ok(self):
-        rec = RobustPDBBuilder.HeaderRecord(
-            classification="PHOTOSYNTHESIS",
-            date="28-MAR-07",
-            idcode="2UXK",
-        )
-        reference_string = (
-            "HEADER    PHOTOSYNTHESIS                          28-MAR-07   2UXK"
-        )
-        self.assertEqual(rec.pdb, reference_string)
+class TestHeaderBase:
 
+    classification: str = "PHOTOSYNTHESIS"
+    date: str = "28-MAR-07"
+    idcode: str = "2UXK"
 
-class TestHeaderDate(unittest.TestCase):
-    """Tests for the HEADER record date field."""
+    reference_string = "HEADER    PHOTOSYNTHESIS                          28-MAR-07   2UXK"
 
-    def setUp(self):
-        self.classification = "PHOTOSYNTHESIS"
-        self.idcode = "2UXK"
-
-    def assertExceptionRaisedOnInitialization(self, datestr):
-        with self.assertRaises(AssertionError):
+    def assertExceptionRaisedUponInitialization(
+        self, classification: str = None, date: str = None, idcode: str = None
+    ):
+        with pytest.raises(AssertionError):
+            classification_str = self.classification if classification is None else classification
+            date_str = self.date if date is None else date
+            idcode_str = self.idcode if idcode is None else idcode
             RobustPDBBuilder.HeaderRecord(
-                classification=self.classification,
-                idcode=self.idcode,
-                date=datestr,
+                classification=classification_str,
+                date=date_str,
+                idcode=idcode_str,
             )
 
+
+class TestHeader(TestHeaderBase):
+
+    def test_header_ok(self):
+        rec = RobustPDBBuilder.HeaderRecord(self.classification, self.date, self.idcode)
+        assert rec.pdb == self.reference_string
+
+    def test_classification_string_too_long(self):
+        self.assertExceptionRaisedUponInitialization(classification="X" * 80)
+
+    def test_idcode_string_too_long(self):
+        self.assertExceptionRaisedUponInitialization(idcode="X" * 5)
+
+    def test_idcode_string_too_short(self):
+        self.assertExceptionRaisedUponInitialization(idcode="X" * 3)
+
+
+class TestHeaderDate(TestHeaderBase):
+    """Tests for the HEADER record date field."""
+
     def test_too_many_tokens(self):
-        self.assertExceptionRaisedOnInitialization("28-MAR-07-FOO")
+        self.assertExceptionRaisedUponInitialization(date="28-MAR-07-FOO")
 
     # -- Test day format ---------------------------------------------------------------
     def test_day_is_not_an_integer(self):
-        self.assertExceptionRaisedOnInitialization("LU-MAR-07")
+        self.assertExceptionRaisedUponInitialization(date="LU-MAR-07")
 
     def test_day_is_too_short(self):
-        self.assertExceptionRaisedOnInitialization("2-MAR-07")
+        self.assertExceptionRaisedUponInitialization(date="2-MAR-07")
 
     def test_day_is_too_long(self):
-        self.assertExceptionRaisedOnInitialization("288-MAR-07")
+        self.assertExceptionRaisedUponInitialization(date="288-MAR-07")
 
     # -- Test month format -------------------------------------------------------------
     def test_month_is_not_a_string(self):
-        self.assertExceptionRaisedOnInitialization("28-03-07")
+        self.assertExceptionRaisedUponInitialization(date="28-03-07")
 
     def test_month_is_too_short(self):
-        self.assertExceptionRaisedOnInitialization("28-MA-07")
+        self.assertExceptionRaisedUponInitialization(date="28-MA-07")
 
     def test_month_is_too_long(self):
-        self.assertExceptionRaisedOnInitialization("28-MARS-07")
+        self.assertExceptionRaisedUponInitialization(date="28-MARS-07")
 
     # -- Test year format --------------------------------------------------------------
     def test_year_is_not_an_integer(self):
-        self.assertExceptionRaisedOnInitialization("28-MAR-UX")
+        self.assertExceptionRaisedUponInitialization(date="28-MAR-UX")
 
     def test_year_is_too_short(self):
-        self.assertExceptionRaisedOnInitialization("28-MAR-0")
+        self.assertExceptionRaisedUponInitialization(date="28-MAR-0")
 
     def test_year_is_too_long(self):
-        self.assertExceptionRaisedOnInitialization("28-MAR-2007")
+        self.assertExceptionRaisedUponInitialization(date="28-MAR-2007")
+
+
