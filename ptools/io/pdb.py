@@ -290,11 +290,13 @@ class RobustPDBBuilder:
         date: str
         idcode: str
 
-        date_pattern = re.compile("[0-9]{2}-[A-Z]{3}-[0-9]{2}$")
+        classification_pattern = re.compile(r".{0,40}$")
+        date_pattern = re.compile(r"[0-9]{2}-[A-Z]{3}-[0-9]{2}$")
+        idcode_pattern = re.compile(r"\w{4}$")
 
         def check_format_classification(self):
             """Checks the format for member `classification`."""
-            assert len(self.classification) < 41
+            assert self.classification_pattern.match(self.classification) is not None
 
         def check_format_date(self):
             """Checks the format for member `date`."""
@@ -302,7 +304,7 @@ class RobustPDBBuilder:
 
         def check_format_idcode(self):
             """Checks the format for member `idcode`."""
-            assert len(self.idcode) == 4
+            assert self.idcode_pattern.match(self.idcode) is not None
 
 
         @property
