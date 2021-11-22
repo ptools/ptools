@@ -2,12 +2,13 @@
 
 import abc
 import os
+from typing import Protocol
 
 from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
-class _FromPDBBase(abc.ABC):
+class _FromPDBBase(Protocol):
     """Abstract Base class for classes which can be initialized from PDB files.
 
     Ensures that child classes implement the `init_from_pdb` method.
@@ -31,7 +32,6 @@ class FromPDB(_FromPDBBase):
         rigid = cls()
         rigid.init_from_pdb(path)
         return rigid
-
 
 
 class InvalidPDBFormatError(IOError):
