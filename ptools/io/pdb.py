@@ -294,6 +294,18 @@ class RobustPDBBuilder:
         date_pattern = re.compile(r"[0-9]{2}-[A-Z]{3}-[0-9]{2}$")
         idcode_pattern = re.compile(r"\w{4}$")
 
+        @classmethod
+        @property
+        def line_pattern(cls):
+            return re.compile(
+                f"HEADER    {cls.classification_pattern.pattern[:-1]}{cls.date_pattern.pattern[:-1]}   {cls.date_pattern.pattern}"
+            )
+
+        @classmethod
+        def check_format_line(cls, line: str):
+            """Checks a full line format."""
+            assert cls.line_pattern.match(line)
+
         def check_format_classification(self):
             """Checks the format for member `classification`."""
             assert self.classification_pattern.match(self.classification) is not None

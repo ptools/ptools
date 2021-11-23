@@ -47,6 +47,9 @@ class TestHeader(TestHeaderBase):
         rec = RobustPDBBuilder.HeaderRecord(self.classification, self.date, self.idcode)
         assert rec.pdb == self.reference_string
 
+    def test_check_format_line(self):
+        RobustPDBBuilder.HeaderRecord.check_format_line(self.reference_string)
+
     def test_classification_string_too_long(self):
         self.assertExceptionRaisedUponInitialization(classification="X" * 80)
 
