@@ -251,6 +251,13 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(sel), 426)
         self.assertEqual([atom.name for atom in sel], ["CA"] * 426)
 
+    def test_select_atom_types(self):
+        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        sel = atoms.select_atom_types(["CA", "CB"])
+        self.assertEqual(len(sel), 426 + 64)
+        self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426)
+        self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64)
+
     def test_select_residue_range(self):
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         sel = atoms.select_residue_range(10, 20)
