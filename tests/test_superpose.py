@@ -1,144 +1,141 @@
-import random
-import sys
+# Unit-tests libraries.
 import unittest
+from pytest import approx
 
+from hypothesis import given
+from hypothesis.strategies import composite, floats
+from hypothesis.extra.numpy import arrays
+
+# Type-hinting special types.
+from typing import Callable
+from hypothesis.strategies import SearchStrategy
+
+# Scientific libraries.
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+# PTools imports.
 from ptools import superpose
 from ptools.rigidbody import RigidBody
 from ptools.spatial import coord3d, transformation_matrix
 from ptools.superpose import Screw
 
+# Test-specific imports.
 from . import TEST_LIGAND
-from .testing import assert_array_almost_equal
 
 
-class TestScrew(unittest.TestCase):
-    def setUp(self):
-        self.screw = Screw()
+def test_screw_initialization():
+    screw = Screw()
+    assert screw.unit == approx(np.zeros(3))
+    assert screw.point == approx(np.zeros(3))
+    assert screw.normtranslation == approx(0)
+    assert screw.angle == approx(0)
 
-    def test_get_set_angle(self):
-        self.assertEqual(self.screw.angle, 0)
-        value = random_float()
-        self.screw.angle = value
-        self.assertAlmostEqual(self.screw.angle, value)
 
-    def test_get_set_normtranslation(self):
-        self.assertEqual(self.screw.normtranslation, 0)
-        value = random_float()
-        self.screw.normtranslation = value
-        self.assertAlmostEqual(self.screw.normtranslation, value)
+def test_screw_copy():
+    source = Screw()
+    target = source.copy()
+    assert target.unit == approx(source.unit)
+    assert target.point == approx(source.point)
+    assert target.normtranslation == approx(source.normtranslation)
+    assert target.angle == approx(source.angle)
 
-    def test_get_set_unit_vector(self):
-        assert_array_almost_equal(self.screw.unit, coord3d())
-        u = coord3d((random_float(), random_float(), random_float()))
-        self.screw.unit = u
-        assert_array_almost_equal(self.screw.unit, u)
+    # Makes sure modifying one does not modify the other.
+    target.angle += 12
+    target.unit += 3
+    assert target.angle == approx(source.angle + 12)
+    assert target.unit == approx(source.unit + 3)
 
-    def test_get_set_point(self):
-        assert_array_almost_equal(self.screw.point, coord3d())
-        u = coord3d((random_float(), random_float(), random_float()))
-        self.screw.point = u
-        assert_array_almost_equal(self.screw.point, u)
 
-    def test_copy(self):
-        target = self.screw.copy()
-        self.assertAlmostEqual(target.angle, self.screw.angle)
-        self.assertAlmostEqual(target.normtranslation, self.screw.normtranslation)
-        assert_array_almost_equal(target.unit, self.screw.unit)
-        assert_array_almost_equal(target.point, self.screw.point)
-
-        # Make sure changing one does not change the other
-        target.angle += 12
-        self.assertAlmostEqual(target.angle, self.screw.angle + 12)
-
-        target.unit += 3
-        assert_array_almost_equal(target.unit, self.screw.unit + 3)
+@composite
+def vectors3(
+    draw: Callable[[SearchStrategy[float]], float],
+    min_value: float = 1e-8,
+    max_value: float = 1e8,
+) -> np.ndarray:
+    """Returns a custom vector of 3 floats with custom boundaries."""
+    return draw(
+        arrays(
+            dtype=float,
+            shape=(3,),
+            elements=floats(min_value=min_value, max_value=max_value),
+        )
+    )
 
 
 class TestSuperpose(unittest.TestCase):
     def setUp(self):
         self.target = RigidBody.from_pdb(TEST_LIGAND)
 
-    def test_fit(self):
+    @given(vectors3(), vectors3())
+    def test_fit(self, translation_vector: np.ndarray, rotation_vector: np.ndarray):
         mobile = self.target.copy()
 
         # Random translation and rotation.
-        t = [-4.2, 5.1, 20.2]
-        r = Rotation.from_euler("xyz", [-10, 30, 90]).as_matrix()
-
-        mobile.moveby(t)
-        mobile.rotate(r)
+        rotation_matrix = Rotation.from_euler("xyz", rotation_vector).as_matrix()
+        mobile.moveby(translation_vector)
+        mobile.rotate(rotation_matrix)
 
         superpose.fit(mobile, self.target)
-
-        assert_array_almost_equal(mobile.coords, self.target.coords)
+        assert mobile.coords == approx(self.target.coords, rel=1e-4)
 
     def test_rmsd(self):
         # RMSD with copy should be 0.0
         mobile = self.target.copy()
-        self.assertAlmostEqual(superpose.rmsd(mobile, self.target), 0.0)
+        assert superpose.rmsd(mobile, self.target) == approx(0.0)
 
         # RMSD after translation of 10 units should be 10.
         mobile.translate((10, 0, 0))
-        self.assertAlmostEqual(superpose.rmsd(mobile, self.target), 10.0)
+        assert superpose.rmsd(mobile, self.target) == approx(10.0)
 
         # RMSD after translation and fit should be 0.0.
-        self.assertAlmostEqual(superpose.rmsd(mobile, self.target, do_fit=True), 0)
+        assert superpose.rmsd(mobile, self.target, do_fit=True) == approx(0.0)
 
     def test_mat_trans_to_screw(self):
-
+        """Those are non-regression tests."""
         # abs(1 + a - b - c) > EPSILON
         m = np.zeros((4, 4))
         s = superpose.mat_trans_2_screw(m)
-        self.assertTrue(isinstance(s, Screw))
+        assert isinstance(s, Screw)
 
-        self.assertAlmostEqual(s.angle, 1.57079632679)
-        self.assertAlmostEqual(s.normtranslation, 0.0)
-        assert_array_almost_equal(s.unit, coord3d(1.0, 0.0, 0.0))
-        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+        assert s.angle == approx(1.57079632679)
+        assert s.normtranslation == approx(0.0)
+        assert s.unit == approx(coord3d(1.0, 0.0, 0.0))
+        assert s.point == approx(coord3d(0.0, 0.0, 0.0))
 
         # abs(1 - a + b - c) > EPSILON
         s = superpose.mat_trans_2_screw(
             transformation_matrix(rotation=np.array([0, -34, 0]))
         )
-        self.assertAlmostEqual(s.angle, -0.59341194)
-        self.assertAlmostEqual(s.normtranslation, 0.0)
-        assert_array_almost_equal(s.unit, coord3d(0.0, 1.0, 0.0))
-        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+        assert s.angle == approx(-0.59341194)
+        assert s.normtranslation == approx(0.0)
+        assert s.unit == approx(coord3d(0.0, 1.0, 0.0))
+        assert s.point == approx(coord3d(0.0, 0.0, 0.0))
 
         # abs(1 - a - b + c) > EPSILON
         s = superpose.mat_trans_2_screw(
             transformation_matrix(rotation=np.array([0, 0, 90]))
         )
-        self.assertAlmostEqual(s.angle, 1.5707963)
-        self.assertAlmostEqual(s.normtranslation, 0.0)
-        assert_array_almost_equal(s.unit, coord3d(0.0, 0.0, 1.0))
-        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+        assert s.angle == approx(1.5707963)
+        assert s.normtranslation == approx(0.0)
+        assert s.unit == approx(coord3d(0.0, 0.0, 1.0))
+        assert s.point == approx(coord3d(0.0, 0.0, 0.0))
 
         # angle = 0
         t = transformation_matrix(
             rotation=np.zeros(3), translation=np.array([-3, 2, 1])
         )
         s = superpose.mat_trans_2_screw(t)
-        self.assertAlmostEqual(s.angle, 0.0)
-        self.assertAlmostEqual(s.normtranslation, 3.74165738)
-        assert_array_almost_equal(s.unit, coord3d(-0.80178373, 0.53452248, 0.26726124))
-        assert_array_almost_equal(s.point, coord3d(0.0, 0.0, 0.0))
+        assert s.angle == approx(0.0)
+        assert s.normtranslation == approx(3.74165738)
+        assert s.unit == approx(coord3d(-0.80178373, 0.53452248, 0.26726124))
+        assert s.point == approx(coord3d(0.0, 0.0, 0.0))
 
         t = transformation_matrix(
             rotation=np.array([11, 19, 87]), translation=np.array([-1, 8, 11])
         )
         s = superpose.mat_trans_2_screw(t)
-        self.assertAlmostEqual(s.angle, 1.58731230)
-        self.assertAlmostEqual(s.normtranslation, 10.95636347)
-        assert_array_almost_equal(s.unit, coord3d(0.25480885, 0.07588361, 0.9640094))
-        assert_array_almost_equal(s.point, coord3d(0.0, 3.30358643, 21.22781297))
-
-
-def random_float():
-    """Return a random floatting point number in the range
-    [-max_float; +max_float]."""
-    max_float = sys.float_info.max
-    return random.randrange(-max_float, +max_float)
+        assert s.angle == approx(1.58731230)
+        assert s.normtranslation == approx(10.95636347)
+        assert s.unit == approx(coord3d(0.25480885, 0.07588361, 0.9640094))
+        assert s.point == approx(coord3d(0.0, 3.30358643, 21.22781297))
