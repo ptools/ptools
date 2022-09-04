@@ -12,10 +12,9 @@ from typing import Sequence
 
 import numpy as np
 
-import ptools.spatial
-from ptools.spatial import SpatialObject
+from . import linalg
 from . import tables
-
+from .spatial import SpatialObject
 
 # The Protein Data Bank format for atom coordinates
 PDB_FMT = (
@@ -270,7 +269,7 @@ class AtomCollection(SpatialObject, UserList):
 
     def center_of_mass(self) -> np.ndarray:
         """Returns the center of mass (barycenter)."""
-        return ptools.spatial.center_of_mass(self.coords, self.masses)
+        return linalg.center_of_mass(self.coords, self.masses)
 
     def tensor_of_inertia(self, weights=None, method: str = "accurate"):
         """Returns the inertia tensors of a set of atoms.
@@ -294,7 +293,7 @@ class AtomCollection(SpatialObject, UserList):
                 The "fast" method is probably sufficient to calculate axes of
                 inertia.
         """
-        return ptools.spatial.principal_axes(self.tensor_of_inertia(method), sort)
+        return linalg.principal_axes(self.tensor_of_inertia(method), sort)
 
     def radius_of_gyration(self) -> float:
         """Returns the isometric radius of gyration (atom mass is not taken

@@ -479,24 +479,3 @@ class TestSpatialObjectTransformations(unittest.TestCase):
             self.obj.translate((1, 0, 0, 0))
 
 
-class TestSpatial(unittest.TestCase):
-    def test_angle(self):
-        u = (2, 2, 0)
-        v = (0, 3, 0)
-        angle = spatial.angle(u, v)
-        self.assertAlmostEqual(math.degrees(angle), 45)
-
-    def test_tensor_of_inertia_accurate_fails_without_weights(self):
-        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        err = "need weights to compute accurate tensor of inertia"
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.tensor_of_inertia(array, method="accurate")
-
-    def test_tensor_of_inertia_invalid_method(self):
-        array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        err = (
-            r"parameter 'method' should be 'accurate' or 'fast' "
-            r"\(found method='foobar'\)"
-        )
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.tensor_of_inertia(array, method="foobar")

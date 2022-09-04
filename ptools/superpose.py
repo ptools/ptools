@@ -7,8 +7,10 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from ptools.atom import AtomCollection
-from ptools import spatial
+from .atom import AtomCollection
+from . import linalg
+from . import spatial
+
 
 
 @dataclass
@@ -160,7 +162,7 @@ def mat_trans_2_screw(matrix: np.ndarray) -> Screw:
         return screw
 
     v = np.array((1, 0, 0))
-    if abs(spatial.angle(screw.unit, v)) < 0.1:
+    if abs(linalg.angle(screw.unit, v)) < 0.1:
         v = np.array((0, 0, 1))
 
     u = v - np.dot(v, screw.unit) * screw.unit

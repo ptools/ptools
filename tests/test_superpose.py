@@ -1,4 +1,4 @@
-# Unit-tests libraries.
+# Unit-test libraries.
 import unittest
 from pytest import approx
 
