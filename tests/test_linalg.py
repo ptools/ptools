@@ -1,21 +1,37 @@
 # Python core libraries.
+from enum import Enum
 import math
+import random
 
 # Unit-test libraries.
+import pytest
 from pytest import approx
-
-from hypothesis import given
-from hypothesis.strategies import composite, floats, integers
-from hypothesis.extra.numpy import arrays
-
-# Type-hinting special types.
-from typing import Callable
 
 # Scientific libraries.
 import numpy as np
 
 # PTools imports.
 import ptools.linalg as linalg
+
+
+def generate_random_array(
+    low: float = 0.0, high: float = 1.0, shape: int | tuple[int] = 1
+) -> np.ndarray:
+    return np.random.uniform(low, high, shape)
+
+
+def generate_random_coordinates() -> np.ndarray:
+    """Generate a coordinates-like array.
+
+    The output array's size is random as well.
+    """
+    N = random.randint(2, 3000)
+    return generate_random_array(-1000, 1000, (N, 3))
+
+
+def generate_empty_coordinates() -> np.ndarray:
+    """Returns an empty array."""
+    return np.zeros((0, 3))
 
 
 def test_angle():
@@ -25,50 +41,61 @@ def test_angle():
     assert math.degrees(angle) == approx(45)
 
 
-@composite
-def np_friendly_arrays(draw: Callable) -> np.array:
-    shape = (
-        draw(integers(min_value=2, max_value=8192)),
-        draw(integers(min_value=2, max_value=8192)),
-    )
-    return draw(
-        arrays(
-            dtype=float, shape=shape, elements=floats(min_value=1e-10, max_value=1e10)
-        )
-    )
+class TestCentroid:
+    """Namespace that holds unit-tests for ptools.linalg.centroid."""
+
+    def test_random_coordinates(self):
+        x = generate_random_coordinates()
+        np.testing.assert_array_almost_equal(linalg.centroid(x), np.mean(x, axis=0))
+
+    def test_empty_coordinates(self):
+        x = generate_empty_coordinates()
+        with pytest.warns(RuntimeWarning, match="Mean of empty slice"):
+            assert np.isnan(linalg.centroid(x)).all()
 
 
-def test_centroid():
-    x = np.random.rand(1000, 3)
-    np.testing.assert_array_almost_equal(linalg.centroid(x), np.mean(x, axis=0))
+class TestCenterOfMass:
+    """Namespace that holds unit-tests for ptools.linalg.center_of_mass."""
+
+    @staticmethod
+    def test_random_coordinates():
+        x = generate_random_coordinates()
+        w = generate_random_array(shape=x.shape[0])
+        actual = linalg.center_of_mass(x, w)
+        expected = np.average(x, axis=0, weights=w)
+        np.testing.assert_array_almost_equal(actual, expected)
+
+    @staticmethod
+    def test_empty_coordinates():
+        x = generate_empty_coordinates()
+        w = np.ones(x.shape[0])
+        with pytest.raises(
+            ZeroDivisionError, match="cannot compute center of mass of empty array"
+        ):
+            linalg.center_of_mass(x, w)
+
+    @staticmethod
+    def test_empty_weights():
+        x = generate_random_coordinates()
+        w = np.ones(0)
+        with pytest.raises(
+            ValueError, match="input array and weights should be the same size"
+        ):
+            linalg.center_of_mass(x, w)
 
 
-def test_center_of_mass():
-    def center_of_mass(x: np.ndarray, w: np.ndarray) -> np.ndarray:
-        """Numpy-style COM calculation... way slower than PTools."""
-        return np.average(x, axis=0, weights=w)
+class TestTensorOfInertia:
+    """Namespace that holds unit-tests for ptools.linalg.tensor_of_inertia."""
 
-    x = np.random.rand(1000, 3)
-    w = np.ones(x.shape[0])
-    actual = linalg.center_of_mass(x, weights=w)
-    expected = center_of_mass(x, w)
-    np.testing.assert_array_almost_equal(actual, expected)
+    @staticmethod
+    def test_invalid_method():
+        x = generate_random_array()
+        with pytest.raises(ValueError):
+            linalg.tensor_of_inertia(x, method="accurate")  # method invalid type: str
 
-
-
-
-# def test_tensor_of_inertia_invalid_method():
-#     err = (
-#         r"parameter 'method' should be 'accurate' or 'fast' "
-#         r"\(found method='foobar'\)"
-#     )
-#     with pytest.raises(ValueError, match=err):
-#         linalg.tensor_of_inertia(np.zeros((3, 3)), method="foobar")
-
-
-# def test_tensor_of_inertia_accurate_fails_without_weights(self):
-#     array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-#     err = "need weights to compute accurate tensor of inertia"
-#     with self.assertRaisesRegex(ValueError, err):
-#         spatial.tensor_of_inertia(array, method="accurate")
-
+    @staticmethod
+    def test_accurate_fails_without_weights():
+        x = generate_random_array()
+        err = "need weights to compute accurate tensor of inertia"
+        with pytest.raises(ValueError, match=err):
+            linalg.tensor_of_inertia(x, method=linalg.Method.ACCURATE)

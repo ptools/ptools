@@ -2,20 +2,34 @@
 
 # Python core libraries.
 import math
+from enum import Enum, auto
 
 # Scientific libraries.
 import numpy as np
 import scipy.linalg as L
+
+
+class Method(Enum):
+    FAST = auto()
+    ACCURATE = auto()
+
 
 def angle(u: np.ndarray, v: np.ndarray) -> float:
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (L.norm(u) * L.norm(v)))
 
 
-def center_of_mass(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
+def center_of_mass(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """Return the center of mass (barycenter)."""
-    weights = weights.reshape(-1, 1)
-    return (coords * weights).sum(axis=0) / weights.sum()
+    N = x.shape[0]
+    if N == 0:
+        raise ZeroDivisionError("cannot compute center of mass of empty array")
+    if weights.shape[0] != N:
+        raise ValueError(
+            f"input array and weights should be the same size ({N} != {weights.shape[0]})"
+        )
+    weights = weights.reshape(N, 1)
+    return (x * weights).sum(axis=0) / weights.sum()
 
 
 def centroid(x: np.ndarray) -> np.ndarray:
@@ -61,17 +75,15 @@ def _tensor_of_inertia_fast(coords: np.ndarray) -> np.ndarray:
 
 
 def tensor_of_inertia(
-    coords: np.ndarray, weights: np.ndarray = None, method: str = "accurate"
+    coords: np.ndarray, weights: np.ndarray = None, method: Method = Method.ACCURATE
 ) -> np.ndarray:
     """Returns the inertia tensors of a set of coordinates.
 
     Allows to choose between "accurate" (weighted) and "fast" methods.
     """
-    if method not in ("accurate", "fast"):
-        raise ValueError(
-            "parameter 'method' should be 'accurate' or 'fast' " f"(found {method=!r})"
-        )
-    if method == "accurate":
+    if method not in list(Method):
+        raise ValueError(f"parameter 'method' should be Method.ACCURATE or Method.FAST (found {method=!r})")
+    if method is Method.ACCURATE:
         if weights is None:
             raise ValueError("need weights to compute accurate tensor of " "inertia")
         return _tensor_of_inertia_accurate(coords, weights)
@@ -95,4 +107,3 @@ def principal_axes(tensor: np.ndarray, sort: bool = True) -> np.ndarray:
         order = np.argsort(evalues)[::-1]  # descending order
         evectors = evectors[:, order].transpose()
     return evectors
-
