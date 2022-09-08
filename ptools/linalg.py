@@ -2,7 +2,6 @@
 
 # Python core libraries.
 import math
-from enum import Enum, auto
 
 # Scientific libraries.
 import numpy as np
@@ -41,16 +40,18 @@ def inertia_tensor(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
     Only works on N x 3 arrays.
     """
     if not coords.shape[1] == 3:
-        raise ValueError(f"inertia tensor can only be calculated on a N x 3 array, (found {coords.shape})")
+        raise ValueError(
+            f"inertia tensor can only be calculated on a N x 3 array, (found {coords.shape})"
+        )
 
     com = center_of_mass(coords, weights)
     X = coords - com
 
     x, y, z = X.T
 
-    Ixx = np.sum(weights * (y ** 2 + z ** 2))
-    Iyy = np.sum(weights * (x ** 2 + z ** 2))
-    Izz = np.sum(weights * (x ** 2 + y ** 2))
+    Ixx = np.sum(weights * (y**2 + z**2))
+    Iyy = np.sum(weights * (x**2 + z**2))
+    Izz = np.sum(weights * (x**2 + y**2))
     Ixy = -np.sum(weights * x * y)
     Iyz = -np.sum(weights * y * z)
     Ixz = -np.sum(weights * x * z)

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+# Python core libraries.
 import os
 
+# Scientific libraries.
 import numpy as np
 
+# PTools.
 from .atom import AtomCollection
 from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
