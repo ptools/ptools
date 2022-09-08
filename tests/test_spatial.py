@@ -79,8 +79,10 @@ class TestSpatialObjectArray(unittest.TestCase):
         self.assertEqual(self.obj.coords.shape, (2, 3))
         assert_array_almost_equal(self.obj.coords[1], (1, 1, 1))
 
-    def test_tensor_of_inertia(self):
-        assert_array_almost_equal(self.obj.tensor_of_inertia(), np.full((3, 3), 0.5))
+    def test_inertia_tensor(self):
+        expected = np.full((3, 3), -0.5)
+        np.fill_diagonal(expected, 1)
+        assert_array_almost_equal(self.obj.inertia_tensor(), expected)
 
 
 class TestRotation(unittest.TestCase):

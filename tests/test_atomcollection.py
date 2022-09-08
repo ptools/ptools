@@ -207,7 +207,7 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_equal(self.atoms.masses, np.ones(self.n_atoms))
 
     # pylint: disable=R0201
-    def test_tensor_of_inertia_accurate(self):
+    def test_inertia_tensor(self):
         # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
         atoms = ptools.io.read_pdb(TEST_LIGAND)
@@ -216,21 +216,8 @@ class TestAtomCollection(unittest.TestCase):
             [694837.16289436, 3803047.59374612, -194611.71739629],
             [-263651.10452372, -194611.71739629, 3425042.27240564],
         ]
-        I = atoms.tensor_of_inertia(method="accurate")
+        I = atoms.inertia_tensor()
         assert_array_almost_equal(I, ref, decimal=2)
-
-    # pylint: disable=R0201
-    def test_tensor_of_inertia_fast(self):
-        # Reference calculated with ptools-python d0b41dc (this is actually a
-        # non-regression test).
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
-        ref = [
-            [147200.90378622, -57794.00682372, 21649.47873511],
-            [-57794.00682372, 136694.86723672, 16076.77968389],
-            [21649.47873511, 16076.77968389, 168066.83235232],
-        ]
-        I = atoms.tensor_of_inertia(method="fast")
-        assert_array_almost_equal(I, ref, decimal=8)
 
     # pylint: disable=R0201
     def test_principal_axes(self):

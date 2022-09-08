@@ -13,6 +13,9 @@ import numpy as np
 # PTools imports.
 import ptools.linalg as linalg
 
+# More test-specific imports.
+from .testing import assert_array_almost_equal
+
 
 def generate_random_array(
     low: float = 0.0, high: float = 1.0, shape: int | tuple[int] = 1
@@ -46,7 +49,7 @@ class TestCentroid:
 
     def test_random_coordinates(self):
         x = generate_random_coordinates()
-        np.testing.assert_array_almost_equal(linalg.centroid(x), np.mean(x, axis=0))
+        assert_array_almost_equal(linalg.centroid(x), np.mean(x, axis=0))
 
     def test_empty_coordinates(self):
         x = generate_empty_coordinates()
@@ -63,39 +66,39 @@ class TestCenterOfMass:
         w = generate_random_array(shape=x.shape[0])
         actual = linalg.center_of_mass(x, w)
         expected = np.average(x, axis=0, weights=w)
-        np.testing.assert_array_almost_equal(actual, expected)
+        assert_array_almost_equal(actual, expected)
 
     @staticmethod
     def test_empty_coordinates():
         x = generate_empty_coordinates()
         w = np.ones(x.shape[0])
-        with pytest.raises(
-            ZeroDivisionError, match="cannot compute center of mass of empty array"
-        ):
+        err = "cannot compute center of mass of empty array"
+        with pytest.raises(ZeroDivisionError, match=err):
             linalg.center_of_mass(x, w)
 
     @staticmethod
     def test_empty_weights():
         x = generate_random_coordinates()
         w = np.ones(0)
-        with pytest.raises(
-            ValueError, match="input array and weights should be the same size"
-        ):
+        err = "input array and weights should be the same size"
+        with pytest.raises(ValueError, match=err):
             linalg.center_of_mass(x, w)
 
 
-class TestTensorOfInertia:
-    """Namespace that holds unit-tests for ptools.linalg.tensor_of_inertia."""
+class TestInertiaTensor:
+    """Namespace that holds unit-tests for ptools.linalg.inertia_tensor."""
+
+    # @staticmethod
+    # def test_tensor_of_inertia():
+    #     x = np.array(((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
+    #     w = np.ones((x.shape[0]))
+    #     expected = np.full((3, 3), 0.5)
+    #     assert_array_almost_equal(linalg.tensor_of_inertia(x, w), expected)
 
     @staticmethod
-    def test_invalid_method():
-        x = generate_random_array()
-        with pytest.raises(ValueError):
-            linalg.tensor_of_inertia(x, method="accurate")  # method invalid type: str
-
-    @staticmethod
-    def test_accurate_fails_without_weights():
-        x = generate_random_array()
-        err = "need weights to compute accurate tensor of inertia"
+    def test_accurate_fails_if_array_is_not_n_by_3():
+        x = np.array(((0.0, 0.0), (1.0, 1.0)))
+        w = np.ones((x.shape[0]))
+        err = "inertia tensor can only be calculated on a N x 3 array"
         with pytest.raises(ValueError, match=err):
-            linalg.tensor_of_inertia(x, method=linalg.Method.ACCURATE)
+            linalg.inertia_tensor(x, w)

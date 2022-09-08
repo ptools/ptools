@@ -271,29 +271,19 @@ class AtomCollection(SpatialObject, UserList):
         """Returns the center of mass (barycenter)."""
         return linalg.center_of_mass(self.coords, self.masses)
 
-    def tensor_of_inertia(self, weights=None, method: str = "accurate"):
-        """Returns the inertia tensors of a set of atoms.
+    def inertia_tensor(self, weights=None):
+        """Returns the inertia tensors of a set of atoms."""
+        if weights is None:
+            weights = self.masses
+        return super().inertia_tensor(weights)
 
-        Args:
-            method (str): "fast" or "accurate"
-                The "fast" method does not take into account atom masses.
-        """
-        weights = self.masses if method == "accurate" else None
-        return super().tensor_of_inertia(weights, method)
-
-    def principal_axes(self, sort: bool = True, method: str = "accurate") -> np.ndarray:
+    def principal_axes(self, sort: bool = True) -> np.ndarray:
         """Returns an AtomCollection principal axes.
 
         Args:
             sort (bool): sort axes by importance
-            method (str): "fast" or "accurate"
-                The "fast" method does not take into account atom masses when
-                calculating the tensor of inertia, resulting in a less
-                accurate result.
-                The "fast" method is probably sufficient to calculate axes of
-                inertia.
         """
-        return linalg.principal_axes(self.tensor_of_inertia(method), sort)
+        return linalg.principal_axes(self.inertia_tensor(), sort)
 
     def radius_of_gyration(self) -> float:
         """Returns the isometric radius of gyration (atom mass is not taken

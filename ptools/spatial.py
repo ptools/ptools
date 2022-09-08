@@ -105,11 +105,11 @@ class SpatialObject:
         """Orients a SpatialObject."""
         orient(self.coords, vector, target)
 
-    def tensor_of_inertia(
-        self, weights: np.ndarray = None, method: str = "fast"
-    ) -> np.ndarray:
-        """Returns a SpatialObject inertial tensors."""
-        return L.tensor_of_inertia(self.coords, weights, method)
+    def inertia_tensor(self, weights: np.ndarray = None) -> np.ndarray:
+        """Returns a SpatialObject inertia tensor."""
+        if weights is None:
+            weights = np.ones(self.coords.shape[0])
+        return L.inertia_tensor(self.coords, weights)
 
     def distance_to_axis(self, axis: np.ndarray) -> float:
         """Returns the SpatialObject distance to an arbitrary axis."""
