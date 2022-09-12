@@ -7,7 +7,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from .forcefield import AttractForceField1
-from .spatial import transformation_matrix
+from .linalg import transformation_matrix
 from .rigidbody import RigidBody
 
 

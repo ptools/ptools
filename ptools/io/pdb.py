@@ -28,15 +28,19 @@ class FromPDB(_FromPDBBase):
     @classmethod
     def from_pdb(cls, path: Union[str, bytes, os.PathLike]):
         """Returns a new instance of the class initialized using `cls.init_from_pdb`."""
-        rigid = cls()
-        rigid.init_from_pdb(path)
-        return rigid
-
+        obj = cls()
+        obj.init_from_pdb(path)
+        return obj
 
 
 class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
+class InvalidPDBAtomLineError(ValueError):
+    """Raised when the a PDB line does not describe an atom."""
+    def __init__(self, header, *args):
+        message = f'Invalid atom line: expected "ATOM" or "HETATM" as header, found "{header}"'
+        super(InvalidPDBAtomLineError, self).__init__(message, *args)
 
 class PDBLine(str):
     """Generic PDB formatted line.
@@ -70,9 +74,14 @@ class ModelLine(PDBLine):
         """Model identifier."""
         return self[10:].strip()
 
-
 class AtomLine(PDBLine):
     """Helper methods for an atom line."""
+
+    def __init__(self, *args) -> None:
+        super().__init__(*args)
+        if not self.is_atom():
+            raise InvalidPDBAtomLineError(self.header)
+
 
     @property
     def atom_index(self) -> int:
@@ -94,12 +103,12 @@ class AtomLine(PDBLine):
     @property
     def name(self) -> str:
         """Atom name."""
-        return self[12:16].strip().upper()
+        return self[12:16].strip()
 
     @property
     def resname(self) -> str:
         """Atom residue name."""
-        return self[17:20].strip().upper()
+        return self[17:20].strip()
 
     @property
     def chain(self) -> str:

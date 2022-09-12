@@ -1,5 +1,3 @@
-"""Ptools linear algebra library."""
-
 # Python core libraries.
 import math
 
@@ -7,13 +5,30 @@ import math
 import numpy as np
 import scipy.linalg as L
 
+# Typing imports
+from numpy.typing import ArrayLike
+
+from .matrix import (
+    translation_matrix,
+    transformation_matrix,
+    rotation_matrix,
+    rotation_matrix_around_axis,
+    attract_euler_rotation_matrix,
+    orientation_matrix,
+)
+
+
+def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
+    """Returns the euclidean distance between two sets of coordinates."""
+    return (((lhs - rhs) ** 2.0).sum()) ** 0.5
+
 
 def angle(u: np.ndarray, v: np.ndarray) -> float:
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (L.norm(u) * L.norm(v)))
 
 
-def center_of_mass(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
+def center_of_mass(x: ArrayLike, weights: ArrayLike) -> np.ndarray:
     """Return the center of mass (barycenter)."""
     N = x.shape[0]
     if N == 0:
@@ -26,7 +41,7 @@ def center_of_mass(x: np.ndarray, weights: np.ndarray) -> np.ndarray:
     return (x * weights).sum(axis=0) / weights.sum()
 
 
-def centroid(x: np.ndarray) -> np.ndarray:
+def centroid(x: ArrayLike) -> np.ndarray:
     """Return x centroid.
 
     Centroid is the average coordinate along axis 0.
@@ -34,7 +49,7 @@ def centroid(x: np.ndarray) -> np.ndarray:
     return np.mean(x, axis=0)
 
 
-def inertia_tensor(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
+def inertia_tensor(coords: ArrayLike, weights: ArrayLike) -> np.ndarray:
     """Returns the inertia tensor of a set of coordinates.
 
     Only works on N x 3 arrays.
@@ -67,7 +82,7 @@ def inertia_tensor(coords: np.ndarray, weights: np.ndarray) -> np.ndarray:
     return I
 
 
-def principal_axes(tensor: np.ndarray, sort: bool = True) -> np.ndarray:
+def principal_axes(tensor: ArrayLike, sort: bool = True) -> np.ndarray:
     """Return the principal axes given the tensor of inertia.
 
     Computes the eigenvalues and right eigenvectors of the tensor of inertia.

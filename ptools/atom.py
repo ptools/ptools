@@ -289,7 +289,7 @@ class AtomCollection(SpatialObject, UserList):
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
         centered = self.coords - self.centroid()
-        rgyr2 = np.sum(centered ** 2) / len(self)
+        rgyr2 = np.sum(centered**2) / len(self)
         return math.sqrt(rgyr2)
 
     def topdb(self) -> str:
@@ -312,7 +312,9 @@ class AtomCollection(SpatialObject, UserList):
 
     def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom types."""
-        return self.__class__(atoms=[atom for atom in self if atom.name.strip() in atom_types])
+        return self.__class__(
+            atoms=[atom for atom in self if atom.name.strip() in atom_types]
+        )
 
     def select_residue_range(self, start: int, end: int) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""

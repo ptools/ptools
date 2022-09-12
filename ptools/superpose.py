@@ -12,7 +12,6 @@ from . import linalg
 from . import spatial
 
 
-
 @dataclass
 class Screw:
     """A screw."""
@@ -66,9 +65,9 @@ def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     rotation[:3, :3] = kabsch
 
     # Calculate translation component.
-    result = spatial.translation_matrix(-t1)
+    result = linalg.translation_matrix(-t1)
     result = np.matmul(rotation, result)
-    rotation = spatial.translation_matrix(t0)
+    rotation = linalg.translation_matrix(t0)
     result = np.matmul(rotation, result)
 
     return result

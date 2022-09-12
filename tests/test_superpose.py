@@ -17,7 +17,8 @@ from scipy.spatial.transform import Rotation
 # PTools imports.
 from ptools import superpose
 from ptools.rigidbody import RigidBody
-from ptools.spatial import coord3d, transformation_matrix
+from ptools.spatial import coord3d
+from ptools.linalg import transformation_matrix
 from ptools.superpose import Screw
 
 # Test-specific imports.
