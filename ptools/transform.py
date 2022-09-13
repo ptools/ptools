@@ -13,7 +13,7 @@ from .linalg import (
 )
 
 
-def translate(coords: ArrayLike, t: ArrayLike):
+def translate(coords: np.array, t: ArrayLike):
     """In-place translation of coordinates."""
 
     def _translate_scalar(x):
@@ -35,7 +35,7 @@ def translate(coords: ArrayLike, t: ArrayLike):
         np.add(coords, t, coords)
 
 
-def rotate_by(coords: ArrayLike, angles: ArrayLike = np.zeros(3)):
+def rotate_by(coords: np.array, angles: np.array = np.zeros(3)):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -47,7 +47,7 @@ def rotate_by(coords: ArrayLike, angles: ArrayLike = np.zeros(3)):
     rotate(coords, matrix)
 
 
-def rotate(coords: ArrayLike, r: ArrayLike):
+def rotate(coords: np.array, r: np.array):
     """In-place rotation of coordinates using a rotation matrix or 3 angles."""
     r = np.array(r)
     if r.shape == (3,):
@@ -62,12 +62,7 @@ def rotate(coords: ArrayLike, r: ArrayLike):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
-def ab_rotation_matrix(A: ArrayLike, B: ArrayLike, amount: float) -> np.ndarray:
-    """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
-    return rotation_matrix_around_axis(B - A, amount, A)
-
-
-def transform(coords: ArrayLike, matrix: ArrayLike):
+def transform(coords: np.array, matrix: np.array):
     """In-place transformation of coordinates by a 4 x 4 matrix.
 
     This function should be used only when the transformation matrix
@@ -93,11 +88,7 @@ def transform(coords: ArrayLike, matrix: ArrayLike):
     coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
-def orient(
-    coords: ArrayLike,
-    vector: ArrayLike,
-    target: ArrayLike,
-):
+def orient(coords: np.array, vector: np.array, target: np.array):
     """Orients coordinates.
 
     Args:
@@ -109,13 +100,13 @@ def orient(
     transform(coords, matrix)
 
 
-def attract_euler_rotate(coords: ArrayLike, phi: float, ssi: float, rot: float):
+def attract_euler_rotate(coords: np.array, phi: float, ssi: float, rot: float):
     """In-place Euler rotation of coordinates using the Attract convention."""
     matrix = attract_euler_rotation_matrix(phi, ssi, rot)
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotate(coords: ArrayLike, A: ArrayLike, B: ArrayLike, amount: float):
+def ab_rotate(coords: np.array, A: np.array, B: np.array, amount: float):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
     matrix = rotation_matrix_around_axis(B - A, amount, A)
     transform(coords, matrix)

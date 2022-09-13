@@ -10,7 +10,10 @@ import scipy.linalg as L
 def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
     """ReturnS the matrix to translate by direction vector."""
     matrix = np.identity(4)
-    matrix[:3, 3] = direction[:3]
+    if np.isscalar(direction):
+        matrix[:3, 3] = direction
+    else:
+        matrix[:3, 3] = direction[:3]
     return matrix
 
 
@@ -23,7 +26,7 @@ def transformation_matrix(
     return matrix
 
 
-def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
+def rotation_matrix(angles: np.ndarray = np.zeros(3)) -> np.ndarray:
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
@@ -35,6 +38,8 @@ def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
     Returns:
         numpy.ndarray: 4x4 rotation matrix.
     """
+    assert np.shape(angles) == (3,)
+
     alpha = math.radians(angles[0])
     beta = math.radians(angles[1])
     gamma = math.radians(angles[2])
@@ -62,7 +67,7 @@ def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
 
 
 def rotation_matrix_around_axis(
-    axis: ArrayLike, amount: float, center: ArrayLike = np.zeros(3)
+    axis: np.ndarray, amount: float, center: np.ndarray = np.zeros(3)
 ):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
@@ -74,6 +79,9 @@ def rotation_matrix_around_axis(
     Returns:
         np.ndarray: 4 x 4 rotation matrix
     """
+    assert np.shape(axis) == (3, )
+    assert np.shape(center) == (3, )
+
     origin_matrix = translation_matrix(-center)
     offset_matrix = translation_matrix(+center)
     rotation = L.expm(np.cross(np.identity(3), axis / L.norm(axis) * amount))
@@ -124,7 +132,7 @@ def attract_euler_rotation_matrix(phi: float, ssi: float, rot: float):
 
 
 def orientation_matrix(
-    coords: ArrayLike, vector: ArrayLike, target: ArrayLike
+    coords: np.ndarray, vector: np.ndarray, target: np.ndarray
 ) -> np.ndarray:
     """Calculates an orientation matrix.
 
@@ -146,6 +154,10 @@ def orientation_matrix(
         >>> T = orientation_matrix(rigidbody.coords, I[2], [0, 0, 1])
         >>> receptor.transform(T)
     """
+    assert np.shape(vector) == np.shape(target)
+    assert np.ndim(coords) == 2
+    assert np.ndim(vector) == 1 and len(vector) == np.shape(coords)[1]
+
     com = coords.mean(axis=0)
 
     vec1 = vector / np.linalg.norm(vector)
@@ -157,3 +169,8 @@ def orientation_matrix(
     amount = math.atan2(sine, cosine)
 
     return rotation_matrix_around_axis(axis, amount, center=com)
+
+
+def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float) -> np.ndarray:
+    """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
+    return rotation_matrix_around_axis(B - A, amount, A)

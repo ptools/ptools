@@ -36,12 +36,37 @@ def generate_empty_coordinates() -> np.ndarray:
     """Returns an empty array."""
     return np.zeros((0, 3))
 
-
 def test_angle():
     u = (2, 2, 0)
     v = (0, 3, 0)
     angle = linalg.angle(u, v)
     assert math.degrees(angle) == approx(45)
+
+
+class TestTranslationMatrix:
+    """Namespace that holds unit-tests for ptools.linalg.centroid."""
+
+    def test_vector(self):
+        x = generate_random_array(shape=(3, ))
+        actual = linalg.matrix.translation_matrix(x)
+        expected = np.array([
+            [1, 0, 0, x[0]],
+            [0, 1, 0, x[1]],
+            [0, 0, 1, x[2]],
+            [0, 0, 0, 1],
+        ])
+        assert_array_almost_equal(actual, expected)
+
+    def test_scalar(self):
+        x = random.random()
+        actual = linalg.matrix.translation_matrix(x)
+        expected = np.array([
+            [1, 0, 0, x],
+            [0, 1, 0, x],
+            [0, 0, 1, x],
+            [0, 0, 0, 1],
+        ])
+        assert_array_almost_equal(actual, expected)
 
 
 class TestCentroid:
@@ -96,7 +121,7 @@ class TestInertiaTensor:
     #     assert_array_almost_equal(linalg.tensor_of_inertia(x, w), expected)
 
     @staticmethod
-    def test_accurate_fails_if_array_is_not_n_by_3():
+    def test_fails_if_array_is_not_n_by_3():
         x = np.array(((0.0, 0.0), (1.0, 1.0)))
         w = np.ones((x.shape[0]))
         err = "inertia tensor can only be calculated on a N x 3 array"

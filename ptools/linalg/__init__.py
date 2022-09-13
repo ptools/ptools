@@ -20,7 +20,12 @@ from .matrix import (
 
 def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
     """Returns the euclidean distance between two sets of coordinates."""
-    return (((lhs - rhs) ** 2.0).sum()) ** 0.5
+    return (np.sum((lhs - rhs) ** 2.0)) ** 0.5
+
+
+def distance_to_axis(x: np.ndarray, axis: np.ndarray) -> float:
+    """Returns the distance between `x` and an arbitrary axis."""
+    return np.linalg.norm(np.cross(x, axis))
 
 
 def angle(u: np.ndarray, v: np.ndarray) -> float:
@@ -33,7 +38,7 @@ def center_of_mass(x: ArrayLike, weights: ArrayLike) -> np.ndarray:
     N = x.shape[0]
     if N == 0:
         raise ZeroDivisionError("cannot compute center of mass of empty array")
-    if weights.shape[0] != N:
+    if np.shape(weights) != (N,):
         raise ValueError(
             f"input array and weights should be the same size ({N} != {weights.shape[0]})"
         )

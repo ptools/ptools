@@ -111,7 +111,7 @@ class SpatialObject:
 
     def distance_to_axis(self, axis: ArrayLike) -> float:
         """Returns the SpatialObject distance to an arbitrary axis."""
-        return np.linalg.norm(np.cross(self.coords, axis))
+        return L.distance_to_axis(self.coords, axis)
 
 
 # pylint: disable-msg=W1113
