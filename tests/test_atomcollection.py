@@ -22,8 +22,8 @@ from . import TEST_LIGAND
 # pylint: disable=R0904
 class TestAtomCollection(unittest.TestCase):
     def setUp(self):
-        self.n_atoms = 10
-        self.atoms = dummy_atomcollection(self.n_atoms)
+        self.n_atoms: int = 10
+        self.atoms: AtomCollection = dummy_atomcollection(self.n_atoms)
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms), self.n_atoms)
@@ -153,7 +153,7 @@ class TestAtomCollection(unittest.TestCase):
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):
             assert_array_not_almost_equal(self.atoms.centroid(), origin)
-            self.atoms.center(origin, use_weights=False)
+            self.atoms.center_to_origin(origin, use_weights=False)
             assert_array_almost_equal(self.atoms.centroid(), origin)
 
     def test_center_with_weights(self):
@@ -171,7 +171,7 @@ class TestAtomCollection(unittest.TestCase):
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):
             assert_array_not_almost_equal(self.atoms.center_of_mass(), origin)
-            self.atoms.center(origin, use_weights=True)
+            self.atoms.center_to_origin(origin, use_weights=True)
             assert_array_almost_equal(self.atoms.center_of_mass(), origin)
 
     def test_add(self):

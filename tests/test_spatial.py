@@ -37,14 +37,14 @@ class TestSpatialObjectVector(unittest.TestCase):
         obj.translate((1, 2, 3))
         assert_array_almost_equal(obj.coords, (1, 2, 3))
 
-    def test_center(self):
+    def test_center_to_origin(self):
         obj = spatial.SpatialObject((1, 1, 1))
-        obj.center()
+        obj.center_to_origin()
         assert_array_almost_equal(obj.centroid(), (0, 0, 0))
 
     def test_center_custom_origin(self):
         obj = spatial.SpatialObject((1, 1, 1))
-        obj.center(origin=(2, 2, 2))
+        obj.center_to_origin(origin=(2, 2, 2))
         assert_array_almost_equal(obj.centroid(), (2, 2, 2))
 
     # pylint guesses type wrong

@@ -12,7 +12,108 @@ from . import linalg as L
 from .linalg import transform as T
 
 
-class SpatialObject:
+class ObjectWithCoordinates:
+    """Object with coordinates.
+
+    Coordinates are stored in private _coords array which allows to automatically
+    convert coordinates to numpy arrays upon change.
+    """
+    _coords: np.ndarray
+
+    def __init__(self, coords: ArrayLike = np.zeros(3)):
+        self._coords = coord3d(coords)
+
+    @property
+    def coords(self) -> np.ndarray:
+        """Returns SpatialObject cartesian coordinates."""
+        return self._coords
+
+    @coords.setter
+    def coords(self, pos: ArrayLike):
+        """Sets SpatialObject cartesian coordinates."""
+        self._coords = coord3d(pos)
+
+    def distance(self, other: ObjectWithCoordinates) -> float:
+        """Returns the euclidean distance between two objects."""
+        return L.distance(self.coords, other.coords)
+
+    def centroid(self) -> np.ndarray:
+        """Returns an spatial object geometric center."""
+        return L.centroid(self._coords)
+
+    def distance_to_axis(self, axis: ArrayLike) -> float:
+        """Returns the SpatialObject distance to an arbitrary axis."""
+        return L.distance_to_axis(self.coords, axis)
+
+
+class CanTranslate(ObjectWithCoordinates):
+    """Object which coordinates can be translated."""
+
+    def center_to_origin(self, origin: ArrayLike = np.zeros(3)):
+        """Centers spatial object on `origin`."""
+        self.translate(np.array(origin) - self.centroid())
+
+    def translate(self, direction: ArrayLike):
+        """Translates object coordinates using vector `direction`.
+
+        Args:
+            direction (scalar or array): scalar, 1 x 3 shaped vector or
+                4 x 4 matrix
+        """
+        T.translate(self.coords, direction)
+
+    def moveby(self, direction: ArrayLike):
+        """Translates object coordinates using vector or scalar `direction`.
+
+        This is an alias for `SpatialObject.translate`.
+        """
+        self.translate(direction)
+
+
+class CanRotate(ObjectWithCoordinates):
+    """Object which coordinates can be rotated."""
+
+    def rotate_by(self, angles: ArrayLike):
+        """Rotates object coordinates around X, Y and Z axes.
+
+        Args:
+            angles (3, ): rotation angles around the X-, Y- and Z-axes
+        """
+        T.rotate_by(self.coords, angles)
+
+    def rotate(self, rotation: ArrayLike):
+        """Rotates object using rotation matrix or 3 angles.
+
+        Args:
+            rotation (np.ndarray): 3 x 3 matrix or 3 x 1 vector of angles.
+        """
+        T.rotate(self.coords, rotation)
+
+    def ab_rotate(self, A: ArrayLike, B: ArrayLike, amount: float):
+        """Rotates object using PTools rotation around axis."""
+        T.ab_rotate(self.coords, A, B, amount)
+
+    def transform(self, matrix: ArrayLike):
+        """Transforms object using 4x4 matrix."""
+        T.transform(self.coords, matrix)
+
+    def move(self, matrix: ArrayLike):
+        """Transforms object using 4x4 matrix.
+
+        This is an alias for `SpatialObject.transform`.
+        """
+        self.transform(matrix)
+
+    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
+        """Rotates object with Attract convention."""
+        T.attract_euler_rotate(self.coords, phi, ssi, rot)
+
+    def orient(self, vector: ArrayLike, target: ArrayLike):
+        """Orients a SpatialObject."""
+        T.orient(self.coords, vector, target)
+
+
+class SpatialObject(CanTranslate, CanRotate):
     """An object with coordinates.
 
     Implements basic spatial operations such as translation, rotation, etc.
@@ -21,87 +122,10 @@ class SpatialObject:
     def __init__(self, coords: ArrayLike = np.zeros(3)):
         self._coords = coord3d(coords)
 
-    def dist(self, other: SpatialObject) -> float:
-        """Returns the euclidean distance between two objects."""
-        return L.distance(self.coords, other.coords)
 
     def copy(self) -> SpatialObject:
         """Returns a copy of itself."""
         return self.__class__(self.coords)
-
-    @property
-    def coords(self) -> np.ndarray:
-        """Get SpatialObject cartesian coordinates."""
-        return self._coords
-
-    @coords.setter
-    def coords(self, pos: ArrayLike):
-        """Set SpatialObject cartesian coordinates."""
-        self._coords = coord3d(pos)
-
-    def centroid(self) -> np.ndarray:
-        """Returns an spatial object geometric center."""
-        return L.centroid(self._coords)
-
-    def translate(self, direction: ArrayLike):
-        """Translate object coordinates using vector `direction`.
-
-        Args:
-            direction ((int, float) or np.ndarray): scalar, 1 x 3 shaped vector or
-                4 x 4 matrix
-        """
-        T.translate(self.coords, direction)
-
-    def center(self, origin: ArrayLike = np.zeros(3)):
-        """Center spatial object on `origin`."""
-        self.translate(np.array(origin) - self.centroid())
-
-    def rotate_by(self, angles: ArrayLike):
-        """Rotate object coordinates around X, Y and Z axes.
-
-        Args:
-            angles ([float, float, float]): rotation angle around
-                the X-, Y- and Z-axes
-        """
-        T.rotate_by(self.coords, angles)
-
-    def rotate(self, rotation: ArrayLike):
-        """Rotate object using rotation matrix or 3 angles.
-
-        Args:
-            rotation (np.ndarray): 3 x 3 matrix of 3 x 1 vector of angles.
-        """
-        T.rotate(self.coords, rotation)
-
-    def ab_rotate(self, A: ArrayLike, B: ArrayLike, amount: float):
-        """PTools rotation around axis."""
-        T.ab_rotate(self.coords, A, B, amount)
-
-    def transform(self, matrix: ArrayLike):
-        """Transform object by 4x4 matrix."""
-        T.transform(self.coords, matrix)
-
-    def move(self, matrix: ArrayLike):
-        """Transform object by 4x4 matrix.
-
-        This is an alias for `SpatialObject.transform`.
-        """
-        self.transform(matrix)
-
-    def moveby(self, direction: ArrayLike):
-        """Translate object coordinates using vector or scalar `direction`.
-
-        This is an alias for `SpatialObject.translate`.
-        """
-        self.translate(direction)
-
-    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
-        """Rotate object with Attract convention."""
-        T.attract_euler_rotate(self.coords, phi, ssi, rot)
-
-    def orient(self, vector: ArrayLike, target: ArrayLike):
-        """Orients a SpatialObject."""
-        T.orient(self.coords, vector, target)
 
     def inertia_tensor(self, weights: ArrayLike = None) -> np.ndarray:
         """Returns a SpatialObject inertia tensor."""
@@ -109,14 +133,11 @@ class SpatialObject:
             weights = np.ones(self.coords.shape[0])
         return L.inertia_tensor(self.coords, weights)
 
-    def distance_to_axis(self, axis: ArrayLike) -> float:
-        """Returns the SpatialObject distance to an arbitrary axis."""
-        return L.distance_to_axis(self.coords, axis)
 
 
 # pylint: disable-msg=W1113
 def coord3d(value: ArrayLike = np.zeros(3), *args) -> np.ndarray:
-    """Convert an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
+    """Converts an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
 
     Can be called either with an iterable, either with 3 arguments.
 

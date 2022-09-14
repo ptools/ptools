@@ -23,12 +23,12 @@ def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
     return (np.sum((lhs - rhs) ** 2.0)) ** 0.5
 
 
-def distance_to_axis(x: np.ndarray, axis: np.ndarray) -> float:
+def distance_to_axis(x: ArrayLike, axis: ArrayLike) -> float:
     """Returns the distance between `x` and an arbitrary axis."""
     return np.linalg.norm(np.cross(x, axis))
 
 
-def angle(u: np.ndarray, v: np.ndarray) -> float:
+def angle(u: ArrayLike, v: ArrayLike) -> float:
     """Returns the angle between two vectors in radians."""
     return math.acos(np.dot(u, v) / (L.norm(u) * L.norm(v)))
 

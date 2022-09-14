@@ -260,10 +260,10 @@ class AtomCollection(SpatialObject, UserList):
         """
         return len(self)
 
-    def center(self, origin: np.ndarray = np.zeros(3), use_weights: bool = False):
+    def center_to_origin(self, origin: np.ndarray = np.zeros(3), use_weights: bool = False):
         """Centers AtomCollection on `origin`."""
         if not use_weights:
-            super().center(origin)
+            super().center_to_origin(origin)
         else:
             self.translate(np.array(origin) - self.center_of_mass())
 
