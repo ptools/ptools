@@ -1,15 +1,18 @@
 """test_spatial - Tests for `ptools.spatial` module."""
 
-import math
+# Unit-test specific imports.
 import unittest
+from .testing.moreassert import assert_array_almost_equal
 
+# Scientific libraries.
 import numpy as np
 
+# Ptools imports.
 from ptools import spatial
 from ptools import linalg
-from ptools import transform
+from ptools.linalg import transform
 
-from .testing.moreassert import assert_array_almost_equal
+
 
 # Ignores R0201: Method could be a function (no-self-use)
 # pylint: disable=R0201
@@ -406,13 +409,13 @@ class TestCoord3D(unittest.TestCase):
 
     def test_initialization_with_wrong_number_of_arguments(self):
         err = "Coordinates must be initialized either with 1 or 3 arguments"
-        with self.assertRaisesRegex(TypeError, err):
+        with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(12, 1)
 
-        with self.assertRaisesRegex(TypeError, err):
+        with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d(12, 1, 2, 3)
 
-        with self.assertRaisesRegex(TypeError, err):
+        with self.assertRaisesRegex(ValueError, err):
             spatial.coord3d((1, 2), 3)
 
     def test_initialization_bad_dimensions(self):

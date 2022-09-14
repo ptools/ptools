@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from . import linalg as L
-from . import transform as T
+from .linalg import transform as T
 
 
 class SpatialObject:
@@ -131,7 +131,7 @@ def coord3d(value: ArrayLike = np.zeros(3), *args) -> np.ndarray:
     # Checks function was called with adequate number of arguments.
     if args:
         if len(args) != 2:
-            raise TypeError(
+            raise ValueError(
                 f"Coordinates must be initialized either "
                 f"with 1 or 3 arguments (found {value=}, {args=})"
             )

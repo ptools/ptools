@@ -5,7 +5,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 # PTools libraries
-from .linalg import (
+from .matrix import (
     attract_euler_rotation_matrix,
     orientation_matrix,
     rotation_matrix,
