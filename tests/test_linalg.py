@@ -1,5 +1,4 @@
 # Python core libraries.
-from enum import Enum
 import math
 import random
 
@@ -11,7 +10,7 @@ from pytest import approx
 import numpy as np
 
 # PTools imports.
-import ptools.linalg as linalg
+from ptools import linalg
 
 # More test-specific imports.
 from .testing import assert_array_almost_equal
@@ -44,7 +43,7 @@ def test_angle():
 
 
 class TestTranslationMatrix:
-    """Namespace that holds unit-tests for ptools.linalg.centroid."""
+    """Namespace that holds unit-tests for `ptools.linalg.translation_matrix`."""
 
     def test_vector(self):
         x = generate_random_array(shape=(3, ))
@@ -69,6 +68,111 @@ class TestTranslationMatrix:
         assert_array_almost_equal(actual, expected)
 
 
+class TestRotationMatrix:
+    """Namespace that holds unit-tests for `ptools.linalg.rotation_matrix`."""
+
+    def test_rotation_x_by_90(self):
+        expected = [
+            [1.00, 0.00, 0.00, 0.00],
+            [0.00, 0.00, -1.00, 0.00],
+            [0.00, 1.00, 0.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([90, 0, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_x_by_180(self):
+        expected = [
+            [1.00, 0.00, 0.00, 0.00],
+            [0.00, -1.00, -0.00, 0.00],
+            [0.00, 0.00, -1.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([180, 0, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_x_by_10(self):
+        expected = [
+            [1.0000000, 0.000000, 0.000000, 0.000000],
+            [0.0000000, 0.984808, -0.173648, 0.000000],
+            [0.0000000, 0.173648, 0.984808, 0.000000],
+            [0.0000000, 0.000000, 0.000000, 1.000000],
+        ]
+        actual = linalg.rotation_matrix([10, 0, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_y_by_90(self):
+        expected = [
+            [0.00, 0.00, 1.00, 0.00],
+            [0.00, 1.00, 0.00, 0.00],
+            [-1.00, 0.00, 0.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([0, 90, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_y_by_180(self):
+        expected = [
+            [-1.00, 0.00, 0.00, 0.00],
+            [0.00, 1.00, 0.00, 0.00],
+            [-0.00, 0.00, -1.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([0, 180, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_y_by_10(self):
+        expected = [
+            [0.9848078, 0.000000, 0.173648, 0.000000],
+            [0.0000000, 1.000000, 0.000000, 0.000000],
+            [-0.1736482, 0.000000, 0.984808, 0.000000],
+            [0.0000000, 0.000000, 0.000000, 1.000000],
+        ]
+        actual = linalg.rotation_matrix([0, 10, 0])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_z_by_90(self):
+        expected = [
+            [0.00, -1.00, 0.00, 0.00],
+            [1.00, 0.00, 0.00, 0.00],
+            [0.00, 0.00, 1.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([0, 0, 90])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_z_by_180(self):
+        expected = [
+            [-1.00, -0.00, 0.00, 0.00],
+            [0.00, -1.00, 0.00, 0.00],
+            [0.00, 0.00, 1.00, 0.00],
+            [0.00, 0.00, 0.00, 1.00],
+        ]
+        actual = linalg.rotation_matrix([0, 0, 180])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_z_by_10(self):
+        expected = [
+            [0.9848078, -0.173648, 0.000000, 0.000000],
+            [0.1736482, 0.984808, 0.000000, 0.000000],
+            [0.0000000, 0.000000, 1.000000, 0.000000],
+            [0.0000000, 0.000000, 0.000000, 1.000000],
+        ]
+        actual = linalg.rotation_matrix([0, 0, 10])
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_xyz(self):
+        """Test rotation in X, Y and Z is equivalent to successive rotation
+        in X, then Y, then Z."""
+        actual = linalg.rotation_matrix([10, 10, 10])
+        expected = (
+            linalg.rotation_matrix([10, 0, 0])
+            .dot(linalg.rotation_matrix([0, 10, 0]))
+            .dot(linalg.rotation_matrix([0, 0, 10]))
+        )
+        assert_array_almost_equal(actual, expected)
+
+# ======================================================================================
 class TestCentroid:
     """Namespace that holds unit-tests for ptools.linalg.centroid."""
 
@@ -82,27 +186,25 @@ class TestCentroid:
             assert np.isnan(linalg.centroid(x)).all()
 
 
+# ======================================================================================
 class TestCenterOfMass:
     """Namespace that holds unit-tests for ptools.linalg.center_of_mass."""
 
-    @staticmethod
-    def test_random_coordinates():
+    def test_random_coordinates(self):
         x = generate_random_coordinates()
         w = generate_random_array(shape=x.shape[0])
         actual = linalg.center_of_mass(x, w)
         expected = np.average(x, axis=0, weights=w)
         assert_array_almost_equal(actual, expected)
 
-    @staticmethod
-    def test_empty_coordinates():
+    def test_empty_coordinates(self):
         x = generate_empty_coordinates()
         w = np.ones(x.shape[0])
         err = "cannot compute center of mass of empty array"
         with pytest.raises(ZeroDivisionError, match=err):
             linalg.center_of_mass(x, w)
 
-    @staticmethod
-    def test_empty_weights():
+    def test_empty_weights(self):
         x = generate_random_coordinates()
         w = np.ones(0)
         err = "input array and weights should be the same size"
@@ -110,18 +212,13 @@ class TestCenterOfMass:
             linalg.center_of_mass(x, w)
 
 
+# ======================================================================================
+
+#pylint: disable=R0903
 class TestInertiaTensor:
     """Namespace that holds unit-tests for ptools.linalg.inertia_tensor."""
 
-    # @staticmethod
-    # def test_tensor_of_inertia():
-    #     x = np.array(((0.0, 0.0, 0.0), (1.0, 1.0, 1.0)))
-    #     w = np.ones((x.shape[0]))
-    #     expected = np.full((3, 3), 0.5)
-    #     assert_array_almost_equal(linalg.tensor_of_inertia(x, w), expected)
-
-    @staticmethod
-    def test_fails_if_array_is_not_n_by_3():
+    def test_fails_if_array_is_not_n_by_3(self):
         x = np.array(((0.0, 0.0), (1.0, 1.0)))
         w = np.ones((x.shape[0]))
         err = "inertia tensor can only be calculated on a N x 3 array"
