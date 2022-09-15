@@ -79,8 +79,8 @@ def rotation_matrix_around_axis(
     Returns:
         np.ndarray: 4 x 4 rotation matrix
     """
-    assert np.shape(axis) == (3, )
-    assert np.shape(center) == (3, )
+    assert np.shape(axis) == (3,)
+    assert np.shape(center) == (3,)
 
     origin_matrix = translation_matrix(-center)
     offset_matrix = translation_matrix(+center)

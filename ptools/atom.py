@@ -260,7 +260,9 @@ class AtomCollection(TransformableObject, UserList):
         """
         return len(self)
 
-    def center_to_origin(self, origin: np.ndarray = np.zeros(3), use_weights: bool = False):
+    def center_to_origin(
+        self, origin: np.ndarray = np.zeros(3), use_weights: bool = False
+    ):
         """Centers AtomCollection on `origin`."""
         if not use_weights:
             super().center_to_origin(origin)

@@ -18,6 +18,7 @@ class ObjectWithCoordinates:
     Coordinates are stored in private _coords array which allows to automatically
     convert coordinates to numpy arrays upon change.
     """
+
     _coords: np.ndarray
 
     def __init__(self, coords: ArrayLike = np.zeros(3)):

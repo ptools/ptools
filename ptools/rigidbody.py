@@ -56,7 +56,7 @@ class RigidBody(FromPDB, AtomCollection):
         """Adds forces to atoms."""
         self.atom_forces += forces
 
-    def init_from_pdb(self, path: str | bytes | os.PathLike):
+    def init_from_pdb(self, path: os.PathLike):
         """Initialization from PDB file."""
         atoms = io_read_pdb(path)
         AtomCollection.__init__(self, atoms)

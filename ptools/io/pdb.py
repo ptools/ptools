@@ -14,7 +14,7 @@ class _FromPDBBase(abc.ABC):
     """
 
     @abc.abstractmethod
-    def init_from_pdb(self, path: Union[str, bytes, os.PathLike]):
+    def init_from_pdb(self, path: os.PathLike):
         """Initializes internal components from data read in PDB file."""
 
 
@@ -26,7 +26,7 @@ class FromPDB(_FromPDBBase):
     """
 
     @classmethod
-    def from_pdb(cls, path: Union[str, bytes, os.PathLike]):
+    def from_pdb(cls, path: os.PathLike):
         """Returns a new instance of the class initialized using `cls.init_from_pdb`."""
         obj = cls()
         obj.init_from_pdb(path)
@@ -36,11 +36,14 @@ class FromPDB(_FromPDBBase):
 class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
+
 class InvalidPDBAtomLineError(ValueError):
     """Raised when the a PDB line does not describe an atom."""
+
     def __init__(self, header, *args):
         message = f'Invalid atom line: expected "ATOM" or "HETATM" as header, found "{header}"'
         super(InvalidPDBAtomLineError, self).__init__(message, *args)
+
 
 class PDBLine(str):
     """Generic PDB formatted line.
@@ -74,6 +77,7 @@ class ModelLine(PDBLine):
         """Model identifier."""
         return self[10:].strip()
 
+
 class AtomLine(PDBLine):
     """Helper methods for an atom line."""
 
@@ -81,7 +85,6 @@ class AtomLine(PDBLine):
         super().__init__(*args)
         if not self.is_atom():
             raise InvalidPDBAtomLineError(self.header)
-
 
     @property
     def atom_index(self) -> int:

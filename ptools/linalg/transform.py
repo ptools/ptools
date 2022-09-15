@@ -13,7 +13,7 @@ from .matrix import (
 )
 
 
-def translate(coords: np.array, t: ArrayLike):
+def translate(coords: np.ndarray, t: ArrayLike):
     """In-place translation of coordinates."""
 
     def _translate_scalar(x):
