@@ -3,11 +3,8 @@
 import unittest
 
 from ptools.atom import BaseAtom
-from .testing.moreassert import (
-    assert_array_almost_equal,
-    assert_dummy_atom_initialization_ok,
-)
-from .testing.dummy import dummy_atom
+from .testing.moreassert import assert_array_almost_equal
+from .testing.dummy import generate_dummy_atom
 
 
 class TestBaseAtom(unittest.TestCase):
@@ -20,9 +17,6 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.resid, 0)
         self.assertEqual(atom.charge, 0.0)
         assert_array_almost_equal(atom.coords, (0, 0, 0))
-
-    def test_initialization(self):
-        assert_dummy_atom_initialization_ok(self, dummy_atom())
 
     def test_initialize_with_bad_coordinates(self):
         err = "3D coordinate array should be N x 3"
@@ -62,10 +56,9 @@ class TestBaseAtom(unittest.TestCase):
         # Check that all arguments are adequatly set from original atom
         # and that atom coordinates are not a reference to
         # the initial atom coordinates.
-        atom = dummy_atom()
+        atom = generate_dummy_atom()
         original_coordinates = atom.coords.copy()
         atom_copy = atom.copy()
-        assert_dummy_atom_initialization_ok(self, atom_copy)
         self.assertNotEqual(
             atom_copy.coords.__array_interface__["data"][0],
             atom.coords.__array_interface__["data"][0],
@@ -81,7 +74,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.element, "C")
 
     def test_topdb(self):
-        atom = dummy_atom()
+        atom = generate_dummy_atom()
         reference_string = (
             "ATOM     42  CA  ALA A  17       "
             "1.000   2.000   3.000  1.00  0.00           "
@@ -90,7 +83,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.topdb(), reference_string)
 
     def test_topdb_long_atomid(self):
-        atom = dummy_atom()
+        atom = generate_dummy_atom()
         atom.index = 110000
         reference_string = (
             "ATOM  1adb0  CA  ALA A  17       "
@@ -100,7 +93,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.topdb(), reference_string)
 
     def test_topdb_long_resid(self):
-        atom = dummy_atom()
+        atom = generate_dummy_atom()
         atom.resid = 11000
         reference_string = (
             "ATOM     42  CA  ALA A2af8       "
@@ -110,7 +103,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.topdb(), reference_string)
 
     def test_topdb_long_atom_name(self):
-        atom = dummy_atom()
+        atom = generate_dummy_atom()
         atom.name = "CA1"
         reference_string = (
             "ATOM     42  CA1 ALA A  17       "

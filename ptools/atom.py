@@ -14,7 +14,7 @@ import numpy as np
 
 from . import linalg
 from . import tables
-from .spatial import SpatialObject
+from .spatial import TransformableObject, TranslatableObject
 
 # The Protein Data Bank format for atom coordinates
 PDB_FMT = (
@@ -27,7 +27,7 @@ PDB_FMT = (
 
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
-class BaseAtom(SpatialObject):
+class BaseAtom(TranslatableObject):
     """Base class for an Atom.
 
     Args:
@@ -208,7 +208,7 @@ class Atom(BaseAtom):
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
-class AtomCollection(SpatialObject, UserList):
+class AtomCollection(TransformableObject, UserList):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -225,7 +225,7 @@ class AtomCollection(SpatialObject, UserList):
             atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
             coords = np.array([atom._coords for atom in atoms])
 
-        SpatialObject.__init__(self, coords)
+        TransformableObject.__init__(self, coords)
         UserList.__init__(self, atoms)
         self.masses = np.zeros(len(atoms))
         self.guess_masses()
@@ -275,7 +275,7 @@ class AtomCollection(SpatialObject, UserList):
         """Returns the inertia tensors of a set of atoms."""
         if weights is None:
             weights = self.masses
-        return super().inertia_tensor(weights)
+        return linalg.inertia_tensor(self.coords, weights)
 
     def principal_axes(self, sort: bool = True) -> np.ndarray:
         """Returns an AtomCollection principal axes.

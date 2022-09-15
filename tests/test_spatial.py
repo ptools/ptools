@@ -20,30 +20,30 @@ class TestSpatialObjectVector(unittest.TestCase):
     """Test spatial.SpatialObject methods on a vector."""
 
     def test_empty_constructor(self):
-        obj = spatial.SpatialObject()
+        obj = spatial.ObjectWithCoordinates()
         assert_array_almost_equal(obj.coords, (0, 0, 0))
 
     def test_constructor(self):
-        obj = spatial.SpatialObject((1, 1, 1))
+        obj = spatial.ObjectWithCoordinates((1, 1, 1))
         assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_scalar(self):
-        obj = spatial.SpatialObject((0, 0, 0))
+        obj = spatial.TranslatableObject((0, 0, 0))
         obj.translate(1)
         assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_vector(self):
-        obj = spatial.SpatialObject((0, 0, 0))
+        obj = spatial.TranslatableObject((0, 0, 0))
         obj.translate((1, 2, 3))
         assert_array_almost_equal(obj.coords, (1, 2, 3))
 
     def test_center_to_origin(self):
-        obj = spatial.SpatialObject((1, 1, 1))
+        obj = spatial.TranslatableObject((1, 1, 1))
         obj.center_to_origin()
         assert_array_almost_equal(obj.centroid(), (0, 0, 0))
 
     def test_center_custom_origin(self):
-        obj = spatial.SpatialObject((1, 1, 1))
+        obj = spatial.TranslatableObject((1, 1, 1))
         obj.center_to_origin(origin=(2, 2, 2))
         assert_array_almost_equal(obj.centroid(), (2, 2, 2))
 
@@ -51,7 +51,7 @@ class TestSpatialObjectVector(unittest.TestCase):
     # E1137: 'target.coords' does not support item assignment
     # pylint: disable=E1137
     def test_copy(self):
-        source = spatial.SpatialObject((6, 9, 12))
+        source = spatial.ObjectWithCoordinates((6, 9, 12))
         target = source.copy()
         assert_array_almost_equal(target.coords, source.coords)
         target.coords[0] = 0
@@ -59,7 +59,7 @@ class TestSpatialObjectVector(unittest.TestCase):
         assert_array_almost_equal(source.coords, [6, 9, 12])
 
     def test_distance_to_axis(self):
-        obj = spatial.SpatialObject((0, 0, 0))
+        obj = spatial.ObjectWithCoordinates((0, 0, 0))
         axis = np.array((1, 0, 0))
         self.assertAlmostEqual(obj.distance_to_axis(axis), 0.0)
 
@@ -75,23 +75,16 @@ class TestSpatialObjectArray(unittest.TestCase):
 
     def setUp(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        self.obj = spatial.SpatialObject(array)
+        self.obj = spatial.ObjectWithCoordinates(array)
 
-    # pylint guesses type wrong (self.obj.coords is a np.ndarray)
-    # E1101: Instance of 'tuple' has no 'shape' member
-    # pylint: disable=E1101
     def test_constructor(self):
         self.assertEqual(self.obj.coords.shape, (2, 3))
         assert_array_almost_equal(self.obj.coords[1], (1, 1, 1))
 
-    def test_inertia_tensor(self):
-        expected = np.full((3, 3), -0.5)
-        np.fill_diagonal(expected, 1)
-        assert_array_almost_equal(self.obj.inertia_tensor(), expected)
-
 
 class TestRotation(unittest.TestCase):
-    def test_rotation_X(self):
+    @staticmethod
+    def test_rotation_X():
         # Rotation by 90°.
         ref = [
             [1.00, 0.00, 0.00, 0.00],
@@ -122,7 +115,8 @@ class TestRotation(unittest.TestCase):
         m = linalg.rotation_matrix([10, 0, 0])
         assert_array_almost_equal(m, ref)
 
-    def test_rotation_Y(self):
+    @staticmethod
+    def test_rotation_Y():
         # Rotation by 90°.
         ref = [
             [0.00, 0.00, 1.00, 0.00],
@@ -153,7 +147,8 @@ class TestRotation(unittest.TestCase):
         m = linalg.rotation_matrix([0, 10, 0])
         assert_array_almost_equal(m, ref)
 
-    def test_rotation_Z(self):
+    @staticmethod
+    def test_rotation_Z():
         # Rotation by 90°.
         ref = [
             [0.00, -1.00, 0.00, 0.00],
@@ -184,7 +179,8 @@ class TestRotation(unittest.TestCase):
         m = linalg.rotation_matrix([0, 0, 10])
         assert_array_almost_equal(m, ref)
 
-    def test_rotation_XYZ(self):
+    @staticmethod
+    def test_rotation_XYZ():
         """Test rotation in X, Y and Z is equivalent to successive rotation
         in X, then Y, then Z."""
         m = linalg.rotation_matrix([10, 10, 10])
@@ -195,7 +191,8 @@ class TestRotation(unittest.TestCase):
         )
         assert_array_almost_equal(m, ref)
 
-    def test_rotate_by(self):
+    @staticmethod
+    def test_rotate_by():
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
@@ -221,12 +218,13 @@ class TestRotation(unittest.TestCase):
 
         assert_array_almost_equal(coords, ref_coords, decimal=5)
 
-    def test_rotate_spatial_object(self):
+    @staticmethod
+    def test_rotate_spatial_object():
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        o = spatial.SpatialObject(coords)
+        o = spatial.RotatableObject(coords)
 
         # Rotate by 12° along X-axis.
         o.rotate_by([12, 0, 0])
@@ -250,12 +248,13 @@ class TestRotation(unittest.TestCase):
 
         assert_array_almost_equal(o.coords, ref_coords, decimal=5)
 
-    def test_rotate_abstract_euler(self):
+    @staticmethod
+    def test_rotate_abstract_euler():
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        o = spatial.SpatialObject(coords)
+        o = spatial.RotatableObject(coords)
 
         # Attract Euler rotation.
         o.attract_euler_rotate(10, 12, 14)
@@ -366,7 +365,7 @@ class TestTransformation(unittest.TestCase):
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        o = spatial.SpatialObject(coords)
+        o = spatial.TransformableObject(coords)
 
         # Rotate by 12° along X-axis.
         o.transform(m)
@@ -450,9 +449,13 @@ class TestCoord3D(unittest.TestCase):
 
 
 class TestSpatialObjectTransformations(unittest.TestCase):
+    class FullTransformableObject(spatial.TranslatableObject, spatial.RotatableObject):
+        pass
+
+
     def setUp(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
-        self.obj = spatial.SpatialObject(array)
+        self.obj = self.FullTransformableObject(array)
 
     def test_rotate(self):
         ref = [[0.0, 0.0, 0.0], [1.0, 0.8111595511436462, 1.1584558486938477]]

@@ -1,5 +1,7 @@
 """Creates dummy ptools structures."""
 
+import numpy as np
+
 from ptools.atom import BaseAtom, AtomCollection
 
 
@@ -14,7 +16,7 @@ DUMMY_ATOM_ATTRS = {
 }
 
 
-def dummy_atom():
+def generate_dummy_atom() -> BaseAtom:
     """Creates a dummy atom."""
     atom = BaseAtom()
     for attr, value in DUMMY_ATOM_ATTRS.items():
@@ -22,9 +24,14 @@ def dummy_atom():
     return atom
 
 
-def dummy_atomcollection(n_atoms: int = 10):
-    """Creates a dummy atom collection composed of `n_atoms` atoms.
+def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
+    """Creates a dummy atom collection composed of `size` atoms.
 
     Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
     """
-    return AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(n_atoms)])
+    col = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(size)])
+    for atom in col:
+        for attr in ('name', 'resname', 'chain', 'index', 'resid', 'charge'):
+            setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])
+    return col
+

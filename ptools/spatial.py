@@ -33,6 +33,10 @@ class ObjectWithCoordinates:
         """Sets SpatialObject cartesian coordinates."""
         self._coords = coord3d(pos)
 
+    def copy(self) -> ObjectWithCoordinates:
+        """Returns a copy of itself."""
+        return self.__class__(self.coords)
+
     def distance(self, other: ObjectWithCoordinates) -> float:
         """Returns the euclidean distance between two objects."""
         return L.distance(self.coords, other.coords)
@@ -46,7 +50,7 @@ class ObjectWithCoordinates:
         return L.distance_to_axis(self.coords, axis)
 
 
-class CanTranslate(ObjectWithCoordinates):
+class TranslatableObject(ObjectWithCoordinates):
     """Object which coordinates can be translated."""
 
     def center_to_origin(self, origin: ArrayLike = np.zeros(3)):
@@ -70,7 +74,7 @@ class CanTranslate(ObjectWithCoordinates):
         self.translate(direction)
 
 
-class CanRotate(ObjectWithCoordinates):
+class RotatableObject(ObjectWithCoordinates):
     """Object which coordinates can be rotated."""
 
     def rotate_by(self, angles: ArrayLike):
@@ -93,6 +97,18 @@ class CanRotate(ObjectWithCoordinates):
         """Rotates object using PTools rotation around axis."""
         T.ab_rotate(self.coords, A, B, amount)
 
+    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
+        """Rotates object with Attract convention."""
+        T.attract_euler_rotate(self.coords, phi, ssi, rot)
+
+    def orient(self, vector: ArrayLike, target: ArrayLike):
+        """Orients a SpatialObject."""
+        T.orient(self.coords, vector, target)
+
+
+class TransformableObject(TranslatableObject, RotatableObject):
+    """Object that can be translated and rotated."""
+
     def transform(self, matrix: ArrayLike):
         """Transforms object using 4x4 matrix."""
         T.transform(self.coords, matrix)
@@ -104,38 +120,9 @@ class CanRotate(ObjectWithCoordinates):
         """
         self.transform(matrix)
 
-    def attract_euler_rotate(self, phi: float, ssi: float, rot: float):
-        """Rotates object with Attract convention."""
-        T.attract_euler_rotate(self.coords, phi, ssi, rot)
-
-    def orient(self, vector: ArrayLike, target: ArrayLike):
-        """Orients a SpatialObject."""
-        T.orient(self.coords, vector, target)
-
-
-class SpatialObject(CanTranslate, CanRotate):
-    """An object with coordinates.
-
-    Implements basic spatial operations such as translation, rotation, etc.
-    """
-
-    def __init__(self, coords: ArrayLike = np.zeros(3)):
-        self._coords = coord3d(coords)
-
-
-    def copy(self) -> SpatialObject:
-        """Returns a copy of itself."""
-        return self.__class__(self.coords)
-
-    def inertia_tensor(self, weights: ArrayLike = None) -> np.ndarray:
-        """Returns a SpatialObject inertia tensor."""
-        if weights is None:
-            weights = np.ones(self.coords.shape[0])
-        return L.inertia_tensor(self.coords, weights)
-
-
 
 # pylint: disable-msg=W1113
+# keyword-arg-before-vararg
 def coord3d(value: ArrayLike = np.zeros(3), *args) -> np.ndarray:
     """Converts an iterable of size 3 to a 1 x 3 shaped numpy array of floats.
 

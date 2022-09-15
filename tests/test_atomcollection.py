@@ -7,6 +7,7 @@ import unittest
 import numpy as np
 
 import ptools
+from ptools import tables
 from ptools.atom import AtomCollection, BaseAtom
 
 from .testing.moreassert import (
@@ -14,7 +15,7 @@ from .testing.moreassert import (
     assert_array_almost_equal,
     assert_array_not_almost_equal,
 )
-from .testing.dummy import dummy_atomcollection
+from .testing.dummy import generate_dummy_atomcollection
 from . import TEST_LIGAND
 
 
@@ -23,7 +24,7 @@ from . import TEST_LIGAND
 class TestAtomCollection(unittest.TestCase):
     def setUp(self):
         self.n_atoms: int = 10
-        self.atoms: AtomCollection = dummy_atomcollection(self.n_atoms)
+        self.atoms: AtomCollection = generate_dummy_atomcollection(self.n_atoms)
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms), self.n_atoms)
@@ -200,14 +201,11 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(atoms), self.n_atoms * 2)
         self.assertEqual(atoms.coords.shape[0], self.n_atoms * 2)
 
-    # Ignores R0201: Method could be a function (no-self-use)
-    # pylint: disable=R0201
     def test_masses(self):
-        # atoms name "XXX" should weight 0
-        assert_array_equal(self.atoms.masses, np.ones(self.n_atoms))
+        assert_array_equal(self.atoms.masses, np.full((self.n_atoms,), tables.masses["C"]))
 
-    # pylint: disable=R0201
-    def test_inertia_tensor(self):
+    @staticmethod
+    def test_inertia_tensor():
         # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
         atoms = ptools.io.read_pdb(TEST_LIGAND)
@@ -219,8 +217,8 @@ class TestAtomCollection(unittest.TestCase):
         I = atoms.inertia_tensor()
         assert_array_almost_equal(I, ref, decimal=2)
 
-    # pylint: disable=R0201
-    def test_principal_axes(self):
+    @staticmethod
+    def test_principal_axes():
         atoms = ptools.io.read_pdb(TEST_LIGAND)
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()

@@ -1,50 +1,31 @@
 """test_atom - Tests for `ptools.atom` module."""
 
-import unittest
-
-from ptools.atom import Atom, AtomCollection
-
-from .testing.moreassert import (
-    assert_array_almost_equal,
-    assert_dummy_atom_initialization_ok,
-)
-
-from .testing.dummy import dummy_atom, DUMMY_ATOM_ATTRS
+# Unit-test specific imports
+from pytest import approx
+from .testing.dummy import generate_dummy_atomcollection
 
 
-class TestAtom(unittest.TestCase):
-    def setUp(self):
-        self.atoms = AtomCollection([dummy_atom()])
 
-    def test_constructor_initializes_an_Atom_instance(self):
-        self.assertIsInstance(self.atoms[0], Atom)
+class TestAtom:
+    """Namespace that holds tests for PTools' Atom class"""
 
-    def test_constructor(self):
-        """Checks that when using copy constructor, all arguments are
-        adequatly set and that atom coordinates are not a reference to
-        the initial atom coordinates."""
-        assert_dummy_atom_initialization_ok(self, self.atoms[0])
+    @staticmethod
+    def test_mass_getter():
+        atoms = generate_dummy_atomcollection()
+        print(atoms[0])
+        assert atoms[0].mass == approx(12.011)
 
-    def test_constructor_copies_coordinates(self):
-        orig = dummy_atom()
-        _ = AtomCollection([orig])
-        atom = self.atoms[0]
-        assert_array_almost_equal(atom.coords, DUMMY_ATOM_ATTRS["coords"])
-        orig.coords = (0, 0, 0)
-        assert_array_almost_equal(atom.coords, DUMMY_ATOM_ATTRS["coords"])
+    @staticmethod
+    def test_mass_setter():
+        atoms = generate_dummy_atomcollection()
+        atoms[0].mass = 42
+        assert atoms[0].mass == 42
 
-    def test_mass_getter(self):
-        self.assertEqual(self.atoms[0].mass, 12.011)
+    @staticmethod
+    def test_equal():
+        """Asserts that identical atoms from different AtomCollection instances
+        are evaluated equal when attributes are actually equal."""
+        left = generate_dummy_atomcollection()
+        right = generate_dummy_atomcollection()
+        assert left[0] == right[0]
 
-    # pylint guesses type wrong (self.atoms[0] is an Atom)
-    # E1101: Instance of 'AtomCollection' has no 'mass' member
-    # pylint: disable=E1101
-    def test_mass_setter(self):
-        self.atoms[0].mass = 42
-        self.assertEqual(self.atoms[0].mass, 42)
-
-    def test_equal(self):
-        # Identical atoms from different AtomCollection instances should be evaluated equal.
-        left = self.atoms[0]
-        right = AtomCollection([left.copy()])[0]
-        self.assertEqual(left, right)
