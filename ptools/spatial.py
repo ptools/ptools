@@ -5,6 +5,8 @@
 # e.g. SpatialObject.dist(self, other: SpatialObject)
 from __future__ import annotations
 
+from collections.abc import Sequence
+
 import numpy as np
 from numpy.typing import ArrayLike
 
@@ -148,9 +150,9 @@ def coord3d(value: ArrayLike = np.zeros(3), *args) -> np.ndarray:
     # Initialization from a single value.
     if not args:
         # value is a scalar.
-        if isinstance(value, (int, float)):
+        if np.isscalar(value):
             return _coordinates_from_scalar(value)
-        if isinstance(value, (list, tuple, np.ndarray)):
+        if isinstance(value, (np.ndarray, Sequence)):
             return _coordinates_from_vector(value)
         # value is some invalid type.
         raise TypeError(f"Invalid coordinates initialization from {value}")
@@ -166,21 +168,15 @@ def _coordinates_from_scalar(value: int | float) -> np.ndarray:
 
 def _coordinates_from_vector(value: ArrayLike) -> np.ndarray:
     """Returns a numpy array of size 3 initialized with a vector."""
-    # value is an iterable: numpy will raise a ValueError if some element
-    # is not compatible with float.
-    if isinstance(value, (list, tuple)):
-        array = np.array(value, dtype=float)
-    elif isinstance(value, np.ndarray):
-        array = value.astype("float64")
-    # Checks array corresponds to 3D coordinates
-    if len(array.shape) > 2:
+    array = np.array(value, dtype=float)
+
+    ndim = np.ndim(array)
+    if ndim > 2:
         raise ValueError(
             "3D coordinate array should have at "
             f"most 2 dimensions (found {array.shape}"
         )
-    if (len(array.shape) == 2 and array.shape[1] != 3) or (
-        len(array.shape) == 1 and array.shape[0] != 3
-    ):
+    if (ndim == 2 and array.shape[1] != 3) or (ndim == 1 and array.shape[0] != 3):
         raise ValueError(
             "3D coordinate array should be N x 3 " f"(found {array.shape})"
         )
