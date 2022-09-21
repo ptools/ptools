@@ -206,9 +206,10 @@ def read_pdb(
         """Parses an ATOM line and stores the atom into the current model."""
         current_model.append(AtomLine(line).to_atom())
 
-    models = []
-    model_id_list = []
-    current_model = []
+    models: list[AtomCollection] = []
+    model_id_list: list[str] = []
+    current_model: list[BaseAtom] = []
+
     with open(path, "rt", encoding="utf-8") as f:
         for buffer in f:
             line = PDBLine(buffer)
@@ -238,3 +239,5 @@ def read_pdb(
 
     # Multiple models: returns a list of AtomCollection instances.
     return models
+
+

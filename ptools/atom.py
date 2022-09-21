@@ -5,13 +5,19 @@ atom groups."""
 # e.g. BaseAtom.copy(self) -> BaseAtom
 from __future__ import annotations
 
+# Pythonn core libraries.
 from collections import UserList
 import copy
 import math
-from typing import Sequence
 
+# Scientific libraries.
 import numpy as np
 
+# Type-hinting specific import
+from typing import Sequence
+from numpy.typing import ArrayLike
+
+# PTools imports.
 from . import linalg
 from . import tables
 from .spatial import TransformableObject, TranslatableObject
@@ -52,7 +58,7 @@ class BaseAtom(TranslatableObject):
         chain: str = "X",
         resid: int = 0,
         charge: float = 0.0,
-        coords: np.ndarray = np.zeros(3),
+        coords: ArrayLike = np.zeros(3),
         meta: dict = None,
     ):
         super().__init__(coords)
@@ -79,8 +85,10 @@ class BaseAtom(TranslatableObject):
         """Name setter simultaneously updates element name."""
         self._name = name
 
-    def __eq__(self, other: BaseAtom) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Compares two BaseAtom instances."""
+        if not isinstance(other, BaseAtom):
+            raise TypeError(f"cannot compare BaseAtom with object of type {type(other)}")
         for key in self._comparison_attributes:
             if key != "coords":
                 if getattr(self, key) != getattr(other, key):
@@ -261,7 +269,7 @@ class AtomCollection(TransformableObject, UserList):
         return len(self)
 
     def center_to_origin(
-        self, origin: np.ndarray = np.zeros(3), use_weights: bool = False
+        self, origin: ArrayLike = np.zeros(3), use_weights: bool = False
     ):
         """Centers AtomCollection on `origin`."""
         if not use_weights:
