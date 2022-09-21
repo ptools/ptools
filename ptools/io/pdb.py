@@ -239,5 +239,3 @@ def read_pdb(
 
     # Multiple models: returns a list of AtomCollection instances.
     return models
-
-

@@ -14,13 +14,14 @@ import math
 import numpy as np
 
 # Type-hinting specific import
-from typing import Sequence
+from typing import Any, Sequence
 from numpy.typing import ArrayLike
 
 # PTools imports.
 from . import linalg
 from . import tables
 from .spatial import TransformableObject, TranslatableObject
+from .io.formatters.pdb import PDBFormatter
 
 # The Protein Data Bank format for atom coordinates
 PDB_FMT = (
@@ -117,37 +118,7 @@ class BaseAtom(TranslatableObject):
 
     def topdb(self) -> str:
         """Returns the atom's description in PDB format."""
-
-        rec = "ATOM"
-        altlocchar = " "
-        insertion = " "
-        occ = 1.0
-        bfactor = 0.0
-        element = self.element
-
-        chain = " " if not self.chain else self.chain
-        namebuf = f"{self.name:>4s}" if len(self.name) > 2 else self.name.center(4)
-        indexbuf = f"{self.index:5d}" if self.index < 100000 else f"{self.index:05x}"
-        residbuf = f"{self.resid:4d}" if self.resid < 10000 else f"{self.resid:04x}"
-
-        x, y, z = self.coords
-
-        return PDB_FMT.format(
-            record=rec,
-            index=indexbuf,
-            name=namebuf,
-            altloc=altlocchar,
-            resname=self.resname,
-            chain=chain[0],
-            resid=residbuf,
-            insertion=insertion[0],
-            x=x,
-            y=y,
-            z=z,
-            occupancy=occ,
-            bfactor=bfactor,
-            element=element,
-        )
+        return PDBFormatter.format_atom(self)
 
 
 class Atom(BaseAtom):

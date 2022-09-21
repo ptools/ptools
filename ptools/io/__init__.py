@@ -2,11 +2,6 @@
 
 import os
 
-from .pdb import read_pdb, InvalidPDBFormatError
-
-__all__ = ["read_pdb", "InvalidPDBFormatError"]
-
-
 def check_file_exists(path, message=False):
     """Checks that a file exists.
 

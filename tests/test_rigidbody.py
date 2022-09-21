@@ -3,7 +3,7 @@
 import unittest
 
 from ptools.rigidbody import RigidBody, AttractRigidBody
-from ptools.io import InvalidPDBFormatError
+from ptools.io.pdb import InvalidPDBFormatError
 
 from .testing.io import mk_pdb_10_atoms
 from .testing.io.red import mk_red, mk_red_invalid_charges, TestREDBuilder

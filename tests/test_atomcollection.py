@@ -208,7 +208,7 @@ class TestAtomCollection(unittest.TestCase):
     def test_inertia_tensor():
         # Reference calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         ref = [
             [3679339.47775172, 694837.16289436, -263651.10452372],
             [694837.16289436, 3803047.59374612, -194611.71739629],
@@ -219,7 +219,7 @@ class TestAtomCollection(unittest.TestCase):
 
     @staticmethod
     def test_principal_axes():
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         # Calculated with MDAnalysis 0.20.1:
         # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()
         ref = [
@@ -231,26 +231,26 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_almost_equal(I, ref)
 
     def test_select_atom_type(self):
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_atom_type("CA")
         self.assertEqual(len(sel), 426)
         self.assertEqual([atom.name for atom in sel], ["CA"] * 426)
 
     def test_select_atom_types(self):
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_atom_types(["CA", "CB"])
         self.assertEqual(len(sel), 426 + 64)
         self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426)
         self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64)
 
     def test_select_residue_range(self):
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_residue_range(10, 20)
         self.assertEqual(len(sel), 23)
         self.assertTrue(all(10 <= atom.resid <= 20 for atom in sel))
 
     def test_select_chain(self):
-        atoms = ptools.io.read_pdb(TEST_LIGAND)
+        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_chain("B")
         self.assertEqual(len(sel), 974)
         self.assertTrue(all(atom.chain == "B" for atom in sel))
