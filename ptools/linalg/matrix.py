@@ -26,7 +26,7 @@ def transformation_matrix(
     return matrix
 
 
-def rotation_matrix(angles: np.ndarray = np.zeros(3)) -> np.ndarray:
+def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
     """Return the rotation matrix around the X, Y and Z axes.
 
     The matrix rotates first along X-axis, then Y, then Z.
@@ -174,3 +174,33 @@ def orientation_matrix(
 def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float) -> np.ndarray:
     """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
     return rotation_matrix_around_axis(B - A, amount, A)
+
+
+def shift_matrix(offset: float) -> np.ndarray:
+    """Returns a shift matrix, which is a translation matrix along the X-axis."""
+    return translation_matrix([offset, 0, 0])
+
+
+def slide_matrix(offset: float) -> np.ndarray:
+    """Returns a slide matrix, which is a translation matrix along the Y-axis."""
+    return translation_matrix([0, offset, 0])
+
+
+def rise_matrix(offset: float) -> np.ndarray:
+    """Returns a rise matrix, which is a translation matrix along the Z-axis."""
+    return translation_matrix([0, 0, offset])
+
+
+def tilt_matrix(alpha: float) -> np.ndarray:
+    """Returns a tilt matrix, which is a rotation matrix along the X-axis."""
+    return rotation_matrix([alpha, 0, 0])
+
+
+def roll_matrix(alpha: float) -> np.ndarray:
+    """Returns a roll matrix, which is a rotation matrix along the Y-axis."""
+    return rotation_matrix([0, alpha, 0])
+
+
+def twist_matrix(alpha: float) -> np.ndarray:
+    """Returns a twist matrix, which is a rotation matrix along the Z-axis."""
+    return rotation_matrix([0, 0, alpha])
