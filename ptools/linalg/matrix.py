@@ -21,7 +21,8 @@ def transformation_matrix(
     translation: ArrayLike = np.zeros(3), rotation: ArrayLike = np.zeros(3)
 ) -> np.ndarray:
     """Returns a 4x4 transformation matrix."""
-    matrix = rotation_matrix(rotation)
+    matrix = np.identity(4)
+    matrix[:3, :3] = rotation_matrix(rotation)
     matrix[:3, 3] = translation
     return matrix
 
@@ -43,7 +44,7 @@ def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
     alpha = math.radians(angles[0])
     beta = math.radians(angles[1])
     gamma = math.radians(angles[2])
-    r = np.identity(4)
+    r = np.identity(3)
     r[0, 0] = math.cos(beta) * math.cos(gamma)
     r[0, 1] = -math.cos(beta) * math.sin(gamma)
     r[0, 2] = math.sin(beta)

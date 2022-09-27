@@ -73,90 +73,81 @@ class TestRotationMatrix:
 
     def test_rotation_x_by_90(self):
         expected = [
-            [1.00, 0.00, 0.00, 0.00],
-            [0.00, 0.00, -1.00, 0.00],
-            [0.00, 1.00, 0.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [1.00, 0.00,  0.00],
+            [0.00, 0.00, -1.00],
+            [0.00, 1.00,  0.00],
         ]
         actual = linalg.rotation_matrix([90, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_x_by_180(self):
         expected = [
-            [1.00, 0.00, 0.00, 0.00],
-            [0.00, -1.00, -0.00, 0.00],
-            [0.00, 0.00, -1.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [1.00, 0.00,   0.00],
+            [0.00, -1.00, -0.00],
+            [0.00, 0.00,  -1.00],
         ]
         actual = linalg.rotation_matrix([180, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_x_by_10(self):
         expected = [
-            [1.0000000, 0.000000, 0.000000, 0.000000],
-            [0.0000000, 0.984808, -0.173648, 0.000000],
-            [0.0000000, 0.173648, 0.984808, 0.000000],
-            [0.0000000, 0.000000, 0.000000, 1.000000],
+            [1.0000000, 0.000000, 0.000000 ],
+            [0.0000000, 0.984808, -0.173648],
+            [0.0000000, 0.173648, 0.984808 ],
         ]
         actual = linalg.rotation_matrix([10, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_90(self):
         expected = [
-            [0.00, 0.00, 1.00, 0.00],
-            [0.00, 1.00, 0.00, 0.00],
-            [-1.00, 0.00, 0.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [0.00, 0.00,  1.00],
+            [0.00, 1.00,  0.00],
+            [-1.00, 0.00, 0.00],
         ]
         actual = linalg.rotation_matrix([0, 90, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_180(self):
         expected = [
-            [-1.00, 0.00, 0.00, 0.00],
-            [0.00, 1.00, 0.00, 0.00],
-            [-0.00, 0.00, -1.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [-1.00, 0.00,  0.00],
+            [0.00, 1.00,   0.00],
+            [-0.00, 0.00, -1.00],
         ]
         actual = linalg.rotation_matrix([0, 180, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_10(self):
         expected = [
-            [0.9848078, 0.000000, 0.173648, 0.000000],
-            [0.0000000, 1.000000, 0.000000, 0.000000],
-            [-0.1736482, 0.000000, 0.984808, 0.000000],
-            [0.0000000, 0.000000, 0.000000, 1.000000],
+            [0.9848078, 0.000000, 0.173648 ],
+            [0.0000000, 1.000000, 0.000000 ],
+            [-0.1736482, 0.000000, 0.984808],
         ]
         actual = linalg.rotation_matrix([0, 10, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_z_by_90(self):
         expected = [
-            [0.00, -1.00, 0.00, 0.00],
-            [1.00, 0.00, 0.00, 0.00],
-            [0.00, 0.00, 1.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [0.00, -1.00, 0.00],
+            [1.00, 0.00,  0.00],
+            [0.00, 0.00,  1.00],
         ]
         actual = linalg.rotation_matrix([0, 0, 90])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_z_by_180(self):
         expected = [
-            [-1.00, -0.00, 0.00, 0.00],
-            [0.00, -1.00, 0.00, 0.00],
-            [0.00, 0.00, 1.00, 0.00],
-            [0.00, 0.00, 0.00, 1.00],
+            [-1.00, -0.00, 0.00],
+            [0.00, -1.00,  0.00],
+            [0.00, 0.00,   1.00],
         ]
         actual = linalg.rotation_matrix([0, 0, 180])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_z_by_10(self):
         expected = [
-            [0.9848078, -0.173648, 0.000000, 0.000000],
-            [0.1736482, 0.984808, 0.000000, 0.000000],
-            [0.0000000, 0.000000, 1.000000, 0.000000],
-            [0.0000000, 0.000000, 0.000000, 1.000000],
+            [0.9848078, -0.173648, 0.000000],
+            [0.1736482, 0.984808,  0.000000],
+            [0.0000000, 0.000000,  1.000000],
         ]
         actual = linalg.rotation_matrix([0, 0, 10])
         assert_array_almost_equal(actual, expected)
