@@ -69,45 +69,20 @@ def rotation_matrix_around_axis(
     return np.matmul(np.matmul(offset_matrix, matrix), origin_matrix)
 
 
-def attract_euler_rotation_matrix(phi: float, ssi: float, rot: float):
+def attract_euler_rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
     """Return the rotation matrix for an Euler rotation with Attract
     convention.
 
     Args:
-        phi (float):
-        ssi (float):
-        rot (float):
+        angles: 3 angles for rotation on Z-, Y- and X- axes, respectively, given in radians.
 
     Returns:
         numpy.ndarray: 3 x 3 matrix
     """
-    cs = math.cos(ssi)
-    cp = math.cos(phi)
-    ss = math.sin(ssi)
-    sp = math.sin(phi)
-    crot = math.cos(rot)
-    srot = math.sin(rot)
-
-    cscp = cs * cp
-    cssp = cs * sp
-    sscp = ss * cp
-    sssp = ss * sp
-
-    matrix = np.identity(3)
-
-    matrix[0][0] = crot * cscp + srot * sp
-    matrix[0][1] = srot * cscp - crot * sp
-    matrix[0][2] = sscp
-
-    matrix[1][0] = crot * cssp - srot * cp
-    matrix[1][1] = srot * cssp + crot * cp
-    matrix[1][2] = sssp
-
-    matrix[2][0] = -crot * ss
-    matrix[2][1] = -srot * ss
-    matrix[2][2] = cs
-
-    return matrix
+    by_x = rotation_matrix([0, 0, angles[2]], degrees=False).T  # what the hell is going on here???
+    by_y = rotation_matrix([0, angles[1], 0], degrees=False)
+    by_z = rotation_matrix([0, 0, angles[0]], degrees=False)
+    return by_z.dot(by_y).dot(by_x)
 
 
 def orientation_matrix(

@@ -35,7 +35,7 @@ def translate(coords: np.ndarray, t: ArrayLike):
         np.add(coords, t, coords)
 
 
-def rotate_by(coords: np.array, angles: np.array = np.zeros(3)):
+def rotate_by(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -47,7 +47,7 @@ def rotate_by(coords: np.array, angles: np.array = np.zeros(3)):
     rotate(coords, matrix)
 
 
-def rotate(coords: np.array, r: np.array):
+def rotate(coords: np.ndarray, r: ArrayLike):
     """In-place rotation of coordinates using a rotation matrix or 3 angles."""
     r = np.array(r)
     if r.shape == (3,):
@@ -62,7 +62,7 @@ def rotate(coords: np.array, r: np.array):
     coords[:] = np.inner(coords, matrix[:3, :3])
 
 
-def transform(coords: np.array, matrix: np.array):
+def transform(coords: np.ndarray, matrix: ArrayLike):
     """In-place transformation of coordinates by a 4 x 4 matrix.
 
     This function should be used only when the transformation matrix
@@ -88,7 +88,7 @@ def transform(coords: np.array, matrix: np.array):
     coords[:] = (a[:, 0:n].T / a[:, n]).T
 
 
-def orient(coords: np.array, vector: np.array, target: np.array):
+def orient(coords: np.ndarray, vector: ArrayLike, target: ArrayLike):
     """Orients coordinates.
 
     Args:
@@ -100,13 +100,13 @@ def orient(coords: np.array, vector: np.array, target: np.array):
     transform(coords, matrix)
 
 
-def attract_euler_rotate(coords: np.array, phi: float, ssi: float, rot: float):
+def attract_euler_rotate(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
     """In-place Euler rotation of coordinates using the Attract convention."""
-    matrix = attract_euler_rotation_matrix(phi, ssi, rot)
+    matrix = attract_euler_rotation_matrix(angles)
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotate(coords: np.array, A: np.array, B: np.array, amount: float):
+def ab_rotate(coords: np.ndarray, A: ArrayLike, B: ArrayLike, amount: float):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
     matrix = rotation_matrix_around_axis(B - A, amount, A)
     transform(coords, matrix)

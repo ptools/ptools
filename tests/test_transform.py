@@ -73,7 +73,7 @@ class TestRotate:
         obj = spatial.RotatableObject(coords)
 
         # Attract Euler rotation.
-        obj.attract_euler_rotate(10, 12, 14)
+        obj.attract_euler_rotate([10, 12, 14])
 
         # Coordinates calculated with ptools version c9f7fee::
         #
