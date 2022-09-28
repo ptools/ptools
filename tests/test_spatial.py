@@ -13,7 +13,6 @@ from ptools import linalg
 from ptools.linalg import transform
 
 
-
 # Ignores R0201: Method could be a function (no-self-use)
 # pylint: disable=R0201
 class TestSpatialObjectVector(unittest.TestCase):
@@ -67,7 +66,7 @@ class TestSpatialObjectVector(unittest.TestCase):
         self.assertAlmostEqual(obj.distance_to_axis(axis), 1.0)
 
         obj.coords = (0, 1, 1)
-        self.assertAlmostEqual(obj.distance_to_axis(axis), 2.0 ** 0.5)
+        self.assertAlmostEqual(obj.distance_to_axis(axis), 2.0**0.5)
 
 
 class TestSpatialObjectArray(unittest.TestCase):
@@ -144,7 +143,6 @@ class TestSpatialObjectTransformations(unittest.TestCase):
     class FullTransformableObject(spatial.TranslatableObject, spatial.RotatableObject):
         pass
 
-
     def setUp(self):
         array = np.array(((0, 0, 0), (1, 1, 1)), dtype=float)
         self.obj = self.FullTransformableObject(array)
@@ -179,5 +177,3 @@ class TestSpatialObjectTransformations(unittest.TestCase):
         err = r"Dimensions error: expected 3 x 1 or 4 x 4 \(got \(4,\)\)"
         with self.assertRaisesRegex(ValueError, err):
             self.obj.translate((1, 0, 0, 0))
-
-

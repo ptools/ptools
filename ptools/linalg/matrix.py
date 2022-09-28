@@ -4,7 +4,7 @@ import math
 # Scientific libraries.
 import numpy as np
 from numpy.typing import ArrayLike
-import scipy.linalg as L
+import scipy
 
 
 def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
@@ -27,44 +27,22 @@ def transformation_matrix(
     return matrix
 
 
-def rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
-    """Return the rotation matrix around the X, Y and Z axes.
+def rotation_matrix(angles: ArrayLike = np.zeros(3), sequence: str="xyz", degrees: bool=True) -> np.ndarray:
+    """Returns a rotation matrix in from Euler angles.
 
-    The matrix rotates first along X-axis, then Y, then Z.
+    This is an alias for `scipy.spatial.transform.Rotation.from_euler`.
 
     Args:
         angles ([float, float, float]): rotation angle around
                 the X-, Y- and Z-axes
+        sequence: order in which rotations are applied
+        degrees: angles are given either in degrees or in radians
 
     Returns:
         numpy.ndarray: 4x4 rotation matrix.
     """
-    assert np.shape(angles) == (3,)
+    return scipy.spatial.transform.Rotation.from_euler(sequence, angles, degrees).as_matrix()
 
-    alpha = math.radians(angles[0])
-    beta = math.radians(angles[1])
-    gamma = math.radians(angles[2])
-    r = np.identity(3)
-    r[0, 0] = math.cos(beta) * math.cos(gamma)
-    r[0, 1] = -math.cos(beta) * math.sin(gamma)
-    r[0, 2] = math.sin(beta)
-
-    r[1, 0] = math.cos(alpha) * math.sin(gamma) + math.sin(alpha) * math.sin(
-        beta
-    ) * math.cos(gamma)
-    r[1, 1] = math.cos(alpha) * math.cos(gamma) - math.sin(alpha) * math.sin(
-        beta
-    ) * math.sin(gamma)
-    r[1, 2] = -math.sin(alpha) * math.cos(beta)
-
-    r[2, 0] = math.sin(alpha) * math.sin(gamma) - math.cos(alpha) * math.sin(
-        beta
-    ) * math.cos(gamma)
-    r[2, 1] = math.sin(alpha) * math.cos(gamma) + math.cos(alpha) * math.sin(
-        beta
-    ) * math.sin(gamma)
-    r[2, 2] = math.cos(alpha) * math.cos(beta)
-    return r
 
 
 def rotation_matrix_around_axis(
@@ -85,7 +63,7 @@ def rotation_matrix_around_axis(
 
     origin_matrix = translation_matrix(-center)
     offset_matrix = translation_matrix(+center)
-    rotation = L.expm(np.cross(np.identity(3), axis / L.norm(axis) * amount))
+    rotation = scipy.linalg.expm(np.cross(np.identity(3), axis / scipy.linalg.norm(axis) * amount))
     matrix = np.identity(4)
     matrix[:3, :3] = rotation
     return np.matmul(np.matmul(offset_matrix, matrix), origin_matrix)

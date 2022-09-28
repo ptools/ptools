@@ -5,7 +5,6 @@ from pytest import approx
 from .testing.dummy import generate_dummy_atomcollection
 
 
-
 class TestAtom:
     """Namespace that holds tests for PTools' Atom class"""
 
@@ -28,4 +27,3 @@ class TestAtom:
         left = generate_dummy_atomcollection()
         right = generate_dummy_atomcollection()
         assert left[0] == right[0]
-

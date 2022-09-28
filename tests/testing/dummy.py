@@ -31,7 +31,6 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
     """
     col = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(size)])
     for atom in col:
-        for attr in ('name', 'resname', 'chain', 'index', 'resid', 'charge'):
+        for attr in ("name", "resname", "chain", "index", "resid", "charge"):
             setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])
     return col
-

@@ -202,7 +202,9 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(atoms.coords.shape[0], self.n_atoms * 2)
 
     def test_masses(self):
-        assert_array_equal(self.atoms.masses, np.full((self.n_atoms,), tables.masses["C"]))
+        assert_array_equal(
+            self.atoms.masses, np.full((self.n_atoms,), tables.masses["C"])
+        )
 
     @staticmethod
     def test_inertia_tensor():
@@ -240,8 +242,12 @@ class TestAtomCollection(unittest.TestCase):
         atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_atom_types(["CA", "CB"])
         self.assertEqual(len(sel), 426 + 64)
-        self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426)
-        self.assertEqual([atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64)
+        self.assertEqual(
+            [atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426
+        )
+        self.assertEqual(
+            [atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64
+        )
 
     def test_select_residue_range(self):
         atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)

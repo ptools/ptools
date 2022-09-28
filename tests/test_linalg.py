@@ -35,6 +35,7 @@ def generate_empty_coordinates() -> np.ndarray:
     """Returns an empty array."""
     return np.zeros((0, 3))
 
+
 def test_angle():
     u = (2, 2, 0)
     v = (0, 3, 0)
@@ -46,25 +47,29 @@ class TestTranslationMatrix:
     """Namespace that holds unit-tests for `ptools.linalg.translation_matrix`."""
 
     def test_vector(self):
-        x = generate_random_array(shape=(3, ))
+        x = generate_random_array(shape=(3,))
         actual = linalg.matrix.translation_matrix(x)
-        expected = np.array([
-            [1, 0, 0, x[0]],
-            [0, 1, 0, x[1]],
-            [0, 0, 1, x[2]],
-            [0, 0, 0, 1],
-        ])
+        expected = np.array(
+            [
+                [1, 0, 0, x[0]],
+                [0, 1, 0, x[1]],
+                [0, 0, 1, x[2]],
+                [0, 0, 0, 1],
+            ]
+        )
         assert_array_almost_equal(actual, expected)
 
     def test_scalar(self):
         x = random.random()
         actual = linalg.matrix.translation_matrix(x)
-        expected = np.array([
-            [1, 0, 0, x],
-            [0, 1, 0, x],
-            [0, 0, 1, x],
-            [0, 0, 0, 1],
-        ])
+        expected = np.array(
+            [
+                [1, 0, 0, x],
+                [0, 1, 0, x],
+                [0, 0, 1, x],
+                [0, 0, 0, 1],
+            ]
+        )
         assert_array_almost_equal(actual, expected)
 
 
@@ -73,35 +78,35 @@ class TestRotationMatrix:
 
     def test_rotation_x_by_90(self):
         expected = [
-            [1.00, 0.00,  0.00],
+            [1.00, 0.00, 0.00],
             [0.00, 0.00, -1.00],
-            [0.00, 1.00,  0.00],
+            [0.00, 1.00, 0.00],
         ]
         actual = linalg.rotation_matrix([90, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_x_by_180(self):
         expected = [
-            [1.00, 0.00,   0.00],
+            [1.00, 0.00, 0.00],
             [0.00, -1.00, -0.00],
-            [0.00, 0.00,  -1.00],
+            [0.00, 0.00, -1.00],
         ]
         actual = linalg.rotation_matrix([180, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_x_by_10(self):
         expected = [
-            [1.0000000, 0.000000, 0.000000 ],
+            [1.0000000, 0.000000, 0.000000],
             [0.0000000, 0.984808, -0.173648],
-            [0.0000000, 0.173648, 0.984808 ],
+            [0.0000000, 0.173648, 0.984808],
         ]
         actual = linalg.rotation_matrix([10, 0, 0])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_90(self):
         expected = [
-            [0.00, 0.00,  1.00],
-            [0.00, 1.00,  0.00],
+            [0.00, 0.00, 1.00],
+            [0.00, 1.00, 0.00],
             [-1.00, 0.00, 0.00],
         ]
         actual = linalg.rotation_matrix([0, 90, 0])
@@ -109,8 +114,8 @@ class TestRotationMatrix:
 
     def test_rotation_y_by_180(self):
         expected = [
-            [-1.00, 0.00,  0.00],
-            [0.00, 1.00,   0.00],
+            [-1.00, 0.00, 0.00],
+            [0.00, 1.00, 0.00],
             [-0.00, 0.00, -1.00],
         ]
         actual = linalg.rotation_matrix([0, 180, 0])
@@ -118,8 +123,8 @@ class TestRotationMatrix:
 
     def test_rotation_y_by_10(self):
         expected = [
-            [0.9848078, 0.000000, 0.173648 ],
-            [0.0000000, 1.000000, 0.000000 ],
+            [0.9848078, 0.000000, 0.173648],
+            [0.0000000, 1.000000, 0.000000],
             [-0.1736482, 0.000000, 0.984808],
         ]
         actual = linalg.rotation_matrix([0, 10, 0])
@@ -128,8 +133,8 @@ class TestRotationMatrix:
     def test_rotation_z_by_90(self):
         expected = [
             [0.00, -1.00, 0.00],
-            [1.00, 0.00,  0.00],
-            [0.00, 0.00,  1.00],
+            [1.00, 0.00, 0.00],
+            [0.00, 0.00, 1.00],
         ]
         actual = linalg.rotation_matrix([0, 0, 90])
         assert_array_almost_equal(actual, expected)
@@ -137,8 +142,8 @@ class TestRotationMatrix:
     def test_rotation_z_by_180(self):
         expected = [
             [-1.00, -0.00, 0.00],
-            [0.00, -1.00,  0.00],
-            [0.00, 0.00,   1.00],
+            [0.00, -1.00, 0.00],
+            [0.00, 0.00, 1.00],
         ]
         actual = linalg.rotation_matrix([0, 0, 180])
         assert_array_almost_equal(actual, expected)
@@ -146,22 +151,34 @@ class TestRotationMatrix:
     def test_rotation_z_by_10(self):
         expected = [
             [0.9848078, -0.173648, 0.000000],
-            [0.1736482, 0.984808,  0.000000],
-            [0.0000000, 0.000000,  1.000000],
+            [0.1736482, 0.984808, 0.000000],
+            [0.0000000, 0.000000, 1.000000],
         ]
         actual = linalg.rotation_matrix([0, 0, 10])
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_xyz(self):
-        """Test rotation in X, Y and Z is equivalent to successive rotation
-        in X, then Y, then Z."""
-        actual = linalg.rotation_matrix([10, 10, 10])
-        expected = (
-            linalg.rotation_matrix([10, 0, 0])
-            .dot(linalg.rotation_matrix([0, 10, 0]))
-            .dot(linalg.rotation_matrix([0, 0, 10]))
-        )
+        """Tests rotation order."""
+        angles = [10, 50, 80]
+        by_x = linalg.rotation_matrix([angles[0], 0, 0])
+        by_y = linalg.rotation_matrix([0, angles[1], 0])
+        by_z = linalg.rotation_matrix([0, 0, angles[2]])
+
+        actual = linalg.rotation_matrix(angles)
+        expected = by_z.dot(by_y).dot(by_x)
         assert_array_almost_equal(actual, expected)
+
+    def test_rotation_zyx(self):
+        """Tests rotation order."""
+        angles = [10, 10, 10]
+        by_x = linalg.rotation_matrix([angles[0], 0, 0])
+        by_y = linalg.rotation_matrix([0, angles[1], 0])
+        by_z = linalg.rotation_matrix([0, 0, angles[2]])
+
+        actual = linalg.rotation_matrix(angles, sequence="zyx")
+        expected = by_x.dot(by_y).dot(by_z)
+        assert_array_almost_equal(actual, expected)
+
 
 # ======================================================================================
 class TestCentroid:
@@ -205,7 +222,7 @@ class TestCenterOfMass:
 
 # ======================================================================================
 
-#pylint: disable=R0903
+# pylint: disable=R0903
 class TestInertiaTensor:
     """Namespace that holds unit-tests for ptools.linalg.inertia_tensor."""
 
