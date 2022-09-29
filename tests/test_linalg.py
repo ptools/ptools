@@ -186,29 +186,22 @@ class TestAttractEulerRotationMatrix:
     def test_rotation_x_by_90(self):
         alpha = 90
         actual = linalg.matrix.attract_euler_rotation_matrix([alpha, 0, 0])
-        expected = np.array(
-            [[cos(alpha), -sin(alpha), 0.0], [sin(alpha), cos(alpha), 0.0], [0, 0, 1]]
-        )
+
+        # Attract convention: first angle is actually a rotation along the Z-axis.
+        expected = linalg.matrix.rotation_matrix([0, 0, alpha], degrees=False)
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_90(self):
         alpha = 90
         actual = linalg.matrix.attract_euler_rotation_matrix([0, alpha, 0])
-        expected = np.array(
-            [[cos(alpha), 0, sin(alpha)], [0, 1, 0], [-sin(alpha), 0, cos(alpha)]]
-        )
+        expected = linalg.matrix.rotation_matrix([0, alpha, 0], degrees=False)
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_z_by_90(self):
         alpha = 90
         actual = linalg.matrix.attract_euler_rotation_matrix([0, 0, alpha])
-        expected = np.array(
-            [
-                [cos(alpha), sin(alpha), 0],
-                [-sin(alpha), cos(alpha), 0],
-                [0, 0, 1],
-            ]
-        )
+        # Attract convention: matrix has to be transposed... don't know what's going on here...
+        expected = linalg.matrix.rotation_matrix([0, 0, alpha], degrees=False).T
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_xyz(self):
