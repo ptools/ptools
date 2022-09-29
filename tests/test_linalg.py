@@ -1,5 +1,6 @@
 # Python core libraries.
 import math
+from math import sin, cos
 import random
 
 # Unit-test libraries.
@@ -177,6 +178,56 @@ class TestRotationMatrix:
 
         actual = linalg.rotation_matrix(angles, sequence="zyx")
         expected = by_x.dot(by_y).dot(by_z)
+        assert_array_almost_equal(actual, expected)
+
+
+# ======================================================================================
+class TestAttractEulerRotationMatrix:
+    def test_rotation_x_by_90(self):
+        alpha = 90
+        actual = linalg.matrix.attract_euler_rotation_matrix([alpha, 0, 0])
+        expected = np.array(
+            [[cos(alpha), -sin(alpha), 0.0], [sin(alpha), cos(alpha), 0.0], [0, 0, 1]]
+        )
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_y_by_90(self):
+        alpha = 90
+        actual = linalg.matrix.attract_euler_rotation_matrix([0, alpha, 0])
+        expected = np.array(
+            [[cos(alpha), 0, sin(alpha)], [0, 1, 0], [-sin(alpha), 0, cos(alpha)]]
+        )
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_z_by_90(self):
+        alpha = 90
+        actual = linalg.matrix.attract_euler_rotation_matrix([0, 0, alpha])
+        expected = np.array(
+            [
+                [cos(alpha), sin(alpha), 0],
+                [-sin(alpha), cos(alpha), 0],
+                [0, 0, 1],
+            ]
+        )
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_xyz(self):
+        # actually a non regression test
+        angles = [10, 50, 80]
+        actual = linalg.matrix.attract_euler_rotation_matrix(angles)
+        expected = np.array(
+            [
+                [0.630074, 0.744674, 0.220151],
+                [-0.775995, 0.614376, 0.142737],
+                [-0.028963, -0.260771, 0.964966],
+            ]
+        )
+        assert_array_almost_equal(actual, expected)
+
+    def test_legacy(self):
+        angles = [10, 50, 80]
+        actual = linalg.matrix.attract_euler_rotation_matrix_legacy(*angles)
+        expected = linalg.matrix.attract_euler_rotation_matrix(angles)
         assert_array_almost_equal(actual, expected)
 
 

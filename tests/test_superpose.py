@@ -139,4 +139,4 @@ class TestSuperpose(unittest.TestCase):
         assert s.angle == approx(-1.5252596161330076)
         assert s.normtranslation == approx(-12.77587846045537)
         assert s.unit == approx(coord3d(0.06444127, -0.26669722, -0.96162358))
-        assert s.point == approx(coord3d(0.0,  -8.50905679, -39.2568708))
+        assert s.point == approx(coord3d(0.0, -8.50905679, -39.2568708))
