@@ -96,9 +96,9 @@ class RotatableObject(ObjectWithCoordinates):
         """
         T.rotate(self.coords, rotation)
 
-    def ab_rotate(self, A: ArrayLike, B: ArrayLike, amount: float):
+    def ab_rotate(self, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True):
         """Rotates object using PTools rotation around axis."""
-        T.ab_rotate(self.coords, A, B, amount)
+        T.ab_rotate(self.coords, A, B, amount, degrees)
 
     def attract_euler_rotate(self, angles: np.ndarray = np.zeros(3)):
         """Rotates object with Attract convention."""

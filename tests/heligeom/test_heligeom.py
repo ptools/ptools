@@ -42,7 +42,7 @@ class TestHeligeomSimple(unittest.TestCase):
         point = coord3d(0, 0, 0)
         axis = coord3d(1, 0, 0)
         angle = math.pi / 4
-        self.mono2.ab_rotate(point, axis, angle)
+        self.mono2.ab_rotate(point, axis, angle, degrees=False)
 
         hp = heli_analyze(self.mono1, self.mono2)
         self.assertAlmostEqual(hp.angle, angle)

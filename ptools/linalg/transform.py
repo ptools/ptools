@@ -106,7 +106,7 @@ def attract_euler_rotate(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotate(coords: np.ndarray, A: ArrayLike, B: ArrayLike, amount: float):
+def ab_rotate(coords: np.ndarray, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
-    matrix = rotation_matrix_around_axis(B - A, amount, A)
+    matrix = rotation_matrix_around_axis(B - A, amount, A, degrees)
     transform(coords, matrix)

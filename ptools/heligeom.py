@@ -35,7 +35,7 @@ def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> Rigi
     chain_id += 1
 
     for _ in range(N - 1):
-        mono_test.ab_rotate(origin, origin + axis, hp.angle)
+        mono_test.ab_rotate(origin, origin + axis, hp.angle, degrees=False)
         mono_test.translate(axis * hp.normtranslation)
         mono_test.set_chain(string.ascii_uppercase[chain_id % 26])
         final += mono_test

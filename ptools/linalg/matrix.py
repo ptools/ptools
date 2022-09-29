@@ -8,7 +8,7 @@ import scipy
 
 
 def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
-    """ReturnS the matrix to translate by direction vector."""
+    """Returns a 4 x 4 matrix to translate by direction vector."""
     matrix = np.identity(4)
     if np.isscalar(direction):
         matrix[:3, 3] = direction
@@ -20,10 +20,31 @@ def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
 def transformation_matrix(
     translation: ArrayLike = np.zeros(3), rotation: ArrayLike = np.zeros(3)
 ) -> np.ndarray:
-    """Returns a 4x4 transformation matrix."""
+    """Returns a 4x4 transformation matrix.
+
+    Args:
+        translations: offsets for X- Y- Z-axes translations or 4 x 4 translation matrix
+        rotation: angles for X- Y- Z-axes rotations or 3 x 3 rotation matrix
+    """
     matrix = np.identity(4)
-    matrix[:3, :3] = rotation_matrix(rotation)
-    matrix[:3, 3] = translation
+
+    if np.shape(rotation) == (3,):
+        matrix[:3, :3] = rotation_matrix(rotation)
+    elif np.shape(rotation) == (3, 3):
+        matrix[:3, :3] = rotation
+    else:
+        raise ValueError(
+            f"rotation expects either vector of size 3 or 3 x 3 rotation matrix (found {np.shape(rotation)})"
+        )
+
+    if np.shape(translation) == (3,):
+        matrix[:3, 3] = translation
+    elif np.shape(translation) == (4, 4):
+        matrix[:, 3] = translation[:, 3]
+    else:
+        raise ValueError(
+            f"translation expects either vector of size 3 or 3 x 3 translation matrix (found {np.shape(translation)})"
+        )
     return matrix
 
 
@@ -41,7 +62,7 @@ def rotation_matrix(
         degrees: angles are given either in degrees or in radians
 
     Returns:
-        numpy.ndarray: 4x4 rotation matrix.
+        numpy.ndarray: 3 x 3 rotation matrix.
     """
     return scipy.spatial.transform.Rotation.from_euler(
         sequence, angles, degrees
@@ -49,29 +70,33 @@ def rotation_matrix(
 
 
 def rotation_matrix_around_axis(
-    axis: np.ndarray, amount: float, center: np.ndarray = np.zeros(3)
+    axis: np.ndarray, amount: float, center: np.ndarray = np.zeros(3), degrees=True
 ):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
     Args:
-        axis (np.ndarray (N x 3)): axis of rotation
-        amount (float): amount in radians
-        center (np.ndarray (3 x 1)): center of rotation
+        axis (3 x 1): axis of rotation
+        amount: angle
+        center (3 x 1): center of rotation
+        degrees: amount is given in degrees (if False, it is given in radians)
 
     Returns:
-        np.ndarray: 4 x 4 rotation matrix
+        np.ndarray: 4 x 4 transformation matrix
     """
     assert np.shape(axis) == (3,)
     assert np.shape(center) == (3,)
 
-    origin_matrix = translation_matrix(-center)
-    offset_matrix = translation_matrix(+center)
+    if degrees:
+        amount = math.radians(amount)
+
+    origin_matrix = translation_matrix(-np.array(center))
+    offset_matrix = translation_matrix(+np.array(center))
     rotation = scipy.linalg.expm(
         np.cross(np.identity(3), axis / scipy.linalg.norm(axis) * amount)
     )
     matrix = np.identity(4)
     matrix[:3, :3] = rotation
-    return np.matmul(np.matmul(offset_matrix, matrix), origin_matrix)
+    return offset_matrix @ matrix @ origin_matrix
 
 
 def attract_euler_rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
@@ -89,7 +114,7 @@ def attract_euler_rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray
     ).T  # what the hell is going on here???
     by_y = rotation_matrix([0, angles[1], 0], degrees=False)
     by_z = rotation_matrix([0, 0, angles[0]], degrees=False)
-    return by_z.dot(by_y).dot(by_x)
+    return by_z @ by_y @ by_x
 
 
 def attract_euler_rotation_matrix_legacy(phi: float, ssi: float, rot: float):
@@ -166,12 +191,12 @@ def orientation_matrix(
     cosine = np.dot(vec1, vec2)
     amount = math.atan2(sine, cosine)
 
-    return rotation_matrix_around_axis(axis, amount, center=com)
+    return rotation_matrix_around_axis(axis, amount, center=com, degrees=False)
 
 
-def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float) -> np.ndarray:
-    """Returns the rotation matrix to rotate around axis (A, B) by amount (in radians)."""
-    return rotation_matrix_around_axis(B - A, amount, A)
+def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float, degrees=True) -> np.ndarray:
+    """Returns the rotation matrix to rotate around axis (A, B) by amount."""
+    return rotation_matrix_around_axis(B - A, amount, A, degrees)
 
 
 def shift_matrix(offset: float) -> np.ndarray:
@@ -191,14 +216,45 @@ def rise_matrix(offset: float) -> np.ndarray:
 
 def tilt_matrix(alpha: float) -> np.ndarray:
     """Returns a tilt matrix, which is a rotation matrix along the X-axis."""
-    return rotation_matrix([alpha, 0, 0])
+    return transformation_matrix(rotation=rotation_matrix([alpha, 0, 0]))
 
 
 def roll_matrix(alpha: float) -> np.ndarray:
     """Returns a roll matrix, which is a rotation matrix along the Y-axis."""
-    return rotation_matrix([0, alpha, 0])
+    return transformation_matrix(rotation=rotation_matrix([0, alpha, 0]))
 
 
 def twist_matrix(alpha: float) -> np.ndarray:
     """Returns a twist matrix, which is a rotation matrix along the Z-axis."""
-    return rotation_matrix([0, 0, alpha])
+    return transformation_matrix(rotation=rotation_matrix([0, 0, alpha]))
+
+
+# =======================================================================================
+# Matrices to build "classic" DNA.
+#
+# Parameters taken from
+# S.Arnott, R.Chandrasekaran, D.L.Birdsall, A.G.W.Leslie and R.L.Ratliff, Nature 283, 743-746 (1980)
+
+
+def adna_tranformation_matrix() -> np.ndarray:
+    matrix = (
+        twist_matrix(31.1185909091)
+        @ roll_matrix(2.06055181818)
+        @ tilt_matrix(2.12008054545)
+        @ rise_matrix(3.37983727273)
+        @ slide_matrix(-2.41029181818)
+        @ shift_matrix(-0.549621454545)
+    )
+    return matrix
+
+
+def bdna_tranformation_matrix() -> np.ndarray:
+    matrix = (
+        twist_matrix(35.9063052632)
+        @ roll_matrix(-2.66592947368)
+        @ tilt_matrix(-1.80234789474)
+        @ rise_matrix(3.27145684211)
+        @ slide_matrix(-1.34487389474)
+        @ shift_matrix(-0.425181378947)
+    )
+    return matrix

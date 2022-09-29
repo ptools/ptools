@@ -1,6 +1,5 @@
 # Python core libraries.
 import math
-from math import sin, cos
 import random
 
 # Unit-test libraries.
@@ -12,13 +11,18 @@ import numpy as np
 
 # PTools imports.
 from ptools import linalg
+from ptools.linalg.matrix import (
+    rotation_matrix,
+    translation_matrix,
+    transformation_matrix,
+)
 
 # More test-specific imports.
 from .testing import assert_array_almost_equal
 
 
 def generate_random_array(
-    low: float = 0.0, high: float = 1.0, shape: int | tuple[int] = 1
+    low: float = -10.0, high: float = 10.0, shape: int | tuple[int] = 1
 ) -> np.ndarray:
     return np.random.uniform(low, high, shape)
 
@@ -49,7 +53,7 @@ class TestTranslationMatrix:
 
     def test_vector(self):
         x = generate_random_array(shape=(3,))
-        actual = linalg.matrix.translation_matrix(x)
+        actual = translation_matrix(x)
         expected = np.array(
             [
                 [1, 0, 0, x[0]],
@@ -62,7 +66,7 @@ class TestTranslationMatrix:
 
     def test_scalar(self):
         x = random.random()
-        actual = linalg.matrix.translation_matrix(x)
+        actual = translation_matrix(x)
         expected = np.array(
             [
                 [1, 0, 0, x],
@@ -181,6 +185,89 @@ class TestRotationMatrix:
         assert_array_almost_equal(actual, expected)
 
 
+class TestTransformationMatrixFromVectors:
+    def test_rotations_only(self):
+        rotation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, :3] = rotation_matrix(rotation)
+
+        actual = transformation_matrix(rotation=rotation)
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+    def test_translations_only(self):
+        translation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, 3] = translation
+
+        actual = transformation_matrix(translation=translation)
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_and_translations(self):
+        rotation = generate_random_array(shape=(3,))
+        translation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, :3] = rotation_matrix(rotation)
+        expected[:3, 3] = translation
+
+        actual = transformation_matrix(translation, rotation)
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+
+class TestTransformationMatrixFromMatrices:
+    def test_rotations_only(self):
+        rotation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, :3] = rotation_matrix(rotation)
+
+        actual = transformation_matrix(rotation=rotation_matrix(rotation))
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+    def test_translations_only(self):
+        translation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, 3] = translation
+
+        actual = transformation_matrix(translation=translation_matrix(translation))
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+    def test_rotation_and_translations(self):
+        rotation = generate_random_array(shape=(3,))
+        translation = generate_random_array(shape=(3,))
+
+        expected = np.eye(4)
+        expected[:3, :3] = rotation_matrix(rotation)
+        expected[:3, 3] = translation
+
+        actual = transformation_matrix(
+            translation_matrix(translation), rotation_matrix(rotation)
+        )
+        assert actual.shape == (4, 4)
+        assert_array_almost_equal(actual, expected)
+
+
+
+# ======================================================================================
+class TestRotationMatrixAroundAxis:
+
+    def test_rotation_matrix_round_axis(self):
+        # rotation of 90° along Z-axis.
+        actual = linalg.rotation_matrix_around_axis([0, 0, 1], 90)
+        expected = np.eye(4)
+        expected[:3, :3] = rotation_matrix([0, 0, 90])
+        assert_array_almost_equal(actual, expected)
+        print(actual)
+        # assert 1 == 2
+
 # ======================================================================================
 class TestAttractEulerRotationMatrix:
     def test_rotation_x_by_90(self):
@@ -188,20 +275,20 @@ class TestAttractEulerRotationMatrix:
         actual = linalg.matrix.attract_euler_rotation_matrix([alpha, 0, 0])
 
         # Attract convention: first angle is actually a rotation along the Z-axis.
-        expected = linalg.matrix.rotation_matrix([0, 0, alpha], degrees=False)
+        expected = rotation_matrix([0, 0, alpha], degrees=False)
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_y_by_90(self):
         alpha = 90
         actual = linalg.matrix.attract_euler_rotation_matrix([0, alpha, 0])
-        expected = linalg.matrix.rotation_matrix([0, alpha, 0], degrees=False)
+        expected = rotation_matrix([0, alpha, 0], degrees=False)
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_z_by_90(self):
         alpha = 90
         actual = linalg.matrix.attract_euler_rotation_matrix([0, 0, alpha])
         # Attract convention: matrix has to be transposed... don't know what's going on here...
-        expected = linalg.matrix.rotation_matrix([0, 0, alpha], degrees=False).T
+        expected = rotation_matrix([0, 0, alpha], degrees=False).T
         assert_array_almost_equal(actual, expected)
 
     def test_rotation_xyz(self):
@@ -276,3 +363,31 @@ class TestInertiaTensor:
         err = "inertia tensor can only be calculated on a N x 3 array"
         with pytest.raises(ValueError, match=err):
             linalg.inertia_tensor(x, w)
+
+
+class TestDNA:
+    def test_adna(self):
+        # non-regression test
+        expected = np.array(
+            [
+                [0.85554587, -0.51531864, 0.04987943, 0.9404263],
+                [0.51647696, 0.85620086, -0.01310093, -2.39183975],
+                [-0.03595566, 0.03697002, 0.99866932, 3.30599325],
+                [0.0, 0.0, 0.0, 1.0],
+            ]
+        )
+        actual = linalg.matrix.adna_tranformation_matrix()
+        assert_array_almost_equal(actual, expected)
+
+    def test_bdna(self):
+        # non-regression test
+        expected = np.array(
+            [
+                [8.09100476e-01, -5.84986445e-01, -5.61006103e-02, 2.59187817e-01],
+                [5.85826775e-01, 8.10434321e-01, -1.78910064e-03, -1.34486756e00],
+                [4.65124597e-02, -3.14176774e-02, 9.98423518e-01, 3.28877603e00],
+                [0.0, 0.0, 0.0, 1.0],
+            ]
+        )
+        actual = linalg.matrix.bdna_tranformation_matrix()
+        assert_array_almost_equal(actual, expected)
