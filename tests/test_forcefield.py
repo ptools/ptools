@@ -22,8 +22,8 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
     )
 
     def setUp(self):
-        self.receptor = RigidBody.from_pdb(TEST_RECEPTOR_RED)
-        self.ligand = RigidBody.from_pdb(TEST_LIGAND_RED)
+        self.receptor = AttractRigidBody.from_pdb(TEST_RECEPTOR_RED)
+        self.ligand = AttractRigidBody.from_pdb(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
         # Save forcefield parameters for later use in non-regression tests.

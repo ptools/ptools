@@ -41,20 +41,9 @@ class RigidBody(FromPDB, AtomCollection):
     def __post_init__(self):
         """Post-initialization.
 
-        Necessary to initialize a new instance using class.from_pdb.
+        Should be overriden by child classes.
         """
-        N = len(self)
-        self.atom_categories = np.zeros(N, dtype=int)
-        self.atom_charges = np.zeros(N, dtype=float)
-        self.atom_forces = np.zeros((N, 3), dtype=float)
-
-    def reset_forces(self):
-        """Set all atom forces to (0, 0 0)."""
-        self.atom_forces.fill(0)
-
-    def apply_forces(self, forces: np.ndarray):
-        """Adds forces to atoms."""
-        self.atom_forces += forces
+        pass
 
     def init_from_pdb(self, path: os.PathLike):
         """Initialization from PDB file."""
@@ -64,14 +53,19 @@ class RigidBody(FromPDB, AtomCollection):
 
 
 class AttractRigidBody(RigidBody):
-    """AttractRigidBody is a RigidBody with custom initialization from PDB file."""
+    """AttractRigidBody is a RigidBody on which one can calculate the energy.
+
+    Atom categories and charges are parsed from input PDB file."""
 
     def __post_init__(self):
         """Post-initialization.
 
         Necessary to initialize a new instance using class.from_pdb.
         """
-        super().__post_init__()
+        N = len(self)
+        self.atom_categories = np.zeros(N, dtype=int)
+        self.atom_charges = np.zeros(N, dtype=float)
+        self.atom_forces = np.zeros((N, 3), dtype=float)
         self._init_categories_and_charges_from_pdb_extra()
 
     def _init_categories_and_charges_from_pdb_extra(self):
@@ -115,3 +109,13 @@ class AttractRigidBody(RigidBody):
         for tokens in extra:
             assert_has_valid_category_and_charge(tokens)
         return extra
+
+    def reset_forces(self):
+        """Set all atom forces to (0, 0 0)."""
+        self.atom_forces.fill(0)
+
+    def apply_forces(self, forces: np.ndarray):
+        """Adds forces to atoms."""
+        self.atom_forces += forces
+
+
