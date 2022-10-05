@@ -5,22 +5,27 @@ from __future__ import annotations
 # Python core libraries.
 import os
 
+# Type hinting specific imports
+from collections.abc import Sequence
+
+
 # Scientific libraries.
 import numpy as np
 
 # PTools.
-from .atom import AtomCollection
+from .atom import AtomCollection, BaseAtom
 from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
 
 
-class RigidBody(FromPDB, AtomCollection):
-    """RigidBody is an AtomCollection on which one can calculate the energy.
+
+class RigidBody(AtomCollection, FromPDB):
+    """RigidBody is an AtomCollection that can be initialized from a PDB file.
 
     It has 3 additionnal arrays comparaed to AtomCollection:
         - atom_categories (np.ndarray(N, )):
             1 x N shaped array for atom categories
-        - atom_charges (np.ndarray(N, )):
+        - atom_charges (np.ndarray(N, )):O
             1 x N shaped array for atom charges
         - atom_forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
@@ -28,28 +33,18 @@ class RigidBody(FromPDB, AtomCollection):
     Also, it can be initialized from a file.
     """
 
-    def __init__(self, *args, **kwargs):
-        if args and isinstance(args[0], str):
+    def __init__(self, atoms: Sequence[BaseAtom] = None):
+        if isinstance(atoms, str):
             raise TypeError(
                 "RigidBody class can not longer be instantiated from a path. "
                 "Use RigidBody.from_pdb instead."
             )
-
-        AtomCollection.__init__(self, *args, **kwargs)
-        self.__post_init__()
-
-    def __post_init__(self):
-        """Post-initialization.
-
-        Should be overriden by child classes.
-        """
-        pass
-
-    def init_from_pdb(self, path: os.PathLike):
-        """Initialization from PDB file."""
-        atoms = io_read_pdb(path)
         AtomCollection.__init__(self, atoms)
-        self.__post_init__()
+
+    @classmethod
+    def from_pdb(cls: RigidBody, path: os.PathLike) -> RigidBody:
+        atoms = io_read_pdb(path)
+        return cls(atoms)
 
 
 class AttractRigidBody(RigidBody):
@@ -57,22 +52,25 @@ class AttractRigidBody(RigidBody):
 
     Atom categories and charges are parsed from input PDB file."""
 
-    def __post_init__(self):
-        """Post-initialization.
-
-        Necessary to initialize a new instance using class.from_pdb.
-        """
+    def __init__(self, atoms: Sequence[BaseAtom] = None):
+        super().__init__(atoms)
         N = len(self)
         self.atom_categories = np.zeros(N, dtype=int)
         self.atom_charges = np.zeros(N, dtype=float)
         self.atom_forces = np.zeros((N, 3), dtype=float)
-        self._init_categories_and_charges_from_pdb_extra()
+
+    @classmethod
+    def from_pdb(cls: AttractRigidBody, path: os.PathLike) -> AttractRigidBody:
+        rigid: AttractRigidBody = super().from_pdb(path)
+        rigid._init_categories_and_charges_from_pdb_extra()
+        return rigid
 
     def _init_categories_and_charges_from_pdb_extra(self):
-        """Initializez atom and charges arrays from data read from PDB."""
+        """Initializes atom and charges arrays from data read from PDB."""
         extra = self._parse_extra_from_atoms()
         self.atom_categories = np.array([int(tokens[0]) - 1 for tokens in extra])
         self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
+        self.atom_forces = np.zeros((len(self), 3), dtype=float)
 
     def _parse_extra_from_atoms(self):
         """Parses extra atom field.
@@ -117,5 +115,3 @@ class AttractRigidBody(RigidBody):
     def apply_forces(self, forces: np.ndarray):
         """Adds forces to atoms."""
         self.atom_forces += forces
-
-

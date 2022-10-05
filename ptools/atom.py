@@ -289,23 +289,23 @@ class AtomCollection(TransformableObject, UserList):
 
     def select_atom_type(self, atom_type: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom type."""
-        return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
+        return AtomCollection(atoms=[atom for atom in self if atom.name == atom_type])
 
     def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom types."""
-        return self.__class__(
+        return AtomCollection(
             atoms=[atom for atom in self if atom.name.strip() in atom_types]
         )
 
     def select_residue_range(self, start: int, end: int) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
-        return self.__class__(
+        return AtomCollection(
             atoms=[atom for atom in self if start <= atom.resid <= end]
         )
 
     def select_chain(self, chain_id: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired chain."""
-        return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
+        return AtomCollection(atoms=[atom for atom in self if atom.chain == chain_id])
 
 
 def guess_atom_element(atom_name: str) -> str:

@@ -8,30 +8,17 @@ from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
 
 
-class _FromPDBBase(Protocol):
+class FromPDB(Protocol):
     """Abstract Base class for classes which can be initialized from PDB files.
 
     Ensures that child classes implement the `init_from_pdb` method.
     """
 
+    @classmethod
     @abc.abstractmethod
-    def init_from_pdb(self, path: os.PathLike):
+    def from_pdb(cls, path: os.PathLike):
         """Initializes internal components from data read in PDB file."""
 
-
-class FromPDB(_FromPDBBase):
-    """Base class for classes which can be initialized from PDB files.
-
-    Implements FromPDB.from_pdb which returns a new instance initialized
-    from a PDB file, read with `cls.init_from_pdb`.
-    """
-
-    @classmethod
-    def from_pdb(cls, path: os.PathLike):
-        """Returns a new instance of the class initialized using `cls.init_from_pdb`."""
-        obj = cls()
-        obj.init_from_pdb(path)
-        return obj
 
 class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
@@ -235,7 +222,7 @@ def read_pdb(
 
     # Only 1 model: returns a simple AtomCollection
     if len(models) == 1:
-        return AtomCollection(models[0])
+        return models[0]
 
     # Multiple models: returns a list of AtomCollection instances.
     return models
