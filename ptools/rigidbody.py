@@ -7,7 +7,7 @@ import os
 
 # Type hinting specific imports
 from collections.abc import Sequence
-
+from typing import Type, TypeVar
 
 # Scientific libraries.
 import numpy as np
@@ -17,6 +17,9 @@ from .atom import AtomCollection, BaseAtom
 from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
 
+
+RigidBodyType = TypeVar("RigidBodyType", bound="RigidBody")
+AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 
 class RigidBody(AtomCollection, FromPDB):
@@ -42,7 +45,7 @@ class RigidBody(AtomCollection, FromPDB):
         AtomCollection.__init__(self, atoms)
 
     @classmethod
-    def from_pdb(cls: RigidBody, path: os.PathLike) -> RigidBody:
+    def from_pdb(cls: Type[RigidBodyType], path: os.PathLike) -> RigidBodyType:
         atoms = io_read_pdb(path)
         return cls(atoms)
 
@@ -60,8 +63,8 @@ class AttractRigidBody(RigidBody):
         self.atom_forces = np.zeros((N, 3), dtype=float)
 
     @classmethod
-    def from_pdb(cls: AttractRigidBody, path: os.PathLike) -> AttractRigidBody:
-        rigid: AttractRigidBody = super().from_pdb(path)
+    def from_pdb(cls: Type[AttractRigidBodyType], path: os.PathLike) -> AttractRigidBodyType:
+        rigid = super().from_pdb(path)
         rigid._init_categories_and_charges_from_pdb_extra()
         return rigid
 

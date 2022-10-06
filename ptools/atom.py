@@ -14,7 +14,7 @@ import math
 import numpy as np
 
 # Type-hinting specific import
-from typing import Any, Sequence
+from typing import Any, Iterator, Sequence
 from numpy.typing import ArrayLike
 
 # PTools imports.
@@ -306,6 +306,27 @@ class AtomCollection(TransformableObject, UserList):
     def select_chain(self, chain_id: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired chain."""
         return AtomCollection(atoms=[atom for atom in self if atom.chain == chain_id])
+
+    def iter_atoms(self) -> Iterator[Atom]:
+        """Iterate over the collection's atoms."""
+        return iter(self)
+
+    def iter_residues(self) -> Iterator[AtomCollection]:
+        """Iterate over a collection's residues."""
+        current_residue = [self[0]]
+        current_resid = current_residue[0].resid
+        current_chain = current_residue[0].chain
+        for atom in self[1:]:
+            if atom.chain != current_chain or atom.resid != current_resid:
+                yield AtomCollection(current_residue)
+                current_residue = [atom]
+                current_resid = current_residue[0].resid
+                current_chain = current_residue[0].chain
+            else:
+                current_residue.append(atom)
+        yield AtomCollection(current_residue)
+
+
 
 
 def guess_atom_element(atom_name: str) -> str:
