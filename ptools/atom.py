@@ -289,23 +289,23 @@ class AtomCollection(TransformableObject, UserList):
 
     def select_atom_type(self, atom_type: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom type."""
-        return AtomCollection(atoms=[atom for atom in self if atom.name == atom_type])
+        return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
 
     def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom types."""
-        return AtomCollection(
+        return self.__class__(
             atoms=[atom for atom in self if atom.name.strip() in atom_types]
         )
 
     def select_residue_range(self, start: int, end: int) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
-        return AtomCollection(
+        return self.__class__(
             atoms=[atom for atom in self if start <= atom.resid <= end]
         )
 
     def select_chain(self, chain_id: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired chain."""
-        return AtomCollection(atoms=[atom for atom in self if atom.chain == chain_id])
+        return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
 
     def iter_atoms(self) -> Iterator[Atom]:
         """Iterate over the collection's atoms."""
@@ -318,13 +318,13 @@ class AtomCollection(TransformableObject, UserList):
         current_chain = current_residue[0].chain
         for atom in self[1:]:
             if atom.chain != current_chain or atom.resid != current_resid:
-                yield AtomCollection(current_residue)
+                yield self.__class__(current_residue)
                 current_residue = [atom]
                 current_resid = current_residue[0].resid
                 current_chain = current_residue[0].chain
             else:
                 current_residue.append(atom)
-        yield AtomCollection(current_residue)
+        yield self.__class__(current_residue)
 
 
 
