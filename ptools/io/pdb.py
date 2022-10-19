@@ -2,11 +2,10 @@
 
 import abc
 import os
-from typing import Protocol
+from typing import Protocol, Sequence, Tuple, Union
 
-from typing import Sequence, Tuple, Union
 from ..atom import BaseAtom, AtomCollection
-
+from .._typing import FilePath
 
 class FromPDB(Protocol):
     """Abstract Base class for classes which can be initialized from PDB files.
@@ -16,7 +15,7 @@ class FromPDB(Protocol):
 
     @classmethod
     @abc.abstractmethod
-    def from_pdb(cls, path: os.PathLike):
+    def from_pdb(cls, path: FilePath):
         """Initializes internal components from data read in PDB file."""
 
 
@@ -169,12 +168,12 @@ def parse_atom_line(buffer: str) -> BaseAtom:
 
 
 def read_pdb(
-    path: str, as_dict=False
+    path: FilePath, as_dict=False
 ) -> Union[dict[str, AtomCollection], Sequence[AtomCollection], AtomCollection]:
     """Read a Protein Data Bank file.
 
     Args:
-        path (str): path to file.
+        path (FilePath): path to file.
         as_dict (bool): if True, returns models in a dictionnary.
 
     Returns:

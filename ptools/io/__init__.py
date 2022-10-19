@@ -1,19 +1,20 @@
 """linalg - Defines functions to read/write files."""
 
 import os
+from typing import Optional
+from .._typing import FilePath
 
-def check_file_exists(path, message=False):
+
+def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> bool:
     """Checks that a file exists.
 
     Returns a boolean and optionaly prints an error message if file does
     not exist.
 
     Args:
-        path (str): path to file
-        message (bool/str): if True, prints default a message if file does not exist.
+        path (FilePath): path to file
+        message (bool | str): if True, prints default a message if file does not exist.
             If a string, print the string if file does not exists.
-        exitstatus (int): exit status
-        prefix (str): message prefix
 
     Returns:
         bool: True if file exists, False either.
@@ -27,7 +28,7 @@ def check_file_exists(path, message=False):
     return exists
 
 
-def assert_file_exists(path, message=""):
+def assert_file_exists(path: FilePath, message: Optional[str] = ""):
     """Makes sure a file does exists.
 
     Args:
@@ -46,7 +47,7 @@ def assert_file_exists(path, message=""):
         raise IsADirectoryError(message)
 
 
-def backup_if_exists(source):
+def backup_if_exists(source: FilePath):
     """Creates a backup of a file if source already exists.
 
     Files will be renamed file.1, file.2, etc.

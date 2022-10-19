@@ -3,13 +3,18 @@
 # pylint: disable=R0903
 # Only 1 public method... so what?
 
+from typing import Optional
+
+import numpy as np
+
 from ..rigidbody import RigidBody
+from .._typing import FilePath
 
 
 class AttractFileParameters:
     """Stores parameters from an Attract parameter file."""
 
-    def __init__(self, path=""):
+    def __init__(self, path: Optional[FilePath] = ""):
         self.nbminim = 0
         self.minimlist = []
         self.rstk = 0.0
@@ -17,11 +22,11 @@ class AttractFileParameters:
         if path:
             self._init_from_file(path)
 
-    def _init_from_file(self, path):
+    def _init_from_file(self, path: FilePath):
         """Read attract parameter file.
 
         Args:
-            path (str): path to attract parameter file.
+            path (FilePath): path to attract parameter file.
 
         Returns:
             nbminim (int): number of minimizations to perform.
@@ -105,7 +110,7 @@ class AttractFileParameters:
             self.minimlist.append(read_minimization())
 
 
-def read_aminon(path):
+def read_aminon(path: FilePath) -> list[tuple[float,  float]]:
     """Read Attract force field parameter file.
 
     This file is supposed to have 3 values per line:
@@ -116,7 +121,7 @@ def read_aminon(path):
         - inull (0)
 
     Args:
-        path (str): path to file.
+        path (FilePath): path to file.
 
     Returns:
         list[(float, float)]: radius and amplitude values for each line.
@@ -133,13 +138,13 @@ def read_aminon(path):
     return params
 
 
-def check_ff_version_match(receptor, ligand):
+def check_ff_version_match(receptor_path: FilePath, ligand_path: FilePath) -> str:
     """Read force field name from receptor and ligand files and check that
     they match.
 
     Args:
-        receptor (str): path to receptor file.
-        ligand (str): path to ligand file.
+        receptor_path (FilePath): path to receptor file.
+        ligand_path (FilePath): path to ligand file.
 
     Returns:
         str: force field name.
@@ -147,8 +152,8 @@ def check_ff_version_match(receptor, ligand):
     Raises:
         ValueError: if force field name from receptor and ligand differ.
     """
-    ff_rec = read_forcefield_from_reduced(receptor)
-    ff_lig = read_forcefield_from_reduced(ligand)
+    ff_rec = read_forcefield_from_reduced(receptor_path)
+    ff_lig = read_forcefield_from_reduced(ligand_path)
     if ff_rec != ff_lig:
         err = "receptor and ligand force field names do not match: '{}' != '{}'"
         err = err.format(ff_rec, ff_lig)
@@ -156,14 +161,14 @@ def check_ff_version_match(receptor, ligand):
     return ff_rec
 
 
-def read_forcefield_from_reduced(path):
+def read_forcefield_from_reduced(path: FilePath) -> str:
     """Read force field name from reduced PDB.
 
     Force field is read from the first line which should be formatted as
     HEADER <FORCE_FIELD_NAME>.
 
     Args:
-        path (str): path to reduced PDB.
+        path (FilePath): path to reduced PDB.
 
     Raises:
         IOError: if header cannot be extracted from first line.
@@ -203,22 +208,22 @@ def read_forcefield_from_reduced(path):
     return get_ffname()
 
 
-def read_attract_parameter(path):
+def read_attract_parameter(path: FilePath) -> AttractFileParameters:
     """Reads an Attract parameter file."""
     return AttractFileParameters(path)
 
 
-def read_translations(filename="translation.dat"):
+def read_translations(path: Optional[FilePath] = "translation.dat") -> dict[int, np.ndarray]:
     """Reads a translation file and returns the dictionary of translations."""
-    rb = RigidBody(filename)
-    print(f"Read {len(rb)} translations from {filename}")
+    rb = RigidBody(path)
+    print(f"Read {len(rb)} translations from {path}")
     translations = [(atom.index, atom.coords) for atom in rb]
     return dict(translations)
 
 
 # pylint: disable=R0914
 # Not so many local variables
-def read_rotations(filename="rotation.dat"):
+def read_rotations(path: Optional[FilePath] = "rotation.dat") -> dict[int, tuple[float, float, float]]:
     """Returns the  dictionary of rotations read from file.
 
     Each rotation is a tuple (phi, theta, chi).
@@ -231,7 +236,7 @@ def read_rotations(filename="rotation.dat"):
     nphi = []
     # read theta, phi, rot data
     # nchi is number of steps to rotate about the axis joining the ligand/receptor centers
-    with open(filename, "rt", encoding="utf-8") as rotdat:
+    with open(path, "rt", encoding="utf-8") as rotdat:
         line = rotdat.readline().split()
         ntheta = int(line[0])
         nchi = int(line[1])

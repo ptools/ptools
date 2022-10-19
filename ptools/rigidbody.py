@@ -8,6 +8,7 @@ import os
 # Type hinting specific imports
 from collections.abc import Sequence
 from typing import Type, TypeVar
+from ._typing import FilePath
 
 # Scientific libraries.
 import numpy as np
@@ -45,7 +46,7 @@ class RigidBody(AtomCollection, FromPDB):
         AtomCollection.__init__(self, atoms)
 
     @classmethod
-    def from_pdb(cls: Type[RigidBodyType], path: os.PathLike) -> RigidBodyType:
+    def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
         atoms = io_read_pdb(path)
         return cls(atoms)
 
@@ -63,7 +64,7 @@ class AttractRigidBody(RigidBody):
         self.atom_forces = np.zeros((N, 3), dtype=float)
 
     @classmethod
-    def from_pdb(cls: Type[AttractRigidBodyType], path: os.PathLike) -> AttractRigidBodyType:
+    def from_pdb(cls: Type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
         rigid = super().from_pdb(path)
         rigid._init_categories_and_charges_from_pdb_extra()
         return rigid

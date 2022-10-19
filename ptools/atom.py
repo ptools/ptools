@@ -17,6 +17,7 @@ import numpy as np
 # Type-hinting specific import
 from typing import Any, Callable, Iterator, Sequence
 from numpy.typing import ArrayLike
+from ._typing import FilePath
 
 # PTools imports.
 from . import linalg
@@ -280,7 +281,7 @@ class AtomCollection(TransformableObject, UserList):
         """Returns a string representing the AtomCollection in PDB format."""
         return "\n".join(atom.topdb() for atom in self)
 
-    def writepdb(self, path: str):
+    def writepdb(self, path: FilePath):
         """Writes the AtomCollection to a PDB formatted file."""
         with open(path, "wt", encoding="utf-8") as f:
             print(self.topdb(), file=f)
