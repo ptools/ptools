@@ -5,16 +5,17 @@ atom groups."""
 # e.g. BaseAtom.copy(self) -> BaseAtom
 from __future__ import annotations
 
-# Pythonn core libraries.
+# Python core libraries.
 from collections import UserList
 import copy
+import itertools
 import math
 
 # Scientific libraries.
 import numpy as np
 
 # Type-hinting specific import
-from typing import Any, Iterator, Sequence
+from typing import Any, Callable, Iterator, Sequence
 from numpy.typing import ArrayLike
 
 # PTools imports.
@@ -89,7 +90,9 @@ class BaseAtom(TranslatableObject):
     def __eq__(self, other: object) -> bool:
         """Compares two BaseAtom instances."""
         if not isinstance(other, BaseAtom):
-            raise TypeError(f"cannot compare BaseAtom with object of type {type(other)}")
+            raise TypeError(
+                f"cannot compare BaseAtom with object of type {type(other)}"
+            )
         for key in self._comparison_attributes:
             if key != "coords":
                 if getattr(self, key) != getattr(other, key):
@@ -287,6 +290,11 @@ class AtomCollection(TransformableObject, UserList):
         for atom in self:
             atom.chain = chain
 
+    def groupby(self, key: Callable) -> dict[Any, AtomCollection]:
+        data = sorted(self, key=key)
+        grouped = itertools.groupby(data, key=key)
+        return {key: self.__class__(list(group)) for key, group in grouped}
+
     def select_atom_type(self, atom_type: str) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom type."""
         return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
@@ -294,7 +302,7 @@ class AtomCollection(TransformableObject, UserList):
     def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired atom types."""
         return self.__class__(
-            atoms=[atom for atom in self if atom.name.strip() in atom_types]
+            atoms=[atom for atom in self if atom.name in atom_types]
         )
 
     def select_residue_range(self, start: int, end: int) -> AtomCollection:
@@ -312,21 +320,12 @@ class AtomCollection(TransformableObject, UserList):
         return iter(self)
 
     def iter_residues(self) -> Iterator[AtomCollection]:
-        """Iterate over a collection's residues."""
-        current_residue = [self[0]]
-        current_resid = current_residue[0].resid
-        current_chain = current_residue[0].chain
-        for atom in self[1:]:
-            if atom.chain != current_chain or atom.resid != current_resid:
-                yield self.__class__(current_residue)
-                current_residue = [atom]
-                current_resid = current_residue[0].resid
-                current_chain = current_residue[0].chain
-            else:
-                current_residue.append(atom)
-        yield self.__class__(current_residue)
+        by_residue = self.groupby(lambda atom: (atom.resid, atom.chain))
+        return iter(by_residue.values())
 
-
+    def iter_chains(self) -> Iterator[AtomCollection]:
+        by_chain = self.groupby(lambda atom: atom.chain)
+        return iter(by_chain.values())
 
 
 def guess_atom_element(atom_name: str) -> str:
