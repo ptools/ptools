@@ -2,7 +2,6 @@
 
 # Scientific libraries.
 import numpy as np
-from numpy.typing import ArrayLike
 
 # PTools libraries
 from .matrix import (
@@ -11,6 +10,9 @@ from .matrix import (
     rotation_matrix,
     rotation_matrix_around_axis,
 )
+
+# Type hinting libraries
+from .._typing import ArrayLike
 
 
 def translate(coords: np.ndarray, t: ArrayLike):
@@ -106,7 +108,8 @@ def attract_euler_rotate(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
     coords[:] = np.inner(coords, matrix)
 
 
-def ab_rotate(coords: np.ndarray, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True):
+def ab_rotate(coords: np.ndarray, point_a: ArrayLike, point_b: ArrayLike, amount: float, degrees: bool = True):
     """Rotates coords around axis (A, B) by amount theta (in radians)."""
-    matrix = rotation_matrix_around_axis(B - A, amount, A, degrees)
+    point_a, point_b = np.asarray(point_a), np.asarray(point_b)
+    matrix = rotation_matrix_around_axis(point_b - point_a, amount, point_a, degrees)
     transform(coords, matrix)

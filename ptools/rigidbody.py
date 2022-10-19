@@ -48,6 +48,7 @@ class RigidBody(AtomCollection, FromPDB):
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
         atoms = io_read_pdb(path)
+        assert isinstance(atoms, AtomCollection)
         return cls(atoms)
 
 

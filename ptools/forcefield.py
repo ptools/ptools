@@ -1,7 +1,7 @@
 """Ptools forcefield implementation."""
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Protocol
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -66,8 +66,8 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 )
 
 
-@dataclass
-class ForceFieldBase(ABC):
+
+class ForceFieldBase(Protocol):
     """Base class for a force field.
 
     All force field must be derivated from this class or child.
@@ -75,13 +75,11 @@ class ForceFieldBase(ABC):
 
     receptor: AttractRigidBody
     ligand: AttractRigidBody
-    cutoff: float = 10
+    cutoff: float
 
-    @abstractmethod
     def energy(self) -> float:
         """Return the total energy between the two molecules"""
 
-    @abstractmethod
     def update(self):
         """Calculates all energy terms."""
 
@@ -89,6 +87,11 @@ class ForceFieldBase(ABC):
 @dataclass
 class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
+
+    receptor: AttractRigidBody
+    ligand: AttractRigidBody
+    cutoff: float = 10
+
 
     paramfile: str = ""
     _repulsive_parameters: np.ndarray = field(

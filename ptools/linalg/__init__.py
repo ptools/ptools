@@ -3,10 +3,10 @@ import math
 
 # Scientific libraries.
 import numpy as np
-import scipy.linalg as L
+import numpy.linalg as L
 
 # Typing imports
-from numpy.typing import ArrayLike
+from .._typing import ArrayLike
 
 from .matrix import (
     translation_matrix,
@@ -18,14 +18,22 @@ from .matrix import (
 )
 
 
+def normalized(array: np.ndarray) -> np.ndarray:
+    """Returns the normalized array, i.e. array / norm(array)."""
+    return array / np.linalg.norm(array)
+
+
 def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
     """Returns the euclidean distance between two sets of coordinates."""
+    lhs, rhs = np.asarray(lhs), np.asarray(rhs)
     return (np.sum((lhs - rhs) ** 2.0)) ** 0.5
 
 
 def distance_to_axis(x: ArrayLike, axis: ArrayLike) -> float:
     """Returns the distance between `x` and an arbitrary axis."""
-    return np.linalg.norm(np.cross(x, axis))
+    result = np.linalg.norm(np.cross(x, axis))
+    assert isinstance(result, float)
+    return result
 
 
 def angle(u: ArrayLike, v: ArrayLike) -> float:
@@ -35,10 +43,12 @@ def angle(u: ArrayLike, v: ArrayLike) -> float:
 
 def center_of_mass(x: ArrayLike, weights: ArrayLike) -> np.ndarray:
     """Return the center of mass (barycenter)."""
+    x = np.asarray(x)
+    weights = np.asarray(weights)
     N = x.shape[0]
     if N == 0:
         raise ZeroDivisionError("cannot compute center of mass of empty array")
-    if np.shape(weights) != (N,):
+    if weights.shape != (N,):
         raise ValueError(
             f"input array and weights should be the same size ({N} != {weights.shape[0]})"
         )
@@ -59,6 +69,9 @@ def inertia_tensor(coords: ArrayLike, weights: ArrayLike) -> np.ndarray:
 
     Only works on N x 3 arrays.
     """
+    coords = np.asarray(coords)
+    weights = np.asarray(weights)
+
     if not coords.shape[1] == 3:
         raise ValueError(
             f"inertia tensor can only be calculated on a N x 3 array, (found {coords.shape})"

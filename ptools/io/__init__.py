@@ -40,7 +40,7 @@ def assert_file_exists(path: FilePath, message: Optional[str] = ""):
         IsADirectoryError: if `path` is a directory
     """
     if not message:
-        message = path
+        message = f"{path}"
     if not os.path.exists(path):
         raise FileNotFoundError(message)
     if os.path.isdir(path):

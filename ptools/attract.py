@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 
 from .forcefield import AttractForceField1
 from .linalg import transformation_matrix
-from .rigidbody import RigidBody
+from .rigidbody import AttractRigidBody, RigidBody
 
 
 def _function(x: np.ndarray, ff: AttractForceField1) -> float:
@@ -34,12 +34,12 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     return e
 
 
-def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
+def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
     """Run the Attract docking procedure.
 
     Args:
-        ligand (ptools.rigidbody.RigidBody)
-        receptor (ptools.rigidbody.RigidBody)
+        ligand (ptools.rigidbody.AttractRigidBody)
+        receptor (ptools.rigidbody.AttractRigidBody)
         translations (dict)
         rotations (dict[int]->[float, float, float])
         minimlist (list[dict[str]->value])
@@ -79,7 +79,7 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
             rot = rotations[rotnb]
 
             ligand.translate(-ligand.centroid())
-            ligand.attract_euler_rotate(rot[0], rot[1], rot[2])
+            ligand.attract_euler_rotate(rot)
             ligand.translate(trans)
 
             for i, minim in enumerate(minimlist):
@@ -92,8 +92,8 @@ def run_attract(ligand: RigidBody, receptor: RigidBody, **kwargs):
 
 def _run_minimization(
     params: dict[str, Any],
-    receptor: RigidBody,
-    ligand: RigidBody,
+    receptor: AttractRigidBody,
+    ligand: AttractRigidBody,
 ):
     start = time.time()
     cutoff = params["squarecutoff"] ** 0.5

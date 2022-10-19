@@ -14,11 +14,11 @@ from .._typing import FilePath
 class AttractFileParameters:
     """Stores parameters from an Attract parameter file."""
 
-    def __init__(self, path: Optional[FilePath] = ""):
-        self.nbminim = 0
-        self.minimlist = []
-        self.rstk = 0.0
-        self.lignames = []
+    def __init__(self, path: FilePath = ""):
+        self.nbminim: int = 0
+        self.minimlist: list[dict[str, (int | float)]] = []
+        self.rstk: float = 0.0
+        self.lignames: list[str] = []
         if path:
             self._init_from_file(path)
 
@@ -213,9 +213,9 @@ def read_attract_parameter(path: FilePath) -> AttractFileParameters:
     return AttractFileParameters(path)
 
 
-def read_translations(path: Optional[FilePath] = "translation.dat") -> dict[int, np.ndarray]:
+def read_translations(path: FilePath = "translation.dat") -> dict[int, np.ndarray]:
     """Reads a translation file and returns the dictionary of translations."""
-    rb = RigidBody(path)
+    rb = RigidBody.from_pdb(path)
     print(f"Read {len(rb)} translations from {path}")
     translations = [(atom.index, atom.coords) for atom in rb]
     return dict(translations)
@@ -223,7 +223,7 @@ def read_translations(path: Optional[FilePath] = "translation.dat") -> dict[int,
 
 # pylint: disable=R0914
 # Not so many local variables
-def read_rotations(path: Optional[FilePath] = "rotation.dat") -> dict[int, tuple[float, float, float]]:
+def read_rotations(path: FilePath = "rotation.dat") -> dict[int, tuple[float, float, float]]:
     """Returns the  dictionary of rotations read from file.
 
     Each rotation is a tuple (phi, theta, chi).

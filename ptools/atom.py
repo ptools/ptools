@@ -10,14 +10,14 @@ from collections import UserList
 import copy
 import itertools
 import math
+from typing_extensions import Self
 
 # Scientific libraries.
 import numpy as np
 
 # Type-hinting specific import
-from typing import Any, Callable, Iterator, Sequence
-from numpy.typing import ArrayLike
-from ._typing import FilePath
+from typing import Any, Callable, Iterator, Sequence, Type, TypeVar
+from ._typing import ArrayLike, FilePath
 
 # PTools imports.
 from . import linalg
@@ -191,6 +191,9 @@ class Atom(BaseAtom):
         self.collection.masses[self.serial] = guess_atom_mass(self.element)
 
 
+
+AtomCollectionType = TypeVar("AtomCollectionType", bound="AtomCollection")
+
 class AtomCollection(TransformableObject, UserList):
     """Group of atoms.
 
@@ -219,20 +222,20 @@ class AtomCollection(TransformableObject, UserList):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __add__(self, other: AtomCollection) -> AtomCollection:
+    def __add__(self, other: AtomCollectionType) -> AtomCollection:
         """Concatenates two RigidBody instances."""
         output = super().__add__(other.copy())
         output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
 
-    def __iadd__(self, other: AtomCollection) -> AtomCollection:
+    def __iadd__(self, other: AtomCollectionType) -> AtomCollection:
         return self.__add__(other)
 
     def guess_masses(self):
         """Guesses atom masses and store them."""
         self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
 
-    def copy(self) -> AtomCollection:
+    def copy(self) -> AtomCollectionType:
         """Returns a copy of the current collection."""
         return self.__class__(self)
 

@@ -3,8 +3,10 @@ import math
 
 # Scientific libraries.
 import numpy as np
-from numpy.typing import ArrayLike
 import scipy
+
+# Type hinting libraries.
+from .._typing import ArrayLike
 
 
 def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
@@ -27,6 +29,8 @@ def transformation_matrix(
         rotation: angles for X- Y- Z-axes rotations or 3 x 3 rotation matrix
     """
     matrix = np.identity(4)
+    translation = np.asarray(translation)
+    rotation = np.asarray(rotation)
 
     if np.shape(rotation) == (3,):
         matrix[:3, :3] = rotation_matrix(rotation)
@@ -155,7 +159,7 @@ def attract_euler_rotation_matrix_legacy(phi: float, ssi: float, rot: float):
 
 
 def orientation_matrix(
-    coords: np.ndarray, vector: np.ndarray, target: np.ndarray
+    coords: np.ndarray, vector: ArrayLike, target: ArrayLike
 ) -> np.ndarray:
     """Calculates an orientation matrix.
 
@@ -165,8 +169,8 @@ def orientation_matrix(
 
     Args:
         coords (np.ndarray <N x 3>): coordinates
-        vector (np.ndarray (1 x 3)): reference for rotation
-        target (np.ndarray (1 x 3)): target for rotation
+        vector (ArrayLike (1 x 3)): reference for rotation
+        target (ArrayLike (1 x 3)): target for rotation
 
     Returns:
         np.ndarray (4 x 4): transformation matrix
@@ -183,8 +187,8 @@ def orientation_matrix(
 
     com = coords.mean(axis=0)
 
-    vec1 = vector / np.linalg.norm(vector)
-    vec2 = target / np.linalg.norm(target)
+    vec1 = np.asarray(vector) / np.linalg.norm(vector)
+    vec2 = np.asarray(target) / np.linalg.norm(target)
 
     axis = np.cross(vec1, vec2)
     sine = np.linalg.norm(axis)

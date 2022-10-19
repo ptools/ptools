@@ -6,9 +6,10 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
-from numpy.typing import ArrayLike
+from ._typing import ArrayLike
 
 from . import linalg as L
 from .linalg import transform as T
@@ -151,7 +152,7 @@ def coord3d(value: ArrayLike = np.zeros(3), *args) -> np.ndarray:
     if not args:
         # value is a scalar.
         if np.isscalar(value):
-            return _coordinates_from_scalar(value)
+            return _coordinates_from_scalar(_to_float(value))
         if isinstance(value, (np.ndarray, Sequence)):
             return _coordinates_from_vector(value)
         # value is some invalid type.
@@ -181,3 +182,10 @@ def _coordinates_from_vector(value: ArrayLike) -> np.ndarray:
             "3D coordinate array should be N x 3 " f"(found {array.shape})"
         )
     return array
+
+
+def _to_float(arg: Any) -> float:
+    try:
+        return float(arg)
+    except:
+        raise
