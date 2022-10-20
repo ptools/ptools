@@ -53,6 +53,10 @@ class ObjectWithCoordinates:
         """Returns the SpatialObject distance to an arbitrary axis."""
         return L.distance_to_axis(self.coords, axis)
 
+    def normalize(self):
+        """Normalize coordinates."""
+        self.coords = L.normalize(self.coords)
+
 
 class TranslatableObject(ObjectWithCoordinates):
     """Object which coordinates can be translated."""
