@@ -1,10 +1,10 @@
 """Protein Data Bank format I/O."""
 
 import abc
-import os
 from typing import Protocol, Sequence, Tuple, Union
 
-from ..atom import BaseAtom, AtomCollection
+from ..atom import BaseAtom
+from ..atomcollection import AtomCollection
 from .._typing import FilePath
 
 class FromPDB(Protocol):

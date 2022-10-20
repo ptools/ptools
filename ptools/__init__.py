@@ -7,6 +7,7 @@ __version__ = "0.1.0"
 
 from . import (
     atom,
+    atomcollection,
     attract,
     forcefield,
     heligeom,
@@ -22,6 +23,7 @@ from .rigidbody import AttractRigidBody, RigidBody
 
 __all__ = [
     "atom",
+    "atomcollection",
     "attract",
     "forcefield",
     "heligeom",

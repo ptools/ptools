@@ -8,7 +8,8 @@ import numpy as np
 
 import ptools
 from ptools import tables
-from ptools.atom import AtomCollection, BaseAtom
+from ptools.atom import BaseAtom
+from ptools.atomcollection import AtomCollection
 
 from .testing.moreassert import (
     assert_array_equal,
@@ -286,27 +287,27 @@ class TestAtomCollection(unittest.TestCase):
 
 class TestGuessAtomName(unittest.TestCase):
     def test_basic(self):
-        self.assertEqual(ptools.atom.guess_atom_element("CA"), "C")
-        self.assertEqual(ptools.atom.guess_atom_element("NZ"), "N")
+        self.assertEqual(ptools.atom.BaseAtom.guess_element("CA"), "C")
+        self.assertEqual(ptools.atom.BaseAtom.guess_element("NZ"), "N")
 
     def test_has_numeric(self):
-        self.assertEqual(ptools.atom.guess_atom_element("CA1"), "C")
+        self.assertEqual(ptools.atom.BaseAtom.guess_element("CA1"), "C")
 
     def test_starts_with_numeric(self):
-        self.assertEqual(ptools.atom.guess_atom_element("1CA"), "C")
+        self.assertEqual(ptools.atom.BaseAtom.guess_element("1CA"), "C")
 
     def test_has_only_numeric(self):
-        self.assertEqual(ptools.atom.guess_atom_element("111"), "X")
+        self.assertEqual(ptools.atom.BaseAtom.guess_element("111"), "X")
 
 
 class TestGuessAtomMass(unittest.TestCase):
     def test_basic(self):
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("C"), 12.01100)
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("H"), 1.00800)
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("O"), 15.99900)
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("N"), 14.00700)
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("P"), 30.97400)
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("S"), 32.06000)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("C"), 12.01100)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("H"), 1.00800)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("O"), 15.99900)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("N"), 14.00700)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("P"), 30.97400)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("S"), 32.06000)
 
     def test_element_does_not_exists(self):
-        self.assertAlmostEqual(ptools.atom.guess_atom_mass("DUMMY"), 1.0)
+        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("DUMMY"), 1.0)

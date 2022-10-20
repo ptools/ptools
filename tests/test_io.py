@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from ptools import io
-from ptools.atom import AtomCollection
+from ptools.atomcollection import AtomCollection
 from ptools.io import pdb
 
 from .testing.io import (

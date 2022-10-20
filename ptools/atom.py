@@ -6,24 +6,26 @@ atom groups."""
 from __future__ import annotations
 
 # Python core libraries.
-from collections import UserList
 import copy
-import itertools
-import math
-from typing_extensions import Self
 
 # Scientific libraries.
 import numpy as np
 
 # Type-hinting specific import
-from typing import Any, Callable, Iterator, Sequence, Type, TypeVar
-from ._typing import ArrayLike, FilePath
+from typing import TYPE_CHECKING
+from ._typing import ArrayLike
 
 # PTools imports.
-from . import linalg
 from . import tables
-from .spatial import TransformableObject, TranslatableObject
+from .spatial import TranslatableObject
 from .io.formatters.pdb import PDBFormatter
+
+
+
+if TYPE_CHECKING:
+    from atomcollection import AtomCollection
+
+
 
 # The Protein Data Bank format for atom coordinates
 PDB_FMT = (
@@ -76,7 +78,7 @@ class BaseAtom(TranslatableObject):
     @property
     def element(self):
         """Returns an atom element name (read-only)."""
-        return guess_atom_element(self.name)
+        return self.guess_element(self.name)
 
     @property
     def name(self) -> str:
@@ -124,6 +126,23 @@ class BaseAtom(TranslatableObject):
         """Returns the atom's description in PDB format."""
         return PDBFormatter.format_atom(self)
 
+    @classmethod
+    def guess_mass(cls, element: str) -> float:
+        """Returns the atom mass based on the element name."""
+        return tables.masses.get(element, 1.0)
+
+    @classmethod
+    def guess_element(cls, name: str) -> str:
+        """Returns the atom element based on its name.
+
+        Basically returns the first non-numeric character in atom_name.
+        """
+        for char in name:
+            if char.isalpha():
+                return char
+        return "X"
+
+
 
 class Atom(BaseAtom):
     """Atom that belongs to a group of atoms.
@@ -143,7 +162,7 @@ class Atom(BaseAtom):
 
     """
 
-    def __init__(self, atom: BaseAtom, serial: int, collection: AtomCollection):
+    def __init__(self, atom: BaseAtom, serial: int, collection: "AtomCollection"):
         self.serial = serial
         self.collection = collection
         attrs = (
@@ -188,161 +207,4 @@ class Atom(BaseAtom):
     @name.setter
     def name(self, name: str):
         self._name = name
-        self.collection.masses[self.serial] = guess_atom_mass(self.element)
-
-
-
-AtomCollectionType = TypeVar("AtomCollectionType", bound="AtomCollection")
-
-class AtomCollection(TransformableObject, UserList):
-    """Group of atoms.
-
-    For better performances, atom coordinates are stored into a numpy array.
-
-    Args:
-        atoms (list[BaseAtom]): list of atoms
-    """
-
-    def __init__(self, atoms: Sequence[BaseAtom] = None):
-        if atoms is None or len(atoms) == 0:
-            atoms = []
-            coords = np.zeros((0, 3))
-        else:
-            atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
-            coords = np.array([atom._coords for atom in atoms])
-
-        TransformableObject.__init__(self, coords)
-        UserList.__init__(self, atoms)
-        self.masses = np.zeros(len(atoms))
-        self.guess_masses()
-
-    def __repr__(self) -> str:
-        """String representation."""
-        modulename = self.__module__
-        classname = self.__class__.__name__
-        return f"<{modulename}.{classname} with {len(self)} atoms>"
-
-    def __add__(self, other: AtomCollectionType) -> AtomCollection:
-        """Concatenates two RigidBody instances."""
-        output = super().__add__(other.copy())
-        output.coords = np.concatenate((self.coords, other.coords), axis=0)
-        return output
-
-    def __iadd__(self, other: AtomCollectionType) -> AtomCollection:
-        return self.__add__(other)
-
-    def guess_masses(self):
-        """Guesses atom masses and store them."""
-        self.masses = np.array([guess_atom_mass(atom.element) for atom in self])
-
-    def copy(self) -> AtomCollectionType:
-        """Returns a copy of the current collection."""
-        return self.__class__(self)
-
-    def size(self) -> int:
-        """Gets the number of atoms in the collection.
-
-        Alias for len(AtomCollection).
-        """
-        return len(self)
-
-    def center_to_origin(
-        self, origin: ArrayLike = np.zeros(3), use_weights: bool = False
-    ):
-        """Centers AtomCollection on `origin`."""
-        if not use_weights:
-            super().center_to_origin(origin)
-        else:
-            self.translate(np.array(origin) - self.center_of_mass())
-
-    def center_of_mass(self) -> np.ndarray:
-        """Returns the center of mass (barycenter)."""
-        return linalg.center_of_mass(self.coords, self.masses)
-
-    def inertia_tensor(self, weights=None):
-        """Returns the inertia tensors of a set of atoms."""
-        if weights is None:
-            weights = self.masses
-        return linalg.inertia_tensor(self.coords, weights)
-
-    def principal_axes(self, sort: bool = True) -> np.ndarray:
-        """Returns an AtomCollection principal axes.
-
-        Args:
-            sort (bool): sort axes by importance
-        """
-        return linalg.principal_axes(self.inertia_tensor(), sort)
-
-    def radius_of_gyration(self) -> float:
-        """Returns the isometric radius of gyration (atom mass is not taken
-        into account)."""
-        centered = self.coords - self.centroid()
-        rgyr2 = np.sum(centered**2) / len(self)
-        return math.sqrt(rgyr2)
-
-    def topdb(self) -> str:
-        """Returns a string representing the AtomCollection in PDB format."""
-        return "\n".join(atom.topdb() for atom in self)
-
-    def writepdb(self, path: FilePath):
-        """Writes the AtomCollection to a PDB formatted file."""
-        with open(path, "wt", encoding="utf-8") as f:
-            print(self.topdb(), file=f)
-
-    def set_chain(self, chain: str):
-        """Sets all atom chain property."""
-        for atom in self:
-            atom.chain = chain
-
-    def groupby(self, key: Callable) -> dict[Any, AtomCollection]:
-        data = sorted(self, key=key)
-        grouped = itertools.groupby(data, key=key)
-        return {key: self.__class__(list(group)) for key, group in grouped}
-
-    def select_atom_type(self, atom_type: str) -> AtomCollection:
-        """Returns a sub-collection made of atoms with desired atom type."""
-        return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
-
-    def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
-        """Returns a sub-collection made of atoms with desired atom types."""
-        return self.__class__(
-            atoms=[atom for atom in self if atom.name in atom_types]
-        )
-
-    def select_residue_range(self, start: int, end: int) -> AtomCollection:
-        """Returns a sub-collection made of atoms with desired which residue is within the range."""
-        return self.__class__(
-            atoms=[atom for atom in self if start <= atom.resid <= end]
-        )
-
-    def select_chain(self, chain_id: str) -> AtomCollection:
-        """Returns a sub-collection made of atoms with desired chain."""
-        return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
-
-    def iter_atoms(self) -> Iterator[Atom]:
-        """Iterate over the collection's atoms."""
-        return iter(self)
-
-    def iter_residues(self) -> Iterator[AtomCollection]:
-        by_residue = self.groupby(lambda atom: (atom.resid, atom.chain))
-        return iter(by_residue.values())
-
-    def iter_chains(self) -> Iterator[AtomCollection]:
-        by_chain = self.groupby(lambda atom: atom.chain)
-        return iter(by_chain.values())
-
-
-def guess_atom_element(atom_name: str) -> str:
-    """Returns the atom element based on its name.
-
-    Basically returns the first non-numeric character in atom_name.
-    """
-    for char in atom_name:
-        if char.isalpha():
-            return char
-    return "X"
-
-
-def guess_atom_mass(element: str) -> float:
-    """Returns the atom mass based on the element name."""
-    return tables.masses.get(element, 1.0)
+        self.collection.masses[self.serial] = self.guess_mass(self.element)

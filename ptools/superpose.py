@@ -7,9 +7,8 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .atom import AtomCollection
+from .atomcollection import AtomCollection
 from . import linalg
-from . import spatial
 
 
 @dataclass

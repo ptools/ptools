@@ -2,7 +2,8 @@
 
 import numpy as np
 
-from ptools.atom import BaseAtom, AtomCollection
+from ptools.atom import BaseAtom
+from ptools.atomcollection import AtomCollection
 
 
 DUMMY_ATOM_ATTRS = {

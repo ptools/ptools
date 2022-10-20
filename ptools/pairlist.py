@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from ptools.atom import AtomCollection
+from .atomcollection import AtomCollection
 
 
 @dataclass

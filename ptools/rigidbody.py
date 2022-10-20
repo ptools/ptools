@@ -14,7 +14,8 @@ from ._typing import FilePath
 import numpy as np
 
 # PTools.
-from .atom import AtomCollection, BaseAtom
+from .atom import BaseAtom
+from .atomcollection import AtomCollection
 from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
 
