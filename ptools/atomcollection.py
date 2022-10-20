@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import UserList
 import itertools
 import math
-from typing import Any, Callable, Iterator, Sequence
+from typing import Any, Callable, Iterable, Iterator, Protocol
 
 import numpy as np
 
@@ -23,12 +23,13 @@ class AtomCollection(TransformableObject, UserList):
         atoms (list[BaseAtom]): list of atoms
     """
 
-    def __init__(self, atoms: Sequence[BaseAtom] = None):
-        if atoms is None or len(atoms) == 0:
+    def __init__(self, atoms: Iterable[BaseAtom] = None):
+        if atoms is None:
             atoms = []
             coords = np.zeros((0, 3))
-        else:
-            atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
+
+        atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
+        if atoms:
             coords = np.array([atom._coords for atom in atoms])
 
         TransformableObject.__init__(self, coords)
@@ -42,13 +43,15 @@ class AtomCollection(TransformableObject, UserList):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __add__(self, other: AtomCollection) -> AtomCollection:
+    def __add__(self, other: Iterable[BaseAtom]) -> AtomCollection:
         """Concatenates two RigidBody instances."""
+        if not isinstance(other, AtomCollection):
+            other = AtomCollection(other)
         output = super().__add__(other.copy())
         output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
 
-    def __iadd__(self, other: AtomCollection) -> AtomCollection:
+    def __iadd__(self, other: Iterable[BaseAtom]) -> AtomCollection:
         return self.__add__(other)
 
     def guess_masses(self):
