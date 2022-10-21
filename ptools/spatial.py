@@ -55,7 +55,7 @@ class ObjectWithCoordinates:
 
     def normalize(self):
         """Normalize coordinates."""
-        self.coords = L.normalize(self.coords)
+        self.coords = L.normalized(self.coords)
 
 
 class TranslatableObject(ObjectWithCoordinates):
