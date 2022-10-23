@@ -18,6 +18,8 @@ from .matrix import (
 )
 
 
+norm = np.linalg.norm
+
 def normalized(array: np.ndarray) -> np.ndarray:
     """Returns the normalized array, i.e. array / norm(array)."""
     return array / np.linalg.norm(array)
