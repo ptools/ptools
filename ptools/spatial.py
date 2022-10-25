@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import numpy as np
@@ -18,6 +18,10 @@ from . import linalg as L
 from .linalg import transform as T
 
 
+def default_array3d():
+    return array3d(np.zeros((3, )))
+
+
 @dataclass
 class ObjectWithCoordinates:
     """Object with coordinates.
@@ -26,7 +30,7 @@ class ObjectWithCoordinates:
     convert coordinates to numpy arrays upon change.
     """
 
-    coordinates: array3d = array3d(np.zeros(3))
+    coordinates: array3d = field(default_factory=default_array3d)
 
     def __post_init__(self):
         self.coordinates = array3d(self.coordinates)

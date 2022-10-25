@@ -1,7 +1,7 @@
 """Superposition methods."""
 
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import math
 
 import numpy as np
@@ -10,13 +10,16 @@ from scipy.spatial.transform import Rotation
 from .atomcollection import AtomCollection
 from . import linalg
 
+def zeros3f():
+    return np.zeros(3, dtype="float64")
+
 
 @dataclass
 class Screw:
     """A screw."""
 
-    unit: np.ndarray = np.zeros(3)
-    point: np.ndarray = np.zeros(3)
+    unit: np.ndarray = field(default_factory=zeros3f)
+    point: np.ndarray = field(default_factory=zeros3f)
     normtranslation: float = 0.0
     angle: float = 0.0
 

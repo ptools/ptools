@@ -7,6 +7,8 @@ from scipy.spatial.distance import cdist
 
 from .atomcollection import AtomCollection
 
+def zeros3f():
+    return np.zeros((3,), dtype="float64")
 
 @dataclass
 class PairList:
@@ -22,10 +24,8 @@ class PairList:
     receptor: AtomCollection
     ligand: AtomCollection
     cutoff: float
-    _all_sqdistances: np.ndarray = field(
-        init=False, repr=False, default=np.zeros((0, 0))
-    )
-    _contacts: np.ndarray = field(init=False, repr=False, default=np.zeros((0, 0)))
+    _all_sqdistances: np.ndarray = field(init=False, repr=False, default_factory=zeros3f)
+    _contacts: np.ndarray = field(init=False, repr=False, default_factory=zeros3f)
 
     def __post_init__(self):
         self.update()

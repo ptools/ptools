@@ -84,6 +84,9 @@ class ForceFieldBase(Protocol):
         """Calculates all energy terms."""
 
 
+def empty():
+    return np.empty(0)
+
 @dataclass
 class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
@@ -95,13 +98,13 @@ class AttractForceField1(ForceFieldBase):
 
     paramfile: str = ""
     _repulsive_parameters: np.ndarray = field(
-        init=False, repr=False, default=np.empty(0)
+        init=False, repr=False, default_factory=empty
     )
     _attractive_parameters: np.ndarray = field(
-        init=False, repr=False, default=np.empty(0)
+        init=False, repr=False, default_factory=empty
     )
-    _repulsive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
-    _attractive_pairs: np.ndarray = field(init=False, repr=False, default=np.empty(0))
+    _repulsive_pairs: np.ndarray = field(init=False, repr=False, default_factory=empty)
+    _attractive_pairs: np.ndarray = field(init=False, repr=False, default_factory=empty)
 
     _vdw_energy: float = field(init=False, repr=False, default=0.0)
     _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
