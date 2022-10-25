@@ -11,7 +11,7 @@ from typing import Any
 
 import numpy as np
 
-from .coordinates import Coordinates3D
+from .array3d import array3d
 from ._typing import ArrayLike
 
 from . import linalg as L
@@ -26,20 +26,20 @@ class ObjectWithCoordinates:
     convert coordinates to numpy arrays upon change.
     """
 
-    coordinates: Coordinates3D = Coordinates3D(np.zeros(3))
+    coordinates: array3d = array3d(np.zeros(3))
 
     def __post_init__(self):
-        self.coordinates = Coordinates3D(self.coordinates)
+        self.coordinates = array3d(self.coordinates)
 
     @property
-    def coords(self) -> Coordinates3D:
+    def coords(self) -> array3d:
         """Returns SpatialObject cartesian coordinates."""
         return self.coordinates
 
     @coords.setter
     def coords(self, pos: ArrayLike):
         """Sets SpatialObject cartesian coordinates."""
-        self.coordinates = Coordinates3D(pos)
+        self.coordinates = array3d(pos)
 
     def copy(self) -> ObjectWithCoordinates:
         """Returns a copy of itself."""

@@ -7,6 +7,8 @@ from typing import Any, Callable, Iterable, Iterator, Protocol
 
 import numpy as np
 
+
+from .array3d import array3d
 from .atom import Atom, BaseAtom
 from .spatial import TransformableObject
 from . import linalg
@@ -26,11 +28,11 @@ class AtomCollection(TransformableObject, UserList):
     def __init__(self, atoms: Iterable[BaseAtom] = None):
         if atoms is None:
             atoms = []
-            coords = np.zeros((0, 3))
+            coords = array3d(np.zeros((0, 3)))
 
         atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
         if atoms:
-            coords = np.array([atom.coordinates for atom in atoms])
+            coords = array3d([atom.coordinates for atom in atoms])
 
         TransformableObject.__init__(self, coords)
         UserList.__init__(self, atoms)

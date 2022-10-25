@@ -13,6 +13,8 @@ import numpy as np
 
 # Type-hinting specific import
 from typing import TYPE_CHECKING
+
+from ptools.array3d import array3d
 from ._typing import ArrayLike
 
 # PTools imports.
@@ -179,13 +181,13 @@ class Atom(BaseAtom):
         super().__init__(**kwargs)
 
     @property
-    def coords(self) -> np.ndarray:
+    def coords(self) -> array3d:
         """Gets atom cartesian coordinates."""
         return self.collection.coords[self.serial].copy()
 
     @coords.setter
-    def coords(self, pos: np.ndarray):
-        self.collection.coords[self.serial] = np.array(pos)
+    def coords(self, pos: ArrayLike):
+        self.collection.coords[self.serial] = array3d(pos)
 
     @property
     def mass(self) -> float:

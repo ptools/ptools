@@ -7,8 +7,8 @@ from numpy.typing import ArrayLike
 import ptools.linalg as L
 
 
-class Invalid3DCoordinates(Exception):
-    """Exception raised when trying to initialize Coordinates3D from an invalid input array.
+class Invalid3DArrayError(ValueError):
+    """Exception raised when trying to initialize array3d from an invalid input array.
 
     Attributes:
         shape: tuple[int, ...] -- input array dimensions
@@ -19,7 +19,7 @@ class Invalid3DCoordinates(Exception):
         super().__init__(message)
 
 
-class Coordinates3D(np.ndarray):
+class array3d(np.ndarray):
     """Holds 3D-coordinates.
 
     Main purpose is to ensure the 3D-ness of the coordinates.
@@ -33,11 +33,11 @@ class Coordinates3D(np.ndarray):
         ndim = len(obj.shape)
 
         if not 1 <= ndim <= 2:
-            raise Invalid3DCoordinates(obj.shape)
+            raise Invalid3DArrayError(obj.shape)
         if ndim == 1 and obj.shape[0] != 3:
-            raise Invalid3DCoordinates(obj.shape)
+            raise Invalid3DArrayError(obj.shape)
         elif ndim == 2 and obj.shape[1] != 3:
-            raise Invalid3DCoordinates(obj.shape)
+            raise Invalid3DArrayError(obj.shape)
 
         return obj
 
@@ -49,7 +49,7 @@ class Coordinates3D(np.ndarray):
         """Centers coordinates on target."""
         self = self.centered(target)
 
-    def centered(self, target: Optional[ArrayLike] = None) -> Coordinates3D:
+    def centered(self, target: Optional[ArrayLike] = None) -> array3d:
         """Returns the centered coordinates relatively to target."""
         if target is None:
             target = self.centroid()
@@ -62,6 +62,6 @@ class Coordinates3D(np.ndarray):
         """Normalize coordinates."""
         self = self.normalized()
 
-    def normalized(self) -> Coordinates3D:
+    def normalized(self) -> array3d:
         """Returns normalized coordinates."""
         return self.__class__(L.normalized(self))
