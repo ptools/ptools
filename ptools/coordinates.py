@@ -87,13 +87,9 @@ class Coordinates3D:
 
     def __setitem__(self, i: slice|int, item):
         self.array[i] = item
-        # if self.shape == (3,):
-        #     self.array[i] = item
-        # else:
-        #     self.array[i] = self._to_3d_array(item)
 
-    def __array__(self) -> np.ndarray:
-        return self.array
+    def __array__(self, *args) -> np.ndarray:
+        return np.asarray(self.array, *args)
 
     def centroid(self) -> np.ndarray:
         """Returns an spatial object geometric center."""
