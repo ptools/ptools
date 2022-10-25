@@ -30,7 +30,7 @@ class AtomCollection(TransformableObject, UserList):
 
         atoms = [Atom(atom, serial, self) for serial, atom in enumerate(atoms)]
         if atoms:
-            coords = np.array([atom._coords for atom in atoms])
+            coords = np.array([atom.coordinates for atom in atoms])
 
         TransformableObject.__init__(self, coords)
         UserList.__init__(self, atoms)

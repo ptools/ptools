@@ -6,15 +6,19 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
+
+from .coordinates import Coordinates3D
 from ._typing import ArrayLike
 
 from . import linalg as L
 from .linalg import transform as T
 
 
+@dataclass
 class ObjectWithCoordinates:
     """Object with coordinates.
 
@@ -22,24 +26,24 @@ class ObjectWithCoordinates:
     convert coordinates to numpy arrays upon change.
     """
 
-    _coords: np.ndarray
+    coordinates: Coordinates3D = Coordinates3D(np.zeros(3))
 
-    def __init__(self, coords: ArrayLike = np.zeros(3)):
-        self._coords = coord3d(coords)
+    def __post_init__(self):
+        self.coordinates = Coordinates3D(self.coordinates)
 
     @property
-    def coords(self) -> np.ndarray:
+    def coords(self) -> Coordinates3D:
         """Returns SpatialObject cartesian coordinates."""
-        return self._coords
+        return self.coordinates
 
     @coords.setter
     def coords(self, pos: ArrayLike):
         """Sets SpatialObject cartesian coordinates."""
-        self._coords = coord3d(pos)
+        self.coordinates = Coordinates3D(pos)
 
     def copy(self) -> ObjectWithCoordinates:
         """Returns a copy of itself."""
-        return self.__class__(self.coords)
+        return self.__class__(self.coordinates.copy())
 
     def distance(self, other: ObjectWithCoordinates) -> float:
         """Returns the euclidean distance between two objects."""
@@ -47,7 +51,7 @@ class ObjectWithCoordinates:
 
     def centroid(self) -> np.ndarray:
         """Returns an spatial object geometric center."""
-        return L.centroid(self._coords)
+        return self.coordinates.centroid()
 
     def distance_to_axis(self, axis: ArrayLike) -> float:
         """Returns the SpatialObject distance to an arbitrary axis."""
@@ -55,7 +59,7 @@ class ObjectWithCoordinates:
 
     def normalize(self):
         """Normalize coordinates."""
-        self.coords = L.normalized(self.coords)
+        self.coordinates.normalize()
 
 
 class TranslatableObject(ObjectWithCoordinates):
@@ -63,7 +67,7 @@ class TranslatableObject(ObjectWithCoordinates):
 
     def center_to_origin(self, origin: ArrayLike = np.zeros(3)):
         """Centers spatial object on `origin`."""
-        self.translate(np.array(origin) - self.centroid())
+        self.translate(np.asarray(origin) - self.centroid())
 
     def translate(self, direction: ArrayLike):
         """Translates object coordinates using vector `direction`.
@@ -72,7 +76,7 @@ class TranslatableObject(ObjectWithCoordinates):
             direction (scalar or array): scalar, 1 x 3 shaped vector or
                 4 x 4 matrix
         """
-        T.translate(self.coords, direction)
+        T.translate(self.coordinates, direction)
 
     def moveby(self, direction: ArrayLike):
         """Translates object coordinates using vector or scalar `direction`.

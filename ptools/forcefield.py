@@ -204,7 +204,7 @@ class AttractForceField1(ForceFieldBase):
         XA = np.take(self.receptor.coords, keep[0], axis=0)
         XB = np.take(self.ligand.coords, keep[1], axis=0)
 
-        dx = XA - XB
+        dx = np.asarray(XA - XB)
         rr2 = 1.0 / np.power(dx, 2).sum(axis=1)
         dx = dx + rr2[:, None]
 
@@ -238,7 +238,7 @@ class AttractForceField1(ForceFieldBase):
             self.ligand.atom_forces -= fdb.sum(axis=0)
             return et.sum()
 
-        dx = self.receptor.coords[:, None] - self.ligand.coords
+        dx = np.asarray(self.receptor.coords[:, None] - self.ligand.coords)
         sq_distances = cdist(
             self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
         )

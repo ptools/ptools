@@ -3,6 +3,7 @@
 import unittest
 
 from ptools.atom import BaseAtom
+from ptools.coordinates import Invalid3DCoordinates
 from .testing.moreassert import assert_array_almost_equal
 from .testing.dummy import generate_dummy_atom
 
@@ -19,14 +20,14 @@ class TestBaseAtom(unittest.TestCase):
         assert_array_almost_equal(atom.coords, (0, 0, 0))
 
     def test_initialize_with_bad_coordinates(self):
-        err = "3D coordinate array should be N x 3"
-        with self.assertRaisesRegex(ValueError, err):
+        err = r"cannot initialize 3D-coordinates from array with shape \(2,\)"
+        with self.assertRaisesRegex(Invalid3DCoordinates, err):
             BaseAtom(coords=(1, 2))
 
     def test_set_bad_coordinates(self):
         atom = BaseAtom()
-        err = "3D coordinate array should be N x 3"
-        with self.assertRaisesRegex(ValueError, err):
+        err = r"cannot initialize 3D-coordinates from array with shape \(2,\)"
+        with self.assertRaisesRegex(Invalid3DCoordinates, err):
             atom.coords = (1, 2)
 
     # Ignores R0201: Method could be a function (no-self-use)

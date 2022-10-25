@@ -75,6 +75,7 @@ class TestAttractForceField1(unittest.TestCase):
     def test_non_bonded_energy_small_cutoff(self):
         # Reference values calculated from PTools 8439c40.
         self.ff.cutoff = 5.0
+        print(f"{self.ff.non_bonded_energy()=}")
         self.assertAlmostEqual(self.ff.non_bonded_energy(), -4.85626395114)
 
     def test_non_bonded_energy_large_cutoff(self):
