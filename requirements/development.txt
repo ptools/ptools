@@ -4,3 +4,4 @@ black
 pylint>=2.10.2
 pytest>=5.3.5
 pytest-cov>=2.8.1
+hypothesis>=6.54.5
