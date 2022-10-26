@@ -254,7 +254,7 @@ class TestAtomCollection(unittest.TestCase):
         atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
         sel = atoms.select_residue_range(10, 20)
         self.assertEqual(len(sel), 23)
-        self.assertTrue(all(10 <= atom.resid <= 20 for atom in sel))
+        self.assertTrue(all(10 <= atom.residue_index <= 20 for atom in sel))
 
     def test_select_chain(self):
         atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)

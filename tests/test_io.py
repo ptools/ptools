@@ -39,8 +39,8 @@ class TestPDBIO(unittest.TestCase):
             atom = atoms[i]
             self.assertEqual(atom.index, i + 1)
             self.assertEqual(atom.name, TestPDBBuilder.atom_names()[i])
-            self.assertEqual(atom.resid, 1)
-            self.assertEqual(atom.resname, "LYS")
+            self.assertEqual(atom.residue_index, 1)
+            self.assertEqual(atom.residue_name, "LYS")
             self.assertEqual(atom.chain, "A")
             self.assertAlmostEqual(atom.coords[0], i + 1)
             self.assertAlmostEqual(atom.coords[1], 10 + i + 1)

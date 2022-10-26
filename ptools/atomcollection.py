@@ -137,7 +137,7 @@ class AtomCollection(TransformableObject, UserList):
     def select_residue_range(self, start: int, end: int) -> AtomCollection:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
         return self.__class__(
-            atoms=[atom for atom in self if start <= atom.resid <= end]
+            atoms=[atom for atom in self if start <= atom.residue_index <= end]
         )
 
     def select_chain(self, chain_id: str) -> AtomCollection:
@@ -149,7 +149,7 @@ class AtomCollection(TransformableObject, UserList):
         return iter(self)
 
     def iter_residues(self) -> Iterator[AtomCollection]:
-        by_residue = self.groupby(lambda atom: (atom.resid, atom.chain))
+        by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
         return iter(by_residue.values())
 
     def iter_chains(self) -> Iterator[AtomCollection]:

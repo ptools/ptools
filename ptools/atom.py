@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 # The Protein Data Bank format for atom coordinates
 PDB_FMT = (
     "{record:<6s}{index:5s} "
-    "{name:4s}{altloc}{resname:<4s}{chain:s}{resid:>4s}{insertion}   "
+    "{name:4s}{altloc}{resname:<4s}{chain:s}{residue_index:>4s}{insertion}   "
     "{x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{bfactor:6.2f}          "
     "{element:>2s}"
 )
@@ -48,32 +48,32 @@ class BaseAtom(TranslatableObject):
         name (str): atom name
         resname (str): residue name
         chain (str): chain identifier
-        resid (int): residue number (read from topology file)
+        residue_index (int): residue number (read from topology file)
         charge (float): charge
         coords (numpy.ndarray): cartesian coordinates
         meta (dict[str, ()]): metadata dictionnary
     """
 
     # Atom equality evaluated on these attributes
-    _comparison_attributes = ["index", "name", "resname", "resid", "chain", "coords"]
+    _comparison_attributes = ["index", "name", "residue_name", "residue_index", "chain", "coords"]
 
     def __init__(
         self,
         index: int = 0,
         name: str = "XXX",
-        resname: str = "XXX",
+        residue_name: str = "XXX",
         chain: str = "X",
-        resid: int = 0,
+        residue_index: int = 0,
         charge: float = 0.0,
         coords: ArrayLike = np.zeros(3),
         meta: dict = None,
     ):
         super().__init__(coords)
         self._name = name
-        self.resname = resname
-        self.chain = chain
         self.index = index
-        self.resid = resid
+        self.residue_index = residue_index
+        self.residue_name = residue_name
+        self.chain = chain
         self.charge = charge
         self.meta = meta
 
@@ -169,10 +169,10 @@ class Atom(BaseAtom):
         self.collection = collection
         attrs = (
             "name",
-            "resname",
+            "residue_name",
             "chain",
             "index",
-            "resid",
+            "residue_index",
             "charge",
             "meta",
             "coords",

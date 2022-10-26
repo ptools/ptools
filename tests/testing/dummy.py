@@ -8,10 +8,10 @@ from ptools.atomcollection import AtomCollection
 
 DUMMY_ATOM_ATTRS = {
     "name": "CA",
-    "resname": "ALA",
-    "chain": "A",
     "index": 42,
-    "resid": 17,
+    "residue_name": "ALA",
+    "residue_index": 17,
+    "chain": "A",
     "charge": 2.0,
     "coords": (1, 2, 3),
 }
@@ -32,6 +32,6 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
     """
     col = AtomCollection([BaseAtom(coords=(i, i, i)) for i in range(size)])
     for atom in col:
-        for attr in ("name", "resname", "chain", "index", "resid", "charge"):
+        for attr in ("name", "index", "residue_name", "residue_index", "chain", "charge"):
             setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])
     return col

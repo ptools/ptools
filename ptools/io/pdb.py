@@ -151,8 +151,8 @@ class AtomLine(PDBLine):
         return BaseAtom(
             index=self.atom_id,
             name=self.name,
-            resname=self.resname,
-            resid=self.residue_id,
+            residue_name=self.resname,
+            residue_index=self.residue_id,
             chain=self.chain,
             coords=self.coordinates,
             meta={"extra": self.extra},

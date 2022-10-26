@@ -12,10 +12,10 @@ class TestBaseAtom(unittest.TestCase):
     def test_empty_initializer(self):
         atom = BaseAtom()
         self.assertEqual(atom.name, "XXX")
-        self.assertEqual(atom.resname, "XXX")
-        self.assertEqual(atom.chain, "X")
         self.assertEqual(atom.index, 0)
-        self.assertEqual(atom.resid, 0)
+        self.assertEqual(atom.residue_name, "XXX")
+        self.assertEqual(atom.residue_index, 0)
+        self.assertEqual(atom.chain, "X")
         self.assertEqual(atom.charge, 0.0)
         assert_array_almost_equal(atom.coords, (0, 0, 0))
 
@@ -48,10 +48,6 @@ class TestBaseAtom(unittest.TestCase):
     def test_equals_coordinates_differ(self):
         left, right = BaseAtom(coords=(0, 0, 0)), BaseAtom(coords=(1, 1, 1))
         self.assertNotEqual(left, right)
-
-    def test_repr(self):
-        atom = BaseAtom()
-        self.assertNotIn("_", repr(atom))
 
     def test_copy(self):
         # Check that all arguments are adequatly set from original atom
@@ -95,7 +91,7 @@ class TestBaseAtom(unittest.TestCase):
 
     def test_topdb_long_resid(self):
         atom = generate_dummy_atom()
-        atom.resid = 11000
+        atom.residue_index = 11000
         reference_string = (
             "ATOM     42  CA  ALA A2af8       "
             "1.000   2.000   3.000  1.00  0.00           "
