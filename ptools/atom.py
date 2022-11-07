@@ -39,24 +39,41 @@ PDB_FMT = (
 )
 
 
+@dataclass
+class ChainProperties:
+    name: str = "X"
+
+    def copy(self) -> ChainProperties:
+        return copy.deepcopy(self)
+
+
+@dataclass
+class ResidueProperties:
+    """Stores residue properties."""
+    name: str = "XXX"
+    index: int = 0
+
+    def copy(self) -> ResidueProperties:
+        return copy.deepcopy(self)
+
+@dataclass
+class AtomProperties:
+    """Stores atom properties."""
+    name: str = "XXX"
+    index: int = 0
+    residue: ResidueProperties = field(default_factory = ResidueProperties)
+    chain: ChainProperties = field(default_factory = ChainProperties)
+    charge: float = 0.0
+    meta: dict[str, Any] = field(default_factory=dict)
+
+    def copy(self) -> AtomProperties:
+        return copy.deepcopy(self)
+
+
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
 class BaseAtom(TranslatableObject):
-    """Base class for an Atom.
-
-    Args:
-        index (int): index (read from topology file)
-        name (str): atom name
-        resname (str): residue name
-        chain (str): chain identifier
-        residue_index (int): residue number (read from topology file)
-        charge (float): charge
-        coords (numpy.ndarray): cartesian coordinates
-        meta (dict[str, ()]): metadata dictionnary
-    """
-
-    # Atom equality evaluated on these attributes
-    _comparison_attributes = ["index", "name", "residue_name", "residue_index", "chain", "coords"]
+    """Base class for an Atom."""
 
     def __init__(
         self,
@@ -66,17 +83,60 @@ class BaseAtom(TranslatableObject):
         chain: str = "X",
         residue_index: int = 0,
         charge: float = 0.0,
-        meta: dict = None,
+        meta: dict[str, Any] = None,
         coords: ArrayLike = np.zeros(3),
     ):
         super().__init__(coords)
-        self.name = name
-        self.index = index
-        self.residue_index = residue_index
-        self.residue_name = residue_name
-        self.chain = chain
-        self.charge = charge
-        self.meta = meta
+        self.properties = AtomProperties()
+        self.properties.name = name
+        self.properties.index = index
+        self.properties.charge = charge
+        self.properties.meta = meta
+        self.properties.residue.index = residue_index
+        self.properties.residue.name = residue_name
+        self.properties.chain.name = chain
+
+
+    def __getattribute__(self, __name: str) -> Any:
+        if __name == "properties":
+            return super().__getattribute__(__name)
+
+        if hasattr(self, "properties"):
+            attrs = super().__getattribute__("properties")
+
+            if __name == "residue_index":
+                return attrs.residue.index
+            if __name == "residue_name":
+                return attrs.residue.name
+            if __name == "chain":
+                return attrs.chain.name
+
+            if __name in attrs.__dict__:
+                return getattr(attrs, __name)
+
+        return super().__getattribute__(__name)
+
+
+    def __setattr__(self, __name: str, __value: Any) -> None:
+        if __name == "properties":
+            return super().__setattr__(__name, __value)
+
+        if hasattr(self, "properties"):
+            attrs = super().__getattribute__("properties")
+
+            if __name == "residue_index":
+                return setattr(attrs.residue, "index", __value)
+            if __name == "residue_name":
+                return setattr(attrs.residue, "name", __value)
+            if __name == "chain":
+                return setattr(attrs.chain, "name", __value)
+
+            if __name in attrs.__dict__:
+                return setattr(attrs, __name, __value)
+
+
+        return super().__setattr__(__name, __value)
+
 
     @property
     def element(self):
@@ -86,16 +146,13 @@ class BaseAtom(TranslatableObject):
     def __eq__(self, other: object) -> bool:
         """Compares two BaseAtom instances."""
         if not isinstance(other, BaseAtom):
-            raise TypeError(
-                f"cannot compare BaseAtom with object of type {type(other)}"
-            )
-        for key in self._comparison_attributes:
-            if key != "coords":
-                if getattr(self, key) != getattr(other, key):
-                    return False
-            elif np.abs(self.coords - other.coords).sum() > 1e-6:
-                return False
-        return True
+            err = f"cannot compare BaseAtom with object of type {type(other)}"
+            raise TypeError(err)
+
+        if self.properties != other.properties:
+            return False
+
+        return np.allclose(self.coords, other.coords)
 
     def __repr__(self) -> str:
         """BaseAtom string representation."""
@@ -111,7 +168,7 @@ class BaseAtom(TranslatableObject):
 
     def copy(self) -> BaseAtom:
         """Returns a copy of the current atom."""
-        obj = copy.copy(self)
+        obj = copy.deepcopy(self)
         obj.coords = obj.coords.copy()
         return obj
 
