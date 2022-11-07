@@ -7,12 +7,13 @@ from __future__ import annotations
 
 # Python core libraries.
 import copy
+from dataclasses import dataclass, field
 
 # Scientific libraries.
 import numpy as np
 
 # Type-hinting specific import
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 from ptools.array3d import array3d
 from ._typing import ArrayLike
@@ -65,11 +66,11 @@ class BaseAtom(TranslatableObject):
         chain: str = "X",
         residue_index: int = 0,
         charge: float = 0.0,
-        coords: ArrayLike = np.zeros(3),
         meta: dict = None,
+        coords: ArrayLike = np.zeros(3),
     ):
         super().__init__(coords)
-        self._name = name
+        self.name = name
         self.index = index
         self.residue_index = residue_index
         self.residue_name = residue_name
@@ -81,16 +82,6 @@ class BaseAtom(TranslatableObject):
     def element(self):
         """Returns an atom element name (read-only)."""
         return self.guess_element(self.name)
-
-    @property
-    def name(self) -> str:
-        """Gets/Sets atom's name."""
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        """Name setter simultaneously updates element name."""
-        self._name = name
 
     def __eq__(self, other: object) -> bool:
         """Compares two BaseAtom instances."""
@@ -198,15 +189,3 @@ class Atom(BaseAtom):
     def mass(self, mass: float):
         """Gets/Sets an atom mass."""
         self.collection.masses[self.serial] = mass
-
-    # Override BaseAtom name setter to manually handle masses
-    # (name getter override is mandatory).
-    @property
-    def name(self) -> str:
-        """Gets/Sets atom's name."""
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        self._name = name
-        self.collection.masses[self.serial] = self.guess_mass(self.element)

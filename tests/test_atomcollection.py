@@ -129,6 +129,7 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms[i].name = "CA"
         for i in range(5, 10):
             self.atoms[i].name = "NZ"
+        self.atoms.guess_masses()
 
         center = self.atoms.center_of_mass()
         assert_array_almost_equal(center, [4.69179, 4.69179, 4.69179])
@@ -164,6 +165,7 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms[i].name = "CA"
         for i in range(5, 10):
             self.atoms[i].name = "NZ"
+        self.atoms.guess_masses()
 
         # This test should pass for a valid test of masses impact on AtomCollection.center()
         assert_array_not_almost_equal(

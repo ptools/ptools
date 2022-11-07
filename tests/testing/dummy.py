@@ -34,4 +34,5 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
     for atom in col:
         for attr in ("name", "index", "residue_name", "residue_index", "chain", "charge"):
             setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])
+    col.guess_masses()
     return col
