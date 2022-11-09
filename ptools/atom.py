@@ -40,33 +40,33 @@ PDB_FMT = (
 
 
 @dataclass
-class ChainProperties:
+class ChainAttrs:
     name: str = "X"
 
-    def copy(self) -> ChainProperties:
+    def copy(self) -> ChainAttrs:
         return copy.deepcopy(self)
 
 
 @dataclass
-class ResidueProperties:
+class ResidueAttrs:
     """Stores residue properties."""
     name: str = "XXX"
     index: int = 0
 
-    def copy(self) -> ResidueProperties:
+    def copy(self) -> ResidueAttrs:
         return copy.deepcopy(self)
 
 @dataclass
-class AtomProperties:
+class AtomAttrs:
     """Stores atom properties."""
     name: str = "XXX"
     index: int = 0
-    residue: ResidueProperties = field(default_factory = ResidueProperties)
-    chain: ChainProperties = field(default_factory = ChainProperties)
+    residue: ResidueAttrs = field(default_factory = ResidueAttrs)
+    chain: ChainAttrs = field(default_factory = ChainAttrs)
     charge: float = 0.0
     meta: dict[str, Any] = field(default_factory=dict)
 
-    def copy(self) -> AtomProperties:
+    def copy(self) -> AtomAttrs:
         return copy.deepcopy(self)
 
 
@@ -75,70 +75,58 @@ class AtomProperties:
 class BaseAtom(TranslatableObject):
     """Base class for an Atom."""
 
-    def __init__(
-        self,
-        index: int = 0,
-        name: str = "XXX",
-        residue_name: str = "XXX",
-        chain: str = "X",
-        residue_index: int = 0,
-        charge: float = 0.0,
-        meta: dict[str, Any] = None,
-        coords: ArrayLike = np.zeros(3),
-    ):
-        super().__init__(coords)
-        self.properties = AtomProperties()
-        self.properties.name = name
-        self.properties.index = index
-        self.properties.charge = charge
-        self.properties.meta = meta
-        self.properties.residue.index = residue_index
-        self.properties.residue.name = residue_name
-        self.properties.chain.name = chain
-
+    def __init__(self, **kwargs):
+        super().__init__(kwargs.pop("coords", np.zeros(3)))
+        self.attrs = AtomAttrs()
+        for name, value in kwargs.items():
+            if hasattr(self, name):
+                setattr(self, name, value)
+            elif hasattr(self.attrs, name):
+                setattr(self.attrs, name, value)
+            else:
+                raise AttributeError(f"{self.__class__.__qualname__!r} object has no attribute {name!r}")
 
     def get_name(self) -> str:
-        return self.properties.name
+        return self.attrs.name
 
     def set_name(self, value: str):
-        self.properties.name = value
+        self.attrs.name = value
 
     def get_index(self) -> int:
-        return self.properties.index
+        return self.attrs.index
 
     def set_index(self, value: int):
-        self.properties.index = value
+        self.attrs.index = value
 
     def get_charge(self) -> float:
-        return self.properties.charge
+        return self.attrs.charge
 
     def set_charge(self, value: float):
-        self.properties.charge = value
+        self.attrs.charge = value
 
     def get_meta(self) -> dict[str, Any]:
-        return self.properties.meta
+        return self.attrs.meta
 
     def set_meta(self, value: dict[str, Any]):
-        self.properties.meta = value
+        self.attrs.meta = value
 
     def get_chain(self) -> str:
-        return self.properties.chain.name
+        return self.attrs.chain.name
 
     def set_chain(self, value: str):
-        self.properties.chain.name = value
+        self.attrs.chain.name = value
 
     def get_residue_name(self) -> str:
-        return self.properties.residue.name
+        return self.attrs.residue.name
 
     def set_residue_name(self, value: str):
-        self.properties.residue.name = value
+        self.attrs.residue.name = value
 
     def get_residue_index(self) -> int:
-        return self.properties.residue.index
+        return self.attrs.residue.index
 
     def set_residue_index(self, value: int):
-        self.properties.residue.index = value
-
+        self.attrs.residue.index = value
 
     name = property(get_name, set_name)
     index = property(get_index, set_index)
@@ -160,7 +148,7 @@ class BaseAtom(TranslatableObject):
             err = f"cannot compare BaseAtom with object of type {type(other)}"
             raise TypeError(err)
 
-        if self.properties != other.properties:
+        if self.attrs != other.attrs:
             return False
 
         return np.allclose(self.coords, other.coords)
