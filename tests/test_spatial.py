@@ -27,22 +27,22 @@ class TestSpatialObjectVector(unittest.TestCase):
         assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_scalar(self):
-        obj = spatial.TranslatableObject((0, 0, 0))
+        obj = spatial.SupportsTranslation((0, 0, 0))
         obj.translate(1)
         assert_array_almost_equal(obj.coords, (1, 1, 1))
 
     def test_translate_vector(self):
-        obj = spatial.TranslatableObject((0, 0, 0))
+        obj = spatial.SupportsTranslation((0, 0, 0))
         obj.translate((1, 2, 3))
         assert_array_almost_equal(obj.coords, (1, 2, 3))
 
     def test_center_to_origin(self):
-        obj = spatial.TranslatableObject((1, 1, 1))
+        obj = spatial.SupportsTranslation((1, 1, 1))
         obj.center_to_origin()
         assert_array_almost_equal(obj.centroid(), (0, 0, 0))
 
     def test_center_custom_origin(self):
-        obj = spatial.TranslatableObject((1, 1, 1))
+        obj = spatial.SupportsTranslation((1, 1, 1))
         obj.center_to_origin(origin=(2, 2, 2))
         assert_array_almost_equal(obj.centroid(), (2, 2, 2))
 
@@ -140,7 +140,7 @@ class TestCoord3D(unittest.TestCase):
 
 
 class TestSpatialObjectTransformations(unittest.TestCase):
-    class FullTransformableObject(spatial.TranslatableObject, spatial.RotatableObject):
+    class FullTransformableObject(spatial.SupportsTranslation, spatial.SupportsRotation):
         pass
 
     def setUp(self):

@@ -41,7 +41,7 @@ class TestRotate:
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        obj = spatial.RotatableObject(coords)
+        obj = spatial.SupportsRotation(coords)
 
         # Rotate by 12° along X-axis.
         obj.rotate_by([12, 0, 0])
@@ -70,7 +70,7 @@ class TestRotate:
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        obj = spatial.RotatableObject(coords)
+        obj = spatial.SupportsRotation(coords)
 
         # Attract Euler rotation.
         obj.attract_euler_rotate([10, 12, 14])
@@ -181,7 +181,7 @@ class TestTransformation:
         coords = np.array(list([i + 1.0, i + 11.0, i + 21.0] for i in range(10)))
 
         # Initialize SpatialObject.
-        obj = spatial.TransformableObject(coords)
+        obj = spatial.SupportsTransformation(coords)
 
         # Rotate by 12° along X-axis.
         obj.transform(matrix)

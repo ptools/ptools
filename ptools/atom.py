@@ -19,7 +19,7 @@ from ._typing import ArrayLike
 
 # PTools imports.
 from . import tables
-from .spatial import TranslatableObject
+from .spatial import SupportsTranslation
 from .io.formatters.pdb import PDBFormatter
 
 
@@ -40,7 +40,7 @@ PDB_FMT = (
 
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
-class BaseAtom(TranslatableObject):
+class BaseAtom(SupportsTranslation):
     """Base class for an Atom.
 
     Args:

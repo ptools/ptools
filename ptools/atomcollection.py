@@ -10,13 +10,13 @@ import numpy as np
 
 from .array3d import array3d
 from .atom import Atom, BaseAtom
-from .spatial import TransformableObject
+from .spatial import SupportsTransformation
 from . import linalg
 
 from ._typing import ArrayLike, FilePath
 
 
-class AtomCollection(TransformableObject, UserList):
+class AtomCollection(SupportsTransformation, UserList):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -34,7 +34,7 @@ class AtomCollection(TransformableObject, UserList):
         if atoms:
             coords = array3d([atom.coordinates for atom in atoms])
 
-        TransformableObject.__init__(self, coords)
+        SupportsTransformation.__init__(self, coords)
         UserList.__init__(self, atoms)
         self.masses = np.zeros(len(atoms))
         self.guess_masses()
