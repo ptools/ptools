@@ -66,11 +66,11 @@ class ObjectWithCoordinates:
         self.coordinates.normalize()
 
 
-class TranslatableObject(ObjectWithCoordinates):
+class SupportsTranslation(ObjectWithCoordinates):
     """Object which coordinates can be translated."""
 
     def center_to_origin(self, origin: ArrayLike = np.zeros(3)):
-        """Centers spatial object on `origin`."""
+        """Centers object on `origin`."""
         self.translate(np.asarray(origin) - self.centroid())
 
     def translate(self, direction: ArrayLike):
@@ -90,7 +90,7 @@ class TranslatableObject(ObjectWithCoordinates):
         self.translate(direction)
 
 
-class RotatableObject(ObjectWithCoordinates):
+class SupportsRotation(ObjectWithCoordinates):
     """Object which coordinates can be rotated."""
 
     def rotate_by(self, angles: ArrayLike):
@@ -122,7 +122,7 @@ class RotatableObject(ObjectWithCoordinates):
         T.orient(self.coords, vector, target)
 
 
-class TransformableObject(TranslatableObject, RotatableObject):
+class SupportsTransformation(SupportsTranslation, SupportsRotation):
     """Object that can be translated and rotated."""
 
     def transform(self, matrix: ArrayLike):
