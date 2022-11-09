@@ -97,45 +97,56 @@ class BaseAtom(TranslatableObject):
         self.properties.chain.name = chain
 
 
-    def __getattribute__(self, __name: str) -> Any:
-        if __name == "properties":
-            return super().__getattribute__(__name)
+    def get_name(self) -> str:
+        return self.properties.name
 
-        if hasattr(self, "properties"):
-            attrs = super().__getattribute__("properties")
+    def set_name(self, value: str):
+        self.properties.name = value
 
-            if __name == "residue_index":
-                return attrs.residue.index
-            if __name == "residue_name":
-                return attrs.residue.name
-            if __name == "chain":
-                return attrs.chain.name
+    def get_index(self) -> int:
+        return self.properties.index
 
-            if __name in attrs.__dict__:
-                return getattr(attrs, __name)
+    def set_index(self, value: int):
+        self.properties.index = value
 
-        return super().__getattribute__(__name)
+    def get_charge(self) -> float:
+        return self.properties.charge
+
+    def set_charge(self, value: float):
+        self.properties.charge = value
+
+    def get_meta(self) -> dict[str, Any]:
+        return self.properties.meta
+
+    def set_meta(self, value: dict[str, Any]):
+        self.properties.meta = value
+
+    def get_chain(self) -> str:
+        return self.properties.chain.name
+
+    def set_chain(self, value: str):
+        self.properties.chain.name = value
+
+    def get_residue_name(self) -> str:
+        return self.properties.residue.name
+
+    def set_residue_name(self, value: str):
+        self.properties.residue.name = value
+
+    def get_residue_index(self) -> int:
+        return self.properties.residue.index
+
+    def set_residue_index(self, value: int):
+        self.properties.residue.index = value
 
 
-    def __setattr__(self, __name: str, __value: Any) -> None:
-        if __name == "properties":
-            return super().__setattr__(__name, __value)
-
-        if hasattr(self, "properties"):
-            attrs = super().__getattribute__("properties")
-
-            if __name == "residue_index":
-                return setattr(attrs.residue, "index", __value)
-            if __name == "residue_name":
-                return setattr(attrs.residue, "name", __value)
-            if __name == "chain":
-                return setattr(attrs.chain, "name", __value)
-
-            if __name in attrs.__dict__:
-                return setattr(attrs, __name, __value)
-
-
-        return super().__setattr__(__name, __value)
+    name = property(get_name, set_name)
+    index = property(get_index, set_index)
+    charge = property(get_charge, set_charge)
+    meta = property(get_meta, set_meta)
+    chain = property(get_chain, set_chain)
+    residue_name = property(get_residue_name, set_residue_name)
+    residue_index = property(get_residue_index, set_residue_index)
 
 
     @property
