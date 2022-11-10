@@ -41,6 +41,11 @@ class array3d(np.ndarray):
 
         return obj
 
+    @classmethod
+    def zeros(cls, shape: int | tuple[int, ...] = 3) -> array3d:
+        """Builds a 0-filled 3D-array."""
+        return cls(np.zeros(shape, dtype=float))
+
     def centroid(self) -> np.ndarray:
         """Returns an spatial object geometric center."""
         return L.centroid(self)
