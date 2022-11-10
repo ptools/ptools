@@ -95,25 +95,17 @@ class AtomLine(PDBLine):
         return self[12:16].strip()
 
     @property
-    def resname(self) -> str:
-        """Atom residue name."""
-        return self[17:20].strip()
-
-    @property
     def chain(self) -> str:
         """Chain identifier."""
         return self[21].strip()
 
     @property
-    def resid(self) -> int:
-        """Residue identifer.
-
-        Alias for AtomLine.residue_id.
-        """
-        return self.residue_id
+    def residue_name(self) -> str:
+        """Atom residue name."""
+        return self[17:20].strip()
 
     @property
-    def residue_id(self) -> int:
+    def residue_index(self) -> int:
         """Residue identifer.
 
         See also:
@@ -151,8 +143,8 @@ class AtomLine(PDBLine):
         return BaseAtom(
             index=self.atom_id,
             name=self.name,
-            residue_name=self.resname,
-            residue_index=self.residue_id,
+            residue_name=self.residue_name,
+            residue_index=self.residue_index,
             chain=self.chain,
             coords=self.coordinates,
             meta={"extra": self.extra},
