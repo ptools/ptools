@@ -35,6 +35,20 @@ class ObjectWithCoordinates:
     def __post_init__(self):
         self.coordinates = array3d(self.coordinates)
 
+
+    def __eq__(self, other: object) -> bool:
+        """Compares two BaseAtom instances."""
+        if not isinstance(other, self.__class__):
+            err = f"cannot compare {self.__class__.__qualname__} with object of type {type(other)}"
+            raise TypeError(err)
+
+        attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates", )
+        for name in attrs:
+            if getattr(self, name) != getattr(other, name):
+                return False
+
+        return np.allclose(self.coordinates, other.coordinates)
+
     @property
     def coords(self) -> array3d:
         """Returns SpatialObject cartesian coordinates."""

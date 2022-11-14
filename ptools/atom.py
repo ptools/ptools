@@ -59,22 +59,11 @@ class BaseAtom(SupportsTranslation):
         return self.guess_element(self.name)
 
     def __eq__(self, other: object) -> bool:
-        """Compares two BaseAtom instances."""
-        if not isinstance(other, BaseAtom):
-            err = f"cannot compare BaseAtom with object of type {type(other)}"
-            raise TypeError(err)
-
-        attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates", )
-        for name in attrs:
-            if getattr(self, name) != getattr(other, name):
-                return False
-
-        return np.allclose(self.coordinates, other.coordinates)
+        return super().__eq__(other)
 
     def copy(self) -> BaseAtom:
         """Returns a copy of the current atom."""
         obj = copy.deepcopy(self)
-        obj.coords = obj.coords.copy()
         return obj
 
     def topdb(self) -> str:
