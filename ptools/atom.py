@@ -39,37 +39,6 @@ PDB_FMT = (
 )
 
 
-@dataclass
-class ChainAttrs:
-    name: str = "X"
-
-    def copy(self) -> ChainAttrs:
-        return copy.deepcopy(self)
-
-
-@dataclass
-class ResidueAttrs:
-    """Stores residue properties."""
-    name: str = "XXX"
-    index: int = 0
-
-    def copy(self) -> ResidueAttrs:
-        return copy.deepcopy(self)
-
-@dataclass
-class AtomAttrs:
-    """Stores atom properties."""
-    name: str = "XXX"
-    index: int = 0
-    residue: ResidueAttrs = field(default_factory = ResidueAttrs)
-    chain: ChainAttrs = field(default_factory = ChainAttrs)
-    charge: float = 0.0
-    meta: dict[str, Any] = field(default_factory=dict)
-
-    def copy(self) -> AtomAttrs:
-        return copy.deepcopy(self)
-
-
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
 @dataclass
@@ -96,7 +65,6 @@ class BaseAtom(SupportsTranslation):
             raise TypeError(err)
 
         attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates", )
-        print(list(attrs))
         for name in attrs:
             if getattr(self, name) != getattr(other, name):
                 return False
@@ -131,6 +99,7 @@ class BaseAtom(SupportsTranslation):
 
 
 
+@dataclass(init=False)
 class Atom(BaseAtom):
     """Atom that belongs to a group of atoms.
 
@@ -183,3 +152,6 @@ class Atom(BaseAtom):
     def mass(self, mass: float):
         """Gets/Sets an atom mass."""
         self.collection.masses[self.serial] = mass
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
