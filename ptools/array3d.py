@@ -70,3 +70,7 @@ class array3d(np.ndarray):
     def normalized(self) -> array3d:
         """Returns normalized coordinates."""
         return self.__class__(L.normalized(self))
+
+
+def asarray3d(value: ArrayLike) -> array3d:
+    return array3d(value)
