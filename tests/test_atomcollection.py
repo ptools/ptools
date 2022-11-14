@@ -180,7 +180,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_add(self):
         atoms2 = AtomCollection(
-            [BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)]
+            [BaseAtom(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
         )
         n_final = len(self.atoms) + len(atoms2)
         all_atoms = self.atoms + atoms2
@@ -189,7 +189,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_add_makes_copies(self):
         atoms2 = AtomCollection(
-            [BaseAtom(coords=(i + 100, i, i)) for i in range(self.n_atoms)]
+            [BaseAtom(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
         )
         assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
         all_atoms = self.atoms + atoms2

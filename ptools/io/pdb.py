@@ -146,7 +146,7 @@ class AtomLine(PDBLine):
             residue_name=self.residue_name,
             residue_index=self.residue_index,
             chain=self.chain,
-            coords=self.coordinates,
+            coordinates=self.coordinates,
             meta={"extra": self.extra},
         )
 

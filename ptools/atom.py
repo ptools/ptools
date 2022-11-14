@@ -72,70 +72,17 @@ class AtomAttrs:
 
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
+@dataclass
 class BaseAtom(SupportsTranslation):
     """Base class for an Atom."""
 
-    def __init__(self, **kwargs):
-        super().__init__(kwargs.pop("coords", np.zeros(3)))
-        self.attrs = AtomAttrs()
-        for name, value in kwargs.items():
-            if hasattr(self, name):
-                setattr(self, name, value)
-            elif hasattr(self.attrs, name):
-                setattr(self.attrs, name, value)
-            else:
-                raise AttributeError(f"{self.__class__.__qualname__!r} object has no attribute {name!r}")
-
-    def get_name(self) -> str:
-        return self.attrs.name
-
-    def set_name(self, value: str):
-        self.attrs.name = value
-
-    def get_index(self) -> int:
-        return self.attrs.index
-
-    def set_index(self, value: int):
-        self.attrs.index = value
-
-    def get_charge(self) -> float:
-        return self.attrs.charge
-
-    def set_charge(self, value: float):
-        self.attrs.charge = value
-
-    def get_meta(self) -> dict[str, Any]:
-        return self.attrs.meta
-
-    def set_meta(self, value: dict[str, Any]):
-        self.attrs.meta = value
-
-    def get_chain(self) -> str:
-        return self.attrs.chain.name
-
-    def set_chain(self, value: str):
-        self.attrs.chain.name = value
-
-    def get_residue_name(self) -> str:
-        return self.attrs.residue.name
-
-    def set_residue_name(self, value: str):
-        self.attrs.residue.name = value
-
-    def get_residue_index(self) -> int:
-        return self.attrs.residue.index
-
-    def set_residue_index(self, value: int):
-        self.attrs.residue.index = value
-
-    name = property(get_name, set_name)
-    index = property(get_index, set_index)
-    charge = property(get_charge, set_charge)
-    meta = property(get_meta, set_meta)
-    chain = property(get_chain, set_chain)
-    residue_name = property(get_residue_name, set_residue_name)
-    residue_index = property(get_residue_index, set_residue_index)
-
+    name: str = "XXX"
+    index: int = 0
+    residue_name: str = "XXX"
+    residue_index: int = 0
+    chain: str = "X"
+    charge: float = 0.0
+    meta: dict[str, Any] = field(default_factory=dict)
 
     @property
     def element(self):
@@ -148,22 +95,13 @@ class BaseAtom(SupportsTranslation):
             err = f"cannot compare BaseAtom with object of type {type(other)}"
             raise TypeError(err)
 
-        if self.attrs != other.attrs:
-            return False
+        attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates", )
+        print(list(attrs))
+        for name in attrs:
+            if getattr(self, name) != getattr(other, name):
+                return False
 
-        return np.allclose(self.coords, other.coords)
-
-    def __repr__(self) -> str:
-        """BaseAtom string representation."""
-        attrs = {}
-        for key, value in sorted(self.__dict__.items()):
-            if key.startswith("_") and not key.startswith("__"):
-                key = key[1:]
-            attrs[key] = value
-        modulename = self.__module__
-        classname = self.__class__.__name__
-        desc = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
-        return f"<{modulename}.{classname}({desc})>"
+        return np.allclose(self.coordinates, other.coordinates)
 
     def copy(self) -> BaseAtom:
         """Returns a copy of the current atom."""
@@ -222,7 +160,7 @@ class Atom(BaseAtom):
             "residue_index",
             "charge",
             "meta",
-            "coords",
+            "coordinates",
         )
         kwargs = {k: getattr(atom, k) for k in attrs}
         super().__init__(**kwargs)

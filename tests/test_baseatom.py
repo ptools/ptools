@@ -22,7 +22,7 @@ class TestBaseAtom(unittest.TestCase):
     def test_initialize_with_bad_coordinates(self):
         err = r"cannot initialize 3D-coordinates from array with shape \(2,\)"
         with self.assertRaisesRegex(Invalid3DArrayError, err):
-            BaseAtom(coords=(1, 2))
+            BaseAtom(coordinates=(1, 2))
 
     def test_set_bad_coordinates(self):
         atom = BaseAtom()
@@ -46,7 +46,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertNotEqual(left, right)
 
     def test_equals_coordinates_differ(self):
-        left, right = BaseAtom(coords=(0, 0, 0)), BaseAtom(coords=(1, 1, 1))
+        left, right = BaseAtom(coordinates=(0, 0, 0)), BaseAtom(coordinates=(1, 1, 1))
         self.assertNotEqual(left, right)
 
     def test_copy(self):
