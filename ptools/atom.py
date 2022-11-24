@@ -20,7 +20,6 @@ from ._typing import ArrayLike
 
 # PTools imports.
 from . import tables
-from .spatial import SupportsTranslation
 from .io.formatters.pdb import PDBFormatter
 
 
@@ -42,7 +41,7 @@ PDB_FMT = (
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
 @dataclass
-class BaseAtom(SupportsTranslation):
+class BaseAtom:
     """Base class for an Atom."""
 
     name: str = "XXX"
@@ -51,15 +50,37 @@ class BaseAtom(SupportsTranslation):
     residue_index: int = 0
     chain: str = "X"
     charge: float = 0.0
+    coordinates: array3d = field(default_factory=lambda: array3d((0, 0, 0)))
     meta: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        self.coordinates = array3d(self.coordinates)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, BaseAtom):
+            raise NotImplementedError
+
+        for attr, value in self.__dict__.items():
+            if attr != "coordinates":
+                if value != getattr(other, attr):
+                    return False
+            elif not np.allclose(self.coordinates, other.coordinates):
+                return False
+
+        return True
+
+    @property
+    def coords(self) -> array3d:
+        return self.coordinates
+
+    @coords.setter
+    def coords(self, value: ArrayLike):
+        self.coordinates = array3d(value)
 
     @property
     def element(self):
         """Returns an atom element name (read-only)."""
         return self.guess_element(self.name)
-
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
     def copy(self) -> BaseAtom:
         """Returns a copy of the current atom."""
