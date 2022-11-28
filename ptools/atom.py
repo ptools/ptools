@@ -23,19 +23,8 @@ from . import tables
 from .io.formatters.pdb import PDBFormatter
 
 
-
 if TYPE_CHECKING:
     from atomcollection import AtomCollection
-
-
-
-# The Protein Data Bank format for atom coordinates
-PDB_FMT = (
-    "{record:<6s}{index:5s} "
-    "{name:4s}{altloc}{resname:<4s}{chain:s}{residue_index:>4s}{insertion}   "
-    "{x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{bfactor:6.2f}          "
-    "{element:>2s}"
-)
 
 
 # pylint: disable=R0902,R0913
