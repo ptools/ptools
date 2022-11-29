@@ -18,7 +18,7 @@ from ._typing import ArrayLike
 
 # PTools imports.
 from . import tables
-from .array3d import array3d
+from .array3d import array3d, validate_array3d_dimensions
 from .io.formatters.pdb import PDBFormatter
 
 
@@ -28,9 +28,9 @@ if TYPE_CHECKING:
 
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
-@define(slots=False)
+@define(slots=False, eq=False)
 class BaseAtom:
-    """Base class for an Atom."""
+    """Stores atom properties."""
 
     name: str = "XXX"
     index: int = 0
@@ -44,25 +44,19 @@ class BaseAtom:
     meta: dict[str, Any] = field(factory=dict)
 
     def __eq__(self, other: object) -> bool:
+        """Tests for equality.
+
+        ``coordinates`` equality is check using ``numpy.allclose``.
+        """
         if not isinstance(other, BaseAtom):
             raise NotImplementedError
 
-        for attr, value in self.__dict__.items():
-            if attr != "coordinates":
-                if value != getattr(other, attr):
-                    return False
-            elif not np.allclose(self.coordinates, other.coordinates):
+        attrs = self.__dict__.keys() - ("coordinates",)
+        for attr in attrs:
+            if getattr(self, attr) != getattr(other, attr):
                 return False
 
-        return True
-
-    @property
-    def coords(self) -> array3d:
-        return self.coordinates
-
-    @coords.setter
-    def coords(self, value: ArrayLike):
-        self.coordinates = array3d(value)
+        return np.allclose(self.coordinates, other.coordinates)
 
     @property
     def element(self):

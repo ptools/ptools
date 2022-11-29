@@ -4,7 +4,7 @@ import unittest
 
 from ptools.atom import BaseAtom
 from ptools.array3d import Invalid3DArrayError
-from .testing.moreassert import assert_array_almost_equal
+from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 from .testing.dummy import generate_dummy_atom
 
 
@@ -17,7 +17,7 @@ class TestBaseAtom(unittest.TestCase):
         self.assertEqual(atom.residue_index, 0)
         self.assertEqual(atom.chain, "X")
         self.assertEqual(atom.charge, 0.0)
-        assert_array_almost_equal(atom.coords, (0, 0, 0))
+        assert_array_almost_equal(atom.coordinates, (0, 0, 0))
 
     def test_initialize_with_bad_coordinates(self):
         err = r"cannot initialize 3D-coordinates from array with shape \(2,\)"
@@ -28,15 +28,13 @@ class TestBaseAtom(unittest.TestCase):
         atom = BaseAtom()
         err = r"cannot initialize 3D-coordinates from array with shape \(2,\)"
         with self.assertRaisesRegex(Invalid3DArrayError, err):
-            atom.coords = (1, 2)
+            atom.coordinates = (1, 2)
 
-    # Ignores R0201: Method could be a function (no-self-use)
-    # pylint: disable=R0201
     def test_set_coordinates(self):
         atom = BaseAtom()
-        assert_array_almost_equal(atom.coords, (0, 0, 0))
-        atom.coords = (1, 2, 3)
-        assert_array_almost_equal(atom.coords, (1, 2, 3))
+        assert_array_almost_equal(atom.coordinates, (0, 0, 0))
+        atom.coordinates = (1, 2, 3)
+        assert_array_almost_equal(atom.coordinates, (1, 2, 3))
 
     def test_equals(self):
         self.assertEqual(BaseAtom(), BaseAtom())
@@ -50,19 +48,25 @@ class TestBaseAtom(unittest.TestCase):
         self.assertNotEqual(left, right)
 
     def test_copy(self):
-        # Check that all arguments are adequatly set from original atom
-        # and that atom coordinates are not a reference to
-        # the initial atom coordinates.
         atom = generate_dummy_atom()
-        original_coordinates = atom.coords.copy()
-        atom_copy = atom.copy()
-        self.assertNotEqual(
-            atom_copy.coords.__array_interface__["data"][0],
-            atom.coords.__array_interface__["data"][0],
-        )
-        assert_array_almost_equal(atom_copy.coords, original_coordinates)
-        atom.coords = (0, 0, 0)
-        assert_array_almost_equal(atom_copy.coords, original_coordinates)
+        copy = atom.copy()
+
+        # Checks equality in the standard fashion for all attributes expect ``coordinates``.
+        for attr in atom.__dict__.keys() - ("coordinates",):
+            self.assertEqual(getattr(atom, attr), getattr(copy, attr))
+
+        # Checks numpy array of coordinates is actually a copy.
+        self.assertNotEqual(id(atom.coordinates), id(copy.coordinates))
+        assert_array_almost_equal(atom.coordinates, copy.coordinates)
+
+        source_coordinates = atom.coordinates.copy()
+        atom.coordinates += 12
+
+        # copy coordinates should stay unchanged.
+        assert_array_almost_equal(copy.coordinates, source_coordinates)
+
+        # ...while original atom coordinates should have changed.
+        assert_array_not_almost_equal(atom.coordinates, source_coordinates)
 
     def test_name_setter(self):
         atom = BaseAtom()

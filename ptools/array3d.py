@@ -73,12 +73,22 @@ def asarray3d(obj: ArrayLike) -> array3d:
 
 def validate_array3d_dimensions(obj: Any):
     """Raises Invalid3DArrayError if ``obj`` dimensions do not correspond to 3D-data."""
+    if not is_array3d(obj):
+        raise Invalid3DArrayError(np.shape(obj))
+
+
+def is_array3d(obj: Any) -> bool:
+    """Returns True if an object shape corresponds to 3D-coordinates."""
     shape = np.shape(obj)
     ndim = len(shape)
 
     if not 1 <= ndim <= 2:
-        raise Invalid3DArrayError(shape)
+        return False
     if ndim == 1 and shape[0] != 3:
-        raise Invalid3DArrayError(shape)
+        return False
     elif ndim == 2 and shape[1] != 3:
-        raise Invalid3DArrayError(shape)
+        return False
+
+    return True
+
+
