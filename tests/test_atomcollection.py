@@ -8,7 +8,7 @@ import numpy as np
 
 import ptools
 from ptools import tables
-from ptools.atom import BaseAtom
+from ptools.atomattrs import AtomAttrs
 from ptools.atomcollection import AtomCollection
 
 from .testing.moreassert import (
@@ -85,7 +85,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_getitem_single_atom(self):
         atom = self.atoms[0]
-        self.assertIsInstance(atom, ptools.atom.Atom)
+        self.assertIsInstance(atom, AtomAttrs)
         assert_array_almost_equal(atom.coords, self.atoms.coords[0])
 
     def test_getitem_slice(self):
@@ -180,7 +180,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_add(self):
         atoms2 = AtomCollection(
-            [BaseAtom(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
+            [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
         )
         n_final = len(self.atoms) + len(atoms2)
         all_atoms = self.atoms + atoms2
@@ -189,7 +189,7 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_add_makes_copies(self):
         atoms2 = AtomCollection(
-            [BaseAtom(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
+            [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
         )
         assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
         all_atoms = self.atoms + atoms2
@@ -289,27 +289,27 @@ class TestAtomCollection(unittest.TestCase):
 
 class TestGuessAtomName(unittest.TestCase):
     def test_basic(self):
-        self.assertEqual(ptools.atom.BaseAtom.guess_element("CA"), "C")
-        self.assertEqual(ptools.atom.BaseAtom.guess_element("NZ"), "N")
+        self.assertEqual(AtomAttrs.guess_element("CA"), "C")
+        self.assertEqual(AtomAttrs.guess_element("NZ"), "N")
 
     def test_has_numeric(self):
-        self.assertEqual(ptools.atom.BaseAtom.guess_element("CA1"), "C")
+        self.assertEqual(AtomAttrs.guess_element("CA1"), "C")
 
     def test_starts_with_numeric(self):
-        self.assertEqual(ptools.atom.BaseAtom.guess_element("1CA"), "C")
+        self.assertEqual(AtomAttrs.guess_element("1CA"), "C")
 
     def test_has_only_numeric(self):
-        self.assertEqual(ptools.atom.BaseAtom.guess_element("111"), "X")
+        self.assertEqual(AtomAttrs.guess_element("111"), "X")
 
 
 class TestGuessAtomMass(unittest.TestCase):
     def test_basic(self):
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("C"), 12.01100)
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("H"), 1.00800)
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("O"), 15.99900)
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("N"), 14.00700)
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("P"), 30.97400)
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("S"), 32.06000)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("C"), 12.01100)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("H"), 1.00800)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("O"), 15.99900)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("N"), 14.00700)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("P"), 30.97400)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("S"), 32.06000)
 
     def test_element_does_not_exists(self):
-        self.assertAlmostEqual(ptools.atom.BaseAtom.guess_mass("DUMMY"), 1.0)
+        self.assertAlmostEqual(AtomAttrs.guess_mass("DUMMY"), 1.0)

@@ -3,17 +3,74 @@ from __future__ import annotations
 from collections import UserList
 import itertools
 import math
-from typing import Any, Callable, Iterable, Iterator, Protocol
+from typing import Any, Callable, Iterable, Iterator
 
 import numpy as np
 
 
 from .array3d import array3d
-from .atom import Atom, BaseAtom
+from .atomattrs import AtomAttrs
 from .spatial import SupportsTransformation
 from . import linalg
 
 from ._typing import ArrayLike, FilePath
+
+
+class Atom(AtomAttrs):
+    """Atom that belongs to a group of atoms.
+
+    Its coordinates are a weak reference to the AtomCollection coordinate
+    array. Atom knows its positions in the AtomCollection and can therefore
+    find its coordinates into the AtomCollection coordinate array.
+
+    An Atom initialization can only be done from a AtomAttrs.
+
+    Args:
+        serial (int): atom index in the collection (can be different from
+            `Atom.index` attribute).
+        atom (AtomAttrs): atom properties stored in AtomAttrs.
+        collection (AtomCollection): reference to the collection the atom
+            belongs to.
+
+    """
+
+    def __init__(self, atom: AtomAttrs, serial: int, collection: "AtomCollection"):
+        self.serial = serial
+        self.collection = collection
+        attrs = (
+            "name",
+            "residue_name",
+            "chain",
+            "index",
+            "residue_index",
+            "charge",
+            "meta",
+            "coordinates",
+        )
+        kwargs = {k: getattr(atom, k) for k in attrs}
+        super().__init__(**kwargs)
+
+    @property
+    def coords(self) -> array3d:
+        """Gets atom cartesian coordinates."""
+        return self.collection.coords[self.serial].copy()
+
+    @coords.setter
+    def coords(self, pos: ArrayLike):
+        self.collection.coords[self.serial] = array3d(pos)
+
+    @property
+    def mass(self) -> float:
+        """Gets/Sets an atom mass."""
+        return self.collection.masses[self.serial]
+
+    @mass.setter
+    def mass(self, mass: float):
+        """Gets/Sets an atom mass."""
+        self.collection.masses[self.serial] = mass
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
 
 
 class AtomCollection(SupportsTransformation, UserList):
@@ -22,10 +79,10 @@ class AtomCollection(SupportsTransformation, UserList):
     For better performances, atom coordinates are stored into a numpy array.
 
     Args:
-        atoms (list[BaseAtom]): list of atoms
+        atoms (list[AtomAttrs]): list of atoms
     """
 
-    def __init__(self, atoms: Iterable[BaseAtom] = None):
+    def __init__(self, atoms: Iterable[AtomAttrs] = None):
         if atoms is None:
             atoms = []
             coords = array3d(np.zeros((0, 3)))
@@ -45,7 +102,7 @@ class AtomCollection(SupportsTransformation, UserList):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __add__(self, other: Iterable[BaseAtom]) -> AtomCollection:
+    def __add__(self, other: Iterable[AtomAttrs]) -> AtomCollection:
         """Concatenates two RigidBody instances."""
         if not isinstance(other, AtomCollection):
             other = AtomCollection(other)
@@ -53,7 +110,7 @@ class AtomCollection(SupportsTransformation, UserList):
         output.coords = np.concatenate((self.coords, other.coords), axis=0)
         return output
 
-    def __iadd__(self, other: Iterable[BaseAtom]) -> AtomCollection:
+    def __iadd__(self, other: Iterable[AtomAttrs]) -> AtomCollection:
         return self.__add__(other)
 
     def guess_masses(self):

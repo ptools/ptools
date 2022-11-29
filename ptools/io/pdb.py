@@ -3,9 +3,10 @@
 import abc
 from typing import Protocol, Sequence, Tuple, Union
 
-from ..atom import BaseAtom
+from ..atomattrs import AtomAttrs
 from ..atomcollection import AtomCollection
 from .._typing import FilePath
+
 
 class FromPDB(Protocol):
     """Abstract Base class for classes which can be initialized from PDB files.
@@ -138,9 +139,9 @@ class AtomLine(PDBLine):
         """Extra properties"""
         return self[54:].strip()
 
-    def to_atom(self) -> BaseAtom:
-        """Creates a BaseAtom from an atom line."""
-        return BaseAtom(
+    def to_atom(self) -> AtomAttrs:
+        """Creates a AtomAttrs from an atom line."""
+        return AtomAttrs(
             index=self.atom_id,
             name=self.name,
             residue_name=self.residue_name,
@@ -151,8 +152,8 @@ class AtomLine(PDBLine):
         )
 
 
-def parse_atom_line(buffer: str) -> BaseAtom:
-    """Returns an `atom.BaseAtom` initialized with data read from line."""
+def parse_atom_line(buffer: str) -> AtomAttrs:
+    """Returns an `atom.AtomAttrs` initialized with data read from line."""
     line = AtomLine(buffer)
     if not line.is_atom():
         raise ValueError(f"Not a valid atom line: header is {line.header}")
@@ -172,7 +173,7 @@ def read_pdb(
         AtomCollection: collection of Atoms
     """
 
-    def register_model(atom_list: Sequence[BaseAtom]):
+    def register_model(atom_list: Sequence[AtomAttrs]):
         """Stores `atom_list` into `models` as an AtomCollection."""
         models.append(AtomCollection(atom_list))
 
@@ -186,7 +187,7 @@ def read_pdb(
 
     models: list[AtomCollection] = []
     model_id_list: list[str] = []
-    current_model: list[BaseAtom] = []
+    current_model: list[AtomAttrs] = []
 
     with open(path, "rt", encoding="utf-8") as f:
         for buffer in f:

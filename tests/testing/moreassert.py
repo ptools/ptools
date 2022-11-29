@@ -1,9 +1,6 @@
 """testing.moreassert - Defines more assert functions."""
-import unittest
 
 import numpy
-
-from ptools.atom import BaseAtom
 
 from .dummy import DUMMY_ATOM_ATTRS
 

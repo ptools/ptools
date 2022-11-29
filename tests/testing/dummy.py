@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ptools.atom import BaseAtom
+from ptools.atomattrs import AtomAttrs
 from ptools.atomcollection import AtomCollection
 
 
@@ -17,9 +17,9 @@ DUMMY_ATOM_ATTRS = {
 }
 
 
-def generate_dummy_atom() -> BaseAtom:
+def generate_dummy_atom() -> AtomAttrs:
     """Creates a dummy atom."""
-    atom = BaseAtom()
+    atom = AtomAttrs()
     for attr, value in DUMMY_ATOM_ATTRS.items():
         setattr(atom, attr, value)
     return atom
@@ -30,7 +30,7 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
 
     Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
     """
-    col = AtomCollection([BaseAtom(coordinates=(i, i, i)) for i in range(size)])
+    col = AtomCollection([AtomAttrs(coordinates=(i, i, i)) for i in range(size)])
     for atom in col:
         for attr in ("name", "index", "residue_name", "residue_index", "chain", "charge"):
             setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])

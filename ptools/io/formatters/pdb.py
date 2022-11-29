@@ -1,7 +1,7 @@
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ...atom import BaseAtom
+    from ...atomattrs import AtomAttrs
 
 
 class PDBFormatter:
@@ -13,7 +13,7 @@ class PDBFormatter:
     )
 
     @classmethod
-    def format_atom(cls, atom: "BaseAtom", **kwargs) -> str:
+    def format_atom(cls, atom: "AtomAttrs", **kwargs) -> str:
         fmt_args: dict[str, Any] = {
             "record": "ATOM",
             "altloc": " ",

@@ -36,7 +36,7 @@ class ObjectWithCoordinates:
         self.coordinates = array3d(self.coordinates)
 
     def __eq__(self, other: object) -> bool:
-        """Compares two BaseAtom instances."""
+        """Checks for equality."""
         if not isinstance(other, self.__class__):
             err = f"cannot compare {self.__class__.__qualname__} with object of type {type(other)}"
             raise TypeError(err)

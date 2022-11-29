@@ -14,7 +14,7 @@ from ._typing import FilePath
 import numpy as np
 
 # PTools.
-from .atom import BaseAtom
+from .atomattrs import AtomAttrs
 from .atomcollection import AtomCollection
 from .io.pdb import InvalidPDBFormatError, FromPDB
 from .io.pdb import read_pdb as io_read_pdb
@@ -38,7 +38,7 @@ class RigidBody(AtomCollection, FromPDB):
     Also, it can be initialized from a file.
     """
 
-    def __init__(self, atoms: Sequence[BaseAtom] = None):
+    def __init__(self, atoms: Sequence[AtomAttrs] = None):
         if isinstance(atoms, str):
             raise TypeError(
                 "RigidBody class can not longer be instantiated from a path. "
@@ -58,7 +58,7 @@ class AttractRigidBody(RigidBody):
 
     Atom categories and charges are parsed from input PDB file."""
 
-    def __init__(self, atoms: Sequence[BaseAtom] = None):
+    def __init__(self, atoms: Sequence[AtomAttrs] = None):
         super().__init__(atoms)
         N = len(self)
         self.atom_categories = np.zeros(N, dtype=int)
