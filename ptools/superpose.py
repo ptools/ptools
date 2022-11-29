@@ -54,7 +54,7 @@ def kabsch_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
 
 
 def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
-    """Return the fit matrix between two RigidBody."""
+    """Returns the fit matrix between two ``AtomCollection`` instances."""
     t0 = target.centroid()
     t1 = mobile.centroid()
 
@@ -77,7 +77,7 @@ def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
 
 
 def fit(mobile: AtomCollection, target: AtomCollection):
-    """Fit two RigidBody."""
+    """Fits two ``mobile`` onto ``target``."""
     matrix = fit_matrix(mobile, target)
     mobile.move(matrix)
 
