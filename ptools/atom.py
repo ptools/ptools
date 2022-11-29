@@ -7,19 +7,18 @@ from __future__ import annotations
 
 # Python core libraries.
 import copy
-from dataclasses import dataclass, field
+from attrs import define, field
 
 # Scientific libraries.
 import numpy as np
 
 # Type-hinting specific import
 from typing import Any, TYPE_CHECKING
-
-from ptools.array3d import array3d
 from ._typing import ArrayLike
 
 # PTools imports.
 from . import tables
+from .array3d import array3d
 from .io.formatters.pdb import PDBFormatter
 
 
@@ -29,7 +28,7 @@ if TYPE_CHECKING:
 
 # pylint: disable=R0902,R0913
 # A lot of instant attributes... Is it really an issue?
-@dataclass
+@define(slots=False)
 class BaseAtom:
     """Base class for an Atom."""
 
@@ -39,11 +38,10 @@ class BaseAtom:
     residue_index: int = 0
     chain: str = "X"
     charge: float = 0.0
-    coordinates: array3d = field(default_factory=lambda: array3d((0, 0, 0)))
-    meta: dict[str, Any] = field(default_factory=dict)
-
-    def __post_init__(self):
-        self.coordinates = array3d(self.coordinates)
+    coordinates: array3d = field(
+        factory=lambda: array3d((0, 0, 0)), converter=lambda x: array3d(x)
+    )
+    meta: dict[str, Any] = field(factory=dict)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, BaseAtom):
@@ -97,8 +95,6 @@ class BaseAtom:
         return "X"
 
 
-
-@dataclass(init=False)
 class Atom(BaseAtom):
     """Atom that belongs to a group of atoms.
 

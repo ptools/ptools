@@ -66,7 +66,6 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 )
 
 
-
 class ForceFieldBase(Protocol):
     """Base class for a force field.
 
@@ -87,6 +86,7 @@ class ForceFieldBase(Protocol):
 def empty():
     return np.empty(0)
 
+
 @dataclass
 class AttractForceField1(ForceFieldBase):
     """The AttractForceField1."""
@@ -94,7 +94,6 @@ class AttractForceField1(ForceFieldBase):
     receptor: AttractRigidBody
     ligand: AttractRigidBody
     cutoff: float = 10
-
 
     paramfile: str = ""
     _repulsive_parameters: np.ndarray = field(

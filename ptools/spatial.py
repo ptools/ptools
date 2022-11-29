@@ -19,7 +19,7 @@ from .linalg import transform as T
 
 
 def default_array3d():
-    return array3d(np.zeros((3, )))
+    return array3d(np.zeros((3,)))
 
 
 @dataclass
@@ -35,14 +35,13 @@ class ObjectWithCoordinates:
     def __post_init__(self):
         self.coordinates = array3d(self.coordinates)
 
-
     def __eq__(self, other: object) -> bool:
         """Compares two BaseAtom instances."""
         if not isinstance(other, self.__class__):
             err = f"cannot compare {self.__class__.__qualname__} with object of type {type(other)}"
             raise TypeError(err)
 
-        attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates", )
+        attrs = self.__class__.__dataclass_fields__.keys() - ("coordinates",)
         for name in attrs:
             if getattr(self, name) != getattr(other, name):
                 return False
@@ -123,7 +122,9 @@ class SupportsRotation(ObjectWithCoordinates):
         """
         T.rotate(self.coords, rotation)
 
-    def ab_rotate(self, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True):
+    def ab_rotate(
+        self, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True
+    ):
         """Rotates object using PTools rotation around axis."""
         T.ab_rotate(self.coords, A, B, amount, degrees)
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -30,14 +30,8 @@ class array3d(np.ndarray):
         # We first cast to be our class type
         obj = np.asarray(input_array, dtype="float64").view(cls)
 
-        ndim = len(obj.shape)
-
-        if not 1 <= ndim <= 2:
-            raise Invalid3DArrayError(obj.shape)
-        if ndim == 1 and obj.shape[0] != 3:
-            raise Invalid3DArrayError(obj.shape)
-        elif ndim == 2 and obj.shape[1] != 3:
-            raise Invalid3DArrayError(obj.shape)
+        # Checks input_array dimensions.
+        validate_array3d_dimensions(obj)
 
         return obj
 
@@ -72,5 +66,19 @@ class array3d(np.ndarray):
         return self.__class__(L.normalized(self))
 
 
-def asarray3d(value: ArrayLike) -> array3d:
-    return array3d(value)
+def asarray3d(obj: ArrayLike) -> array3d:
+    """Converts an object to an ``array3d``."""
+    return array3d(obj)
+
+
+def validate_array3d_dimensions(obj: Any):
+    """Raises Invalid3DArrayError if ``obj`` dimensions do not correspond to 3D-data."""
+    shape = np.shape(obj)
+    ndim = len(shape)
+
+    if not 1 <= ndim <= 2:
+        raise Invalid3DArrayError(shape)
+    if ndim == 1 and shape[0] != 3:
+        raise Invalid3DArrayError(shape)
+    elif ndim == 2 and shape[1] != 3:
+        raise Invalid3DArrayError(shape)

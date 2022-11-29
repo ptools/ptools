@@ -66,7 +66,9 @@ class AttractRigidBody(RigidBody):
         self.atom_forces = np.zeros((N, 3), dtype=float)
 
     @classmethod
-    def from_pdb(cls: Type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
+    def from_pdb(
+        cls: Type[AttractRigidBodyType], path: FilePath
+    ) -> AttractRigidBodyType:
         rigid = super().from_pdb(path)
         rigid._init_categories_and_charges_from_pdb_extra()
         return rigid

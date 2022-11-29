@@ -10,6 +10,7 @@ from scipy.spatial.transform import Rotation
 from .atomcollection import AtomCollection
 from . import linalg
 
+
 def zeros3f():
     return np.zeros(3, dtype="float64")
 
