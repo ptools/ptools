@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from .atomcollection import AtomCollection
-from . import linalg, measure
+from . import linalg, measure, transform
 
 
 def zeros3f():
@@ -79,7 +79,7 @@ def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
 def fit(mobile: AtomCollection, target: AtomCollection):
     """Fits two ``mobile`` onto ``target``."""
     matrix = fit_matrix(mobile, target)
-    mobile.move(matrix)
+    transform.move(mobile, matrix)
 
 
 def rmsd(mobile: AtomCollection, target: AtomCollection, do_fit: bool = False) -> float:

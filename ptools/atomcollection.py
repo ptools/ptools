@@ -50,6 +50,7 @@ class Atom(AtomAttrs):
         kwargs = {k: getattr(atom, k) for k in attrs}
         super().__init__(**kwargs)
 
+
     @property
     def coords(self) -> array3d:
         """Gets atom cartesian coordinates."""
@@ -70,10 +71,18 @@ class Atom(AtomAttrs):
         self.collection.masses[self.serial] = mass
 
     def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
+        if not isinstance(other, self.__class__):
+            err = f"cannot compare {self.__class__.__qualname__} with object of type {type(other)}"
+            raise TypeError(err)
+
+        if not np.allclose(self.coordinates, other.coordinates):
+            return False
+
+        attrs = self.__dict__.keys() - ("coordinates", "collection")
+        return all(getattr(self, attr) == getattr(other, attr) for attr in attrs)
 
 
-class AtomCollection(SupportsTransformation, UserList):
+class AtomCollection(UserList):
     """Group of atoms.
 
     For better performances, atom coordinates are stored into a numpy array.
@@ -91,10 +100,20 @@ class AtomCollection(SupportsTransformation, UserList):
         if atoms:
             coords = array3d([atom.coordinates for atom in atoms])
 
-        SupportsTransformation.__init__(self, coords)
+        self.coordinates = coords
         UserList.__init__(self, atoms)
         self.masses = np.zeros(len(atoms))
         self.guess_masses()
+
+    def __eq__(self, other: object) -> bool:
+        """Checks for equality."""
+        if not isinstance(other, self.__class__):
+            err = f"cannot compare {self.__class__.__qualname__} with object of type {type(other)}"
+            raise TypeError(err)
+
+        if not np.allclose(self.coordinates, other.coordinates):
+            return False
+        return all(lhs == rhs for (lhs, rhs) in zip(self, other))
 
     def __repr__(self) -> str:
         """String representation."""
@@ -127,15 +146,6 @@ class AtomCollection(SupportsTransformation, UserList):
         Alias for len(AtomCollection).
         """
         return len(self)
-
-    def center_to_origin(
-        self, origin: ArrayLike = np.zeros(3), use_weights: bool = False
-    ):
-        """Centers AtomCollection on `origin`."""
-        if not use_weights:
-            super().center_to_origin(origin)
-        else:
-            self.translate(np.array(origin) - measure.center_of_mass(self))
 
     def set_chain(self, chain: str):
         """Sets all atom chain property."""

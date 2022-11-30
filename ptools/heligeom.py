@@ -6,8 +6,9 @@ Some more documentation coming soon.
 import string
 import numpy as np
 
-from ptools.rigidbody import RigidBody
-from ptools.superpose import Screw, mat_trans_2_screw, fit_matrix
+from .rigidbody import RigidBody
+from .superpose import Screw, mat_trans_2_screw, fit_matrix
+from . import transform
 
 
 def heli_analyze(mono1: RigidBody, mono2: RigidBody) -> Screw:
@@ -28,15 +29,15 @@ def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> Rigi
         axis = np.array([0.0, 0, 1])
 
         # Align the screw axis on Z-axis and apply the transformation on mono_test
-        mono_test.orient(hp.unit, [0.0, 0.0, 1.0])
+        transform.orient(mono_test, hp.unit, [0.0, 0.0, 1.0])
 
     mono_test.set_chain(string.ascii_uppercase[chain_id % 26])
     final += mono_test
     chain_id += 1
 
     for _ in range(N - 1):
-        mono_test.ab_rotate(origin, origin + axis, hp.angle, degrees=False)
-        mono_test.translate(axis * hp.normtranslation)
+        transform.ab_rotate(mono_test, origin, origin + axis, hp.angle, degrees=False)
+        transform.translate(mono_test, axis * hp.normtranslation)
         mono_test.set_chain(string.ascii_uppercase[chain_id % 26])
         final += mono_test
         chain_id += 1

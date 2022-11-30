@@ -8,6 +8,7 @@ from ptools import RigidBody
 from ptools.heligeom import heli_analyze, heli_construct
 from ptools.spatial import coord3d
 from ptools.io import to_pdb
+from ptools import transform
 
 from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
 
@@ -21,7 +22,7 @@ TEST_REF_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N3-Zalign.pdb")
 
 def move_rigidbody(rb, x=0, y=0, z=0):
     out = rb.copy()
-    out.moveby([x, y, z])
+    transform.moveby(out, [x, y, z])
     return out
 
 
@@ -43,7 +44,7 @@ class TestHeligeomSimple(unittest.TestCase):
         point = coord3d(0, 0, 0)
         axis = coord3d(1, 0, 0)
         angle = math.pi / 4
-        self.mono2.ab_rotate(point, axis, angle, degrees=False)
+        transform.ab_rotate(self.mono2, point, axis, angle, degrees=False)
 
         hp = heli_analyze(self.mono1, self.mono2)
         self.assertAlmostEqual(hp.angle, angle)

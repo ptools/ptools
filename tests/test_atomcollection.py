@@ -113,45 +113,6 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms.masses, np.ones(len(self.atoms)) * mass_ref
         )
 
-    def test_translate(self):
-        # Translate is a method herited from `spatial.SpatialObject`.
-        # Basically is should work on any child class.
-        origin = (0, 0, 0)
-        center = measure.centroid(self.atoms)
-        self.atoms.translate(origin - center)
-        assert_array_almost_equal(measure.centroid(self.atoms), (0, 0, 0))
-
-    def test_translate_scalar(self):
-        scalar = -4.5
-        self.atoms.translate(scalar)
-        assert_array_almost_equal(measure.centroid(self.atoms), (0, 0, 0))
-
-    def test_center_without_weigths(self):
-        origin = np.zeros(3)
-        for origin in (np.zeros(3), np.ones(3)):
-            assert_array_not_almost_equal(measure.centroid(self.atoms), origin)
-            self.atoms.center_to_origin(origin, use_weights=False)
-            assert_array_almost_equal(measure.centroid(self.atoms), origin)
-
-    def test_center_with_weights(self):
-        # Changes atom names, therefore elements, therefore masses.
-        for i in range(5):
-            self.atoms[i].name = "CA"
-        for i in range(5, 10):
-            self.atoms[i].name = "NZ"
-        self.atoms.guess_masses()
-
-        # This test should pass for a valid test of masses impact on AtomCollection.center()
-        assert_array_not_almost_equal(
-            measure.centroid(self.atoms), measure.center_of_mass(self.atoms)
-        )
-
-        origin = np.zeros(3)
-        for origin in (np.zeros(3), np.ones(3)):
-            assert_array_not_almost_equal(measure.center_of_mass(self.atoms), origin)
-            self.atoms.center_to_origin(origin, use_weights=True)
-            assert_array_almost_equal(measure.center_of_mass(self.atoms), origin)
-
     def test_add(self):
         atoms2 = AtomCollection(
             [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]

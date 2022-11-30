@@ -15,7 +15,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 # PTools imports.
-from ptools import superpose
+from ptools import superpose, transform
 from ptools.rigidbody import RigidBody
 from ptools.spatial import coord3d
 from ptools.linalg import transformation_matrix
@@ -74,8 +74,8 @@ class TestSuperpose(unittest.TestCase):
 
         # Random translation and rotation.
         rotation_matrix = Rotation.from_euler("xyz", rotation_vector).as_matrix()
-        mobile.moveby(translation_vector)
-        mobile.rotate(rotation_matrix)
+        transform.moveby(mobile, translation_vector)
+        transform.rotate(mobile, rotation_matrix)
 
         superpose.fit(mobile, self.target)
         assert mobile.coordinates == approx(self.target.coordinates, rel=1e-4)
@@ -86,7 +86,7 @@ class TestSuperpose(unittest.TestCase):
         assert superpose.rmsd(mobile, self.target) == approx(0.0)
 
         # RMSD after translation of 10 units should be 10.
-        mobile.translate((10, 0, 0))
+        transform.translate(mobile, (10, 0, 0))
         assert superpose.rmsd(mobile, self.target) == approx(10.0)
 
         # RMSD after translation and fit should be 0.0.
