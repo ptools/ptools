@@ -12,8 +12,8 @@ from .array3d import array3d
 from .atomattrs import AtomAttrs
 from .spatial import SupportsTransformation
 from . import linalg
-
-from ._typing import ArrayLike, FilePath
+from . import measure
+from ._typing import ArrayLike
 
 
 class Atom(AtomAttrs):
@@ -135,32 +135,7 @@ class AtomCollection(SupportsTransformation, UserList):
         if not use_weights:
             super().center_to_origin(origin)
         else:
-            self.translate(np.array(origin) - self.center_of_mass())
-
-    def center_of_mass(self) -> np.ndarray:
-        """Returns the center of mass (barycenter)."""
-        return linalg.center_of_mass(self.coordinates, self.masses)
-
-    def inertia_tensor(self, weights=None):
-        """Returns the inertia tensors of a set of atoms."""
-        if weights is None:
-            weights = self.masses
-        return linalg.inertia_tensor(self.coordinates, weights)
-
-    def principal_axes(self, sort: bool = True) -> np.ndarray:
-        """Returns an AtomCollection principal axes.
-
-        Args:
-            sort (bool): sort axes by importance
-        """
-        return linalg.principal_axes(self.inertia_tensor(), sort)
-
-    def radius_of_gyration(self) -> float:
-        """Returns the isometric radius of gyration (atom mass is not taken
-        into account)."""
-        centered = self.coordinates - self.centroid()
-        rgyr2 = np.sum(centered**2) / len(self)
-        return math.sqrt(rgyr2)
+            self.translate(np.array(origin) - measure.center_of_mass(self))
 
     def set_chain(self, chain: str):
         """Sets all atom chain property."""

@@ -8,8 +8,7 @@ from .testing.moreassert import assert_array_almost_equal
 import numpy as np
 
 # Ptools imports.
-from ptools import spatial
-from ptools import linalg
+from ptools import linalg, measure, spatial
 from ptools.linalg import transform
 
 
@@ -39,12 +38,12 @@ class TestSpatialObjectVector(unittest.TestCase):
     def test_center_to_origin(self):
         obj = spatial.SupportsTranslation((1, 1, 1))
         obj.center_to_origin()
-        assert_array_almost_equal(obj.centroid(), (0, 0, 0))
+        assert_array_almost_equal(measure.centroid(obj), (0, 0, 0))
 
     def test_center_custom_origin(self):
         obj = spatial.SupportsTranslation((1, 1, 1))
         obj.center_to_origin(origin=(2, 2, 2))
-        assert_array_almost_equal(obj.centroid(), (2, 2, 2))
+        assert_array_almost_equal(measure.centroid(obj), (2, 2, 2))
 
     # pylint guesses type wrong
     # E1137: 'target.coordinates' does not support item assignment
@@ -56,17 +55,6 @@ class TestSpatialObjectVector(unittest.TestCase):
         target.coordinates[0] = 0
         assert_array_almost_equal(target.coordinates, [0, 9, 12])
         assert_array_almost_equal(source.coordinates, [6, 9, 12])
-
-    def test_distance_to_axis(self):
-        obj = spatial.ObjectWithCoordinates((0, 0, 0))
-        axis = np.array((1, 0, 0))
-        self.assertAlmostEqual(obj.distance_to_axis(axis), 0.0)
-
-        obj.coordinates = (0, 1, 0)
-        self.assertAlmostEqual(obj.distance_to_axis(axis), 1.0)
-
-        obj.coordinates = (0, 1, 1)
-        self.assertAlmostEqual(obj.distance_to_axis(axis), 2.0**0.5)
 
 
 class TestSpatialObjectArray(unittest.TestCase):

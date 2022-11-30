@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from .atomcollection import AtomCollection
-from . import linalg
+from . import linalg, measure
 
 
 def zeros3f():
@@ -55,8 +55,8 @@ def kabsch_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
 
 def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     """Returns the fit matrix between two ``AtomCollection`` instances."""
-    t0 = target.centroid()
-    t1 = mobile.centroid()
+    t0 = measure.centroid(target)
+    t1 = measure.centroid(mobile)
 
     # Center to origin.
     coords_target = target.coordinates - t0

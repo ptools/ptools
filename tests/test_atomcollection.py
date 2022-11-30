@@ -1,13 +1,11 @@
 """test_atomcollection - Tests for `ptools.atom.AtomCollection`."""
 
-
-import tempfile
 import unittest
 
 import numpy as np
 
 import ptools
-from ptools import tables
+from ptools import measure, tables
 from ptools.atomattrs import AtomAttrs
 from ptools.atomcollection import AtomCollection
 
@@ -115,49 +113,25 @@ class TestAtomCollection(unittest.TestCase):
             self.atoms.masses, np.ones(len(self.atoms)) * mass_ref
         )
 
-    def test_centroid(self):
-        center = self.atoms.centroid()
-        assert_array_almost_equal(center, [4.5, 4.5, 4.5])
-
-    def test_center_of_masses(self):
-        # Masses are 1. COM should be same as center
-        center = self.atoms.center_of_mass()
-        assert_array_almost_equal(center, [4.5, 4.5, 4.5])
-
-        # Changes atoms name, therefore element, therefore mass.
-        for i in range(5):
-            self.atoms[i].name = "CA"
-        for i in range(5, 10):
-            self.atoms[i].name = "NZ"
-        self.atoms.guess_masses()
-
-        center = self.atoms.center_of_mass()
-        assert_array_almost_equal(center, [4.69179, 4.69179, 4.69179])
-
-    def test_radius_of_gyration(self):
-        rgyr = self.atoms.radius_of_gyration()
-        # Reference value calculated with VMD.
-        self.assertAlmostEqual(rgyr, 4.9749369621276855, places=6)
-
     def test_translate(self):
         # Translate is a method herited from `spatial.SpatialObject`.
         # Basically is should work on any child class.
         origin = (0, 0, 0)
-        center = self.atoms.centroid()
+        center = measure.centroid(self.atoms)
         self.atoms.translate(origin - center)
-        assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
+        assert_array_almost_equal(measure.centroid(self.atoms), (0, 0, 0))
 
     def test_translate_scalar(self):
         scalar = -4.5
         self.atoms.translate(scalar)
-        assert_array_almost_equal(self.atoms.centroid(), (0, 0, 0))
+        assert_array_almost_equal(measure.centroid(self.atoms), (0, 0, 0))
 
     def test_center_without_weigths(self):
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):
-            assert_array_not_almost_equal(self.atoms.centroid(), origin)
+            assert_array_not_almost_equal(measure.centroid(self.atoms), origin)
             self.atoms.center_to_origin(origin, use_weights=False)
-            assert_array_almost_equal(self.atoms.centroid(), origin)
+            assert_array_almost_equal(measure.centroid(self.atoms), origin)
 
     def test_center_with_weights(self):
         # Changes atom names, therefore elements, therefore masses.
@@ -169,14 +143,14 @@ class TestAtomCollection(unittest.TestCase):
 
         # This test should pass for a valid test of masses impact on AtomCollection.center()
         assert_array_not_almost_equal(
-            self.atoms.centroid(), self.atoms.center_of_mass()
+            measure.centroid(self.atoms), measure.center_of_mass(self.atoms)
         )
 
         origin = np.zeros(3)
         for origin in (np.zeros(3), np.ones(3)):
-            assert_array_not_almost_equal(self.atoms.center_of_mass(), origin)
+            assert_array_not_almost_equal(measure.center_of_mass(self.atoms), origin)
             self.atoms.center_to_origin(origin, use_weights=True)
-            assert_array_almost_equal(self.atoms.center_of_mass(), origin)
+            assert_array_almost_equal(measure.center_of_mass(self.atoms), origin)
 
     def test_add(self):
         atoms2 = AtomCollection(
@@ -208,32 +182,6 @@ class TestAtomCollection(unittest.TestCase):
         assert_array_equal(
             self.atoms.masses, np.full((self.n_atoms,), tables.masses["C"])
         )
-
-    @staticmethod
-    def test_inertia_tensor():
-        # Reference calculated with MDAnalysis 0.20.1:
-        # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
-        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
-        ref = [
-            [3679339.47775172, 694837.16289436, -263651.10452372],
-            [694837.16289436, 3803047.59374612, -194611.71739629],
-            [-263651.10452372, -194611.71739629, 3425042.27240564],
-        ]
-        I = atoms.inertia_tensor()
-        assert_array_almost_equal(I, ref, decimal=2)
-
-    @staticmethod
-    def test_principal_axes():
-        atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
-        # Calculated with MDAnalysis 0.20.1:
-        # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()
-        ref = [
-            [0.65682984, 0.70033642, -0.27946997],
-            [0.04052252, 0.33731064, 0.94052084],
-            [0.7529492, -0.62908698, 0.1931763],
-        ]
-        I = atoms.principal_axes()
-        assert_array_almost_equal(I, ref)
 
     def test_select_atom_type(self):
         atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)

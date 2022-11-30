@@ -15,6 +15,7 @@ from .array3d import array3d
 from ._typing import ArrayLike
 
 from . import linalg as L
+from . import measure
 from .linalg import transform as T
 
 
@@ -52,18 +53,6 @@ class ObjectWithCoordinates:
         """Returns a copy of itself."""
         return self.__class__(self.coordinates.copy())
 
-    def distance(self, other: ObjectWithCoordinates) -> float:
-        """Returns the euclidean distance between two objects."""
-        return L.distance(self.coordinates, other.coordinates)
-
-    def centroid(self) -> np.ndarray:
-        """Returns an spatial object geometric center."""
-        return self.coordinates.centroid()
-
-    def distance_to_axis(self, axis: ArrayLike) -> float:
-        """Returns the SpatialObject distance to an arbitrary axis."""
-        return L.distance_to_axis(self.coordinates, axis)
-
     def normalize(self):
         """Normalize coordinates."""
         self.coordinates.normalize()
@@ -74,7 +63,7 @@ class SupportsTranslation(ObjectWithCoordinates):
 
     def center_to_origin(self, origin: ArrayLike = np.zeros(3)):
         """Centers object on `origin`."""
-        self.translate(np.asarray(origin) - self.centroid())
+        self.translate(np.asarray(origin) - measure.centroid(self))
 
     def translate(self, direction: ArrayLike):
         """Translates object coordinates using vector `direction`.
