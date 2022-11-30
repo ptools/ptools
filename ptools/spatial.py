@@ -48,23 +48,13 @@ class ObjectWithCoordinates:
 
         return np.allclose(self.coordinates, other.coordinates)
 
-    @property
-    def coords(self) -> array3d:
-        """Returns SpatialObject cartesian coordinates."""
-        return self.coordinates
-
-    @coords.setter
-    def coords(self, pos: ArrayLike):
-        """Sets SpatialObject cartesian coordinates."""
-        self.coordinates = array3d(pos)
-
     def copy(self) -> ObjectWithCoordinates:
         """Returns a copy of itself."""
         return self.__class__(self.coordinates.copy())
 
     def distance(self, other: ObjectWithCoordinates) -> float:
         """Returns the euclidean distance between two objects."""
-        return L.distance(self.coords, other.coords)
+        return L.distance(self.coordinates, other.coordinates)
 
     def centroid(self) -> np.ndarray:
         """Returns an spatial object geometric center."""
@@ -72,7 +62,7 @@ class ObjectWithCoordinates:
 
     def distance_to_axis(self, axis: ArrayLike) -> float:
         """Returns the SpatialObject distance to an arbitrary axis."""
-        return L.distance_to_axis(self.coords, axis)
+        return L.distance_to_axis(self.coordinates, axis)
 
     def normalize(self):
         """Normalize coordinates."""
@@ -112,7 +102,7 @@ class SupportsRotation(ObjectWithCoordinates):
         Args:
             angles (3, ): rotation angles around the X-, Y- and Z-axes
         """
-        T.rotate_by(self.coords, angles)
+        T.rotate_by(self.coordinates, angles)
 
     def rotate(self, rotation: ArrayLike):
         """Rotates object using rotation matrix or 3 angles.
@@ -120,21 +110,21 @@ class SupportsRotation(ObjectWithCoordinates):
         Args:
             rotation (np.ndarray): 3 x 3 matrix or 3 x 1 vector of angles.
         """
-        T.rotate(self.coords, rotation)
+        T.rotate(self.coordinates, rotation)
 
     def ab_rotate(
         self, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True
     ):
         """Rotates object using PTools rotation around axis."""
-        T.ab_rotate(self.coords, A, B, amount, degrees)
+        T.ab_rotate(self.coordinates, A, B, amount, degrees)
 
     def attract_euler_rotate(self, angles: np.ndarray = np.zeros(3)):
         """Rotates object with Attract convention."""
-        T.attract_euler_rotate(self.coords, angles)
+        T.attract_euler_rotate(self.coordinates, angles)
 
     def orient(self, vector: ArrayLike, target: ArrayLike):
         """Orients a SpatialObject."""
-        T.orient(self.coords, vector, target)
+        T.orient(self.coordinates, vector, target)
 
 
 class SupportsTransformation(SupportsTranslation, SupportsRotation):
@@ -142,7 +132,7 @@ class SupportsTransformation(SupportsTranslation, SupportsRotation):
 
     def transform(self, matrix: ArrayLike):
         """Transforms object using 4x4 matrix."""
-        T.transform(self.coords, matrix)
+        T.transform(self.coordinates, matrix)
 
     def move(self, matrix: ArrayLike):
         """Transforms object using 4x4 matrix.

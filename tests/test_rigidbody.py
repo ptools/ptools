@@ -21,13 +21,13 @@ class TestRigidBody(unittest.TestCase):
     def _assert_copy_successful(self, thecopy):
         # Check that both RigidBody instances have the same number of atoms.
         self.assertEqual(len(thecopy), len(self.rigid))
-        self.assertEqual(thecopy.coords.shape, (10, 3))
+        self.assertEqual(thecopy.coordinates.shape, (10, 3))
 
         # Change parent AtomCollection coordinates and make sure it does not
         # affect the copy.
-        ref_coords = self.rigid.coords.copy()
-        self.rigid.coords.fill(0)
-        assert_array_equal(thecopy.coords, ref_coords)
+        ref_coords = self.rigid.coordinates.copy()
+        self.rigid.coordinates.fill(0)
+        assert_array_equal(thecopy.coordinates, ref_coords)
 
     def test_copy_constructor1(self):
         thecopy = self.rigid.copy()

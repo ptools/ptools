@@ -63,7 +63,7 @@ class TestRotate:
             [10.0000000, 13.325602, 33.502663],
         ]
 
-        assert_array_almost_equal(obj.coords, expected, decimal=5)
+        assert_array_almost_equal(obj.coordinates, expected, decimal=5)
 
     def test_rotate_abstract_euler(self):
         # Coordinates are [(1, 11, 21), (2, 12, 22), ..., (10, 20, 30)]
@@ -99,7 +99,7 @@ class TestRotate:
             ]
         )
 
-        assert_array_almost_equal(obj.coords, expected)
+        assert_array_almost_equal(obj.coordinates, expected)
 
 
 class TestTransformation:
@@ -203,4 +203,4 @@ class TestTransformation:
             ]
         )
 
-        assert_array_almost_equal(obj.coords, expected)
+        assert_array_almost_equal(obj.coordinates, expected)

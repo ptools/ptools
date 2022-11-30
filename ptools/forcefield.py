@@ -199,12 +199,12 @@ class AttractForceField1(ForceFieldBase):
             return et.sum()
 
         sq_distances = cdist(
-            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+            self.receptor.coordinates, self.ligand.coordinates, metric="sqeuclidean"
         )
         keep = np.where(sq_distances <= self.cutoff * self.cutoff)
 
-        XA = np.take(self.receptor.coords, keep[0], axis=0)
-        XB = np.take(self.ligand.coords, keep[1], axis=0)
+        XA = np.take(self.receptor.coordinates, keep[0], axis=0)
+        XB = np.take(self.ligand.coordinates, keep[1], axis=0)
 
         dx = np.asarray(XA - XB)
         rr2 = 1.0 / np.power(dx, 2).sum(axis=1)
@@ -240,9 +240,9 @@ class AttractForceField1(ForceFieldBase):
             self.ligand.atom_forces -= fdb.sum(axis=0)
             return et.sum()
 
-        dx = np.asarray(self.receptor.coords[:, None] - self.ligand.coords)
+        dx = np.asarray(self.receptor.coordinates[:, None] - self.ligand.coordinates)
         sq_distances = cdist(
-            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+            self.receptor.coordinates, self.ligand.coordinates, metric="sqeuclidean"
         )
 
         exclude = np.where(sq_distances > self.cutoff * self.cutoff)
@@ -270,7 +270,7 @@ class AttractForceField1(ForceFieldBase):
         norm2 = pairlist.sqdistances()
 
         alldx = [
-            self.receptor.coords[ir] - self.ligand.coords[il] for ir, il in contacts
+            self.receptor.coordinates[ir] - self.ligand.coordinates[il] for ir, il in contacts
         ]
 
         for i, (ir, il) in enumerate(contacts):

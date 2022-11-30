@@ -78,7 +78,7 @@ class TestSuperpose(unittest.TestCase):
         mobile.rotate(rotation_matrix)
 
         superpose.fit(mobile, self.target)
-        assert mobile.coords == approx(self.target.coords, rel=1e-4)
+        assert mobile.coordinates == approx(self.target.coordinates, rel=1e-4)
 
     def test_rmsd(self):
         # RMSD with copy should be 0.0

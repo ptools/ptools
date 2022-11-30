@@ -60,7 +60,7 @@ class TestHeligeomSimple(unittest.TestCase):
             TEST_DATA_DIR, "test_heli_construct_simple_result.npy"
         )
         reference = np.load(reference_file)
-        assert_array_equal(result.coords, reference)
+        assert_array_equal(result.coordinates, reference)
 
     # Ignores W0703: Catching too general exception Exception
     # pylint: disable=W0703

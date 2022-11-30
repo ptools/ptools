@@ -21,7 +21,7 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     Returns:
         float: energy
     """
-    X = ff.ligand.coords.copy()
+    X = ff.ligand.coordinates.copy()
 
     rotation = x[:3]
     translation = x[3:]
@@ -30,7 +30,7 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     ff.ligand.translate(translation)
 
     e = ff.non_bonded_energy()
-    ff.ligand.coords = X
+    ff.ligand.coordinates = X
     return e
 
 

@@ -59,8 +59,8 @@ def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     t1 = mobile.centroid()
 
     # Center to origin.
-    coords_target = target.coords - t0
-    coords_mobile = mobile.coords - t1
+    coords_target = target.coordinates - t0
+    coords_mobile = mobile.coordinates - t1
 
     # Calculate rotation matrix.
     kabsch = kabsch_matrix(coords_mobile, coords_target)
@@ -88,7 +88,7 @@ def rmsd(mobile: AtomCollection, target: AtomCollection, do_fit: bool = False) -
     if do_fit:
         mobile = mobile.copy()
         fit(mobile, target)
-    e = np.power((mobile.coords - target.coords), 2).sum(axis=1)
+    e = np.power((mobile.coordinates - target.coordinates), 2).sum(axis=1)
     return np.sqrt(np.mean(e))
 
 

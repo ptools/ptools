@@ -59,7 +59,7 @@ class PairList:
         """Update contact and distance lists with the neighbor searching
         algorithm."""
         self._all_sqdistances = cdist(
-            self.receptor.coords, self.ligand.coords, metric="sqeuclidean"
+            self.receptor.coordinates, self.ligand.coordinates, metric="sqeuclidean"
         )
         sqcutoff = self.cutoff * self.cutoff
         self._contacts = np.where(self._all_sqdistances <= sqcutoff)

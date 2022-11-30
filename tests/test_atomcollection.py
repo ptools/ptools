@@ -29,23 +29,23 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_initialization(self):
         self.assertEqual(len(self.atoms), self.n_atoms)
-        self.assertEqual(self.atoms.coords.shape, (self.n_atoms, 3))
+        self.assertEqual(self.atoms.coordinates.shape, (self.n_atoms, 3))
 
     def test_initialization_empty(self):
         atoms = AtomCollection()
         self.assertEqual(len(atoms), 0)
-        self.assertEqual(atoms.coords.shape, (0, 3))
+        self.assertEqual(atoms.coordinates.shape, (0, 3))
 
-    def _assert_copy_successful(self, thecopy):
+    def _assert_copy_successful(self, thecopy: AtomCollection):
         # Check that both AtomCollections have the same dimensions.
         self.assertEqual(len(thecopy), self.n_atoms)
-        self.assertEqual(thecopy.coords.shape, (self.n_atoms, 3))
+        self.assertEqual(thecopy.coordinates.shape, (self.n_atoms, 3))
 
         # Change parent AtomCollection coordinates and make sure it does not
         # affect the copy.
-        ref_coords = self.atoms.coords.copy()
-        self.atoms.coords.fill(0)
-        assert_array_equal(thecopy.coords, ref_coords)
+        ref_coords = self.atoms.coordinates.copy()
+        self.atoms.coordinates.fill(0)
+        assert_array_equal(thecopy.coordinates, ref_coords)
 
     def test_copy_initialization1(self):
         thecopy = self.atoms.copy()
@@ -73,20 +73,20 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_coordinates(self):
         ref_coords = np.array([[i, i, i] for i in range(self.n_atoms)], dtype=float)
-        assert_array_almost_equal(self.atoms.coords, ref_coords)
+        assert_array_almost_equal(self.atoms.coordinates, ref_coords)
 
     def test_set_atom_coordinates_from_array(self):
-        self.atoms.coords[0] = (42, 42, 42)
+        self.atoms.coordinates[0] = (42, 42, 42)
         assert_array_almost_equal(self.atoms[0].coords, (42, 42, 42))
 
     def test_set_atom_coordinates_from_atom(self):
         self.atoms[0].coords = (42, 42, 42)
-        assert_array_almost_equal(self.atoms.coords[0], (42, 42, 42))
+        assert_array_almost_equal(self.atoms.coordinates[0], (42, 42, 42))
 
     def test_getitem_single_atom(self):
         atom = self.atoms[0]
         self.assertIsInstance(atom, AtomAttrs)
-        assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+        assert_array_almost_equal(atom.coords, self.atoms.coordinates[0])
 
     def test_getitem_slice(self):
         self.assertIsInstance(self.atoms[:5], AtomCollection)
@@ -94,7 +94,7 @@ class TestAtomCollection(unittest.TestCase):
     def test_getitem_doesnt_make_copies(self):
         atom = self.atoms[0]
         atom.coords += 10
-        assert_array_almost_equal(atom.coords, self.atoms.coords[0])
+        assert_array_almost_equal(atom.coords, self.atoms.coordinates[0])
 
     def test_contains(self):
         atom = self.atoms[0]
@@ -185,7 +185,7 @@ class TestAtomCollection(unittest.TestCase):
         n_final = len(self.atoms) + len(atoms2)
         all_atoms = self.atoms + atoms2
         self.assertEqual(len(all_atoms), n_final)
-        self.assertEqual(all_atoms.coords.shape[0], n_final)
+        self.assertEqual(all_atoms.coordinates.shape[0], n_final)
 
     def test_add_makes_copies(self):
         atoms2 = AtomCollection(
@@ -202,7 +202,7 @@ class TestAtomCollection(unittest.TestCase):
         atoms = self.atoms.copy()
         atoms += self.atoms
         self.assertEqual(len(atoms), self.n_atoms * 2)
-        self.assertEqual(atoms.coords.shape[0], self.n_atoms * 2)
+        self.assertEqual(atoms.coordinates.shape[0], self.n_atoms * 2)
 
     def test_masses(self):
         assert_array_equal(

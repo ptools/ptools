@@ -53,11 +53,11 @@ class Atom(AtomAttrs):
     @property
     def coords(self) -> array3d:
         """Gets atom cartesian coordinates."""
-        return self.collection.coords[self.serial].copy()
+        return self.collection.coordinates[self.serial].copy()
 
     @coords.setter
     def coords(self, pos: ArrayLike):
-        self.collection.coords[self.serial] = array3d(pos)
+        self.collection.coordinates[self.serial] = array3d(pos)
 
     @property
     def mass(self) -> float:
@@ -107,7 +107,7 @@ class AtomCollection(SupportsTransformation, UserList):
         if not isinstance(other, AtomCollection):
             other = AtomCollection(other)
         output = super().__add__(other.copy())
-        output.coords = np.concatenate((self.coords, other.coords), axis=0)
+        output.coordinates = np.concatenate((self.coordinates, other.coordinates), axis=0)
         return output
 
     def __iadd__(self, other: Iterable[AtomAttrs]) -> AtomCollection:
@@ -139,13 +139,13 @@ class AtomCollection(SupportsTransformation, UserList):
 
     def center_of_mass(self) -> np.ndarray:
         """Returns the center of mass (barycenter)."""
-        return linalg.center_of_mass(self.coords, self.masses)
+        return linalg.center_of_mass(self.coordinates, self.masses)
 
     def inertia_tensor(self, weights=None):
         """Returns the inertia tensors of a set of atoms."""
         if weights is None:
             weights = self.masses
-        return linalg.inertia_tensor(self.coords, weights)
+        return linalg.inertia_tensor(self.coordinates, weights)
 
     def principal_axes(self, sort: bool = True) -> np.ndarray:
         """Returns an AtomCollection principal axes.
@@ -158,7 +158,7 @@ class AtomCollection(SupportsTransformation, UserList):
     def radius_of_gyration(self) -> float:
         """Returns the isometric radius of gyration (atom mass is not taken
         into account)."""
-        centered = self.coords - self.centroid()
+        centered = self.coordinates - self.centroid()
         rgyr2 = np.sum(centered**2) / len(self)
         return math.sqrt(rgyr2)
 
