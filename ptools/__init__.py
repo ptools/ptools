@@ -14,7 +14,6 @@ from . import (
     io,
     pairlist,
     rigidbody,
-    spatial,
     superpose,
     tables,
 )
@@ -30,7 +29,6 @@ __all__ = [
     "io",
     "pairlist",
     "rigidbody",
-    "spatial",
     "superpose",
     "tables",
     "AttractRigidBody",

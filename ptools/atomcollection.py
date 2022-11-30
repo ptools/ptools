@@ -45,7 +45,6 @@ class Atom(AtomAttrs):
         kwargs = {k: getattr(atom, k) for k in attrs}
         super().__init__(**kwargs)
 
-
     @property
     def coords(self) -> array3d:
         """Gets atom cartesian coordinates."""
@@ -121,7 +120,9 @@ class AtomCollection(UserList):
         if not isinstance(other, AtomCollection):
             other = AtomCollection(other)
         output = super().__add__(other.copy())
-        output.coordinates = np.concatenate((self.coordinates, other.coordinates), axis=0)
+        lhs = np.asarray(self.coordinates)
+        rhs = np.asarray(other.coordinates)
+        output.coordinates = np.concatenate((lhs, rhs), axis=0)
         return output
 
     def __iadd__(self, other: Iterable[AtomAttrs]) -> AtomCollection:

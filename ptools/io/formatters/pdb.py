@@ -1,5 +1,4 @@
-from typing import Any, TYPE_CHECKING
-
+from typing import Any
 
 from ...atomattrs import AtomAttrs
 from ...atomcollection import AtomCollection
@@ -11,6 +10,7 @@ PDB_FORMAT = (
     "{x:8.3f}{y:8.3f}{z:8.3f}{occupancy:6.2f}{bfactor:6.2f}          "
     "{element:>2s}"
 )
+
 
 def to_pdb(atom_or_collection: AtomAttrs | AtomCollection) -> str:
     if isinstance(atom_or_collection, AtomCollection):
@@ -58,5 +58,3 @@ def _format_residue_name(name: str) -> str:
 
 def _format_residue_index(index: int) -> str:
     return f"{index:4d}" if index < 10000 else f"{index:04x}"
-
-

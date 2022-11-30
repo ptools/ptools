@@ -6,6 +6,7 @@ from .._typing import FilePath
 
 from .formatters.pdb import to_pdb
 
+
 def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> bool:
     """Checks that a file exists.
 

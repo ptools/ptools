@@ -86,9 +86,7 @@ def is_array3d(obj: Any) -> bool:
         return False
     if ndim == 1 and shape[0] != 3:
         return False
-    elif ndim == 2 and shape[1] != 3:
+    if ndim == 2 and shape[1] != 3:
         return False
 
     return True
-
-

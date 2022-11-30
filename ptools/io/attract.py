@@ -1,10 +1,5 @@
 """Read/Write Attract files."""
 
-# pylint: disable=R0903
-# Only 1 public method... so what?
-
-from typing import Optional
-
 import numpy as np
 
 from ..rigidbody import RigidBody
@@ -110,7 +105,7 @@ class AttractFileParameters:
             self.minimlist.append(read_minimization())
 
 
-def read_aminon(path: FilePath) -> list[tuple[float,  float]]:
+def read_aminon(path: FilePath) -> list[tuple[float, float]]:
     """Read Attract force field parameter file.
 
     This file is supposed to have 3 values per line:
@@ -223,7 +218,9 @@ def read_translations(path: FilePath = "translation.dat") -> dict[int, np.ndarra
 
 # pylint: disable=R0914
 # Not so many local variables
-def read_rotations(path: FilePath = "rotation.dat") -> dict[int, tuple[float, float, float]]:
+def read_rotations(
+    path: FilePath = "rotation.dat",
+) -> dict[int, tuple[float, float, float]]:
     """Returns the  dictionary of rotations read from file.
 
     Each rotation is a tuple (phi, theta, chi).

@@ -1,7 +1,7 @@
 """ptools.measure - Measure geometric properties."""
 
 # Python core modules.
-from typing import Optional, Protocol
+from typing import Optional
 
 # Scientific libraries.
 import numpy as np
@@ -31,7 +31,7 @@ def center_of_mass(obj: Topology) -> np.ndarray:
     return L.center_of_mass(obj.coordinates, obj.masses)
 
 
-def inertia_tensor(obj: HasCoordinates | Topology , weights: Optional[ArrayLike] = None):
+def inertia_tensor(obj: HasCoordinates | Topology, weights: Optional[ArrayLike] = None):
     """Returns the inertia tensors of a set of atoms."""
     if weights is None:
         weights = getattr(obj, "masses", np.ones(len(obj.coordinates)))
@@ -51,5 +51,5 @@ def radius_of_gyration(obj: HasCoordinates) -> float:
     """Returns the isometric radius of gyration (atom mass is not taken
     into account)."""
     centered = obj.coordinates - centroid(obj)
-    rgyr2 = np.sum(centered ** 2) / len(obj.coordinates)
-    return rgyr2 ** 0.5
+    rgyr2 = np.sum(centered**2) / len(obj.coordinates)
+    return rgyr2**0.5

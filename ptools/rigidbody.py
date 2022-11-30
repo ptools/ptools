@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-# Python core libraries.
-import os
-
 # Type hinting specific imports
 from collections.abc import Sequence
 from typing import Type, TypeVar
@@ -16,7 +13,7 @@ import numpy as np
 # PTools.
 from .atomattrs import AtomAttrs
 from .atomcollection import AtomCollection
-from .io.pdb import InvalidPDBFormatError, FromPDB
+from .io.pdb import InvalidPDBFormatError
 from .io.pdb import read_pdb as io_read_pdb
 
 
@@ -24,7 +21,7 @@ RigidBodyType = TypeVar("RigidBodyType", bound="RigidBody")
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 
-class RigidBody(AtomCollection, FromPDB):
+class RigidBody(AtomCollection):
     """RigidBody is an AtomCollection that can be initialized from a PDB file.
 
     It has 3 additionnal arrays comparaed to AtomCollection:

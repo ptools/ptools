@@ -255,10 +255,8 @@ class TestTransformationMatrixFromMatrices:
         assert_array_almost_equal(actual, expected)
 
 
-
 # ======================================================================================
 class TestRotationMatrixAroundAxis:
-
     def test_rotation_matrix_round_axis(self):
         # rotation of 90° along Z-axis.
         actual = linalg.rotation_matrix_around_axis([0, 0, 1], 90)
@@ -267,6 +265,7 @@ class TestRotationMatrixAroundAxis:
         assert_array_almost_equal(actual, expected)
         print(actual)
         # assert 1 == 2
+
 
 # ======================================================================================
 class TestAttractEulerRotationMatrix:

@@ -11,6 +11,7 @@ from .linalg import transformation_matrix
 from .rigidbody import AttractRigidBody
 from . import measure, transform
 
+
 def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     """Function to minimize.
 

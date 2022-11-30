@@ -1,23 +1,10 @@
 """Protein Data Bank format I/O."""
 
-import abc
-from typing import Protocol, Sequence, Tuple, Union
+from typing import Sequence, Tuple, Union
 
 from ..atomattrs import AtomAttrs
 from ..atomcollection import AtomCollection
 from .._typing import FilePath
-
-
-class FromPDB(Protocol):
-    """Abstract Base class for classes which can be initialized from PDB files.
-
-    Ensures that child classes implement the `init_from_pdb` method.
-    """
-
-    @classmethod
-    @abc.abstractmethod
-    def from_pdb(cls, path: FilePath):
-        """Initializes internal components from data read in PDB file."""
 
 
 class InvalidPDBFormatError(IOError):
@@ -29,7 +16,7 @@ class InvalidPDBAtomLineError(ValueError):
 
     def __init__(self, header, *args):
         message = f'Invalid atom line: expected "ATOM" or "HETATM" as header, found "{header}"'
-        super(InvalidPDBAtomLineError, self).__init__(message, *args)
+        super().__init__(message, *args)
 
 
 class PDBLine(str):
@@ -40,7 +27,7 @@ class PDBLine(str):
     """
 
     def __init__(self, *args) -> None:
-        super().__init__()
+        super().__init__(*args)
         self.header = self[0:6].strip()
 
     def is_atom(self) -> bool:

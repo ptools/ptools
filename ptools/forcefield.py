@@ -270,7 +270,8 @@ class AttractForceField1(ForceFieldBase):
         norm2 = pairlist.sqdistances()
 
         alldx = [
-            self.receptor.coordinates[ir] - self.ligand.coordinates[il] for ir, il in contacts
+            self.receptor.coordinates[ir] - self.ligand.coordinates[il]
+            for ir, il in contacts
         ]
 
         for i, (ir, il) in enumerate(contacts):

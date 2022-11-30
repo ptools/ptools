@@ -198,7 +198,9 @@ def orientation_matrix(
     return rotation_matrix_around_axis(axis, amount, center=com, degrees=False)
 
 
-def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float, degrees=True) -> np.ndarray:
+def ab_rotation_matrix(
+    A: np.ndarray, B: np.ndarray, amount: float, degrees=True
+) -> np.ndarray:
     """Returns the rotation matrix to rotate around axis (A, B) by amount."""
     return rotation_matrix_around_axis(B - A, amount, A, degrees)
 

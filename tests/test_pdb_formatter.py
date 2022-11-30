@@ -1,7 +1,7 @@
-
 from ptools.io import to_pdb
 
 from .testing.dummy import generate_dummy_atom, generate_dummy_atomcollection
+
 
 def test_topdb():
     atom = generate_dummy_atom()
@@ -51,4 +51,3 @@ def test_to_pdb():
     result = to_pdb(atoms)
     for line, atom in zip(result.splitlines(), atoms):
         assert line == to_pdb(atom)
-

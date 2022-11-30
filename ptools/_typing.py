@@ -14,14 +14,15 @@ ArrayLike = Union[Sequence[Numeric], np.ndarray]
 
 class HasCoordinates(Protocol):
     @property
-    def coordinates(self) -> ArrayLike:
+    def coordinates(self) -> np.ndarray:
         ...
+
 
 class Topology(Protocol):
     @property
-    def coordinates(self) -> ArrayLike:
+    def coordinates(self) -> np.ndarray:
         ...
 
     @property
-    def masses(self) -> ArrayLike:
+    def masses(self) -> np.ndarray:
         ...

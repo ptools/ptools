@@ -75,6 +75,7 @@ def test_zeros():
     actual = array3d.zeros((2, 3))
     assert_array_almost_equal(expected, actual)
 
+
 def test_zeros_fails():
     err = rf"cannot initialize 3D-coordinates from array with shape \(2,\)"
     with pytest.raises(Invalid3DArrayError, match=err):
@@ -83,4 +84,3 @@ def test_zeros_fails():
     err = rf"cannot initialize 3D-coordinates from array with shape \(5, 2\)"
     with pytest.raises(Invalid3DArrayError, match=err):
         array3d.zeros((5, 2))
-

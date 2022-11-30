@@ -21,7 +21,7 @@ def test_distance_to_axis():
     assert measure.distance_to_axis(obj, axis) == approx(1.0)
 
     obj.coordinates = (0, 1, 1)
-    assert measure.distance_to_axis(obj, axis) == approx(2.0 ** 0.5)
+    assert measure.distance_to_axis(obj, axis) == approx(2.0**0.5)
 
 
 def test_centroid():
@@ -49,6 +49,7 @@ def test_center_of_masses():
 
 def test_inertia_tensor():
     from . import TEST_LIGAND
+
     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
 
     # Reference calculated with MDAnalysis 0.20.1:
@@ -64,6 +65,7 @@ def test_inertia_tensor():
 
 def test_principal_axes():
     from . import TEST_LIGAND
+
     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
 
     # Calculated with MDAnalysis 0.20.1:
