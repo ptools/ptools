@@ -69,64 +69,6 @@ class TestSpatialObjectArray(unittest.TestCase):
         assert_array_almost_equal(self.obj.coordinates[1], (1, 1, 1))
 
 
-class TestCoord3D(unittest.TestCase):
-    def test_initialization_default(self):
-        c = spatial.coord3d()
-        self.assertEqual(c.shape, (3,))
-        assert_array_almost_equal(c, (0, 0, 0))
-
-    def test_initialization_scalar(self):
-        c = spatial.coord3d(1)
-        self.assertEqual(c.shape, (3,))
-        assert_array_almost_equal(c, (1, 1, 1))
-
-    def test_initialization_vector(self):
-        c = spatial.coord3d([1, 2, 3])
-        self.assertEqual(c.shape, (3,))
-        assert_array_almost_equal(c, (1, 2, 3))
-
-    def test_initialization_with_wrong_number_of_arguments(self):
-        err = "Coordinates must be initialized either with 1 or 3 arguments"
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d(12, 1)
-
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d(12, 1, 2, 3)
-
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d((1, 2), 3)
-
-    def test_initialization_bad_dimensions(self):
-        err = "3D coordinate array should be N x 3"
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d([2, 2])
-
-    def test_initialization_array(self):
-        array = ((0, 0, 0), (1, 1, 1))
-        c = spatial.coord3d(array)
-        self.assertEqual(c.shape, (2, 3))
-        assert_array_almost_equal(c[0], (0, 0, 0))
-        assert_array_almost_equal(c[1], (1, 1, 1))
-
-    def test_initialization_array_bad_dimensions(self):
-        array = ((0, 0, 0, 0), (1, 1, 1, 1))
-        err = "3D coordinate array should be N x 3"
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d(array)
-
-    def test_initialization_array_fails_more_than_2_dimensions(self):
-        """Test raises the appropriate exeception when array has more that
-        2 dimensions."""
-        array = (
-            ((0, 0, 0, 0), (1, 1, 1, 1)),
-            ((0, 0, 0, 0), (1, 1, 1, 1)),
-            ((0, 0, 0, 0), (1, 1, 1, 1)),
-        )
-        err = "3D coordinate array should have at most 2 dimensions"
-        with self.assertRaisesRegex(ValueError, err):
-            spatial.coord3d(array)
-
-
 class TestSpatialObjectTransformations(unittest.TestCase):
     class FullTransformableObject(spatial.SupportsTranslation, spatial.SupportsRotation):
         pass

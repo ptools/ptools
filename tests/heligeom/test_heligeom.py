@@ -6,7 +6,6 @@ import numpy as np
 
 from ptools import RigidBody
 from ptools.heligeom import heli_analyze, heli_construct
-from ptools.spatial import coord3d
 from ptools.io import to_pdb
 from ptools import transform
 
@@ -41,8 +40,8 @@ class TestHeligeomSimple(unittest.TestCase):
         self.assertAlmostEqual(hp.unit[2], 0.0)
 
     def test_analyze_x_translate_rotate(self):
-        point = coord3d(0, 0, 0)
-        axis = coord3d(1, 0, 0)
+        point = np.array((0, 0, 0))
+        axis = np.array((1, 0, 0))
         angle = math.pi / 4
         transform.ab_rotate(self.mono2, point, axis, angle, degrees=False)
 
