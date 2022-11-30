@@ -15,7 +15,7 @@ from .matrix import (
 from .._typing import ArrayLike
 
 
-def translate(coords: ArrayLike, t: ArrayLike):
+def translate(coords: np.ndarray, t: ArrayLike):
     """In-place translation of coordinates."""
 
     def _translate_scalar(x):
@@ -37,7 +37,7 @@ def translate(coords: ArrayLike, t: ArrayLike):
         np.add(coords, t, coords)
 
 
-def rotate_by(coords: ArrayLike, angles: ArrayLike = np.zeros(3)):
+def rotate_by(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -49,9 +49,9 @@ def rotate_by(coords: ArrayLike, angles: ArrayLike = np.zeros(3)):
     rotate(coords, matrix)
 
 
-def rotate(coords: ArrayLike, r: ArrayLike):
+def rotate(coords: np.ndarray, r: ArrayLike):
     """In-place rotation of coordinates using a rotation matrix or 3 angles."""
-    r = np.asarray(r)
+    r = np.array(r)
     if r.shape == (3,):
         matrix = rotation_matrix(r)
     elif r.shape in ((4, 4), (3, 3)):

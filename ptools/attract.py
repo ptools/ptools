@@ -8,8 +8,8 @@ from scipy.optimize import minimize
 
 from .forcefield import AttractForceField1
 from .linalg import transformation_matrix
-from .rigidbody import AttractRigidBody, RigidBody
-
+from .rigidbody import AttractRigidBody
+from . import measure, transform
 
 def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     """Function to minimize.
@@ -26,8 +26,8 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     rotation = x[:3]
     translation = x[3:]
 
-    ff.ligand.rotate(rotation)
-    ff.ligand.translate(translation)
+    transform.rotate(ff.ligand, rotation)
+    transform.translate(ff.ligand, translation)
 
     e = ff.non_bonded_energy()
     ff.ligand.coordinates = X
@@ -52,7 +52,7 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
         >>>
         >>>
         >>> options = {
-        ...   translations = {0: ligand.centroid()},
+        ...   translations = {0: measure.centroid(ligand)},
         ...   rotations = {0: (0, 0, 0)},
         ...   minimlist = minimlist,
         }
@@ -67,7 +67,7 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
     rotations = kwargs.pop("rotations", None)
 
     if translations is None:
-        translations = {0: ligand.centroid()}
+        translations = {0: measure.centroid(ligand)}
     if rotations is None:
         rotations = {0: (0, 0, 0)}
 
@@ -78,9 +78,9 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
             print(f"@@ Rotation #{rotnb} {roti + 1}/{len(rotations)}")
             rot = rotations[rotnb]
 
-            ligand.translate(-ligand.centroid())
-            ligand.attract_euler_rotate(rot)
-            ligand.translate(trans)
+            transform.translate(ligand, -measure.centroid(ligand))
+            transform.attract_euler_rotate(ligand, rot)
+            transform.translate(ligand, trans)
 
             for i, minim in enumerate(minimlist):
                 print(f"- Minimization {i + 1}/{len(minimlist)}:")
@@ -117,7 +117,7 @@ def _run_minimization(
     print(m)
 
     # Moving ligand accordingly.
-    ligand.transform(m)
+    transform.transform(ligand, m)
 
     print(f"    - elapsed: {time.time() - start:.1f} seconds")
     print("=" * 40, flush=True)
