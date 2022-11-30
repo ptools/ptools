@@ -264,22 +264,6 @@ class TestAtomCollection(unittest.TestCase):
         self.assertEqual(len(sel), 974)
         self.assertTrue(all(atom.chain == "B" for atom in sel))
 
-    def test_to_pdb(self):
-        s = self.atoms.topdb()
-        for i, line in enumerate(s.splitlines()):
-            self.assertEqual(line, self.atoms[i].topdb())
-
-    def test_writepdb(self):
-        # Write PDB to temporary file.
-        with tempfile.NamedTemporaryFile() as pdbfile:
-            self.atoms.writepdb(pdbfile.name)
-
-            # Read file back to check what's been written.
-            with open(pdbfile.name, "rt", encoding="utf-8") as f:
-                s = f.read().rstrip()
-
-            self.assertEqual(s, self.atoms.topdb())
-
     def test_set_chain(self):
         self.atoms.set_chain("A")
         self.assertEqual("".join(a.chain for a in self.atoms), "A" * len(self.atoms))

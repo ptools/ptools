@@ -13,17 +13,11 @@ import numpy as np
 from attrs import define, field
 
 # Type-hinting specific import
-from typing import Any, TYPE_CHECKING
-from ._typing import ArrayLike
+from typing import Any
 
 # PTools imports.
 from . import tables
 from .array3d import array3d
-from .io.formatters.pdb import PDBFormatter
-
-
-if TYPE_CHECKING:
-    from atomcollection import AtomCollection
 
 
 # pylint: disable=R0902,R0913
@@ -67,10 +61,6 @@ class AtomAttrs:
         """Returns a copy of the current atom."""
         obj = copy.deepcopy(self)
         return obj
-
-    def topdb(self) -> str:
-        """Returns the atom's description in PDB format."""
-        return PDBFormatter.format_atom(self)
 
     @classmethod
     def guess_mass(cls, element: str) -> float:

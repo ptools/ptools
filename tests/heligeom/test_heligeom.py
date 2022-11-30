@@ -7,6 +7,7 @@ import numpy as np
 from ptools import RigidBody
 from ptools.heligeom import heli_analyze, heli_construct
 from ptools.spatial import coord3d
+from ptools.io import to_pdb
 
 from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
 
@@ -84,7 +85,6 @@ class TestHeligeom(unittest.TestCase):
     def test_hp_data(self):
         """Test heligeom.heli_analyze results"""
         hp = heli_analyze(self.mono1, self.mono2)
-
         self.assertAlmostEqual(hp.angle, 1.04719867)
         assert_array_almost_equal(hp.point, [0.000436, -0.000296, 0])
         assert_array_almost_equal(hp.unit, [8.47123119e-07, -2.80109302e-06, 1])
@@ -93,18 +93,14 @@ class TestHeligeom(unittest.TestCase):
         """Tests that heligeom.heli_construct"""
         hp = heli_analyze(self.mono1, self.mono2)
         result = heli_construct(self.mono1, hp, N=self.n_monomers)
-
-        self.assertEqual(result.topdb(), self.ref.topdb())
+        self.assertEqual(to_pdb(result), to_pdb(self.ref))
 
     def test_heli_construct_Zalign(self):
         """Tests that heligeom.heli_construct"""
-
         ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N3_Z)
-
         hp = heli_analyze(self.mono1, self.mono2)
         result = heli_construct(self.mono1, hp, N=3, Z=True)
-
-        self.assertEqual(result.topdb(), ref.topdb())
+        self.assertEqual(to_pdb(result), to_pdb(ref))
 
 
 if __name__ == "__main__":

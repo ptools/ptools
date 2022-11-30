@@ -162,15 +162,6 @@ class AtomCollection(SupportsTransformation, UserList):
         rgyr2 = np.sum(centered**2) / len(self)
         return math.sqrt(rgyr2)
 
-    def topdb(self) -> str:
-        """Returns a string representing the AtomCollection in PDB format."""
-        return "\n".join(atom.topdb() for atom in self)
-
-    def writepdb(self, path: FilePath):
-        """Writes the AtomCollection to a PDB formatted file."""
-        with open(path, "wt", encoding="utf-8") as f:
-            print(self.topdb(), file=f)
-
     def set_chain(self, chain: str):
         """Sets all atom chain property."""
         for atom in self:
