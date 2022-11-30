@@ -2,17 +2,12 @@ from __future__ import annotations
 
 from collections import UserList
 import itertools
-import math
 from typing import Any, Callable, Iterable, Iterator
 
 import numpy as np
 
-
 from .array3d import array3d
 from .atomattrs import AtomAttrs
-from .spatial import SupportsTransformation
-from . import linalg
-from . import measure
 from ._typing import ArrayLike
 
 

@@ -7,15 +7,12 @@ from ptools import measure
 
 from pytest import approx
 
-from .testing.dummy import generate_dummy_atomcollection
+from .testing.dummy import generate_dummy_atomcollection, generate_balloon
 from .testing import assert_array_almost_equal
 
 
 def test_distance_to_axis():
-    class Balloon:
-        coordinates = np.zeros(3)
-
-    obj = Balloon()
+    obj = generate_balloon((0, 0, 0))
 
     axis = np.array((1, 0, 0))
     assert measure.distance_to_axis(obj, axis) == approx(0.0)
