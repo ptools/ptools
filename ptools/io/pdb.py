@@ -27,7 +27,7 @@ class PDBLine(str):
     """
 
     def __init__(self, *args) -> None:
-        super().__init__(*args)
+        super().__init__()
         self.header = self[0:6].strip()
 
     def is_atom(self) -> bool:
