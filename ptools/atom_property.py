@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import collections
 import copy
 from typing import Iterable, Optional
@@ -42,7 +44,11 @@ class AtomProperty:
 
     @values.setter
     def values(self, values: ArrayLike):
-        self._values = np.asarray(values)
+        self._values = np.array(values)
+
+    def size(self) -> int:
+        """Returns the number of elements stored in the property."""
+        return self.values.size
 
     def copy(self):
         return copy.deepcopy(self)
@@ -60,6 +66,16 @@ class AtomProperty:
             and self._array_comparison_func(self.values, other.values)
         )
 
+    def __getitem__(self, key: int | slice) -> float | AtomProperty:
+        if isinstance(key, slice):
+            return AtomProperty(
+                self.singular,
+                self.plural,
+                self.values[key],
+                array_comparison_func=self._array_comparison_func,
+            )
+        return self.values[key]
+
 
 class AtomPropertyCollection(collections.abc.Mapping):
     """Container for AtomProperty instances.
@@ -67,16 +83,18 @@ class AtomPropertyCollection(collections.abc.Mapping):
     Allows to access properties either by singular or plural name.
 
     Attributes:
-        properties (dict[str, AtomProperty]): maps property name (plural) with actual AtomProperty instance.
+        properties (dict[str, AtomProperty]): maps property name (plural) with actual
+            AtomProperty instance.
     """
 
     def __init__(self, properties: Optional[Iterable[AtomProperty]] = None) -> None:
-        self._properties = {}
+        self._properties: dict[str, AtomProperty] = {}
         if properties:
-            self._properties = {prop.plural: prop for prop in properties}
+            for prop in properties:
+                self.register(prop)
 
     def __len__(self) -> int:
-        """"Returns the numbers of properties in the collection."""
+        """ "Returns the numbers of properties in the collection."""
         return len(self._properties)
 
     def __iter__(self):
@@ -91,14 +109,40 @@ class AtomPropertyCollection(collections.abc.Mapping):
         """Returns whether a property is present in the collections."""
         if not isinstance(name_or_item, (str, AtomProperty)):
             raise ValueError(f"expects {str} or {AtomProperty}")
-        plural = name_or_item.plural if isinstance(name_or_item, AtomProperty) else name_or_item
+        plural = (
+            name_or_item.plural
+            if isinstance(name_or_item, AtomProperty)
+            else name_or_item
+        )
         return plural in self._properties
 
     def add_property(self, singular: str, plural: str, values: ArrayLike):
         self.register(AtomProperty(singular, plural, np.asarray(values)))
 
+    def number_of_properties(self) -> int:
+        return len(self)
+
+    def number_of_elements(self) -> int:
+        if len(self._properties) == 0:
+            return 0
+        return len(next(iter(self._properties.values())).values)
+
     def register(self, item: AtomProperty):
         """Stores a new property in the collection."""
         if item.plural in self._properties:
             raise KeyError(f"property named {item.plural!r} already exists")
+        if self.number_of_elements() != 0 and self.number_of_elements() != len(
+            item.values
+        ):
+            err = (
+                f"cannot add property {item.plural!r}: expected {self.number_of_elements()} elements, "
+                f"got {len(item.values)}"
+            )
+            raise ValueError(err)
         self._properties[item.plural] = item.copy()
+
+    def slice(self, key: int | slice) -> AtomPropertyCollection:
+        """Returns a new collection with a slice of all properties."""
+        if isinstance(key, int):
+            key = slice(key, key + 1)
+        return AtomPropertyCollection(prop[key] for prop in self._properties.values())
