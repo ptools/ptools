@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Self
 
 import numpy as np
 from numpy.typing import ArrayLike
 
 
-class AtomProperty:
-    """Atom property.
-
-    Stores a property for all atoms that belong to an AtomCollection.
+class NamedArray:
+    """Holds a numpy array besides a singular and a plural name.
 
     Attributes:
         singular (str): name in its singular form
         plural (str): name in its plural form (used in container types)
-        values (ArrayLike): array of values for all atoms in a collection
+        values (ArrayLike): array of values
     """
 
     def __init__(
@@ -66,9 +64,9 @@ class AtomProperty:
             and self._array_comparison_func(self.values, other.values)
         )
 
-    def __getitem__(self, key: int | slice) -> float | AtomProperty:
+    def __getitem__(self, key: int | slice) -> float | Self:
         if isinstance(key, slice):
-            return AtomProperty(
+            return self.__class__(
                 self.singular,
                 self.plural,
                 self.values[key],
@@ -77,38 +75,45 @@ class AtomProperty:
         return self.values[key]
 
 
-class AtomPropertyContainer(collections.abc.Container):
-    """Container for AtomProperty instances.
+class NamedArrayContainer(collections.abc.Container):
+    """Container for NamedArray instances.
+
+    Provides a way to store multiple ``NamedArray`` instances with the same
+    number of elements.
+
+    The container is indexed by the number of elements.
+
+    The ``get`` method allows to retrieve a property by its name.
 
     Attributes:
-        properties (dict[str, AtomProperty]): maps property name (plural) with actual
-            AtomProperty instance.
+        array_list (dict[str, NamedArray]): maps array names (plural) with actual
+            NamedArray instance.
     """
 
-    def __init__(self, properties: Optional[Iterable[AtomProperty]] = None) -> None:
-        self._properties: dict[str, AtomProperty] = {}
-        if properties:
-            for prop in properties:
+    def __init__(self, array_list: Optional[Iterable[NamedArray]] = None) -> None:
+        self._properties: dict[str, NamedArray] = {}
+        if array_list:
+            for prop in array_list:
                 self.register(prop)
 
     def __contains__(self, name_or_item: object) -> bool:
         """Returns whether a property is present in the collections."""
-        if not isinstance(name_or_item, (str, AtomProperty)):
-            raise ValueError(f"expects {str} or {AtomProperty}")
+        if not isinstance(name_or_item, (str, NamedArray)):
+            raise ValueError(f"expects {str} or {NamedArray}")
         plural = (
             name_or_item.plural
-            if isinstance(name_or_item, AtomProperty)
+            if isinstance(name_or_item, NamedArray)
             else name_or_item
         )
         return plural in self._properties
 
-    def __getitem__(self, key: int | slice) -> AtomPropertyContainer:
+    def __getitem__(self, key: int | slice) -> NamedArrayContainer:
         """Returns a new collection with a slice of all properties."""
         if isinstance(key, int):
             key = slice(key, key + 1)
-        return AtomPropertyContainer(prop[key] for prop in self._properties.values())
+        return NamedArrayContainer(prop[key] for prop in self._properties.values())
 
-    def get(self, plural: object) -> AtomProperty:
+    def get(self, plural: object) -> NamedArray:
         """Returns the property with the given plural name."""
         if not isinstance(plural, str):
             raise ValueError("expects string to fetch property using their plural name")
@@ -123,9 +128,9 @@ class AtomPropertyContainer(collections.abc.Container):
         return len(next(iter(self._properties.values())).values)
 
     def add_property(self, singular: str, plural: str, values: ArrayLike):
-        self.register(AtomProperty(singular, plural, np.asarray(values)))
+        self.register(NamedArray(singular, plural, np.asarray(values)))
 
-    def register(self, item: AtomProperty):
+    def register(self, item: NamedArray):
         """Stores a new property in the collection."""
         if item.plural in self._properties:
             raise KeyError(f"property named {item.plural!r} already exists")

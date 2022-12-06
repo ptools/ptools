@@ -1,6 +1,6 @@
-""""test_atompropertycontainerlection - Tests for ``AtomPropertyContainer``."""
+""""test_atompropertycontainerlection - Tests for ``NamedArrayContainer``."""
 
-from ptools.atom_property import AtomProperty, AtomPropertyContainer
+from ptools.namedarray import NamedArray, NamedArrayContainer
 
 import numpy as np
 import pytest
@@ -8,31 +8,31 @@ import pytest
 from .testing import assert_array_almost_equal, assert_array_not_almost_equal
 
 
-def generate_properties() -> list[AtomProperty]:
+def generate_arrays() -> list[NamedArray]:
     return [
-        AtomProperty("one", "ones", np.ones(5)),
-        AtomProperty("two", "twos", np.ones(5) + 1),
-        AtomProperty("three", "threes", np.ones(5) + 3),
+        NamedArray("one", "ones", np.ones(5)),
+        NamedArray("two", "twos", np.ones(5) + 1),
+        NamedArray("three", "threes", np.ones(5) + 3),
     ]
 
 def test_initialization_empty():
-    container = AtomPropertyContainer()
+    container = NamedArrayContainer()
     assert container.number_of_properties() == 0
 
 
 def test_initialization_with_properties():
-    property_list = generate_properties()
-    container = AtomPropertyContainer(property_list)
+    property_list = generate_arrays()
+    container = NamedArrayContainer(property_list)
     assert container.number_of_properties() == len(property_list)
     for prop in property_list:
         assert prop in container
 
 
 def test_initialization_fails():
-    properties = generate_properties()
+    properties = generate_arrays()
     properties[0].values = np.ones(properties[0].size() + 1)
     with pytest.raises(ValueError):
-        AtomPropertyContainer(properties)
+        NamedArrayContainer(properties)
 
 
 def test_add_property():
@@ -42,7 +42,7 @@ def test_add_property():
         values = (1, 2, 3)
 
     # Initialization.
-    container = AtomPropertyContainer()
+    container = NamedArrayContainer()
     assert container.number_of_properties() == 0
 
     # Add a property and checks everything went ok.
@@ -59,9 +59,9 @@ def test_add_property():
 
 
 def test_register():
-    expected = AtomProperty("index", "indices", (1, 2, 3))
+    expected = NamedArray("index", "indices", (1, 2, 3))
 
-    container = AtomPropertyContainer()
+    container = NamedArrayContainer()
     container.register(expected)
 
     actual = container.get(expected.plural)
@@ -69,17 +69,17 @@ def test_register():
 
 
 def test_register_checks_for_size():
-    ones = AtomProperty("one", "ones", np.ones(5))
-    twos = AtomProperty("two", "twos", np.ones(6) + 1)
-    container = AtomPropertyContainer()
+    ones = NamedArray("one", "ones", np.ones(5))
+    twos = NamedArray("two", "twos", np.ones(6) + 1)
+    container = NamedArrayContainer()
     container.register(ones)
     with pytest.raises(ValueError):
         container.register(twos)
 
 
 def test_register_copies_values():
-    item = AtomProperty("index", "indices", (1, 2, 3))
-    container = AtomPropertyContainer()
+    item = NamedArray("index", "indices", (1, 2, 3))
+    container = NamedArrayContainer()
     container.register(item)
 
     assert_array_almost_equal(item.values, container.get(item.plural).values)
@@ -90,7 +90,7 @@ def test_register_copies_values():
 
 
 def test_getitem():
-    container = AtomPropertyContainer(generate_properties())
+    container = NamedArrayContainer(generate_arrays())
     subset = container[1: 3]
     assert container.number_of_properties() == subset.number_of_properties()
     assert container.number_of_elements() == 5
