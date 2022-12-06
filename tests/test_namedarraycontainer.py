@@ -35,7 +35,7 @@ def test_initialization_fails():
         NamedArrayContainer(properties)
 
 
-def test_add_property():
+def test_add_array():
     class expected:
         singular = "index"
         plural = "indices"
@@ -46,7 +46,7 @@ def test_add_property():
     assert container.number_of_properties() == 0
 
     # Add a property and checks everything went ok.
-    container.add_property(expected.singular, expected.plural, expected.values)
+    container.add_array(expected.singular, expected.plural, expected.values)
     assert container.number_of_properties() == 1
     assert container.number_of_elements() == 3
     assert expected.plural in container

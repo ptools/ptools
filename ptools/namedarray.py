@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Iterable, Optional, Self
+from typing import Any, Iterable, Optional, Self
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -56,6 +56,8 @@ class NamedArray:
         return f"{self.__class__.__qualname__}({attrs})"
 
     def __eq__(self, other: object):
+        if isinstance(other, collections.abc.Iterable):
+            return self._array_comparison_func(self.values, other)
         if not isinstance(other, self.__class__):
             raise ValueError(f"cannot compare {self.__class__} and {type(other)}")
         return (
@@ -63,6 +65,9 @@ class NamedArray:
             and self.plural == other.plural
             and self._array_comparison_func(self.values, other.values)
         )
+
+    def __iter__(self) -> Any:
+        return iter(self.values)
 
     def __getitem__(self, key: int | slice) -> float | Self:
         if isinstance(key, slice):
@@ -127,7 +132,7 @@ class NamedArrayContainer(collections.abc.Container):
             return 0
         return len(next(iter(self._properties.values())).values)
 
-    def add_property(self, singular: str, plural: str, values: ArrayLike):
+    def add_array(self, singular: str, plural: str, values: ArrayLike):
         self.register(NamedArray(singular, plural, np.asarray(values)))
 
     def register(self, item: NamedArray):
