@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Any, Iterable, Optional, Self
+from typing import Any, Iterable, Iterator, Optional, Self
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -56,15 +56,17 @@ class NamedArray:
         return f"{self.__class__.__qualname__}({attrs})"
 
     def __eq__(self, other: object):
+        if isinstance(other, self.__class__):
+            return (
+                self.singular == other.singular
+                and self.plural == other.plural
+                and self._array_comparison_func(self.values, other.values)
+            )
         if isinstance(other, collections.abc.Iterable):
             return self._array_comparison_func(self.values, other)
         if not isinstance(other, self.__class__):
             raise ValueError(f"cannot compare {self.__class__} and {type(other)}")
-        return (
-            self.singular == other.singular
-            and self.plural == other.plural
-            and self._array_comparison_func(self.values, other.values)
-        )
+        raise NotImplementedError
 
     def __iter__(self) -> Any:
         return iter(self.values)
@@ -112,11 +114,30 @@ class NamedArrayContainer(collections.abc.Container):
         )
         return plural in self._properties
 
+    def __iter__(self) -> Iterator[NamedArray]:
+        return iter(self._properties.values())
+
     def __getitem__(self, key: int | slice) -> NamedArrayContainer:
         """Returns a new collection with a slice of all properties."""
         if isinstance(key, int):
             key = slice(key, key + 1)
         return NamedArrayContainer(prop[key] for prop in self._properties.values())
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            raise TypeError(f"cannot compare {self.__class__.__qualname__} and {type(other)}")
+        if not self._properties.keys() == other._properties.keys():
+            return False
+        for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays()):
+            if not lhs == rhs:
+                return False
+        return True
+
+    def names(self) -> list[str]:
+        return list(self._properties.keys())
+
+    def iter_arrays(self) -> Iterator[NamedArray]:
+        return iter(self._properties.values())
 
     def get(self, plural: object) -> NamedArray:
         """Returns the property with the given plural name."""

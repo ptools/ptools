@@ -101,3 +101,22 @@ def test_getitem():
     assert container.number_of_elements() == 5
     assert subset.number_of_elements() == 1
 
+
+def test_equality():
+    # Checks equality of containers containing identical arrays.
+    lhs = NamedArrayContainer(generate_arrays())
+    rhs = NamedArrayContainer(generate_arrays())
+    assert lhs == rhs
+
+    # Checks inequality of containers where one array differs from one container
+    # to the other.
+    r_ones = rhs.get("ones")
+    r_ones.values[:] = 13
+    assert lhs != rhs
+
+
+def test_equality_fails():
+    lhs = NamedArrayContainer(generate_arrays())
+    rhs = 2
+    with pytest.raises(TypeError):
+        lhs == rhs
