@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Iterable, Optional, Self
 
 from .namedarray import NamedArrayContainer
@@ -15,6 +15,14 @@ class Particle:
             prop.singular: prop.plural for prop in self._collection.atom_properties
         }
 
+    def __eq__(self, __o: object) -> bool:
+        """Compares two particles using their properties read from the ParticleCollection."""
+        if not isinstance(__o, Particle):
+            return NotImplemented
+        self_properties = self._collection.atom_properties[self._index]
+        other_properties = __o._collection.atom_properties[__o._index]
+        return self_properties == other_properties
+
     def __getattr__(self, name):
         if name in self._singular_to_plural:
             return self._collection.atom_properties.get(self._singular_to_plural[name])[self._index]
@@ -28,11 +36,15 @@ class Particle:
 class ParticleCollection:
     """Represents a collection of particles."""
 
-    atom_properties: Optional[NamedArrayContainer] = None
+    atom_properties: NamedArrayContainer = field(default_factory=NamedArrayContainer)
+    _particles: list[Particle] = field(init=False, repr=False, default_factory=list)
 
     def __post_init__(self):
+        if not isinstance(self.atom_properties, NamedArrayContainer):
+            raise TypeError(f"Expected NamedArrayContainer, got {type(self.atom_properties)}")
         if self.atom_properties is None:
             self.atom_properties = NamedArrayContainer()
+        self._particles = [Particle(self, i) for i in range(self.size())]
 
     def size(self) -> int:
         if self.atom_properties:
@@ -72,6 +84,18 @@ class ParticleCollection:
 
     def __iter__(self):
         """Iterates over the atoms."""
-        return iter(Particle(self, i) for i in range(self.size()))
+
+        return iter(self._particles)
+
+    def __contains__(self, particle: object) -> bool:
+        """Returns whether the given particle is part of the collection."""
+        if isinstance(particle, Particle):
+            return particle in self._particles
+        return False
+
+    @property
+    def coordinates(self):
+        """Returns the coordinates of the atoms."""
+        return self.atom_properties.get("coordinates").values
 
 

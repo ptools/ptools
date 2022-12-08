@@ -1,5 +1,10 @@
+
+import random
+
 import numpy as np
 from numpy.typing import ArrayLike
+
+import pytest
 
 from ptools.namedarray import NamedArrayContainer
 from ptools.particlecollection import ParticleCollection
@@ -49,12 +54,6 @@ def test_from_objects():
     assert pc.atom_properties.get("ys") == [4, 5, 6]
     assert pc.atom_properties.get("zs") == [7, 8, 9]
 
-
-import random
-
-
-class DummyAtom:
-    """Dummy atom class for testing."""
 
 
 AMINO_ACID_NAMES = [
@@ -153,9 +152,16 @@ class TestParticleCollection:
     def charges(self):
         return [atom.charge for atom in self.atoms]
 
+    def test_initialization_from_list_fails(self):
+        with pytest.raises(TypeError):
+            ParticleCollection(self.atoms)
 
     def test_from_atoms(self):
-        """Test initialization from a list of AtomAttrs."""
+        """Test initialization from a list of AtomAttrs.
+
+        Checks that the atoms attributes are correctly stored in the
+        ``ParticleCollection`` in a ``NamedArrayContainer`` instance.
+        """
         from ptools.spelling import plural
 
         pc = ParticleCollection.from_objects(self.atoms)
@@ -164,37 +170,52 @@ class TestParticleCollection:
 
         for attr in vars(self.atoms[0]):
             name = plural(attr)
-            print(name)
             assert pc.atom_properties.get(name) == getattr(self, name)
 
+    def test_get_slice(self):
+        atoms = ParticleCollection.from_objects(self.atoms)
+        assert atoms.size() >= 10
+        subset = atoms[1:3]
+        assert subset.size() == 2
+        assert subset[0] == atoms[1]
+        assert subset[1] == atoms[2]
 
-# def test_get_slice():
-#     atoms = ParticleCollection.from_objects(generate_atoms())
-#     assert atoms.size() == 3
-#     subset = atoms[1:3]
-#     assert subset.size() == 2
-#     assert subset[0] == atoms[1]
-#     assert subset[1] == atoms[2]
+    def test_iter(self):
+        col = ParticleCollection.from_objects(self.atoms)
+        attribute_names = vars(self.atoms[0])
+        for expected, actual in zip(self.atoms, col):
+            for name in attribute_names:
+                if name == "coordinates":
+                    assert_array_almost_equal(
+                        getattr(expected, name), getattr(actual, name)
+                    )
+                else:
+                    assert getattr(expected, name) == getattr(actual, name)
 
+    def test_particle_collection_coordinates(self):
+        """Test that the ``coordinates`` property works."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        assert_array_almost_equal(pc.coordinates, self.coordinates)
 
-# def test_iter():
-#     atoms = generate_atoms()
-#     col = ParticleCollection.from_objects(atoms)
-#     attribute_names = vars(atoms[0])
-#     for expected, actual in zip(atoms, col):
-#         for name in attribute_names:
-#             if name == "coordinates":
-#                 assert_array_almost_equal(
-#                     getattr(expected, name), getattr(actual, name)
-#                 )
-#             else:
-#                 assert getattr(expected, name) == getattr(actual, name)
+    def test_len(self):
+        """Test that the ``len`` function works."""
+        pc = ParticleCollection()
+        assert len(pc) == 0
 
+        pc = ParticleCollection.from_objects(self.atoms)
+        assert len(pc) == len(self.atoms)
 
-# def test_len():
-#     """Test that the ``len`` function works."""
-#     pc = ParticleCollection()
-#     assert len(pc) == 0
-
-#     pc = ParticleCollection.from_objects(generate_atoms())
-#     assert len(pc) == 3
+    def test_contains(self):
+        """Test that the ``in`` operator works."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        assert self.atoms[0] in pc
+        # assert self.atoms[-1] in pc
+        # assert self.atoms[1] in pc
+        # assert self.atoms[2] in pc
+        # assert self.atoms[3] in pc
+        # assert self.atoms[4] in pc
+        # assert self.atoms[5] in pc
+        # assert self.atoms[6] in pc
+        # assert self.atoms[7] in pc
+        # assert self.atoms[8] in pc
+        # assert self.atoms[9] in pc
