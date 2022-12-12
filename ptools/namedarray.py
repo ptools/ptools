@@ -136,6 +136,12 @@ class NamedArrayContainer(collections.abc.Container):
     def names(self) -> list[str]:
         return list(self._properties.keys())
 
+    def singular_names(self) -> list[str]:
+        return [prop.singular for prop in self._properties.values()]
+
+    def plural_names(self) -> list[str]:
+        return [prop.plural for prop in self._properties.values()]  # equivalent to self.names()
+
     def iter_arrays(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
 

@@ -5,14 +5,13 @@ import unittest
 import numpy as np
 
 import ptools
-from ptools import measure, tables
+from ptools import tables
 from ptools.atomattrs import AtomAttrs
 from ptools.atomcollection import AtomCollection
 
 from .testing.moreassert import (
     assert_array_equal,
     assert_array_almost_equal,
-    assert_array_not_almost_equal,
 )
 from .testing.dummy import generate_dummy_atomcollection
 from . import TEST_LIGAND

@@ -1,4 +1,3 @@
-
 import random
 
 import numpy as np
@@ -7,9 +6,80 @@ from numpy.typing import ArrayLike
 import pytest
 
 from ptools.namedarray import NamedArrayContainer
-from ptools.particlecollection import ParticleCollection
+from ptools.particlecollection import Particle, ParticleCollection
 
 from .testing import assert_array_almost_equal
+
+
+AMINO_ACID_NAMES = [
+    "ALA",
+    "ARG",
+    "ASN",
+    "ASP",
+    "CYS",
+    "GLN",
+    "GLU",
+    "GLY",
+    "HIS",
+    "ILE",
+    "LEU",
+    "LYS",
+    "MET",
+    "PHE",
+    "PRO",
+    "SER",
+    "THR",
+    "TRP",
+    "TYR",
+    "VAL",
+]
+
+
+def random_amino_acid_name():
+    """Returns a random amino acid name."""
+    return random.choice(AMINO_ACID_NAMES)
+
+
+def random_atom_name():
+    """Returns a random atom name."""
+    return random.choice(["H", "C", "N", "O", "S"])
+
+
+def random_charge(lower: float = -1, upper: float = 1):
+    """Returns a random charge."""
+    return random.uniform(lower, upper)
+
+
+class DummyAtom:
+    """Dummy atom class for testing."""
+
+    def __init__(self, index, coordinates: ArrayLike):
+        self.chain = "A"
+        self.index = index
+        self.residue_index = index
+        self.coordinates = np.array(coordinates, dtype=float)
+        self.name = random_atom_name()
+        self.residue_name = random_amino_acid_name()
+        self.charge = random_charge()
+
+
+def generate_atoms(size: int = 10) -> list:
+    """Creates a dummy atom collection composed of `size` atoms.
+
+    The atoms have those properties:
+
+    - coordinates are [(0, 0, 0), (1, 1, 1), ..., (size - 1, size - 1, size - 1)],
+    - atom names are randomly chosen from the list of atom names,
+    - atom indices are [1, 2, ..., size],
+    - residue names are randomly chosen from the list of amino acid names,
+    - residue indices are [1, 2, ..., size],
+    - chain is "A",
+    - charge is a random float between -1 and 1,
+    """
+    return [DummyAtom(i, [i, i, i]) for i in range(size)]
+
+
+# ==============================================================================
 
 
 def test_empty_initialization():
@@ -55,76 +125,9 @@ def test_from_objects():
     assert pc.atom_properties.get("zs") == [7, 8, 9]
 
 
-
-AMINO_ACID_NAMES = [
-    "ALA",
-    "ARG",
-    "ASN",
-    "ASP",
-    "CYS",
-    "GLN",
-    "GLU",
-    "GLY",
-    "HIS",
-    "ILE",
-    "LEU",
-    "LYS",
-    "MET",
-    "PHE",
-    "PRO",
-    "SER",
-    "THR",
-    "TRP",
-    "TYR",
-    "VAL",
-]
-
-
-def random_amino_acid_name():
-    """Returns a random amino acid name."""
-    return random.choice(AMINO_ACID_NAMES)
-
-
-def random_atom_name():
-    """Returns a random atom name."""
-    return random.choice(["H", "C", "N", "O", "S"])
-
-
-def random_charge(lower: float = -1, upper: float = 1):
-    """Returns a random charge."""
-    return random.uniform(lower, upper)
-
-
-def generate_atoms(size: int = 10) -> list:
-    """Creates a dummy atom collection composed of `size` atoms.
-
-    The atoms have those properties:
-
-    - coordinates are [(0, 0, 0), (1, 1, 1), ..., (size - 1, size - 1, size - 1)],
-    - atom names are randomly chosen from the list of atom names,
-    - atom indices are [1, 2, ..., size],
-    - residue names are randomly chosen from the list of amino acid names,
-    - residue indices are [1, 2, ..., size],
-    - chain is "A",
-    - charge is a random float between -1 and 1,
-    """
-
-    class DummyAtom:
-        """Dummy atom class for testing."""
-
-        def __init__(self, index, coordinates: ArrayLike):
-            self.chain = "A"
-            self.index = index
-            self.coordinates = np.array(coordinates, dtype=float)
-            self.name = random_atom_name()
-            self.residue_name = random_amino_acid_name()
-            self.charge = random_charge()
-
-    return [DummyAtom(i, [i, i, i]) for i in range(size)]
-
-
 class TestParticleCollection:
     """Test the ``ParticleCollection`` class."""
+
     def setup_method(self):
         self.atoms = generate_atoms()
 
@@ -147,6 +150,10 @@ class TestParticleCollection:
     @property
     def residue_names(self):
         return [atom.residue_name for atom in self.atoms]
+
+    @property
+    def residue_indices(self):
+        return [atom.residue_index for atom in self.atoms]
 
     @property
     def charges(self):
@@ -180,10 +187,23 @@ class TestParticleCollection:
         assert subset[0] == atoms[1]
         assert subset[1] == atoms[2]
 
+
+    def test_get_property_array(self):
+        """Tests access to the properties of the atoms."""
+        atoms = ParticleCollection.from_objects(self.atoms)
+        assert atoms.atom_properties.get("chains") == self.chains
+        assert atoms.atom_properties.get("indices") == self.indices
+        assert atoms.atom_properties.get("coordinates") == self.coordinates
+        assert atoms.atom_properties.get("names") == self.names
+        assert atoms.atom_properties.get("residue_names") == self.residue_names
+        assert atoms.atom_properties.get("residue_indices") == self.residue_indices
+        assert atoms.atom_properties.get("charges") == self.charges
+
+
     def test_iter(self):
         col = ParticleCollection.from_objects(self.atoms)
         attribute_names = vars(self.atoms[0])
-        for expected, actual in zip(self.atoms, col):
+        for expected, actual in zip(self.atoms, col):  # calls __iter__
             for name in attribute_names:
                 if name == "coordinates":
                     assert_array_almost_equal(
@@ -208,14 +228,66 @@ class TestParticleCollection:
     def test_contains(self):
         """Test that the ``in`` operator works."""
         pc = ParticleCollection.from_objects(self.atoms)
-        assert self.atoms[0] in pc
-        # assert self.atoms[-1] in pc
-        # assert self.atoms[1] in pc
-        # assert self.atoms[2] in pc
-        # assert self.atoms[3] in pc
-        # assert self.atoms[4] in pc
-        # assert self.atoms[5] in pc
-        # assert self.atoms[6] in pc
-        # assert self.atoms[7] in pc
-        # assert self.atoms[8] in pc
-        # assert self.atoms[9] in pc
+        for atom in self.atoms:
+            assert atom in pc
+
+    def test_getitem_with_int_returns_particle(self):
+        """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        for i, atom in enumerate(self.atoms):
+            assert isinstance(pc[i], Particle)
+            assert pc[i] == atom
+
+
+
+class TestParticle:
+    """Test the ``Particle`` class."""
+
+    def test_equality(self):
+        """Tests that two particles are equal if they have the same attributes."""
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = col.particles[0]
+        assert a1 == a2
+
+    def test_inequality(self):
+        """Tests that two particles are not equal if they have different attributes."""
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = col.particles[1]
+        assert a1 != a2
+
+    def test_equality_non_particle(self):
+        """Tests that a particle is equal to a non-particle object with the same attributes."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        for attr in col.atom_properties.singular_names():
+            setattr(a2, attr, getattr(a1, attr))
+        assert a1 == a2
+
+    def test_inequality_non_particle(self):
+        """Tests that a particle is not equal to a non-particle object with different attributes."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        for attr in col.atom_properties.singular_names():
+            setattr(a2, attr, "X")
+        assert a1 != a2
+
+    def test_inequality_missing_attribute(self):
+        """Tests that a particle particle equality returns False and does not fail when
+        comparing two particles with different attributes (attribute not present)."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        assert a1 != a2
