@@ -80,7 +80,59 @@ def generate_atoms(size: int = 10) -> list:
 
 
 # ==============================================================================
+class TestParticle:
+    """Test the ``Particle`` class."""
 
+    def test_equality(self):
+        """Tests that two particles are equal if they have the same attributes."""
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = col.particles[0]
+        assert a1 == a2
+
+    def test_inequality(self):
+        """Tests that two particles are not equal if they have different attributes."""
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = col.particles[1]
+        assert a1 != a2
+
+    def test_equality_non_particle(self):
+        """Tests that a particle is equal to a non-particle object with the same attributes."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        for attr in col.atom_properties.singular_names():
+            setattr(a2, attr, getattr(a1, attr))
+        assert a1 == a2
+
+    def test_inequality_non_particle(self):
+        """Tests that a particle is not equal to a non-particle object with different attributes."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        for attr in col.atom_properties.singular_names():
+            setattr(a2, attr, "X")
+        assert a1 != a2
+
+    def test_inequality_missing_attribute(self):
+        """Tests that a particle particle equality returns False and does not fail when
+        comparing two particles with different attributes (attribute not present)."""
+        class Dummy:
+            pass
+
+        col = ParticleCollection.from_objects(generate_atoms(2))
+        a1 = col.particles[0]
+        a2 = Dummy()
+        assert a1 != a2
+
+# ==============================================================================
 
 def test_empty_initialization():
     """Test that the default initialization works."""
@@ -238,56 +290,12 @@ class TestParticleCollection:
             assert isinstance(pc[i], Particle)
             assert pc[i] == atom
 
+    def test_copy(self):
+        """Test that the ``copy`` method returns a deep copy."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        pc_copy = pc.copy()
+        assert pc_copy is not pc
+        assert pc_copy == pc
 
-
-class TestParticle:
-    """Test the ``Particle`` class."""
-
-    def test_equality(self):
-        """Tests that two particles are equal if they have the same attributes."""
-        col = ParticleCollection.from_objects(generate_atoms(2))
-        a1 = col.particles[0]
-        a2 = col.particles[0]
-        assert a1 == a2
-
-    def test_inequality(self):
-        """Tests that two particles are not equal if they have different attributes."""
-        col = ParticleCollection.from_objects(generate_atoms(2))
-        a1 = col.particles[0]
-        a2 = col.particles[1]
-        assert a1 != a2
-
-    def test_equality_non_particle(self):
-        """Tests that a particle is equal to a non-particle object with the same attributes."""
-        class Dummy:
-            pass
-
-        col = ParticleCollection.from_objects(generate_atoms(2))
-        a1 = col.particles[0]
-        a2 = Dummy()
-        for attr in col.atom_properties.singular_names():
-            setattr(a2, attr, getattr(a1, attr))
-        assert a1 == a2
-
-    def test_inequality_non_particle(self):
-        """Tests that a particle is not equal to a non-particle object with different attributes."""
-        class Dummy:
-            pass
-
-        col = ParticleCollection.from_objects(generate_atoms(2))
-        a1 = col.particles[0]
-        a2 = Dummy()
-        for attr in col.atom_properties.singular_names():
-            setattr(a2, attr, "X")
-        assert a1 != a2
-
-    def test_inequality_missing_attribute(self):
-        """Tests that a particle particle equality returns False and does not fail when
-        comparing two particles with different attributes (attribute not present)."""
-        class Dummy:
-            pass
-
-        col = ParticleCollection.from_objects(generate_atoms(2))
-        a1 = col.particles[0]
-        a2 = Dummy()
-        assert a1 != a2
+        pc_copy[0].name = "XXX"
+        assert pc_copy[0].name != pc[0].name

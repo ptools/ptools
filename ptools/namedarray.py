@@ -81,6 +81,9 @@ class NamedArray:
             )
         return self.values[key]
 
+    def __setitem__(self, key: int | slice, value: ArrayLike):
+        self.values[key] = value
+
 
 class NamedArrayContainer(collections.abc.Container):
     """Container for NamedArray instances.
@@ -175,3 +178,6 @@ class NamedArrayContainer(collections.abc.Container):
             )
             raise ValueError(err)
         self._properties[item.plural] = item.copy()
+
+    def copy(self) -> Self:
+        return self.__class__(self._properties.values())

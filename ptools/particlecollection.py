@@ -38,6 +38,20 @@ class Particle:
             ]
         raise KeyError(f"No such property: {name!r}")
 
+    def __setattr__(self, name, value):
+        # Setting the attributes of the class itself.
+        if name in ("_collection", "_index", "_singular_to_plural"):
+            super().__setattr__(name, value)
+            return
+
+        # Setting the attributes of the particle via the collection.
+        if name in self._singular_to_plural:
+            self._collection.atom_properties.get(self._singular_to_plural[name])[
+                self._index
+            ] = value
+        else:
+            raise KeyError(f"No such property: {name!r}")
+
     def properties(self) -> list[str]:
         return [
             prop.singular for prop in self.self._collection.atom_properties.values()
@@ -113,3 +127,7 @@ class ParticleCollection:
     def particles(self):
         """Returns an iterator over the particles."""
         return list(Particle(self, i) for i in range(self.size()))
+
+    def copy(self) -> ParticleCollection:
+        """Returns a copy of the collection."""
+        return ParticleCollection(self.atom_properties.copy())

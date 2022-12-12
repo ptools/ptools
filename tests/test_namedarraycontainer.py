@@ -120,3 +120,13 @@ def test_equality_fails():
     rhs = 2
     with pytest.raises(TypeError):
         lhs == rhs
+
+
+def test_copy():
+    container = NamedArrayContainer(generate_arrays())
+    copy = container.copy()
+    assert container == copy
+
+    # Checks that the copy is independent from the original.
+    copy.get("ones").values[:] = 13
+    assert container != copy

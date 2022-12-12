@@ -77,3 +77,32 @@ def test_getitem():
     assert_array_almost_equal(left.values[1:4], source[1:4])
     assert_array_almost_equal(left[1:4].values, source[1:4])
 
+
+def test_assignment():
+    source = np.array((1, 2, 3, 4, 5))
+    left = NamedArray("foo", "bar", source)
+    right = np.array((6, 7, 8, 9, 10))
+    left.values = right
+    assert_array_almost_equal(left.values, right)
+
+    left[0] = 42
+    expected = np.array((42, 7, 8, 9, 10))
+    assert_array_almost_equal(left.values, expected)
+
+
+def test_copy():
+    source = np.array((1, 2, 3, 4, 5))
+    left = NamedArray("foo", "bar", source)
+    right = left.copy()
+    assert left == right
+    assert left is not right
+
+    # Check that the copy is a deep copy
+    right.values[0] = 42
+    assert_array_not_almost_equal(left.values, right.values)
+
+    right.plural = "baz"
+    assert left.plural != right.plural
+
+    right.singular = "bat"
+    assert left.singular != right.singular
