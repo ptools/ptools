@@ -106,3 +106,14 @@ def test_copy():
 
     right.singular = "bat"
     assert left.singular != right.singular
+
+
+def test_string_arrays_are_object():
+    """Tests that string arrays are of dtype object.
+
+    If not so, then the array will be truncated to the length of the
+    shortest string in the array.
+    """
+    original = NamedArray("foo", "bar", np.array(("apple", "banana", "cherry")))
+    original[2] = "oranges"
+    assert np.all(original.values == np.array(("apple", "banana", "oranges")))

@@ -290,6 +290,21 @@ class TestParticleCollection:
             assert isinstance(pc[i], Particle)
             assert pc[i] == atom
 
+    def test_iter_returns_reference(self):
+        """Test that the ``in`` operator returns a reference to the original object."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        for p in pc:
+            p.name = "banana"
+        expected = ["banana"] * len(self.atoms)
+        actual = pc.atom_properties.get("names")
+        assert actual == expected
+
+    def test_getitem_with_int_returns_reference(self):
+        """Test that the ``getitem`` operator returns a reference to the original object."""
+        pc = ParticleCollection.from_objects(self.atoms)
+        pc[0].name = "banana"
+        assert pc[0].name == "banana"
+
     def test_copy(self):
         """Test that the ``copy`` method returns a deep copy."""
         pc = ParticleCollection.from_objects(self.atoms)

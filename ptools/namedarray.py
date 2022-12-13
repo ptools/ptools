@@ -27,7 +27,10 @@ class NamedArray:
     ) -> None:
         self.singular: str = singular
         self.plural: str = plural
-        self._values: np.ndarray = np.asarray(values)
+        if isinstance(values[0], str):
+            self._values: np.ndarray = np.asarray(values, dtype="O")
+        else:
+            self._values: np.ndarray = np.asarray(values)
         self._array_comparison_func = array_comparison_func
 
         if self._array_comparison_func is None:
@@ -169,7 +172,7 @@ class NamedArrayContainer(collections.abc.Container):
         """Stores a new property in the collection."""
         if item.plural in self._properties:
             raise KeyError(f"property named {item.plural!r} already exists")
-        if self.number_of_elements() != 0 and self.number_of_elements() != len(
+        if self.number_of_properties() != 0 and self.number_of_elements() != len(
             item.values
         ):
             err = (
