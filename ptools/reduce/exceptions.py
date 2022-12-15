@@ -62,9 +62,7 @@ class BeadCreationError(ResidueReductionError):
         self.bead = bead
         self.expected_atoms = sorted(self.bead.atom_reduction_parameters.keys())
         self.found_atoms = sorted(atom.atom_type for atom in self.bead.atoms)
-        super(BeadCreationError, self).__init__(
-            bead.resid_type, bead.resid_id, bead_name=self.bead.name
-        )
+        super().__init__(bead.resid_type, bead.resid_id, bead_name=self.bead.name)
 
 
 class IncompleteBeadError(BeadCreationError):

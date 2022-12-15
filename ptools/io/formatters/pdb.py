@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Iterable, Protocol
 
 from ...atomattrs import AtomAttrs
 from ...atomcollection import AtomCollection
@@ -12,13 +12,57 @@ PDB_FORMAT = (
 )
 
 
-def to_pdb(atom_or_collection: AtomAttrs | AtomCollection) -> str:
-    if isinstance(atom_or_collection, AtomCollection):
+class PDBConvertible(Protocol):
+    """Protocol for objects that can be converted to PDB format.
+
+    Those objects must have the following attributes:
+
+    - coordinates: a 3-tuple of floats
+    - name: a string, atom name
+    - index: an integer, atom index
+    - residue_name: a string, residue name
+    - residue_index: an integer, residue index
+    - chain: a string, chain name
+    - element: a string, element name
+    """
+
+    @property
+    def coordinates(self) -> tuple[float, float, float]:
+        ...
+
+    @property
+    def name(self) -> str:
+        ...
+
+    @property
+    def index(self) -> int:
+        ...
+
+    @property
+    def residue_name(self) -> str:
+        ...
+
+    @property
+    def residue_index(self) -> int:
+        ...
+
+    @property
+    def chain(self) -> str:
+        ...
+
+    @property
+    def element(self) -> str:
+        ...
+
+
+
+def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:
+    if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)
     return format_atom(atom_or_collection)
 
 
-def format_atom(atom: "AtomAttrs", **kwargs) -> str:
+def format_atom(atom: PDBConvertible) -> str:
     fmt_args: dict[str, Any] = {
         "record": "ATOM",
         "altloc": " ",
@@ -31,11 +75,13 @@ def format_atom(atom: "AtomAttrs", **kwargs) -> str:
         "atom_index": _format_atom_index(atom.index),
         "residue_name": _format_residue_name(atom.residue_name),
         "residue_index": _format_residue_index(atom.residue_index),
-        "x": atom.coords[0],
-        "y": atom.coords[1],
-        "z": atom.coords[2],
+
+        # Dirty hack to support both current version of ``Atom`` which
+        # ``coordinates`` attribute does not refers to its actual coordinates... nice...
+        "x": atom.coords[0] if hasattr(atom, "coords") else atom.coordinates[0],
+        "y": atom.coords[1] if hasattr(atom, "coords") else atom.coordinates[1],
+        "z": atom.coords[2] if hasattr(atom, "coords") else atom.coordinates[2],
     }
-    fmt_args.update(kwargs)
     return PDB_FORMAT.format(**fmt_args)
 
 
