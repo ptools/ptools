@@ -11,6 +11,30 @@ from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform
 
 
+def contact(receptor, ligand, cutoff=7):
+    """return residues in interaction, use ptools::pairlist"""
+
+    pl = PairList(receptor, ligand, cutoff)
+    contactnat = set()  # residue list in interaction
+
+    for id_atom_recpt, id_atom_lig in pl.contacts():
+
+        contactnat.add((receptor[id_atom_recpt].resid,
+                        ligand[id_atom_lig].resid))
+
+    return contactnat
+
+
+def fnat(receptor1, ligcrist, receptor2, ligprobe):
+    """return native fraction (fnat)"""
+    corig = contact(receptor1, ligcrist)
+    if len(corig) == 0:
+        return 0
+    cnew = contact(receptor2, ligprobe)
+    intersect = corig & cnew
+    f = float(len(intersect)) / float(len(corig))
+    return f
+
 def distAxis(mono,hp):
     """compute the distance between the axis of the screw and all the atoms of the monomer.
     Return the smallest and biggest distances
