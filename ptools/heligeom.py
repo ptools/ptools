@@ -8,7 +8,7 @@ import numpy as np
 
 from .rigidbody import RigidBody
 from .superpose import Screw, mat_trans_2_screw, fit_matrix
-from . import transform
+from . import transform, linalg
 
 
 def contact(receptor, ligand, cutoff=5):
@@ -91,12 +91,19 @@ def heli_construct(mono1: RigidBody, hp: Screw, N: int, Z: bool = False) -> Rigi
     origin = hp.point
     axis = hp.unit
     if Z:
-        # Redefine origin and axis to Z
-        origin = np.zeros(3)
+        # Redefine axis to Z
         axis = np.array([0.0, 0, 1])
 
         # Align the screw axis on Z-axis and apply the transformation on mono_test
         transform.orient(mono_test, hp.unit, [0.0, 0.0, 1.0])
+
+        # Align the screw axis on Z-axis and apply the transformation on mono_test and origin
+        # "don't know why this works... but Charles does"
+        t_matrix = linalg.orientation_matrix(mono_test.coordinates, hp.unit, axis)
+        transform.transform(mono_test, t_matrix)
+
+        origin[:] = np.inner(origin, t_matrix[:3, :3])
+
 
     mono_test.set_chain(string.ascii_uppercase[chain_id % 26])
     final += mono_test
