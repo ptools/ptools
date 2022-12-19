@@ -26,8 +26,8 @@ atoms:
     OT2: O
 
   ILE:
-    CD: CD1
-  
+    CD: CD
+
   A:
     C1*: A-C1'
     C2*: A-C2'
@@ -60,7 +60,7 @@ atoms:
     O4*: O4'
     OP1: O1P
     OP2: O2P
-  
+
   T:
     C1*:   C1'
     C2*:   C2',

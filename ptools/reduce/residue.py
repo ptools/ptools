@@ -1,35 +1,57 @@
 """ptools.reduce.bead - Defines the ``Residue`` class."""
 
-from dataclasses import dataclass, field, InitVar
+
 from typing import Any
 
-from .bead import Bead
+from ..atomcollection import AtomCollection
 
+from .bead import Bead, BeadIdentifier
+from .exceptions import MissingBeadsError, DuplicateBeadsError, NoAtomsForBeadError
 
 
 class Residue:
     """Coarse-grained representation of a residue.
 
     Attributes:
+        atoms (AtomCollection): list of atoms that compose the residue.
         beads (list[Bead]): list of beads that compose the residue.
-        residue_type (str): residue type.
-        residue_index (int): residue index.
+        reduction_parameters: list[dict[str, Any]]: reduction parameters, where each
+            element is the dictionary of parameters for a bead.
     """
 
-    def __init__(self, residue_type: str, residue_index: int, atoms: list, bead_reduction_parameters: dict[str, Any]):
+    name: str
+    index: int
+    atoms: AtomCollection
+    beads: list[Bead]
+    reduction_parameters: list[dict[str, Any]]
+
+    def __init__(
+        self, atoms: AtomCollection, bead_reduction_parameters: list[dict[str, Any]]
+    ):
         """Initializes a residue."""
+        self.name = atoms[0].residue_name
+        self.index = atoms[0].residue_index
+        self.atoms: AtomCollection = atoms
         self.beads: list[Bead] = []
-        self.residue_type: str = residue_type
-        self.residue_index: int = residue_index
+        self.reduction_parameters = bead_reduction_parameters
+        self.create_beads()
 
-        for bead_parameters in bead_reduction_parameters:
-            atoms = [atom for atom in atoms if atom.atom_type in bead_parameters["atoms"]]
+    def create_beads(self):
+        """Create beads from atoms and bead reduction parameters."""
+        for bead_parameters in self.reduction_parameters:
+            atoms = [
+                atom for atom in self.atoms if atom.name in bead_parameters["atoms"]
+            ]
 
+            # Raises an error if no atoms are found for the bead.
+            if not atoms:
+                bead_type = bead_parameters["name"]
+                bead_identifier = f"{self.name}:{self.index}:{bead_type}"
+                bead_atoms = list(bead_parameters["atoms"].keys())
+                raise NoAtomsForBeadError(bead_identifier, bead_atoms)
 
-
-            bead = Bead(self, bead_parameters)
+            bead = Bead(atoms, bead_parameters)
             self.beads.append(bead)
-
 
     def is_incomplete(self) -> bool:
         """Alias for ``has_missing_beads``."""
@@ -38,10 +60,10 @@ class Residue:
     def has_missing_beads(self) -> bool:
         """Return ``True`` if the residue is incomplete.
 
-        The residue in incomplete if the number of beads provided is inferior to the
+        The residue is incomplete if the number of beads provided is inferior to the
         number expected from the parameters.
         """
-        return len(self.beads) < len(self.bead_reduction_parameters)
+        return len(self.beads) < len(self.reduction_parameters)
 
     def has_duplicate_beads(self) -> bool:
         """Return ``True`` if the residue has duplicate beads.
@@ -49,38 +71,52 @@ class Residue:
         The residue has duplicate beads if the number of beads provided is superior to the
         number expected from the parameters.
         """
-        return len(self.beads) > len(self.bead_reduction_parameters)
+        return len(self.beads) > len(self.reduction_parameters)
 
-    def create_beads(self, bead_reduction_parameters: dict[str, Any]):
-        """Create beads from the given parameters.
+    def has_unexpected_atoms(self) -> bool:
+        """Return ``True`` if the residue has atoms that are not part of any bead."""
+        return len(self.atoms) > sum([len(bead.atoms) for bead in self.beads])
 
-        Args:
-            bead_reduction_parameters: reduction parameters, where keys are parameters names
-                and values are parameters values.
-        """
-        self.bead_reduction_parameters = bead_reduction_parameters
-        self.beads = []
-        for bead_reduction_parameters in self.bead_reduction_parameters.values():
-            beads = self._create_beads(bead_reduction_parameters)
-            self.beads.extend(beads)
+    def check_composition(self):
+        """Check that the residue is complete, has no duplicate beads and that each
+        bead's composition is correct as well."""
+        for bead in self.beads:
+            bead.check_composition()
 
-    def _create_beads(self, bead_reduction_parameters: dict[str, Any]):
-        """Create beads from the given parameters.
+        if self.has_missing_beads():
+            raise MissingBeadsError(self)
 
-        Args:
-            bead_reduction_parameters: reduction parameters, where keys are parameters names
-                and values are parameters values.
+        if self.has_duplicate_beads():
+            raise DuplicateBeadsError(self)
 
-        Returns:
-            list of beads.
-        """
-        beads = []
-        for atom_reduction_parameters in bead_reduction_parameters["atoms"].values():
-            atoms = self._get_atoms(atom_reduction_parameters)
-            if len(atoms) == 0:
-                continue
-            bead = Bead(atoms, self.resid_type, self.resid_id, bead_reduction_parameters)
-            beads.append(bead)
-        return beads
+        if self.has_unexpected_atoms():
+            raise UnexpectedAtomsError(self)
 
+    def find_missing_beads(self) -> set[BeadIdentifier]:
+        """Return the list of missing atoms."""
+        expected = {
+            BeadIdentifier(
+                bead_reduction_parameter["name"], bead_reduction_parameter["typeid"]
+            )
+            for bead_reduction_parameter in self.reduction_parameters
+        }
+        found = {BeadIdentifier(bead.type, bead.typeid) for bead in self.beads}
+        return expected - found
 
+    def find_duplicate_beads(self) -> set[BeadIdentifier]:
+        """Return the list of duplicate atoms."""
+        found = [BeadIdentifier(bead.type, bead.typeid) for bead in self.beads]
+        return set([x for x in found if found.count(x) > 1])
+
+    def find_unexpected_atoms(self) -> set[str]:
+        """Return the list of unexpected atoms."""
+        expected = self._expected_atoms()
+        found = set([atom.name for atom in self.atoms])
+        return found - expected
+
+    def _expected_atoms(self) -> set[str]:
+        """Return the list of expected atoms."""
+        expected = []
+        for bead in self.reduction_parameters:
+            expected += list(bead["atoms"].keys())
+        return set(expected)
