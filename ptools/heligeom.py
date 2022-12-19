@@ -6,12 +6,13 @@ Some more documentation coming soon.
 import string
 import numpy as np
 
+from .pairlist import PairList
 from .rigidbody import RigidBody
 from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform, linalg
 
 
-def contact(receptor, ligand, cutoff=5):
+def contact(receptor: RigidBody, ligand: RigidBody, cutoff: float = 5):
     """return residues in interaction, use ptools::pairlist"""
 
     pl = PairList(receptor, ligand, cutoff)
@@ -25,7 +26,7 @@ def contact(receptor, ligand, cutoff=5):
     return contactnat
 
 
-def fnat(receptor1, ligcrist, receptor2, ligprobe):
+def fnat(receptor1: RigidBody, ligcrist: RigidBody, receptor2: RigidBody, ligprobe: RigidBody) -> float:
     """return native fraction (fnat)"""
     corig = contact(receptor1, ligcrist)
     print(len(corig))
@@ -37,12 +38,12 @@ def fnat(receptor1, ligcrist, receptor2, ligprobe):
     f = float(len(intersect)) / float(len(corig))
     return f
 
-def distAxis(mono,hp):
-    """compute the distance between the axis of the screw and all the atoms of the monomer.
-    Return the smallest and biggest distances
+def distAxis(mono: RigidBody, hp: Screw) -> tuple[float, float]:
+    """compute the distance between the axis of the screw and all the atoms of the monomer mono.
+    Return the smallest and biggest distances.
     """
 
-    dmin, dmax = -1,-1
+    dmin, dmax = -1.0,-1.0
 
     for atom in mono:
 
@@ -61,7 +62,7 @@ def distAxis(mono,hp):
 
     return dmin, dmax
 
-def chain_intersect(rb1, rb2, delta_resid=0):
+def chain_intersect(rb1: RigidBody, rb2: RigidBody, delta_resid: int = 0) -> tuple[RigidBody, RigidBody]:
     """
     Return new RigidBodies containing only the common residues of the input RigidBodies.
     - Assumes RigidBodies contain a single chain. If multiple chains, split before calling
