@@ -17,7 +17,9 @@ TEST_1A74_PROT_RED = os.path.join(TEST_DATA_DIR, "1A74_prot.red")
 TEST_2GLSA = os.path.join(TEST_DATA_DIR, "2GLS_A.pdb")
 TEST_2GLSB = os.path.join(TEST_DATA_DIR, "2GLS_B.pdb")
 TEST_REF_2GLSAB_N6 = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N6.pdb")
+TEST_REF_COORDS_2GLSAB_N6 = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N6.npy")
 TEST_REF_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N3-Zalign.pdb")
+TEST_REF_COORDS_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N3-Zalign.npy")
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -93,13 +95,19 @@ class TestHeligeom(unittest.TestCase):
     def test_heli_construct(self):
         """Tests that heligeom.heli_construct"""
         result = heli_construct(self.mono1, self.hp, N=self.n_monomers)
+        ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N6)
+
         self.assertEqual(to_pdb(result), to_pdb(self.ref))
+        assert_array_almost_equal(result.coordinates, ref_coords)
 
     def test_heli_construct_Zalign(self):
         """Tests that heligeom.heli_construct"""
         ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N3_Z)
+        ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N3_Z)
         result = heli_construct(self.mono1, self.hp, N=3, Z=True)
+
         self.assertEqual(to_pdb(result), to_pdb(ref))
+        assert_array_almost_equal(result.coordinates, ref_coords)
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
