@@ -20,8 +20,8 @@ def contact(receptor: RigidBody, ligand: RigidBody, cutoff: float = 5):
 
     for id_atom_recpt, id_atom_lig in pl.contacts():
 
-        contactnat.add((receptor[id_atom_recpt].resid,
-                        ligand[id_atom_lig].resid))
+        contactnat.add((receptor[id_atom_recpt].residue_index,
+                        ligand[id_atom_lig].residue_index))
 
     return contactnat
 
@@ -38,12 +38,12 @@ def fnat(receptor1: RigidBody, ligcrist: RigidBody, receptor2: RigidBody, ligpro
     f = float(len(intersect)) / float(len(corig))
     return f
 
-def distAxis(mono: RigidBody, hp: Screw) -> tuple[float, float]:
+def dist_axis(mono: RigidBody, hp: Screw) -> tuple[float, float]:
     """compute the distance between the axis of the screw and all the atoms of the monomer mono.
     Return the smallest and biggest distances.
     """
 
-    dmin, dmax = -1.0,-1.0
+    dmin, dmax = -1,-1
 
     for atom in mono:
 
