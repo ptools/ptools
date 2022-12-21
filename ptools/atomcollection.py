@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import UserList
 import itertools
-from typing import Any, Callable, Iterable, Iterator
+from typing import Any, Callable, Iterable, Iterator, Optional, TypeVar
 
 import numpy as np
 
@@ -76,6 +76,8 @@ class Atom(AtomAttrs):
         return all(getattr(self, attr) == getattr(other, attr) for attr in attrs)
 
 
+AtomCollectionType = TypeVar("AtomCollectionType", bound="AtomCollection")
+
 class AtomCollection(UserList):
     """Group of atoms.
 
@@ -85,7 +87,7 @@ class AtomCollection(UserList):
         atoms (list[AtomAttrs]): list of atoms
     """
 
-    def __init__(self, atoms: Iterable[AtomAttrs] = None):
+    def __init__(self, atoms: Optional[Iterable[AtomAttrs]] = None):
         if atoms is None:
             atoms = []
             coords = array3d(np.zeros((0, 3)))
@@ -115,7 +117,7 @@ class AtomCollection(UserList):
         classname = self.__class__.__name__
         return f"<{modulename}.{classname} with {len(self)} atoms>"
 
-    def __add__(self, other: Iterable[AtomAttrs]) -> AtomCollection:
+    def __add__(self: AtomCollectionType, other: Iterable[AtomAttrs]) -> AtomCollectionType:
         """Concatenates two RigidBody instances."""
         if not isinstance(other, AtomCollection):
             other = AtomCollection(other)
@@ -125,14 +127,14 @@ class AtomCollection(UserList):
         output.coordinates = np.concatenate((lhs, rhs), axis=0)
         return output
 
-    def __iadd__(self, other: Iterable[AtomAttrs]) -> AtomCollection:
+    def __iadd__(self: AtomCollectionType, other: Iterable[AtomAttrs]) -> AtomCollectionType:
         return self.__add__(other)
 
     def guess_masses(self):
         """Guesses atom masses and store them."""
         self.masses = np.array([Atom.guess_mass(atom.element) for atom in self])
 
-    def copy(self) -> AtomCollection:
+    def copy(self: AtomCollectionType) -> AtomCollectionType:
         """Returns a copy of the current collection."""
         return self.__class__(self)
 
@@ -148,26 +150,26 @@ class AtomCollection(UserList):
         for atom in self:
             atom.chain = chain
 
-    def groupby(self, key: Callable) -> dict[Any, AtomCollection]:
+    def groupby(self: AtomCollectionType, key: Callable) -> dict[Any, AtomCollectionType]:
         data = sorted(self, key=key)
         grouped = itertools.groupby(data, key=key)
         return {key: self.__class__(list(group)) for key, group in grouped}
 
-    def select_atom_type(self, atom_type: str) -> AtomCollection:
+    def select_atom_type(self: AtomCollectionType, atom_type: str) -> AtomCollectionType:
         """Returns a sub-collection made of atoms with desired atom type."""
         return self.__class__(atoms=[atom for atom in self if atom.name == atom_type])
 
-    def select_atom_types(self, atom_types: list[str]) -> AtomCollection:
+    def select_atom_types(self: AtomCollectionType, atom_types: list[str]) -> AtomCollectionType:
         """Returns a sub-collection made of atoms with desired atom types."""
         return self.__class__(atoms=[atom for atom in self if atom.name in atom_types])
 
-    def select_residue_range(self, start: int, end: int) -> AtomCollection:
+    def select_residue_range(self: AtomCollectionType, start: int, end: int) -> AtomCollectionType:
         """Returns a sub-collection made of atoms with desired which residue is within the range."""
         return self.__class__(
             atoms=[atom for atom in self if start <= atom.residue_index <= end]
         )
 
-    def select_chain(self, chain_id: str) -> AtomCollection:
+    def select_chain(self: AtomCollectionType, chain_id: str) -> AtomCollectionType:
         """Returns a sub-collection made of atoms with desired chain."""
         return self.__class__(atoms=[atom for atom in self if atom.chain == chain_id])
 
@@ -175,10 +177,10 @@ class AtomCollection(UserList):
         """Iterate over the collection's atoms."""
         return iter(self)
 
-    def iter_residues(self) -> Iterator[AtomCollection]:
+    def iter_residues(self: AtomCollectionType) -> Iterator[AtomCollectionType]:
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
         return iter(by_residue.values())
 
-    def iter_chains(self) -> Iterator[AtomCollection]:
+    def iter_chains(self: AtomCollectionType) -> Iterator[AtomCollectionType]:
         by_chain = self.groupby(lambda atom: atom.chain)
         return iter(by_chain.values())

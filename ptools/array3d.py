@@ -55,7 +55,7 @@ class array3d(np.ndarray):
         return self.__class__(self - target)
 
     def norm(self) -> float:
-        return L.norm(self)
+        return float(L.norm(self))  # numpy.linalg.norm() returns a numpy.floating
 
     def normalize(self):
         """Normalize coordinates."""

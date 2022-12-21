@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Type hinting specific imports
 from collections.abc import Sequence
-from typing import Type, TypeVar
+from typing import Optional, Type, TypeVar
 from ._typing import FilePath
 
 # Scientific libraries.
@@ -35,7 +35,7 @@ class RigidBody(AtomCollection):
     Also, it can be initialized from a file.
     """
 
-    def __init__(self, atoms: Sequence[AtomAttrs] = None):
+    def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
         if isinstance(atoms, str):
             raise TypeError(
                 "RigidBody class can not longer be instantiated from a path. "
@@ -55,7 +55,7 @@ class AttractRigidBody(RigidBody):
 
     Atom categories and charges are parsed from input PDB file."""
 
-    def __init__(self, atoms: Sequence[AtomAttrs] = None):
+    def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
         super().__init__(atoms)
         N = len(self)
         self.atom_categories = np.zeros(N, dtype=int)
