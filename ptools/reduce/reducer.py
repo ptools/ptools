@@ -1,6 +1,6 @@
 from pathlib import Path
-from typing import Any
-
+from typing import Any, Container, Optional, Type
+import logging
 
 import yaml
 
@@ -14,6 +14,7 @@ from .exceptions import NoReductionRulesError
 from .residue import Residue
 
 PathLike = str | Path
+ExceptionTypeContainer = Container[Type[Exception]]
 
 
 # TODO: define this path somewhere else.
@@ -24,6 +25,8 @@ PTOOLS_REDUCTION_PARAMETERS_PATH = PTOOLS_DATA_PATH / "reduction_parameters"
 DEFAULT_ATTRACT1_PROTEIN_REDUCTION_PARAMETERS_PATH = (
     PTOOLS_REDUCTION_PARAMETERS_PATH / "attract1_protein_reduction_parameters.yml"
 )
+
+logger = logging.getLogger(__name__)
 
 
 class Reducer:
@@ -41,7 +44,20 @@ class Reducer:
         self.atom_rename_map = read_name_conversion_rules(PTOOLS_ATOM_RENAME_RULES_PATH)
         self.beads: list[Bead] = []
 
-    def reduce(self) -> None:
+    def number_of_atoms(self) -> int:
+        return len(self.all_atoms)
+
+    def number_of_beads(self) -> int:
+        return len(self.beads)
+
+    def reduce(self,
+        ignore_exceptions: Optional[ExceptionTypeContainer] = None,
+        warn_exceptions: Optional[ExceptionTypeContainer] = None,
+    ) -> None:
+        """Lunches reduction."""
+        warn_exceptions = warn_exceptions or []
+        ignore_exceptions = ignore_exceptions or []
+
         self._rename_atoms_and_residues()
         residue_list = list(self.all_atoms.iter_residues())
 
@@ -49,16 +65,15 @@ class Reducer:
             try:
                 coarse_residue = self._reduce_residue(residue)
                 coarse_residue.check_composition()
-            except Exception as e:
-                print(e)
+            except Exception as error:
+                if type(error) in warn_exceptions:
+                    logger.warning("%s", error)
+                elif type(error) in ignore_exceptions:
+                    pass
+                else:
+                    raise error
             else:
                 self.beads.extend(coarse_residue.beads)
-
-    def number_of_atoms(self) -> int:
-        return len(self.all_atoms)
-
-    def number_of_beads(self) -> int:
-        return len(self.beads)
 
     def _reduce_residue(self, residue: AtomCollection) -> Residue:
         """Reduces a single residue."""

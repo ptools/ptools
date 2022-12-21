@@ -6,7 +6,12 @@ from typing import Any
 from ..atomcollection import AtomCollection
 
 from .bead import Bead, BeadIdentifier
-from .exceptions import MissingBeadsError, DuplicateBeadsError, NoAtomsForBeadError
+from .exceptions import (
+    DuplicateBeadsError,
+    MissingBeadsError,
+    NoAtomsForBeadError,
+    UnexpectedAtomsError,
+)
 
 
 class Residue:

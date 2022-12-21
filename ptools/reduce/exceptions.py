@@ -100,7 +100,7 @@ class DuplicateAtomsError(ValueError):
 class UnexpectedAtomsError(Exception):
     """Exception raised when the residue has atoms that are not part of any bead."""
 
-    def __init__(self, residue: Residue):
+    def __init__(self, residue: "Residue"):
         """Initializes the exception."""
         self.unexpected_atoms = residue.find_unexpected_atoms()
         self.message = (
