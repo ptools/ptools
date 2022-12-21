@@ -27,11 +27,12 @@ class Bead:
 
     Attributes:
         atoms: list of atoms that compose the bead.
-        residue_type: residue type.
+        residue_name: residue type.
         residue_index: residue index.
         type: bead type.
-        charge: bead charge.
         typeid: bead type id (present in PDB format in 'extra' field).
+        charge: bead charge.
+        chain: chain identifier.
     """
 
     atoms: list
@@ -55,6 +56,7 @@ class Bead:
             raise ValueError("Bead must have at least one atom.")
 
         self.atoms = atoms
+        self.chain = atoms[0].chain
         self.residue_name = self.atoms[0].residue_name
         self.residue_index = self.atoms[0].residue_index
         self.type = bead_reduction_parameters.get("name", "X")
@@ -62,8 +64,6 @@ class Bead:
         self.charge = bead_reduction_parameters.get("charge", 0.0)
         self.atom_reduction_parameters = bead_reduction_parameters["atoms"]
 
-        # Chain is set from the first atom of the bead.
-        self.chain = atoms[0].chain
 
     def is_incomplete(self) -> bool:
         """Alias for ``has_missing_atoms``."""

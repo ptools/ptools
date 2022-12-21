@@ -4,10 +4,10 @@ import numpy as np
 
 from . import measure
 from .linalg import transform as T
-from ._typing import ArrayLike, HasCoordinates
+from ._typing import ArrayLike, HasCoordinatesType
 
 
-def translate(obj: HasCoordinates, direction: ArrayLike):
+def translate(obj: HasCoordinatesType, direction: ArrayLike):
     """Translates an object coordinates using vector `direction`.
 
     Args:
@@ -17,7 +17,7 @@ def translate(obj: HasCoordinates, direction: ArrayLike):
     T.translate(obj.coordinates, direction)
 
 
-def moveby(obj: HasCoordinates, direction: ArrayLike):
+def moveby(obj: HasCoordinatesType, direction: ArrayLike):
     """Translates object coordinates using vector or scalar `direction`.
 
     This is an alias for ``translate``.
@@ -25,12 +25,12 @@ def moveby(obj: HasCoordinates, direction: ArrayLike):
     translate(obj, direction)
 
 
-def center_to_origin(obj: HasCoordinates, origin: ArrayLike = np.zeros(3)):
+def center_to_origin(obj: HasCoordinatesType, origin: ArrayLike = np.zeros(3)):
     """Centers object on `origin`."""
     translate(obj, np.asarray(origin) - measure.centroid(obj))
 
 
-def rotate_by(obj: HasCoordinates, angles: ArrayLike):
+def rotate_by(obj: HasCoordinatesType, angles: ArrayLike):
     """Rotates object coordinates around X, Y and Z axes.
 
     Args:
@@ -39,7 +39,7 @@ def rotate_by(obj: HasCoordinates, angles: ArrayLike):
     T.rotate_by(obj.coordinates, angles)
 
 
-def rotate(obj: HasCoordinates, rotation: ArrayLike):
+def rotate(obj: HasCoordinatesType, rotation: ArrayLike):
     """Rotates object using rotation matrix or 3 angles.
 
     Args:
@@ -49,28 +49,28 @@ def rotate(obj: HasCoordinates, rotation: ArrayLike):
 
 
 def ab_rotate(
-    obj: HasCoordinates, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True
+    obj: HasCoordinatesType, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True
 ):
     """Rotates object using PTools rotation around axis."""
     T.ab_rotate(obj.coordinates, A, B, amount, degrees)
 
 
-def attract_euler_rotate(obj: HasCoordinates, angles: np.ndarray = np.zeros(3)):
+def attract_euler_rotate(obj: HasCoordinatesType, angles: np.ndarray = np.zeros(3)):
     """Rotates object with Attract convention."""
     T.attract_euler_rotate(obj.coordinates, angles)
 
 
-def orient(obj: HasCoordinates, vector: ArrayLike, target: ArrayLike):
+def orient(obj: HasCoordinatesType, vector: ArrayLike, target: ArrayLike):
     """Orients a SpatialObject."""
     T.orient(obj.coordinates, vector, target)
 
 
-def transform(obj: HasCoordinates, matrix: ArrayLike):
+def transform(obj: HasCoordinatesType, matrix: ArrayLike):
     """Transforms an object using 4x4 matrix."""
     T.transform(obj.coordinates, matrix)
 
 
-def move(obj: HasCoordinates, matrix: ArrayLike):
+def move(obj: HasCoordinatesType, matrix: ArrayLike):
     """Transforms an object using 4x4 matrix.
 
     This is an alias for ``transform``.

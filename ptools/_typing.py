@@ -12,17 +12,43 @@ Numeric = Union[float, int]
 ArrayLike = Union[Sequence[Numeric], np.ndarray]
 
 
-class HasCoordinates(Protocol):
+class HasCoordinatesType(Protocol):
     @property
     def coordinates(self) -> np.ndarray:
         ...
 
 
-class Topology(Protocol):
+class TopologyType(Protocol):
     @property
     def coordinates(self) -> np.ndarray:
         ...
 
     @property
     def masses(self) -> np.ndarray:
+        ...
+
+
+class AtomType(Protocol):
+    @property
+    def name(self) -> str:
+        ...
+
+    @property
+    def index(self) -> int:
+        ...
+
+    @property
+    def residue_name(self) -> str:
+        ...
+
+    @property
+    def residue_index(self) -> int:
+        ...
+
+    @property
+    def chain(self) -> str:
+        ...
+
+    @property
+    def coordinates(self) -> ArrayLike:
         ...
