@@ -9,7 +9,7 @@ from scipy.spatial.transform import Rotation
 
 from .atomcollection import AtomCollection
 from . import linalg, measure, transform
-
+from ._typing import ArrayLike
 
 def zeros3f():
     return np.zeros(3, dtype="float64")
@@ -34,7 +34,7 @@ class Screw:
         return s
 
 
-def kabsch_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
+def kabsch_matrix(mobile: ArrayLike, target: ArrayLike) -> np.ndarray:
     """Calculates a rotation to optimally align two sets of coordinates.
 
     Uses Kabsch algorithm.

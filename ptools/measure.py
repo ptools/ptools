@@ -34,7 +34,7 @@ def center_of_mass(obj: Topology) -> np.ndarray:
 def inertia_tensor(obj: HasCoordinates | Topology, weights: Optional[ArrayLike] = None):
     """Returns the inertia tensors of a set of atoms."""
     if weights is None:
-        weights = getattr(obj, "masses", np.ones(len(obj.coordinates)))
+        weights = np.asarray(getattr(obj, "masses", np.ones(len(obj.coordinates))))
     return L.inertia_tensor(obj.coordinates, weights)
 
 
