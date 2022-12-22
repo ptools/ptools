@@ -1,6 +1,7 @@
 """linalg - Defines functions to read/write files."""
 
 import os
+import pathlib
 from typing import Optional
 from .._typing import FilePath
 
@@ -21,13 +22,13 @@ def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> 
     Returns:
         bool: True if file exists, False either.
     """
-    exists = os.path.exists(path)
-    if not exists and message:
+    path = pathlib.Path(path)
+    if not path.exists() and message:
         if message is True:
             print(f"ERROR: file not found: '{path}'")
         else:
             print(message.format(path))
-    return exists
+    return path.exists()
 
 
 def assert_file_exists(path: FilePath, message: Optional[str] = ""):
@@ -39,13 +40,14 @@ def assert_file_exists(path: FilePath, message: Optional[str] = ""):
 
     Raises:
         FileNotFoundError: if file does not exists
-        IsADirectoryError: if `path` is a directory
+        IsADirectoryError: if ``path`` is a directory
     """
+    path = pathlib.Path(path)
     if not message:
         message = f"{path}"
-    if not os.path.exists(path):
+    if not path.exists():
         raise FileNotFoundError(message)
-    if os.path.isdir(path):
+    if path.is_dir():
         raise IsADirectoryError(message)
 
 

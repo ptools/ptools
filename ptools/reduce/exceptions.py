@@ -1,5 +1,7 @@
 """ptools.reduce.exceptions - Exceptions for ``ptools.reduce``."""
 
+import inspect
+import sys
 from typing import TYPE_CHECKING
 
 
@@ -108,3 +110,17 @@ class UnexpectedAtomsError(Exception):
             f"any bead: {self.unexpected_atoms}"
         )
         super().__init__(self.message)
+
+
+def all_exceptions_names() -> list[str]:
+    """Return a list of all exceptions names defined in this module."""
+    return [
+        name
+        for name, obj in inspect.getmembers(sys.modules[__name__])
+        if inspect.isclass(obj) and issubclass(obj, Exception)
+    ]
+
+
+def exceptions_from_names(names: list[str]) -> list[type[Exception]]:
+    """Return a list of exceptions from a list of exception names."""
+    return [getattr(sys.modules[__name__], name) for name in names]

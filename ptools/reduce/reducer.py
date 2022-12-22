@@ -20,10 +20,10 @@ ExceptionTypeContainer = Container[Type[Exception]]
 # TODO: define this path somewhere else.
 PTOOLS_DATA_PATH = Path(__file__).parent.parent / "data"
 
-PTOOLS_ATOM_RENAME_RULES_PATH = PTOOLS_DATA_PATH / "atom_rename_rules.yml"
-PTOOLS_REDUCTION_PARAMETERS_PATH = PTOOLS_DATA_PATH / "reduction_parameters"
-DEFAULT_ATTRACT1_PROTEIN_REDUCTION_PARAMETERS_PATH = (
-    PTOOLS_REDUCTION_PARAMETERS_PATH / "attract1_protein_reduction_parameters.yml"
+DEFAULT_ATOM_RENAME_RULES_PATH = PTOOLS_DATA_PATH / "atom_rename_rules.yml"
+PTOOLS_REDUCTION_PARAMETERS_DIR = PTOOLS_DATA_PATH / "reduction_parameters"
+ATTRACT1_PROTEIN_REDUCTION_PARAMETERS_PATH = (
+    PTOOLS_REDUCTION_PARAMETERS_DIR / "attract1_protein_reduction_parameters.yml"
 )
 
 logger = logging.getLogger(__name__)
@@ -36,12 +36,16 @@ class Reducer:
     atom_rename_map: dict[str, dict[str, str]]
     beads: list[Bead]
 
-    def __init__(self, topology_file: PathLike, reduction_parameters_file: PathLike):
+    def __init__(self,
+        topology_file: PathLike,
+        reduction_parameters_file: PathLike,
+        name_conversion_file: PathLike,
+    ):
         self.all_atoms = read_single_model_pdb(topology_file)
         self.reduction_parameters = read_reduction_parameters(
             reduction_parameters_file
         )["beads"]
-        self.atom_rename_map = read_name_conversion_rules(PTOOLS_ATOM_RENAME_RULES_PATH)
+        self.atom_rename_map = read_name_conversion_rules(name_conversion_file)
         self.beads: list[Bead] = []
 
     def number_of_atoms(self) -> int:

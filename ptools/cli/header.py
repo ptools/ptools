@@ -22,7 +22,7 @@ def print_header(command_name: str):
     version_str = f"based on the PTools library v{ptools.__version__}"
 
     print("*" * width)
-    for line in ("", command, "", "Python edition", "", version_str,):
+    for line in ("", command, "", "Python edition", "", version_str, ""):
         print(f"* {line.center(width - 4)} *")
     print("*" * width)
     print()

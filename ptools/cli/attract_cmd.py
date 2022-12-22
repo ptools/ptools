@@ -4,7 +4,7 @@ import datetime
 
 import ptools
 from ptools import attract
-
+from .header import print_header
 
 def create_subparser(parent):
     """Creates command-line parser."""
@@ -76,18 +76,7 @@ def create_subparser(parent):
 
 def run(args):
     """Runs attract."""
-    print(
-        f"""
-**********************************************************************
-**                                                                  **
-**                ATTRACT  (Python edition)                         **
-**                based on the PTools library                       **
-**                                                                  **
-**********************************************************************
-PTools revision {ptools.__version__}
-
-"""
-    )
+    print_header("attract")
     time_start = datetime.datetime.now()
     print("Start time:", time_start)
 
