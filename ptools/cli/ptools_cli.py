@@ -15,7 +15,7 @@ def parse_command_line(args=None):
     """Main ptools command-line parsing."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version")
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(required=True)
     attract_cmd.create_subparser(subparsers)
     reduce_cmd.create_subparser(subparsers)
     return parser.parse_args(args)
