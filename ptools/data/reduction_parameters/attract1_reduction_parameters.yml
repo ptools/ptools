@@ -442,3 +442,256 @@ beads:
           weight: 1.0
         CG2:
           weight: 1.0
+
+# DNA beads
+  A:
+    - name: GP1
+      charge:  0.0
+      typeid: 30
+      atoms:
+        O1P:
+          weight: 1.0
+        O2P:
+          weight: 1.0
+        P:
+          weight: 1.0
+    - name: GS1
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O3':
+          weight: 1.0
+        C3':
+          weight: 1.0
+        C4':
+          weight: 1.0
+        C5':
+          weight: 1.0
+    - name: GS2
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C2':
+          weight: 1.0
+        C1':
+          weight: 1.0
+        O4':
+          weight: 1.0
+    - name: GA1
+      charge:  0.0
+      typeid: 33
+      atoms:
+        N7:
+          weight: 1.0
+        C8:
+          weight: 1.0
+        N9:
+          weight: 1.0
+    - name: GA2
+      charge:  0.0
+      typeid: 34
+      atoms:
+        C5:
+          weight: 1.0
+        C6:
+          weight: 1.0
+        N1:
+          weight: 1.0
+        N6:
+          weight: 1.0
+    - name: GA3
+      charge:  0.0
+      typeid: 35
+      atoms:
+        C4:
+          weight: 1.0
+        N3:
+          weight: 1.0
+        C2:
+          weight: 1.0
+
+  C:
+    - name: GP1
+      charge:  0.0
+      typeid: 30
+      atoms:
+        O1P:
+          weight: 1.0
+        O2P:
+          weight: 1.0
+        P:
+          weight: 1.0
+    - name: GS1
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O3':
+          weight: 1.0
+        C3':
+          weight: 1.0
+        C4':
+          weight: 1.0
+        C5':
+          weight: 1.0
+    - name: GS2
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C2':
+          weight: 1.0
+        C1':
+          weight: 1.0
+        O4':
+          weight: 1.0
+    - name: GC1
+      charge:  0.0
+      typeid: 39
+      atoms:
+        C6:
+          weight: 1.0
+        N1:
+          weight: 1.0
+        C2:
+          weight: 1.0
+        O2:
+          weight: 1.0
+    - name: GC2
+      charge:  0.0
+      typeid: 40
+      atoms:
+        C5:
+          weight: 1.0
+        C4:
+          weight: 1.0
+        N4:
+          weight: 1.0
+        N3:
+          weight: 1.0
+
+  G:
+    - name: GP1
+      charge:  0.0
+      typeid: 30
+      atoms:
+        O1P:
+          weight: 1.0
+        O2P:
+          weight: 1.0
+        P:
+          weight: 1.0
+    - name: GS1
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O3':
+          weight: 1.0
+        C3':
+          weight: 1.0
+        C4':
+          weight: 1.0
+        C5':
+          weight: 1.0
+    - name: GS2
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C2':
+          weight: 1.0
+        C1':
+          weight: 1.0
+        O4':
+          weight: 1.0
+    - name: GG1
+      charge:  0.0
+      typeid: 36
+      atoms:
+        N7:
+          weight: 1.0
+        C8:
+          weight: 1.0
+        N9:
+          weight: 1.0
+    - name: GG2
+      charge:  0.0
+      typeid: 37
+      atoms:
+        C5:
+          weight: 1.0
+        C6:
+          weight: 1.0
+        O6:
+          weight: 1.0
+        N1:
+          weight: 1.0
+    - name: GG3
+      charge:  0.0
+      typeid: 38
+      atoms:
+        C4:
+          weight: 1.0
+        N3:
+          weight: 1.0
+        C2:
+          weight: 1.0
+        N2:
+          weight: 1.0
+
+  T:
+    - name: GP1
+      charge:  0.0
+      typeid: 30
+      atoms:
+        O1P:
+          weight: 1.0
+        O2P:
+          weight: 1.0
+        P:
+          weight: 1.0
+    - name: GS1
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O3':
+          weight: 1.0
+        C3':
+          weight: 1.0
+        C4':
+          weight: 1.0
+        C5':
+          weight: 1.0
+    - name: GS2
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C2':
+          weight: 1.0
+        C1':
+          weight: 1.0
+        O4':
+          weight: 1.0
+    - name: GT1
+      charge:  0.0
+      typeid: 41
+      atoms:
+        C6:
+          weight: 1.0
+        N1:
+          weight: 1.0
+        C2:
+          weight: 1.0
+        O2:
+          weight: 1.0
+    - name: GT2
+      charge:  0.0
+      typeid: 42
+      atoms:
+        C5M:
+          weight: 1.0
+        C5:
+          weight: 1.0
+        C4:
+          weight: 1.0
+        O4:
+          weight: 1.0
+        N3:
+          weight: 1.0

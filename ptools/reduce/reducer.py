@@ -22,8 +22,8 @@ PTOOLS_DATA_PATH = Path(__file__).parent.parent / "data"
 
 DEFAULT_ATOM_RENAME_RULES_PATH = PTOOLS_DATA_PATH / "atom_rename_rules.yml"
 PTOOLS_REDUCTION_PARAMETERS_DIR = PTOOLS_DATA_PATH / "reduction_parameters"
-ATTRACT1_PROTEIN_REDUCTION_PARAMETERS_PATH = (
-    PTOOLS_REDUCTION_PARAMETERS_DIR / "attract1_protein_reduction_parameters.yml"
+ATTRACT1_DEFAULT_REDUCTION_PARAMETERS_PATH = (
+    PTOOLS_REDUCTION_PARAMETERS_DIR / "attract1_reduction_parameters.yml"
 )
 
 logger = logging.getLogger(__name__)

@@ -27,7 +27,7 @@ def create_subparser(parent):
         "--reduction-parameters",
         help="path to reduction parameters file.",
         type=Path,
-        default=reduce.ATTRACT1_PROTEIN_REDUCTION_PARAMETERS_PATH,
+        default=reduce.ATTRACT1_DEFAULT_REDUCTION_PARAMETERS_PATH,
     )
     parser.add_argument(
         "--name-conversion-rules",
