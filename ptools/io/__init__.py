@@ -5,7 +5,8 @@ import pathlib
 from typing import Optional
 from .._typing import FilePath
 
-from .formatters.pdb import to_pdb
+from .formatters.pdb import to_pdb, write_pdb
+from .formatters.reduced import to_reduced_pdb, write_reduced_pdb
 
 
 def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> bool:

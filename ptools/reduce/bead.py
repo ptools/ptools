@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .exceptions import IncompleteBeadError, DuplicateAtomsError
+from ..linalg import center_of_mass
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,7 @@ class Bead:
 
     Attributes:
         atoms: list of atoms that compose the bead.
+        index: bead index.
         residue_name: residue type.
         residue_index: residue index.
         type: bead type.
@@ -36,6 +38,7 @@ class Bead:
     """
 
     atoms: list
+    index: int
     residue_name: str
     residue_index: int
     type: str
@@ -56,6 +59,7 @@ class Bead:
             raise ValueError("Bead must have at least one atom.")
 
         self.atoms = atoms
+        self.index = 0
         self.chain = atoms[0].chain
         self.residue_name = self.atoms[0].residue_name
         self.residue_index = self.atoms[0].residue_index
@@ -64,6 +68,20 @@ class Bead:
         self.charge = bead_reduction_parameters.get("charge", 0.0)
         self.atom_reduction_parameters = bead_reduction_parameters["atoms"]
 
+    @property
+    def coordinates(self):
+        """Returns the coordinates of the bead.
+
+        The coordinates of the bead are the center of mass of the bead atoms.
+        """
+        coordinates = [atom.coordinates for atom in self.atoms]
+        weights = [self.atom_reduction_parameters[atom.name].get("weight", 1.0) for atom in self.atoms]
+        return center_of_mass(coordinates, weights)
+
+    @property
+    def name(self) -> str:
+        """Alias for ``type``."""
+        return self.type
 
     def is_incomplete(self) -> bool:
         """Alias for ``has_missing_atoms``."""
@@ -110,7 +128,6 @@ class Bead:
         Returns:
             list of duplicate atom names.
         """
-        expected_atoms = list(self.atom_reduction_parameters.keys())
         found = [atom.name for atom in self.atoms]
         duplicate = [atom for atom in found if found.count(atom) > 1]
         return list(set(duplicate))

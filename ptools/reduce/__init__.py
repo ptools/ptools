@@ -1,7 +1,7 @@
 
 from .reducer import (
+    FORCEFIELDS,
     DEFAULT_ATOM_RENAME_RULES_PATH,
-    ATTRACT1_DEFAULT_REDUCTION_PARAMETERS_PATH,
     Reducer,
 )
 

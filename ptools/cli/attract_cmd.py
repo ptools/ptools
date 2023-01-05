@@ -6,9 +6,13 @@ import ptools
 from ptools import attract
 from .header import print_header
 
+
+__COMMAND__ = "attract"
+
+
 def create_subparser(parent):
     """Creates command-line parser."""
-    parser = parent.add_parser("attract", help=__doc__)
+    parser = parent.add_parser(__COMMAND__, help=__doc__)
     parser.set_defaults(func=run)
     parser.add_argument(
         "-r",
@@ -76,7 +80,7 @@ def create_subparser(parent):
 
 def run(args):
     """Runs attract."""
-    print_header("attract")
+    print_header(__COMMAND__)
     time_start = datetime.datetime.now()
     print("Start time:", time_start)
 

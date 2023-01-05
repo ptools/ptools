@@ -112,6 +112,11 @@ class UnexpectedAtomsError(Exception):
         super().__init__(self.message)
 
 
+def exceptions_from_names(names: list[str]) -> list[type[Exception]]:
+    """Return a list of exceptions from a list of exception names."""
+    return [getattr(sys.modules[__name__], name) for name in names]
+
+
 def all_exceptions_names() -> list[str]:
     """Return a list of all exceptions names defined in this module."""
     return [
@@ -121,6 +126,6 @@ def all_exceptions_names() -> list[str]:
     ]
 
 
-def exceptions_from_names(names: list[str]) -> list[type[Exception]]:
-    """Return a list of exceptions from a list of exception names."""
-    return [getattr(sys.modules[__name__], name) for name in names]
+def all_exceptions() -> list[type[Exception]]:
+    """Return a list of all exceptions defined in this module."""
+    return exceptions_from_names(all_exceptions_names())

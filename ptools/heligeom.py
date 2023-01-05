@@ -76,12 +76,12 @@ def dist_axis(rb: RigidBody, hp: Screw) -> tuple[float, float]:
         a tuple of float containing the minimal and maximal distances.
     """
 
-    dmin, dmax = -1,-1
+    dmin, dmax = -1.0, -1.0
 
     for atom in rb:
 
         v = atom.coords - hp.point
-        d = np.linalg.norm(np.cross(v, hp.unit))
+        d = float(np.linalg.norm(np.cross(v, hp.unit)))
 
         if dmin == -1:
             dmin = d
