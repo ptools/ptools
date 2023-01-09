@@ -7,3 +7,4 @@ libyaml-dev
 python-dev
 python-pip
 python-virtualenv
+python-yaml

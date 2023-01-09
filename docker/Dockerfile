@@ -17,14 +17,14 @@ FROM debian:jessie
 
 # Install system dependecies.
 COPY requirements_apt-get.txt /opt/
-RUN apt-get update && cat /opt/requirements_apt-get.txt | xargs apt-get install -y --fix-missing
+RUN apt-get update && cat /opt/requirements_apt-get.txt | xargs apt-get install --yes --force-yes --fix-missing
 
 RUN find / -name 'libgfortran.so*'
 
 
 # Install python dependencies
 COPY requirements_python.txt /opt/
-RUN pip install --upgrade pip && pip install -r /opt/requirements_python.txt
+RUN pip install && pip install -r /opt/requirements_python.txt
 
 # The entrypoint script is executed everytime the container starts.
 COPY entrypoint.sh /
