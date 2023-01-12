@@ -147,6 +147,22 @@ def parse_atom_line(buffer: str) -> AtomAttrs:
     return line.to_atom()
 
 
+
+def read_single_model_pdb(path: FilePath) -> AtomCollection:
+    """Read a Protein Data Bank file containing a single model.
+
+    Args:
+        path (FilePath): path to file.
+
+    Returns:
+        AtomCollection: collection of Atoms
+    """
+    topology = read_pdb(path)
+    if not isinstance(topology, AtomCollection):
+        raise ValueError("Topology file must contain only one model.")
+    return topology
+
+
 def read_pdb(
     path: FilePath, as_dict=False
 ) -> Union[dict[str, AtomCollection], Sequence[AtomCollection], AtomCollection]:

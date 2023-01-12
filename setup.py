@@ -52,4 +52,7 @@ setup(
     entry_points={
         'console_scripts': ['ptools = ptools.cli.ptools_cli:main']
     },
+    package_data={
+        '': ['data/*', 'data/reduction_parameters/*']
+    }
 )

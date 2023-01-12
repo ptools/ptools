@@ -1,0 +1,790 @@
+forcefield: ATTRACT2
+
+beads:
+  ALA:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid:  2
+      atoms:
+        CB:
+          weight: 1.0
+
+  ARG:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CG
+      charge:  0.0
+      typeid:  3
+      atoms:
+        CG:
+          weight: 1.0
+    - name: NEC
+      charge:  1.0
+      typeid:  4
+      atoms:
+        NE:
+          weight: 1.0
+        CZ:
+          weight: 1.0
+
+  ASN:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid:  5
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+        OD1:
+          weight: 1.0
+        ND2:
+          weight: 1.0
+
+  ASP:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge: -1.0
+      typeid:  6
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+        OD1:
+          weight: 1.0
+        OD2:
+          weight: 1.0
+
+  CYS:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid:  7
+      atoms:
+        CB:
+          weight: 1.0
+        SG:
+          weight: 1.0
+
+  GLN:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CB
+      charge:  0.0
+      typeid:  8
+      atoms:
+        CG:
+          weight: 1.0
+    - name: CN1
+      charge:  0.0
+      typeid:  9
+      atoms:
+        CD:
+          weight: 1.0
+        OE1:
+          weight: 1.0
+        NE2:
+          weight: 1.0
+
+  GLU:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CB
+      charge:  0.0
+      typeid: 10
+      atoms:
+        CG:
+          weight: 1.0
+    - name: CO1
+      charge: -1.0
+      typeid: 11
+      atoms:
+        CD:
+          weight: 1.0
+        OE1:
+          weight: 1.0
+        OE2:
+          weight: 1.0
+
+  GLY:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid:  1
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+
+  HIS: &HIS
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 12
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 13
+      atoms:
+        ND1:
+          weight: 1.0
+        CD2:
+          weight: 1.0
+        NE2:
+          weight: 1.0
+        CE1:
+          weight: 1.0
+
+  HSD: *HIS
+
+  HSE: *HIS
+
+  HSP: *HIS
+
+  ILE:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 14
+      atoms:
+        CB:
+          weight: 1.0
+        CG1:
+          weight: 1.0
+        CG2:
+          weight: 1.0
+        CD1:
+          weight: 1.0
+
+  LEU:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 15
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+        CD1:
+          weight: 1.0
+        CD2:
+          weight: 1.0
+
+  LYS:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CB
+      charge:  0.0
+      typeid: 16
+      atoms:
+        CG:
+          weight: 1.0
+    - name: CE
+      charge:  1.0
+      typeid: 17
+      atoms:
+        CE:
+          weight: 1.0
+
+  MET:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 18
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 19
+      atoms:
+        SD:
+          weight: 1.0
+        CE:
+          weight: 1.0
+
+  PHE:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 20
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 21
+      atoms:
+        CD1:
+          weight: 1.0
+        CD2:
+          weight: 1.0
+        CE1:
+          weight: 1.0
+        CE2:
+          weight: 1.0
+        CZ:
+          weight: 1.0
+
+  PRO:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 22
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+        CD:
+          weight: 1.0
+
+  SER:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 23
+      atoms:
+        CB:
+          weight: 1.0
+        OG:
+          weight: 1.0
+
+  THR:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 24
+      atoms:
+        CB:
+          weight: 1.0
+        OG1:
+          weight: 1.0
+        CG2:
+          weight: 1.0
+
+  TRP:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CG
+      charge:  0.0
+      typeid: 25
+      atoms:
+        CG:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 26
+      atoms:
+        CD2:
+          weight: 1.0
+        CE2:
+          weight: 1.0
+        CE3:
+          weight: 1.0
+        CH2:
+          weight: 1.0
+        CZ3:
+          weight: 1.0
+        CZ2:
+          weight: 1.0
+
+  TYR:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 27
+      atoms:
+        CB:
+          weight: 1.0
+        CG:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 28
+      atoms:
+        CD1:
+          weight: 1.0
+        CD2:
+          weight: 1.0
+        CE1:
+          weight: 1.0
+        CE2:
+          weight: 1.0
+        CZ:
+          weight: 1.0
+        OH:
+          weight: 1.0
+
+  VAL:
+    - name: N
+      charge:  0.0
+      typeid: 30
+      atoms:
+        N:
+          weight: 1.0
+    - name: CA
+      charge:  0.0
+      typeid: 32
+      atoms:
+        CA:
+          weight: 1.0
+    - name: C
+      charge:  0.0
+      typeid: 32
+      atoms:
+        C:
+          weight: 1.0
+    - name: O
+      charge:  0.0
+      typeid: 31
+      atoms:
+        O:
+          weight: 1.0
+    - name: CSE
+      charge:  0.0
+      typeid: 29
+      atoms:
+        CB:
+          weight: 1.0
+        CG1:
+          weight: 1.0
+        CG2:
+          weight: 1.0

@@ -1,0 +1,1280 @@
+forcefield: SCORPION
+
+beads:
+  ALA:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.116
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 2
+      radius: 2.306
+      atoms:
+        CB:
+          charge: -0.0016
+          radius: 2.395
+          weight: 1.0
+
+  ARG:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.0732
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: -0.1077
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.7341
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5894
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 3
+      radius: 2.714
+      atoms:
+        CB:
+          charge: 0.0647
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.096
+          radius: 2.395
+          weight: 1.0
+    - name: CG
+      typeid: 4
+      radius: 2.469
+      charge: 1.0
+      atoms:
+        CD:
+          charge: 0.186
+          radius: 2.295
+          weight: 1.0
+        NE:
+          charge: -0.1839
+          radius: 1.824
+          weight: 1.0
+        CZ:
+          charge: 0.8076
+          radius: 1.908
+          weight: 1.0
+        NH1:
+          charge: 0.0329
+          radius: 1.824
+          weight: 1.0
+        NH2:
+          charge: 0.0329
+          radius: 1.824
+          weight: 1.0
+
+  ASN:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1191
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 5
+      radius: 2.551
+      atoms:
+        CB:
+          charge: -0.0447
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.713
+          radius: 1.908
+          weight: 1.0
+        OD1:
+          charge: -0.5931
+          radius: 1.661
+          weight: 1.0
+        ND2:
+          charge: -0.0799
+          radius: 1.824
+          weight: 1.0
+
+  ASP:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.2227
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1261
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5366
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5819
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 6
+      radius: 2.551
+      charge: -1.0
+      atoms:
+        CB:
+          charge: -0.0547
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.7994
+          radius: 1.908
+          weight: 1.0
+        OD1:
+          charge: -0.8014
+          radius: 1.661
+          weight: 1.0
+        OD2:
+          charge: -0.8014
+          radius: 1.661
+          weight: 1.0
+
+  CYS:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1195
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 7
+      radius: 2.469
+      atoms:
+        CB:
+          charge: 0.103
+          radius: 2.295
+          weight: 1.0
+        SG:
+          charge: -0.1081
+          radius: 2.0
+          weight: 1.0
+
+  GDP:
+    - name: CB
+      typeid: 30
+      radius: 2.111
+      atoms:
+        N7:
+          charge: -0.5709
+          radius: 1.824
+          weight: 1.0
+        C5:
+          charge: 0.1744
+          radius: 1.908
+          weight: 1.0
+        C6:
+          charge: 0.477
+          radius: 1.908
+          weight: 1.0
+        O6:
+          charge: -0.5597
+          radius: 1.661
+          weight: 1.0
+    - name: CG
+      typeid: 31
+      radius: 2.111
+      atoms:
+        N1:
+          charge: -0.1363
+          radius: 1.824
+          weight: 1.0
+        C2:
+          charge: 0.7657
+          radius: 1.908
+          weight: 1.0
+        N2:
+          charge: -0.0944
+          radius: 1.824
+          weight: 1.0
+        N3:
+          charge: -0.6323
+          radius: 1.824
+          weight: 1.0
+    - name: CH
+      typeid: 32
+      radius: 2.111
+      atoms:
+        C4:
+          charge: 0.1222
+          radius: 1.908
+          weight: 1.0
+        N9:
+          charge: 0.0492
+          radius: 1.824
+          weight: 1.0
+        C8:
+          charge: 0.3014
+          radius: 2.267
+          weight: 1.0
+        C1':
+          charge: 0.2197
+          radius: 2.195
+          weight: 1.0
+    - name: CI
+      typeid: 33
+      radius: 2.616
+      atoms:
+        C2':
+          charge: 0.1642
+          radius: 2.295
+          weight: 1.0
+        O2':
+          charge: -0.1953
+          radius: 1.721
+          weight: 1.0
+        C3':
+          charge: 0.2637
+          radius: 2.295
+          weight: 1.0
+        O3':
+          charge: -0.2165
+          radius: 1.721
+          weight: 1.0
+    - name: CJ
+      typeid: 34
+      radius: 2.515
+      atoms:
+        C4':
+          charge: 0.2239
+          radius: 2.295
+          weight: 1.0
+        O4':
+          charge: -0.3548
+          radius: 1.684
+          weight: 1.0
+        O5':
+          charge: -0.5987
+          radius: 1.684
+          weight: 1.0
+        C5':
+          charge: 0.1916
+          radius: 2.295
+          weight: 1.0
+    - name: CL
+      typeid: 35
+      radius: 2.566
+      charge: -1.0
+      atoms:
+        PA:
+          charge: 1.4929
+          radius: 2.1
+          weight: 1.0
+        O1A:
+          charge: -0.9474
+          radius: 1.661
+          weight: 1.0
+        O2A:
+          charge: -0.9474
+          radius: 1.661
+          weight: 1.0
+        O3A:
+          charge: -0.6346
+          radius: 1.684
+          weight: 1.0
+    - name: CN
+      typeid: 35
+      radius: 2.566
+      charge: -2.0
+      atoms:
+        PB:
+          charge: 1.3672
+          radius: 2.1
+          weight: 1.0
+        O1B:
+          charge: -0.9552
+          radius: 1.661
+          weight: 1.0
+        O2B:
+          charge: -0.9552
+          radius: 1.661
+          weight: 1.0
+        O3B:
+          charge: -0.9552
+          radius: 1.661
+          weight: 1.0
+
+  GLN:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0819
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 8
+      radius: 2.714
+      atoms:
+        CB:
+          charge: 0.0306
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.0059
+          radius: 2.395
+          weight: 1.0
+    - name: CG
+      typeid: 9
+      radius: 2.306
+      atoms:
+        CD:
+          charge: 0.6951
+          radius: 1.908
+          weight: 1.0
+        OE1:
+          charge: -0.6086
+          radius: 1.661
+          weight: 1.0
+        NE2:
+          charge: -0.0905
+          radius: 1.824
+          weight: 1.0
+
+  GLU:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.2227
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1502
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5366
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5819
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 10
+      radius: 2.714
+      atoms:
+        CB:
+          charge: 0.0214
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: -0.0714
+          radius: 2.395
+          weight: 1.0
+    - name: CG
+      typeid: 11
+      radius: 2.224
+      charge: -1.0
+      atoms:
+        CD:
+          charge: 0.8054
+          radius: 1.908
+          weight: 1.0
+        OE1:
+          charge: -0.8188
+          radius: 1.661
+          weight: 1.0
+        OE2:
+          charge: -0.8188
+          radius: 1.661
+          weight: 1.0
+
+  GLY:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1144
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+
+  GTP:
+    - name: CB
+      typeid: 30
+      radius: 2.111
+      atoms:
+        N7:
+          charge: -0.5709
+          radius: 1.824
+          weight: 1.0
+        C5:
+          charge: 0.1744
+          radius: 1.908
+          weight: 1.0
+        C6:
+          charge: 0.477
+          radius: 1.908
+          weight: 1.0
+        O6:
+          charge: -0.5597
+          radius: 1.661
+          weight: 1.0
+    - name: CG
+      typeid: 31
+      radius: 2.111
+      atoms:
+        N1:
+          charge: -0.1363
+          radius: 1.824
+          weight: 1.0
+        C2:
+          charge: 0.7657
+          radius: 1.908
+          weight: 1.0
+        N2:
+          charge: -0.0944
+          radius: 1.824
+          weight: 1.0
+        N3:
+          charge: -0.6323
+          radius: 1.824
+          weight: 1.0
+    - name: CH
+      typeid: 32
+      radius: 2.111
+      atoms:
+        C4:
+          charge: 0.1222
+          radius: 1.908
+          weight: 1.0
+        N9:
+          charge: 0.0492
+          radius: 1.824
+          weight: 1.0
+        C8:
+          charge: 0.3014
+          radius: 2.267
+          weight: 1.0
+        C1':
+          charge: 0.2197
+          radius: 2.195
+          weight: 1.0
+    - name: CI
+      typeid: 33
+      radius: 2.616
+      atoms:
+        C2':
+          charge: 0.1642
+          radius: 2.295
+          weight: 1.0
+        O2':
+          charge: -0.1953
+          radius: 1.721
+          weight: 1.0
+        C3':
+          charge: 0.2637
+          radius: 2.295
+          weight: 1.0
+        O3':
+          charge: -0.2165
+          radius: 1.721
+          weight: 1.0
+    - name: CJ
+      typeid: 34
+      radius: 2.515
+      atoms:
+        C4':
+          charge: 0.2239
+          radius: 2.295
+          weight: 1.0
+        O4':
+          charge: -0.3548
+          radius: 1.684
+          weight: 1.0
+        O5':
+          charge: -0.5987
+          radius: 1.684
+          weight: 1.0
+        C5':
+          charge: 0.1916
+          radius: 2.295
+          weight: 1.0
+    - name: CL
+      typeid: 35
+      radius: 2.566
+      charge: -1.0
+      atoms:
+        PA:
+          charge: 1.2532
+          radius: 2.1
+          weight: 1.0
+        O1A:
+          charge: -0.8799
+          radius: 1.661
+          weight: 1.0
+        O2A:
+          charge: -0.8799
+          radius: 1.661
+          weight: 1.0
+        O3A:
+          charge: -0.5689
+          radius: 1.684
+          weight: 1.0
+    - name: CM
+      typeid: 35
+      radius: 2.566
+      charge: -1.0
+      atoms:
+        PB:
+          charge: 1.3852
+          radius: 2.1
+          weight: 1.0
+        O1B:
+          charge: -0.8894
+          radius: 0.661
+          weight: 1.0
+        O2B:
+          charge: -0.8894
+          radius: 0.661
+          weight: 1.0
+        O3B:
+          charge: -0.5322
+          radius: 0.684
+          weight: 1.0
+    - name: CN
+      typeid: 35
+      radius: 2.566
+      charge: -2.0
+      atoms:
+        PG:
+          charge: 1.265
+          radius: 2.1
+          weight: 1.0
+        O1G:
+          charge: -0.9526
+          radius: 1.661
+          weight: 1.0
+        O2G:
+          charge: -0.9526
+          radius: 1.661
+          weight: 1.0
+        O3G:
+          charge: -0.9526
+          radius: 1.661
+          weight: 1.0
+
+  HIE:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0779
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 12
+      radius: 2.306
+      atoms:
+        CB:
+          charge: 0.066
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.1868
+          radius: 1.908
+          weight: 1.0
+        ND1:
+          charge: -0.5432
+          radius: 1.824
+          weight: 1.0
+    - name: CG
+      typeid: 13
+      radius: 2.306
+      atoms:
+        CE1:
+          charge: 0.307
+          radius: 2.267
+          weight: 1.0
+        NE2:
+          charge: 0.0544
+          radius: 1.824
+          weight: 1.0
+        CD2:
+          charge: -0.0345
+          radius: 2.317
+          weight: 1.0
+
+  HIS:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.1069
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 12
+      radius: 2.306
+      atoms:
+        CB:
+          charge: 0.0342
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: -0.0266
+          radius: 1.908
+          weight: 1.0
+        ND1:
+          charge: -0.0162
+          radius: 1.824
+          weight: 1.0
+    - name: CG
+      typeid: 13
+      radius: 2.306
+      atoms:
+        CE1:
+          charge: 0.3449
+          radius: 2.267
+          weight: 1.0
+        NE2:
+          charge: -0.5727
+          radius: 1.824
+          weight: 1.0
+        CD2:
+          charge: 0.2439
+          radius: 2.317
+          weight: 1.0
+
+  ILE:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0272
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 14
+      radius: 3.041
+      atoms:
+        CB:
+          charge: 0.149
+          radius: 2.395
+          weight: 1.0
+        CG2:
+          charge: -0.0558
+          radius: 2.395
+          weight: 1.0
+        CG1:
+          charge: 0.0042
+          radius: 2.395
+          weight: 1.0
+        CD1:
+          charge: -0.0102
+          radius: 2.395
+          weight: 1.0
+
+  LEU:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0404
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 15
+      radius: 2.959
+      atoms:
+        CB:
+          charge: -0.0188
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.317
+          radius: 2.395
+          weight: 1.0
+        CD1:
+          charge: -0.1121
+          radius: 2.395
+          weight: 1.0
+        CD2:
+          charge: -0.1121
+          radius: 2.395
+          weight: 1.0
+
+  LYS:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.0732
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: -0.0974
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.7341
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5894
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 16
+      radius: 2.714
+      atoms:
+        CB:
+          charge: 0.063
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.0393
+          radius: 2.395
+          weight: 1.0
+    - name: CG
+      typeid: 17
+      radius: 2.469
+      charge: 1.0
+      atoms:
+        CD:
+          charge: 0.0763
+          radius: 2.395
+          weight: 1.0
+        CE:
+          charge: 0.2127
+          radius: 2.008
+          weight: 1.0
+        NZ:
+          charge: 0.6346
+          radius: 1.824
+          weight: 1.0
+
+  MET:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0643
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 18
+      radius: 2.633
+      atoms:
+        CB:
+          charge: 0.0824
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.0898
+          radius: 2.295
+          weight: 1.0
+    - name: CG
+      typeid: 19
+      radius: 2.551
+      atoms:
+        SD:
+          charge: -0.2737
+          radius: 2.0
+          weight: 1.0
+        CE:
+          charge: 0.1516
+          radius: 2.295
+          weight: 1.0
+
+  MG2:
+    - name: CB
+      typeid: 36
+      radius: 1.16
+      charge: 2.0
+      atoms:
+        MG:
+          charge: 2.0
+          radius: 1.16
+          weight: 1.0
+
+  PHE:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0954
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 20
+      radius: 2.633
+      atoms:
+        CB:
+          charge: 0.0247
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.0118
+          radius: 1.908
+          weight: 1.0
+        CD1:
+          charge: 0.0074
+          radius: 2.367
+          weight: 1.0
+        CD2:
+          charge: 0.0074
+          radius: 2.367
+          weight: 1.0
+    - name: CG
+      typeid: 21
+      radius: 2.469
+      atoms:
+        CE1:
+          charge: -0.0274
+          radius: 2.367
+          weight: 1.0
+        CE2:
+          charge: -0.0274
+          radius: 2.367
+          weight: 1.0
+        CZ:
+          charge: 0.0225
+          radius: 2.367
+          weight: 1.0
+
+  PRO:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.2548
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0375
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5896
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5748
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 22
+      radius: 2.796
+      atoms:
+        CB:
+          charge: 0.0436
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: 0.0615
+          radius: 2.395
+          weight: 1.0
+        CD:
+          charge: 0.0974
+          radius: 2.295
+          weight: 1.0
+
+  SER:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0594
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 23
+      radius: 2.306
+      atoms:
+        CB:
+          charge: 0.2821
+          radius: 2.295
+          weight: 1.0
+        OG:
+          charge: -0.2271
+          radius: 1.721
+          weight: 1.0
+
+  THR:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0618
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 24
+      radius: 2.714
+      atoms:
+        CB:
+          charge: 0.3697
+          radius: 2.295
+          weight: 1.0
+        CG2:
+          charge: -0.0512
+          radius: 2.395
+          weight: 1.0
+        OG1:
+          charge: -0.2659
+          radius: 1.721
+          weight: 1.0
+
+  TRP:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0848
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 25
+      radius: 2.388
+      atoms:
+        CB:
+          charge: 0.0628
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: -0.1415
+          radius: 1.908
+          weight: 1.0
+        CD1:
+          charge: 0.0424
+          radius: 2.317
+          weight: 1.0
+        NE1:
+          charge: -0.0006
+          radius: 1.824
+          weight: 1.0
+    - name: CG
+      typeid: 26
+      radius: 2.306
+      atoms:
+        CE2:
+          charge: 0.138
+          radius: 1.908
+          weight: 1.0
+        CZ2:
+          charge: -0.1029
+          radius: 2.367
+          weight: 1.0
+        CH2:
+          charge: 0.0283
+          radius: 2.367
+          weight: 1.0
+        CZ3:
+          charge: -0.0525
+          radius: 2.367
+          weight: 1.0
+        CE3:
+          charge: -0.0687
+          radius: 2.367
+          weight: 1.0
+        CD2:
+          charge: 0.1243
+          radius: 1.908
+          weight: 1.0
+
+  TYR:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0862
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 27
+      radius: 2.469
+      atoms:
+        CB:
+          charge: 0.0438
+          radius: 2.395
+          weight: 1.0
+        CG:
+          charge: -0.0011
+          radius: 1.908
+          weight: 1.0
+        CD1:
+          charge: -0.0207
+          radius: 2.367
+          weight: 1.0
+        CD2:
+          charge: -0.0207
+          radius: 2.367
+          weight: 1.0
+    - name: CG
+      typeid: 28
+      radius: 2.388
+      atoms:
+        CE1:
+          charge: -0.0685
+          radius: 2.367
+          weight: 1.0
+        CE2:
+          charge: -0.0685
+          radius: 2.367
+          weight: 1.0
+        CZ:
+          charge: 0.3226
+          radius: 1.908
+          weight: 1.0
+        OH:
+          charge: -0.1587
+          radius: 1.721
+          weight: 1.0
+
+  VAL:
+    - name: CA
+      typeid: 1
+      radius: 2.551
+      atoms:
+        N:
+          charge: -0.1438
+          radius: 1.824
+          weight: 1.0
+        CA:
+          charge: 0.0094
+          radius: 2.295
+          weight: 1.0
+        C:
+          charge: 0.5973
+          radius: 1.908
+          weight: 1.0
+        O:
+          charge: -0.5679
+          radius: 1.661
+          weight: 1.0
+    - name: CB
+      typeid: 29
+      radius: 2.959
+      atoms:
+        CB:
+          charge: 0.2688
+          radius: 2.395
+          weight: 1.0
+        CG1:
+          charge: -0.0819
+          radius: 2.395
+          weight: 1.0
+        CG2:
+          charge: -0.0819
+          radius: 2.395
+          weight: 1.0

@@ -1,0 +1,74 @@
+
+# -- Residue name conversion rules -------------------------------------------
+
+residues:
+  # protein residue name
+  HIE: HIS
+  HSE: HIS
+  HSD: HIS
+  HSP: HIS
+
+  # DNA base names
+  DA: A
+  DT: T
+  DC: C
+  DG: G
+
+
+
+
+# -- Atom name conversion rules ----------------------------------------------
+
+atoms:
+  '*':
+    OT: O
+    OT1: O
+    OT2: O
+
+  ILE:
+    CD: CD
+
+  A:
+    C1*: A-C1'
+    C2*: A-C2'
+    C3*: A-C3'
+    C4*: A-C4'
+    C5*: A-C5'
+    O3*: A-O3',
+    O4*: A-O4'
+    OP1: A-O1P
+    OP2: A-O2P
+
+  C:
+    C1*: C1'
+    C2*: C2'
+    C3*: C3',
+    C4*: C4'
+    C5*: C5'
+    O3*: O3'
+    O4*: O4'
+    OP1: O1P
+    OP2: O2P,
+
+  G:
+    C1*: C1'
+    C2*: C2'
+    C3*: C3'
+    C4*: C4'
+    C5*: C5'
+    O3*: O3',
+    O4*: O4'
+    OP1: O1P
+    OP2: O2P
+
+  T:
+    C1*:   C1'
+    C2*:   C2',
+    C3*:   C3'
+    C4*:   C4'
+    C5*:   C5'
+    C7:   C5M
+    O3*:   O3'
+    O4*:   O4',
+    OP1:   O1P
+    OP2:   O2P
