@@ -1,11 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Any, Iterable, Self
+from typing import Any, Iterable, TypeVar
 
 from .namedarray import NamedArrayContainer
 from . import spelling
-
-import numpy as np
+from .atomattrs import AtomAttrs
 
 
 class Particle:
@@ -57,6 +56,13 @@ class Particle:
             prop.singular for prop in self.self._collection.atom_properties.values()
         ]
 
+    def __str__(self) -> str:
+        attrs = ", ".join(f"{k}={getattr(self, k)!r}" for k in self._singular_to_plural.keys())
+        return f"Particle({attrs})"
+
+
+
+ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
 
 @dataclass
 class ParticleCollection:
@@ -81,14 +87,7 @@ class ParticleCollection:
         return self.size()
 
     @classmethod
-    def from_attributes(cls, attrs: NamedArrayContainer) -> Self:
-        """Creates a new collection from a list of atoms."""
-        obj = cls()
-        obj.atom_properties = attrs
-        return obj
-
-    @classmethod
-    def from_objects(cls, objects: Iterable[Any]) -> Self:
+    def from_objects(cls: type[ParticleCollectionType], objects: Iterable[Any]) -> ParticleCollectionType:
         """Creates a new collection from a list of objects.
 
         Reads the first object's attributes and stores all atom
@@ -117,6 +116,10 @@ class ParticleCollection:
     def __contains__(self, particle: object) -> bool:
         """Returns whether the given particle is part of the collection."""
         return particle in self.particles
+
+    def __add__(self, other: ParticleCollection) -> ParticleCollection:
+        """Adds two collections together."""
+        return ParticleCollection(self.atom_properties + other.atom_properties)
 
     @property
     def coordinates(self):

@@ -46,16 +46,11 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
 
     Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
     """
-    col = AtomCollection([AtomAttrs(coordinates=(i, i, i)) for i in range(size)])
-    for atom in col:
-        for attr in (
-            "name",
-            "index",
-            "residue_name",
-            "residue_index",
-            "chain",
-            "charge",
-        ):
-            setattr(atom, attr, DUMMY_ATOM_ATTRS[attr])
-    col.guess_masses()
-    return col
+    atoms = [AtomAttrs(coordinates=(i, i, i)) for i in range(size)]
+    for atom in atoms:
+        for key, value in DUMMY_ATOM_ATTRS.items():
+            setattr(atom, key, value)
+        atom.guess_element()
+        atom.guess_mass()
+
+    return AtomCollection.from_objects(atoms)

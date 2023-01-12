@@ -7,6 +7,8 @@ from typing import Any, Iterable, Iterator, Optional, Self
 import numpy as np
 from numpy.typing import ArrayLike
 
+from .array3d import array3d
+
 
 class NamedArray:
     """Holds a numpy array besides a singular and a plural name.
@@ -29,8 +31,10 @@ class NamedArray:
         self.plural: str = plural
         if isinstance(values[0], str):
             self._values: np.ndarray = np.asarray(values, dtype="O")
+        elif isinstance(values[0], array3d):
+            self._values: np.ndarray = array3d(values)
         else:
-            self._values: np.ndarray = np.asarray(values)
+            self._values = np.asarray(values)
         self._array_comparison_func = array_comparison_func
 
         if self._array_comparison_func is None:
@@ -166,7 +170,11 @@ class NamedArrayContainer(collections.abc.Container):
         return len(next(iter(self._properties.values())).values)
 
     def add_array(self, singular: str, plural: str, values: ArrayLike):
-        self.register(NamedArray(singular, plural, np.asarray(values)))
+        if values and isinstance(values[0], array3d):
+            values = array3d(values)
+        else:
+            values = np.asarray(values)
+        self.register(NamedArray(singular, plural, values))
 
     def register(self, item: NamedArray):
         """Stores a new property in the collection."""
