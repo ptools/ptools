@@ -130,3 +130,17 @@ def test_copy():
     # Checks that the copy is independent from the original.
     copy.get("ones").values[:] = 13
     assert container != copy
+
+
+def test_add():
+    lhs = NamedArrayContainer(generate_arrays())
+    rhs = NamedArrayContainer(generate_arrays())
+    result = lhs + rhs
+
+    assert result.number_of_properties() == lhs.number_of_properties()
+    assert result.number_of_elements() == lhs.number_of_elements() * 2
+    for prop in lhs:
+        assert_array_almost_equal(
+            result.get(prop.plural).values,
+            np.concatenate((lhs.get(prop.plural).values, rhs.get(prop.plural).values)),
+        )

@@ -19,6 +19,8 @@ class NamedArray:
         values (ArrayLike): array of values
     """
 
+    _values: np.ndarray
+
     def __init__(
         self,
         singular: str,
@@ -29,14 +31,23 @@ class NamedArray:
     ) -> None:
         self.singular: str = singular
         self.plural: str = plural
-        if isinstance(values[0], str):
-            self._values: np.ndarray = np.asarray(values, dtype="O")
-        elif isinstance(values[0], array3d):
-            self._values: np.ndarray = array3d(values)
-        else:
-            self._values = np.asarray(values)
-        self._array_comparison_func = array_comparison_func
 
+        if not isinstance(values, (collections.abc.Sequence, np.ndarray)):
+            raise ValueError(
+                f"values must be a sequence or an array, not {type(values).__qualname__}"
+            )
+
+        if len(values) == 0:
+            self._values = np.empty((0,), dtype=float)
+        else:
+            if isinstance(values[0], str):
+                self._values = np.asarray(values, dtype="O")
+            elif isinstance(values[0], array3d):
+                self._values = array3d(values)
+            else:
+                self._values = np.asarray(values)
+
+        self._array_comparison_func = array_comparison_func
         if self._array_comparison_func is None:
             if np.issubdtype(self._values.dtype, np.floating):
                 self._array_comparison_func = np.allclose
@@ -142,6 +153,21 @@ class NamedArrayContainer(collections.abc.Container):
             if not lhs == rhs:
                 return False
         return True
+
+    def __add__(self, other: object) -> NamedArrayContainer:
+        if not isinstance(other, self.__class__):
+            raise TypeError(f"cannot add {self.__class__.__qualname__} and {type(other)}")
+        if not self._properties.keys() == other._properties.keys():
+            raise ValueError("cannot add two collections with different properties")
+        return NamedArrayContainer(
+            NamedArray(
+                lhs.singular,
+                lhs.plural,
+                np.concatenate((lhs.values, rhs.values)),
+                array_comparison_func=lhs._array_comparison_func,
+            )
+            for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays())
+        )
 
     def names(self) -> list[str]:
         return list(self._properties.keys())
