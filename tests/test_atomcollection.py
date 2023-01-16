@@ -113,7 +113,7 @@ class TestAtomCollection(unittest.TestCase):
         )
 
     def test_add(self):
-        atoms2 = AtomCollection.from_objects(
+        atoms2 = AtomCollection(
             [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
         )
         n_final = len(self.atoms) + len(atoms2)
