@@ -1,10 +1,10 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
-from typing import Any, Iterable, TypeVar
+from typing import Any, Iterable, Optional, TypeVar
 
 from .namedarray import NamedArrayContainer
 from . import spelling
 from .atomattrs import AtomAttrs
+
 
 
 class Particle:
@@ -64,19 +64,22 @@ class Particle:
 
 ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
 
-@dataclass
+
 class ParticleCollection:
     """Represents a collection of particles."""
 
-    atom_properties: NamedArrayContainer = field(default_factory=NamedArrayContainer)
+    atom_properties: NamedArrayContainer
 
-    def __post_init__(self):
-        if not isinstance(self.atom_properties, NamedArrayContainer):
+    def __init__(self, atom_properties: Optional[NamedArrayContainer] = None):
+        if atom_properties is None:
+            atom_properties = NamedArrayContainer()
+
+        if not isinstance(atom_properties, NamedArrayContainer):
             raise TypeError(
-                f"Expected NamedArrayContainer, got {type(self.atom_properties)}"
+                f"Expected NamedArrayContainer, got {type(atom_properties)}"
             )
-        if self.atom_properties is None:
-            self.atom_properties = NamedArrayContainer()
+
+        self.atom_properties = atom_properties
 
     def size(self) -> int:
         if self.atom_properties:
@@ -85,6 +88,11 @@ class ParticleCollection:
 
     def __len__(self) -> int:
         return self.size()
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, ParticleCollection):
+            return NotImplemented
+        return self.atom_properties == __o.atom_properties
 
     @classmethod
     def from_objects(cls: type[ParticleCollectionType], objects: Iterable[Any]) -> ParticleCollectionType:

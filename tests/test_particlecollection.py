@@ -148,7 +148,7 @@ def test_from_attributes():
     attrs.add_array("y", "ys", [4, 5, 6])
     attrs.add_array("z", "zs", [7, 8, 9])
 
-    pc = ParticleCollection.from_attributes(attrs)
+    pc = ParticleCollection(attrs)
     assert pc.atom_properties is not None
     assert pc.size() == 3
 
@@ -314,3 +314,15 @@ class TestParticleCollection:
 
         pc_copy[0].name = "XXX"
         assert pc_copy[0].name != pc[0].name
+
+
+def test_add():
+    """Test that the ``add`` method works."""
+    pc1 = ParticleCollection.from_objects(generate_atoms())
+    pc2 = ParticleCollection.from_objects(generate_atoms())
+
+    pc3 = pc1 + pc2
+
+    assert pc3.size() == pc1.size() + pc2.size()
+    assert pc3[0] == pc1[0]
+    assert pc3[-1] == pc2[-1]
