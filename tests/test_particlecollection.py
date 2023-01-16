@@ -141,14 +141,14 @@ def test_empty_initialization():
     assert pc.size() == 0
 
 
-def test_from_attributes():
+def test_from_properties():
     """Test initialization from a ``NamedArrayContainer``."""
     attrs = NamedArrayContainer()
     attrs.add_array("x", "xs", [1, 2, 3])
     attrs.add_array("y", "ys", [4, 5, 6])
     attrs.add_array("z", "zs", [7, 8, 9])
 
-    pc = ParticleCollection(attrs)
+    pc = ParticleCollection.from_properties(attrs)
     assert pc.atom_properties is not None
     assert pc.size() == 3
 
@@ -211,9 +211,12 @@ class TestParticleCollection:
     def charges(self):
         return [atom.charge for atom in self.atoms]
 
-    def test_initialization_from_list_fails(self):
-        with pytest.raises(TypeError):
-            ParticleCollection(self.atoms)
+    def test_initialization_from_atoms(self):
+        """Test initialization from a list of AtomAttrs."""
+        pc = ParticleCollection(self.atoms)
+        assert pc.atom_properties is not None
+        assert pc.size() == len(self.atoms)
+
 
     def test_from_atoms(self):
         """Test initialization from a list of AtomAttrs.
