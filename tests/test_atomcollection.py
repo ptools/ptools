@@ -44,12 +44,8 @@ class TestAtomCollection(unittest.TestCase):
         self.atoms.coordinates.fill(0)
         assert_array_equal(thecopy.coordinates, ref_coords)
 
-    def test_copy_initialization1(self):
+    def test_copy(self):
         thecopy = self.atoms.copy()
-        self._assert_copy_successful(thecopy)
-
-    def test_copy_initialization2(self):
-        thecopy = AtomCollection.copy(self.atoms)
         self._assert_copy_successful(thecopy)
 
     def test_repr(self):
@@ -113,24 +109,25 @@ class TestAtomCollection(unittest.TestCase):
         )
 
     def test_add(self):
-        atoms2 = AtomCollection(
-            [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
-        )
+        atoms2 = generate_dummy_atomcollection()
         n_final = len(self.atoms) + len(atoms2)
         all_atoms = self.atoms + atoms2
         self.assertEqual(len(all_atoms), n_final)
         self.assertEqual(all_atoms.coordinates.shape[0], n_final)
 
     def test_add_makes_copies(self):
-        atoms2 = AtomCollection(
-            [AtomAttrs(coordinates=(i + 100, i, i)) for i in range(self.n_atoms)]
-        )
-        assert_array_almost_equal(atoms2[-1].coords, [109, 9, 9])
-        all_atoms = self.atoms + atoms2
-        atoms2[-1].coords = np.zeros(3)
+        atoms2 = generate_dummy_atomcollection()
+        assert_array_almost_equal(atoms2[-1].coordinates, [9, 9, 9])
 
-        assert_array_almost_equal(atoms2[-1].coords, [0, 0, 0])
-        assert_array_almost_equal(all_atoms[-1].coords, [109, 9, 9])
+        # Concatenates the two AtomCollections
+        all_atoms = self.atoms + atoms2
+
+        # Modifying the coordinates of the last atom in the second AtomCollection
+        # should not affect the coordinates of the last atom in the concatenated
+        # AtomCollection.
+        atoms2[-1].coordinates = np.zeros(3)
+        assert_array_almost_equal(atoms2[-1].coordinates, [0, 0, 0])
+        assert_array_almost_equal(all_atoms[-1].coordinates, [9, 9, 9])
 
     def test_iadd(self):
         atoms = self.atoms.copy()

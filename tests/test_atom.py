@@ -5,11 +5,6 @@ from pytest import approx
 from .testing.dummy import generate_dummy_atomcollection
 
 
-
-
-
-
-
 def test_mass_getter():
     atoms = generate_dummy_atomcollection()
     assert atoms[0].mass == approx(12.011)

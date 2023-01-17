@@ -13,7 +13,7 @@ import numpy as np
 from attrs import define, field
 
 # Type-hinting specific import
-from typing import Any
+from typing import Any, Optional
 
 # PTools imports.
 from . import tables
@@ -36,6 +36,15 @@ class AtomAttrs:
         factory=lambda: array3d((0, 0, 0)), converter=lambda x: array3d(x)
     )
     meta: dict[str, Any] = field(factory=dict)
+    element: Optional[str] = None
+    mass: Optional[float] = None
+
+    def __attrs_post_init__(self):
+        """Post-initialization method."""
+        if self.element is None:
+            self.element = guess_atom_element(self.name)
+        if self.mass is None:
+            self.mass = guess_atom_mass(self.element)
 
     def __eq__(self, other: object) -> bool:
         """Tests for equality.
@@ -52,28 +61,34 @@ class AtomAttrs:
 
         return np.allclose(self.coordinates, other.coordinates)
 
-    @property
-    def element(self):
-        """Returns an atom element name (read-only)."""
-        return self.guess_element(self.name)
-
     def copy(self) -> AtomAttrs:
         """Returns a copy of the current atom."""
         obj = copy.deepcopy(self)
         return obj
 
-    @classmethod
-    def guess_mass(cls, element: str) -> float:
+    def guess_mass(self):
         """Returns the atom mass based on the element name."""
-        return tables.masses.get(element, 1.0)
+        self.mass = guess_atom_mass(self.element)
 
-    @classmethod
-    def guess_element(cls, name: str) -> str:
+    def guess_element(self):
         """Returns the atom element based on its name.
 
         Basically returns the first non-numeric character in atom_name.
         """
-        for char in name:
-            if char.isalpha():
-                return char
-        return "X"
+        self.element = guess_atom_element(self.name)
+
+
+def guess_atom_mass(element: str) -> float:
+    """Returns the atom mass based on the element name."""
+    return tables.masses.get(element, 1.0)
+
+
+def guess_atom_element(name: str) -> str:
+    """Returns the atom element based on its name.
+
+    Basically returns the first non-numeric character in atom_name.
+    """
+    for char in name:
+        if char.isalpha():
+            return char
+    return "X"

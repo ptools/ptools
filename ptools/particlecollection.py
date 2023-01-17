@@ -1,10 +1,12 @@
 from __future__ import annotations
 from collections.abc import KeysView
+import copy
 from typing import Any, Iterable, Optional, TypeVar
 
 from .namedarray import NamedArrayContainer
 from . import spelling
 
+ParticleType = TypeVar("ParticleType", bound="Particle")
 
 class Particle:
     """Represents a single particle in a collection."""
@@ -15,6 +17,9 @@ class Particle:
         self._singular_to_plural = {
             prop.singular: prop.plural for prop in self._collection.atom_properties
         }
+
+    def copy(self: ParticleType) -> ParticleType:
+        return self.__class__(self._collection, self._index)
 
     def __eq__(self, __o: object) -> bool:
         """Compares two particles using their properties read from the ParticleCollection."""
@@ -33,7 +38,7 @@ class Particle:
             return self._collection.atom_properties.get(self._singular_to_plural[name])[
                 self._index
             ]
-        raise KeyError(f"No such property: {name!r}")
+        super().__getattr__(name)
 
     def __setattr__(self, name, value):
         # Setting the attributes of the class itself.
