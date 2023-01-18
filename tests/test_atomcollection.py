@@ -7,7 +7,7 @@ import numpy as np
 import ptools
 from ptools import tables
 from ptools.atomattrs import AtomAttrs
-from ptools.atomcollection import AtomCollection
+from ptools.atomcollection import Atom, AtomCollection
 
 from .testing.moreassert import (
     assert_array_equal,
@@ -70,24 +70,24 @@ class TestAtomCollection(unittest.TestCase):
 
     def test_set_atom_coordinates_from_array(self):
         self.atoms.coordinates[0] = (42, 42, 42)
-        assert_array_almost_equal(self.atoms[0].coords, (42, 42, 42))
+        assert_array_almost_equal(self.atoms[0].coordinates, (42, 42, 42))
 
     def test_set_atom_coordinates_from_atom(self):
-        self.atoms[0].coords = (42, 42, 42)
+        self.atoms[0].coordinates = (42, 42, 42)
         assert_array_almost_equal(self.atoms.coordinates[0], (42, 42, 42))
 
     def test_getitem_single_atom(self):
         atom = self.atoms[0]
-        self.assertIsInstance(atom, AtomAttrs)
-        assert_array_almost_equal(atom.coords, self.atoms.coordinates[0])
+        self.assertIsInstance(atom, Atom)
+        assert_array_almost_equal(atom.coordinates, self.atoms.coordinates[0])
 
     def test_getitem_slice(self):
         self.assertIsInstance(self.atoms[:5], AtomCollection)
 
     def test_getitem_doesnt_make_copies(self):
         atom = self.atoms[0]
-        atom.coords += 10
-        assert_array_almost_equal(atom.coords, self.atoms.coordinates[0])
+        atom.coordinates += 10
+        assert_array_almost_equal(atom.coordinates, self.atoms.coordinates[0])
 
     def test_contains(self):
         atom = self.atoms[0]

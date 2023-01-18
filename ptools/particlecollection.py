@@ -38,7 +38,7 @@ class Particle:
             return self._collection.atom_properties.get(self._singular_to_plural[name])[
                 self._index
             ]
-        super().__getattr__(name)
+        raise AttributeError(f"No such attribute: {name!r}")
 
     def __setattr__(self, name, value):
         # Setting the attributes of the class itself.
@@ -54,10 +54,10 @@ class Particle:
         else:
             raise KeyError(f"No such property: {name!r}")
 
-    def properties(self) -> list[str]:
-        return [
-            prop.singular for prop in self.self._collection.atom_properties.values()
-        ]
+    # def properties(self) -> list[str]:
+    #     return [
+    #         prop.singular for prop in self.self._collection.atom_properties.values()
+    #     ]
 
     def __str__(self) -> str:
         attrs = ", ".join(

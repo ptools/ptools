@@ -15,7 +15,7 @@ DUMMY_ATOM_ATTRS = {
     "residue_index": 17,
     "chain": "A",
     "charge": 2.0,
-    "coords": (1, 2, 3),
+    "coordinates": (1, 2, 3),
 }
 
 
