@@ -144,3 +144,11 @@ def test_add():
             result.get(prop.plural).values,
             np.concatenate((lhs.get(prop.plural).values, rhs.get(prop.plural).values)),
         )
+
+
+def test_set_values():
+    container = NamedArrayContainer(generate_arrays())
+    assert container.get("ones") == [1, 1, 1, 1, 1]
+
+    container.set("ones", [2, 2, 2, 2, 2])
+    assert container.get("ones") == [2, 2, 2, 2, 2]

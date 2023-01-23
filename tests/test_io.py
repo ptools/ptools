@@ -42,9 +42,9 @@ class TestPDBIO(unittest.TestCase):
             self.assertEqual(atom.residue_index, 1)
             self.assertEqual(atom.residue_name, "LYS")
             self.assertEqual(atom.chain, "A")
-            self.assertAlmostEqual(atom.coords[0], i + 1)
-            self.assertAlmostEqual(atom.coords[1], 10 + i + 1)
-            self.assertAlmostEqual(atom.coords[2], 20 + i + 1)
+            self.assertAlmostEqual(atom.coordinates[0], i + 1)
+            self.assertAlmostEqual(atom.coordinates[1], 10 + i + 1)
+            self.assertAlmostEqual(atom.coordinates[2], 20 + i + 1)
 
     def test_read_pdb_multiple_models(self):
         with mk_pdb_models(3) as tmp_pdb:

@@ -83,7 +83,7 @@ class ParticleCollection:
         if atoms is not None:
             attrs = self._get_attrs_from_object_list(atoms)
             for name in attrs:
-                plural = spelling.plural(name)
+                plural = spelling.pluralize(name)
                 values = [getattr(o, name) for o in atoms]
                 self.atom_properties.add_array(name, plural, values)
 
@@ -129,6 +129,11 @@ class ParticleCollection:
             self.atom_properties + other.atom_properties
         )
 
+    def __getattr__(self, name):
+        if name in self.atom_properties:
+            return self.atom_properties.get(name).values
+        raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
+
     # == Factory methods ================================================================
 
     @classmethod
@@ -173,23 +178,26 @@ class ParticleCollection:
 
     # ===================================================================================
 
-    def copy(self) -> ParticleCollection:
+    def copy(self: ParticleCollectionType) -> ParticleCollectionType:
         """Returns a copy of the collection."""
-        return ParticleCollection.from_properties(self.atom_properties.copy())
+        return self.__class__.from_properties(self.atom_properties.copy())
 
     def guess_elements(self):
         """Guesses the elements of the atoms."""
-        self.atom_properties.add_array(
-            "element",
-            "elements",
-            [guess_atom_element(a.name) for a in self.particles],
-        )
+        values = [guess_atom_element(a.name) for a in self.particles]
+        if "elements" not in self.atom_properties:
+            self.atom_properties.add_array("element", "elements", values)
+        else:
+            self.atom_properties.get("elements").values = values
 
     def guess_masses(self, guess_element: bool = True):
         """Guesses the masses of the atoms."""
         if guess_element:
             self.guess_elements()
-        self.atom_properties.add_array(
-            "mass", "masses", [guess_atom_mass(a.element) for a in self.particles]
-        )
+
+        values = [guess_atom_mass(a.element) for a in self.particles]
+        if "masses" not in self.atom_properties:
+            self.atom_properties.add_array("mass", "masses", values)
+        else:
+            self.atom_properties.get("masses").values = values
 

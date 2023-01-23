@@ -34,8 +34,12 @@ def contact(rb1: RigidBody, rb2: RigidBody, cutoff: float = 5):
 
     for id_atom_rb1, id_atom_rb2 in pl.contacts():
 
-        res_indexes.add((rb1[id_atom_rb1].residue_index,
-                        rb2[id_atom_rb2].residue_index))
+        res_indexes.add(
+            (
+                rb1[id_atom_rb1].get("residue_indices"),
+                rb2[id_atom_rb2].get("residue_indices"),
+            )
+        )
 
     return res_indexes
 
@@ -80,7 +84,7 @@ def dist_axis(rb: RigidBody, hp: Screw) -> tuple[float, float]:
 
     for atom in rb:
 
-        v = atom.coords - hp.point
+        v = atom.coordinates - hp.point
         d = float(np.linalg.norm(np.cross(v, hp.unit)))
 
         if dmin == -1:
@@ -147,7 +151,6 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
     Returns:
         A RigidBody of the constructed oligomer.
     """
-    final = RigidBody()
     rb_orig: RigidBody = rb.copy()
     chain_id = 0
     origin = hp.point
@@ -167,15 +170,20 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
         origin[:] = np.inner(origin, t_matrix[:3, :3])
 
 
-    rb_orig.set_chain(string.ascii_uppercase[chain_id % 26])
-    final += rb_orig
+    chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
+    rb_orig.atom_properties.set("chains", chains)
     chain_id += 1
+
+    final: RigidBody = rb_orig.copy()
 
     for _ in range(N - 1):
         transform.ab_rotate(rb_orig, origin, origin + axis, hp.angle, degrees=False)
         transform.translate(rb_orig, axis * hp.normtranslation)
-        rb_orig.set_chain(string.ascii_uppercase[chain_id % 26])
-        final += rb_orig
+
+        chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
+        rb_orig.atom_properties.set("chains", chains)
         chain_id += 1
+
+        final += rb_orig
 
     return final

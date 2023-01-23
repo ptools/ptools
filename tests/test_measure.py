@@ -7,7 +7,7 @@ from ptools import measure
 
 from pytest import approx
 
-from .testing.dummy import generate_dummy_atomcollection, generate_balloon
+from .generators import generate_particlecollection, generate_balloon
 from .testing import assert_array_almost_equal
 
 
@@ -25,14 +25,16 @@ def test_distance_to_axis():
 
 
 def test_centroid():
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection()
     center = measure.centroid(atoms)
     assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
 
 def test_center_of_masses():
     # Masses are 1. COM should be same as center
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection(size=10, names=["C"] * 10)
+    atoms.guess_masses()
+
     center = measure.center_of_mass(atoms)
     assert_array_almost_equal(center, [4.5, 4.5, 4.5])
 
@@ -80,7 +82,7 @@ def test_principal_axes():
 
 
 def test_radius_of_gyration():
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection()
     rgyr = measure.radius_of_gyration(atoms)
     # Reference value calculated with VMD.
     assert rgyr == approx(4.9749369621276855, 1e-6)

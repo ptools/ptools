@@ -184,8 +184,14 @@ class NamedArrayContainer(collections.abc.Container):
     def get(self, plural: object) -> NamedArray:
         """Returns the property with the given plural name."""
         if not isinstance(plural, str):
-            raise ValueError("expects string to fetch property using their plural name")
+            raise ValueError("expects string to fetch property using its plural name")
         return self._properties[plural]
+
+    def set(self, plural: object, value: ArrayLike):
+        """Sets the property with the given plural name."""
+        if not isinstance(plural, str):
+            raise ValueError("expects string to set property using its plural name")
+        self._properties[plural].values = np.asarray(value)
 
     def number_of_properties(self) -> int:
         return len(self._properties)

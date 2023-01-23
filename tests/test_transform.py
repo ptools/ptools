@@ -3,13 +3,13 @@
 import numpy as np
 
 from .testing import assert_array_almost_equal, assert_array_not_almost_equal
-from .testing.dummy import generate_dummy_atomcollection, generate_balloon
+from .generators import generate_particlecollection, generate_balloon
 
 from ptools import measure, transform
 
 
 def test_translate():
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection()
     origin = (0, 0, 0)
     center = measure.centroid(atoms)
     transform.translate(atoms, origin - center)
@@ -17,7 +17,7 @@ def test_translate():
 
 
 def test_translate_scalar():
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection()
     centroid = measure.centroid(atoms)
     assert_array_almost_equal(centroid, centroid[0])
     scalar = -centroid[0]
@@ -26,7 +26,7 @@ def test_translate_scalar():
 
 
 def test_center_without_weigths():
-    atoms = generate_dummy_atomcollection()
+    atoms = generate_particlecollection()
     origin = np.zeros(3)
     for origin in (np.zeros(3), np.ones(3)):
         assert_array_not_almost_equal(measure.centroid(atoms), origin)

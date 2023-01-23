@@ -1,7 +1,7 @@
 """ptools.spelling - Miscelleanous spelling functions."""
 
 
-def plural(word: str) -> str:
+def pluralize(word: str) -> str:
     """Given a word, returns its plural form."""
 
     def format_output(word: str) -> str:

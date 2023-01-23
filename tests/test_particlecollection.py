@@ -4,7 +4,7 @@ import numpy as np
 
 from pytest import approx
 
-from ptools.namedarray import NamedArrayContainer
+from ptools.namedarray import NamedArray, NamedArrayContainer
 from ptools.particlecollection import Particle, ParticleCollection
 
 from .generators import generate_atoms
@@ -253,3 +253,15 @@ def test_masses():
 
     expected = [atomic_masses[a.name] for a in pc]
     assert pc.atom_properties.get("masses") == expected
+
+
+def test_set_property():
+    """Test that the ``set_property`` method works."""
+    pc = ParticleCollection(generate_atoms())
+    assert pc.atom_properties.get("indices") == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    expected = [42] * pc.size()
+    pc.atom_properties.set("indices", expected)
+    assert isinstance(pc.atom_properties.get("indices"), NamedArray)
+    assert pc.atom_properties.get("indices") == expected
+

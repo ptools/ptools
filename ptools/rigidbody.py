@@ -21,7 +21,10 @@ RigidBodyType = TypeVar("RigidBodyType", bound="RigidBody")
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 
-class RigidBody(AtomCollection):
+from .particlecollection import ParticleCollection
+
+
+class RigidBody(ParticleCollection):
     """RigidBody is an AtomCollection that can be initialized from a PDB file.
 
     It has 3 additionnal arrays comparaed to AtomCollection:
@@ -45,9 +48,9 @@ class RigidBody(AtomCollection):
 
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
-        atoms = io_read_pdb(path)
+        atoms: ParticleCollection = io_read_pdb(path)
         assert isinstance(atoms, AtomCollection)
-        return cls(atoms)
+        return cls.from_properties(atoms.atom_properties)
 
 
 class AttractRigidBody(RigidBody):

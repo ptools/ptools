@@ -1,11 +1,14 @@
 """Generators for testing."""
 
+from dataclasses import dataclass, field
 import random
+from typing import Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
 
 from ptools.atomattrs import AtomAttrs
+from ptools.particlecollection import ParticleCollection
 
 
 AMINO_ACID_NAMES = [
@@ -63,7 +66,7 @@ class Atom:
         self.charge = random_charge()
 
 
-def generate_atoms(size: int = 10) -> list:
+def generate_atoms(size: int = 10, names: Optional[list[str]] = None ) -> list[Atom]:
     """Creates a dummy atom collection composed of `size` atoms.
 
     The atoms have those properties:
@@ -76,7 +79,16 @@ def generate_atoms(size: int = 10) -> list:
     - chain is "A",
     - charge is a random float between -1 and 1,
     """
-    return [Atom(i, [i, i, i]) for i in range(size)]
+    atoms = [Atom(i, [i, i, i]) for i in range(size)]
+    if names is not None:
+        for atom, name in zip(atoms, names):
+            atom.name = name
+    return atoms
+
+
+def generate_particlecollection(**kwargs) -> ParticleCollection:
+    """Creates a dummy particle collection."""
+    return ParticleCollection(generate_atoms(**kwargs))
 
 
 def random_amino_acid_name():
@@ -93,3 +105,18 @@ def random_charge(lower: float = -1, upper: float = 1):
     """Returns a random charge."""
     return random.uniform(lower, upper)
 
+
+
+
+@dataclass
+class Balloon:
+    """Dummy object with coordinates."""
+
+    coordinates: np.ndarray = field(default_factory=lambda: np.zeros((5, 3)))
+
+
+def generate_balloon(coordinates: Optional[np.typing.ArrayLike] = None) -> Balloon:
+    """Returns a ``Balloon`` with given coordinates"""
+    if coordinates is None:
+        return Balloon()
+    return Balloon(np.asarray(coordinates))

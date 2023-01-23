@@ -67,7 +67,7 @@ class TestHeligeomSimple(unittest.TestCase):
 
     # Ignores W0703: Catching too general exception Exception
     # pylint: disable=W0703
-    def test_Z_true_implemented(self):
+    def test_Z_true(self):
         """Tests that using heligeom.extend with Z=true does not raises an error."""
         hp = heli_analyze(self.mono1, self.mono2)  # N is random
         try:
