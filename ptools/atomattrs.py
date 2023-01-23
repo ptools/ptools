@@ -80,7 +80,7 @@ class AtomAttrs:
 
 def guess_atom_mass(element: str) -> float:
     """Returns the atom mass based on the element name."""
-    return tables.masses.get(element, 1.0)
+    return tables.atomic_masses.get(element, 1.0)
 
 
 def guess_atom_element(name: str) -> str:

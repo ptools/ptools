@@ -222,5 +222,34 @@ def test_add():
     assert pc3[-1] == pc2[-1]
 
 
+def test_add_makes_copies():
+    """Test that the ``+`` operator makes copies of the particles."""
+    pc1 = ParticleCollection(generate_atoms())
+    pc2 = ParticleCollection(generate_atoms())
+
+    pc3 = pc1 + pc2
+
+    pc3[0].name = pc1[0].name + "random string"
+    assert pc3[0].name != pc1[0].name
 
 
+def test_inplace_add():
+    """Test that the ``+=`` operator works."""
+    pc1 = ParticleCollection(generate_atoms(size=10))
+    pc2 = ParticleCollection(generate_atoms())
+
+    pc1 += pc2
+
+    assert pc1.size() == pc2.size() * 2
+    assert pc1[10] == pc2[0]
+    assert pc1[-1] == pc2[-1]
+
+
+def test_masses():
+    """Test that the ``guess_masses`` method."""
+    from ptools.tables import atomic_masses
+    pc = ParticleCollection(generate_atoms())
+    pc.guess_masses()
+
+    expected = [atomic_masses[a.name] for a in pc]
+    assert pc.atom_properties.get("masses") == expected

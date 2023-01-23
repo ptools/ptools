@@ -7,7 +7,7 @@ Used to guess atom types, masses, etc.
 # Masses for elements in atomic units (u).
 # Taken from MDAnalysis (which took it from CHARMM and Gromacs atommass.dat)
 
-masses = {
+atomic_masses = {
     "Ac": 227.028,
     "Al": 26.981539,
     "Am": 243,

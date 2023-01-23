@@ -1,8 +1,8 @@
 from __future__ import annotations
 from collections.abc import KeysView
-import copy
 from typing import Any, Iterable, Optional, TypeVar
 
+from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
 from . import spelling
 
@@ -16,6 +16,13 @@ class Particle:
         self._index = index
         self._singular_to_plural = {
             prop.singular: prop.plural for prop in self._collection.atom_properties
+        }
+
+    def properties(self) -> dict[str, Any]:
+        """"Returns a dictionary of all particle properties."""
+        return {
+            k: getattr(self, k)
+            for k in self._singular_to_plural.keys()
         }
 
     def copy(self: ParticleType) -> ParticleType:
@@ -53,11 +60,6 @@ class Particle:
             ] = value
         else:
             raise KeyError(f"No such property: {name!r}")
-
-    # def properties(self) -> list[str]:
-    #     return [
-    #         prop.singular for prop in self.self._collection.atom_properties.values()
-    #     ]
 
     def __str__(self) -> str:
         attrs = ", ".join(
@@ -174,3 +176,20 @@ class ParticleCollection:
     def copy(self) -> ParticleCollection:
         """Returns a copy of the collection."""
         return ParticleCollection.from_properties(self.atom_properties.copy())
+
+    def guess_elements(self):
+        """Guesses the elements of the atoms."""
+        self.atom_properties.add_array(
+            "element",
+            "elements",
+            [guess_atom_element(a.name) for a in self.particles],
+        )
+
+    def guess_masses(self, guess_element: bool = True):
+        """Guesses the masses of the atoms."""
+        if guess_element:
+            self.guess_elements()
+        self.atom_properties.add_array(
+            "mass", "masses", [guess_atom_mass(a.element) for a in self.particles]
+        )
+
