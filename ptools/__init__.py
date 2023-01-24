@@ -7,12 +7,12 @@ __version__ = "0.1.0"
 
 from . import (
     atomattrs,
-    atomcollection,
     attract,
     forcefield,
     heligeom,
     io,
     pairlist,
+    particlecollection,
     rigidbody,
     superpose,
     tables,
@@ -22,12 +22,12 @@ from .rigidbody import AttractRigidBody, RigidBody
 
 __all__ = [
     "atomattrs",
-    "atomcollection",
     "attract",
     "forcefield",
     "heligeom",
     "io",
     "pairlist",
+    "particlecollection",
     "rigidbody",
     "superpose",
     "tables",

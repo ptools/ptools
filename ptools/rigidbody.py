@@ -12,22 +12,19 @@ import numpy as np
 
 # PTools.
 from .atomattrs import AtomAttrs
-from .atomcollection import AtomCollection
 from .io.pdb import InvalidPDBFormatError
 from .io.pdb import read_pdb as io_read_pdb
+from .particlecollection import ParticleCollection
 
 
 RigidBodyType = TypeVar("RigidBodyType", bound="RigidBody")
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 
-from .particlecollection import ParticleCollection
-
-
 class RigidBody(ParticleCollection):
-    """RigidBody is an AtomCollection that can be initialized from a PDB file.
+    """RigidBody is an ParticleCollection that can be initialized from a PDB file.
 
-    It has 3 additionnal arrays comparaed to AtomCollection:
+    It has 3 additionnal arrays compared to ParticleCollection:
         - atom_categories (np.ndarray(N, )):
             1 x N shaped array for atom categories
         - atom_charges (np.ndarray(N, )):O
@@ -44,13 +41,13 @@ class RigidBody(ParticleCollection):
                 "RigidBody class can not longer be instantiated from a path. "
                 "Use RigidBody.from_pdb instead."
             )
-        AtomCollection.__init__(self, atoms)
+        ParticleCollection.__init__(self, atoms)
 
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
-        atoms: ParticleCollection = io_read_pdb(path)
-        assert isinstance(atoms, AtomCollection)
-        return cls.from_properties(atoms.atom_properties)
+        atom_container = io_read_pdb(path)
+        assert isinstance(atom_container, ParticleCollection)
+        return cls.from_properties(atom_container.atom_properties)
 
 
 class AttractRigidBody(RigidBody):

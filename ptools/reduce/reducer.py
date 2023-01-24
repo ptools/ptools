@@ -7,7 +7,7 @@ import yaml
 
 from ..io import assert_file_exists
 from ..io.pdb import read_single_model_pdb
-from ..atomcollection import AtomCollection
+from ..particlecollection import ParticleCollection
 
 from .bead import Bead
 from .exceptions import NoReductionRulesError
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 class Reducer:
 
-    all_atoms: AtomCollection
+    all_atoms: ParticleCollection
     reduction_parameters: dict[str, Any]
     atom_rename_map: dict[str, dict[str, str]]
     beads: list[Bead]
@@ -88,7 +88,7 @@ class Reducer:
         for i, bead in enumerate(self.beads):
             bead.index = i + 1
 
-    def _reduce_residue(self, residue: AtomCollection) -> Residue:
+    def _reduce_residue(self, residue: ParticleCollection) -> Residue:
         """Reduces a single residue."""
         residue_name = residue[0].residue_name
         residue_index = residue[0].residue_index
@@ -129,7 +129,7 @@ def read_reduction_parameters(path: PathLike) -> dict[str, Any]:
     return reduction_parameters
 
 
-def read_topology(path: PathLike) -> AtomCollection:
+def read_topology(path: PathLike) -> ParticleCollection:
     """Reads a PDB topology file."""
     assert_file_exists(path)
     return read_single_model_pdb(path)

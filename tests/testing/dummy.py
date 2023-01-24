@@ -6,7 +6,7 @@ from typing import Optional
 import numpy as np
 
 from ptools.atomattrs import AtomAttrs
-from ptools.atomcollection import AtomCollection
+from ptools.particlecollection import ParticleCollection
 
 DUMMY_ATOM_ATTRS = {
     "name": "CA",
@@ -41,7 +41,7 @@ def generate_dummy_atom() -> AtomAttrs:
     return atom
 
 
-def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
+def generate_dummy_atomcollection(size: int = 10) -> ParticleCollection:
     """Creates a dummy atom collection composed of `size` atoms.
 
     Atom coordinates are [(0, 0, 0), (1, 1, 1), ..., (9, 9, 9)].
@@ -56,4 +56,4 @@ def generate_dummy_atomcollection(size: int = 10) -> AtomCollection:
         atom.guess_element()
         atom.guess_mass()
 
-    return AtomCollection.from_objects(atoms)
+    return ParticleCollection.from_objects(atoms)

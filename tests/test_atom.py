@@ -18,7 +18,7 @@ def test_mass_setter():
     assert atoms[0].mass == 42
 
 def test_equal():
-    """Asserts that identical atoms from different AtomCollection instances
+    """Asserts that identical atoms from different ParticleCollection instances
     are evaluated equal when attributes are actually equal."""
     left = generate_particlecollection()
     right = left.copy()

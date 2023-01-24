@@ -3,7 +3,7 @@
 from typing import Sequence, Tuple, Union
 
 from ..atomattrs import AtomAttrs
-from ..atomcollection import AtomCollection
+from ..particlecollection import ParticleCollection
 from .._typing import FilePath
 
 
@@ -148,24 +148,24 @@ def parse_atom_line(buffer: str) -> AtomAttrs:
 
 
 
-def read_single_model_pdb(path: FilePath) -> AtomCollection:
+def read_single_model_pdb(path: FilePath) -> ParticleCollection:
     """Read a Protein Data Bank file containing a single model.
 
     Args:
         path (FilePath): path to file.
 
     Returns:
-        AtomCollection: collection of Atoms
+        ParticleCollection: collection of Atoms
     """
     topology = read_pdb(path)
-    if not isinstance(topology, AtomCollection):
+    if not isinstance(topology, ParticleCollection):
         raise ValueError("Topology file must contain only one model.")
     return topology
 
 
 def read_pdb(
     path: FilePath, as_dict=False
-) -> Union[dict[str, AtomCollection], Sequence[AtomCollection], AtomCollection]:
+) -> Union[dict[str, ParticleCollection], Sequence[ParticleCollection], ParticleCollection]:
     """Read a Protein Data Bank file.
 
     Args:
@@ -173,12 +173,12 @@ def read_pdb(
         as_dict (bool): if True, returns models in a dictionnary.
 
     Returns:
-        AtomCollection: collection of Atoms
+        ParticleCollection: collection of Atoms
     """
 
     def register_model(atom_list: Sequence[AtomAttrs]):
-        """Stores `atom_list` into `models` as an AtomCollection."""
-        models.append(AtomCollection(atom_list))
+        """Stores `atom_list` into `models` as an ParticleCollection."""
+        models.append(ParticleCollection(atom_list))
 
     def register_model_id(line: str):
         """Extracts model id from model header line and stores `model_id` into `model_id_list`."""
@@ -188,7 +188,7 @@ def read_pdb(
         """Parses an ATOM line and stores the atom into the current model."""
         current_model.append(AtomLine(line).to_atom())
 
-    models: list[AtomCollection] = []
+    models: list[ParticleCollection] = []
     model_id_list: list[str] = []
     current_model: list[AtomAttrs] = []
 
@@ -215,9 +215,9 @@ def read_pdb(
             )
         return dict(zip(model_id_list, models))
 
-    # Only 1 model: returns a simple AtomCollection
+    # Only 1 model: returns a simple ParticleCollection
     if len(models) == 1:
         return models[0]
 
-    # Multiple models: returns a list of AtomCollection instances.
+    # Multiple models: returns a list of ParticleCollection instances.
     return models

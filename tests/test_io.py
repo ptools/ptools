@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from ptools import io
-from ptools.atomcollection import AtomCollection
+from ptools.particlecollection import ParticleCollection
 from ptools.io import pdb
 
 from .testing.io import (
@@ -52,7 +52,7 @@ class TestPDBIO(unittest.TestCase):
         self.assertIsInstance(models, list)
         self.assertEqual(len(models), 3)
         for atoms in models:
-            self.assertIsInstance(atoms, AtomCollection)
+            self.assertIsInstance(atoms, ParticleCollection)
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_as_dict_single_model(self):
@@ -61,7 +61,7 @@ class TestPDBIO(unittest.TestCase):
         self.assertIsInstance(models, dict)
         self.assertEqual(list(models.keys()), ["1"])
         for atoms in models.values():
-            self.assertIsInstance(atoms, AtomCollection)
+            self.assertIsInstance(atoms, ParticleCollection)
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_as_dict_multiple_models(self):
@@ -70,7 +70,7 @@ class TestPDBIO(unittest.TestCase):
         self.assertIsInstance(models, dict)
         self.assertEqual(list(models.keys()), ["1", "2", "3"])
         for atoms in models.values():
-            self.assertIsInstance(atoms, AtomCollection)
+            self.assertIsInstance(atoms, ParticleCollection)
             self.assertTrue(len(atoms), 10)
 
     def test_read_pdb_as_dict_no_model(self):
@@ -84,7 +84,7 @@ class TestPDBIO(unittest.TestCase):
     def test_read_pdb_single_model(self):
         with mk_pdb_10_atoms() as tmp_pdb:
             atoms = pdb.read_pdb(tmp_pdb.name)
-            self.assertIsInstance(atoms, AtomCollection)
+            self.assertIsInstance(atoms, ParticleCollection)
             self.assertEqual(len(atoms), 10)
 
     def test_read_pdb_single_model_as_dict(self):

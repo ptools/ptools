@@ -3,7 +3,7 @@
 
 from typing import Any
 
-from ..atomcollection import AtomCollection
+from ..particlecollection import ParticleCollection
 
 from .bead import Bead, BeadIdentifier
 from .exceptions import (
@@ -18,7 +18,7 @@ class Residue:
     """Coarse-grained representation of a residue.
 
     Attributes:
-        atoms (AtomCollection): list of atoms that compose the residue.
+        atoms (ParticleCollection): list of atoms that compose the residue.
         beads (list[Bead]): list of beads that compose the residue.
         reduction_parameters: list[dict[str, Any]]: reduction parameters, where each
             element is the dictionary of parameters for a bead.
@@ -26,17 +26,17 @@ class Residue:
 
     name: str
     index: int
-    atoms: AtomCollection
+    atoms: ParticleCollection
     beads: list[Bead]
     reduction_parameters: list[dict[str, Any]]
 
     def __init__(
-        self, atoms: AtomCollection, bead_reduction_parameters: list[dict[str, Any]]
+        self, atoms: ParticleCollection, bead_reduction_parameters: list[dict[str, Any]]
     ):
         """Initializes a residue."""
         self.name = atoms[0].residue_name
         self.index = atoms[0].residue_index
-        self.atoms: AtomCollection = atoms
+        self.atoms: ParticleCollection = atoms
         self.beads: list[Bead] = []
         self.reduction_parameters = bead_reduction_parameters
         self.create_beads()

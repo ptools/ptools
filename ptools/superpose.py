@@ -7,7 +7,7 @@ import math
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .atomcollection import AtomCollection
+from .particlecollection import ParticleCollection
 from . import linalg, measure, transform
 from ._typing import ArrayLike
 
@@ -53,8 +53,8 @@ def kabsch_matrix(mobile: ArrayLike, target: ArrayLike) -> np.ndarray:
     return rotation.as_matrix()
 
 
-def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
-    """Returns the fit matrix between two ``AtomCollection`` instances."""
+def fit_matrix(mobile: ParticleCollection, target: ParticleCollection) -> np.ndarray:
+    """Returns the fit matrix between two ``ParticleCollection`` instances."""
     t0 = measure.centroid(target)
     t1 = measure.centroid(mobile)
 
@@ -76,13 +76,13 @@ def fit_matrix(mobile: AtomCollection, target: AtomCollection) -> np.ndarray:
     return result
 
 
-def fit(mobile: AtomCollection, target: AtomCollection):
+def fit(mobile: ParticleCollection, target: ParticleCollection):
     """Fits two ``mobile`` onto ``target``."""
     matrix = fit_matrix(mobile, target)
     transform.move(mobile, matrix)
 
 
-def rmsd(mobile: AtomCollection, target: AtomCollection, do_fit: bool = False) -> float:
+def rmsd(mobile: ParticleCollection, target: ParticleCollection, do_fit: bool = False) -> float:
     """Returns the Root Mean Square Deviation between two groups of atoms."""
     assert len(mobile) == len(target)
     if do_fit:

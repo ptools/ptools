@@ -59,7 +59,7 @@ def test_copy_does_not_contain_any_reference():
 #         self.assertEqual(len(thecopy), len(self.rigid))
 #         self.assertEqual(thecopy.coordinates.shape, (10, 3))
 
-#         # Change parent AtomCollection coordinates and make sure it does not
+#         # Change parent ParticleCollection coordinates and make sure it does not
 #         # affect the copy.
 #         ref_coords = self.rigid.coordinates.copy()
 #         self.rigid.coordinates.fill(0)
