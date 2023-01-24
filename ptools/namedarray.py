@@ -89,7 +89,7 @@ class NamedArray:
     def __iter__(self) -> Any:
         return iter(self.values)
 
-    def __getitem__(self, key: int | slice) -> float | Self:
+    def __getitem__(self, key: int | slice) -> float | NamedArray:
         if isinstance(key, slice):
             return self.__class__(
                 self.singular,
@@ -222,5 +222,5 @@ class NamedArrayContainer(collections.abc.Container):
             raise ValueError(err)
         self._properties[item.plural] = item.copy()
 
-    def copy(self) -> Self:
+    def copy(self) -> NamedArrayContainer:
         return self.__class__(self._properties.values())

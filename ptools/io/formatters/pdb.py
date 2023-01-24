@@ -78,12 +78,9 @@ def format_atom(atom: PDBConvertible) -> str:
         "atom_index": _format_atom_index(atom.index),
         "residue_name": _format_residue_name(atom.residue_name),
         "residue_index": _format_residue_index(atom.residue_index),
-
-        # Dirty hack to support both current version of ``Atom`` which
-        # ``coordinates`` attribute does not refers to its actual coordinates... nice...
-        "x": atom.coords[0] if hasattr(atom, "coords") else atom.coordinates[0],
-        "y": atom.coords[1] if hasattr(atom, "coords") else atom.coordinates[1],
-        "z": atom.coords[2] if hasattr(atom, "coords") else atom.coordinates[2],
+        "x": atom.coordinates[0],
+        "y": atom.coordinates[1],
+        "z": atom.coordinates[2],
     }
     return PDB_FORMAT.format(**fmt_args)
 
