@@ -2,6 +2,8 @@ from __future__ import annotations
 from collections.abc import KeysView
 from typing import Any, Iterable, Optional, TypeVar
 
+import numpy as np
+
 from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
 from . import spelling
@@ -111,7 +113,7 @@ class ParticleCollection:
 
     def __getitem__(self, key: int | slice) -> Particle | ParticleCollection:
         """Returns a new collection with the selected atoms."""
-        if isinstance(key, int):
+        if isinstance(key, (int, np.integer)):
             return Particle(self, key)
         return ParticleCollection.from_properties(self.atom_properties[key])
 

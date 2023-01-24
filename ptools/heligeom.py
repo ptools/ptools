@@ -33,13 +33,13 @@ def contact(rb1: RigidBody, rb2: RigidBody, cutoff: float = 5):
     res_indexes = set()  # residue list in interaction
 
     for id_atom_rb1, id_atom_rb2 in pl.contacts():
-
         res_indexes.add(
             (
-                rb1[id_atom_rb1].get("residue_indices"),
-                rb2[id_atom_rb2].get("residue_indices"),
+                rb1[id_atom_rb1].residue_index,
+                rb2[id_atom_rb2].residue_index,
             )
         )
+
 
     return res_indexes
 

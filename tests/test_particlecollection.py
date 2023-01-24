@@ -8,7 +8,7 @@ from ptools.namedarray import NamedArray, NamedArrayContainer
 from ptools.particlecollection import Particle, ParticleCollection
 
 from .generators import generate_atoms
-from .testing import assert_array_almost_equal
+from .testing import assert_array_almost_equal, assert_array_equal
 
 
 class RandomParticleContainer:
@@ -97,10 +97,9 @@ def test_initialization_from_properties():
     assert pc.atom_properties.get("zs") == [7, 8, 9]
 
 
-def test_get_slice():
+def test_getitem_with_slice():
     expected = RandomParticleContainer(10)
     atoms = ParticleCollection(expected.particles)
-
     assert expected.size() == 10
     assert atoms.size() == expected.size()
 
@@ -113,20 +112,19 @@ def test_get_slice():
     assert subset[1] == atoms[2]
 
 
-# def test_get_slice_returns_a_reference_to_the_original_collection():
-#     expected = RandomParticleContainer(10)
-#     atoms = ParticleCollection(expected.particles)
+def test_setitem_with_slice():
+    expected = RandomParticleContainer(10)
+    atoms = ParticleCollection(expected.particles)
+    assert expected.size() == 10
+    assert atoms.size() == expected.size()
 
-#     # Creates a subset of the atoms.
-#     subset = atoms[1:3]
+    expected_names = list(expected.names)
+    assert_array_equal(atoms.names, expected_names)
 
-#     # Modifies the subset and checks the original object is changed as well.
-#     subset_expected_names = [a.name for a in subset]
-#     assert subset_expected_names == expected.names[1:3]
+    atoms.names[1:3] = [name + "random suffix" for name in atoms[1:3].names]
+    expected_names[1:3] = [name + "random suffix" for name in expected_names[1:3]]
 
-#     subset[0].name = "new random name"
-#     assert subset[0].name == "new random name"
-#     assert atoms[1].name == "new random name"
+    assert_array_equal(atoms.names, expected_names)
 
 
 def test_size_and_len():
