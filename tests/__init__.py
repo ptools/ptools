@@ -1,10 +1,10 @@
-import os
+import pathlib
 
-TEST_LIGAND = os.path.join(os.path.dirname(__file__), "data", "ligand.pdb")
-TEST_RECEPTOR = os.path.join(os.path.dirname(__file__), "data", "receptor.pdb")
+_DATA_DIR = pathlib.Path(__file__).parent / "data"
 
-# File containing distances between every pair of atom of TEST_RECEPTOR
-# and TEST_LIGAND
-TEST_DISTANCES_RECEPTOR_LIGAND = os.path.join(
-    os.path.dirname(__file__), "data", "dist.dat"
-)
+TEST_LIGAND = _DATA_DIR / "ligand.pdb"
+TEST_RECEPTOR = _DATA_DIR / "receptor.pdb"
+
+# File containing distances between every pair of atom of TEST_RECEPTOR and TEST_LIGAND
+# (calculated with VMD and a cutoff of 5 Å).
+TEST_DISTANCES_RECEPTOR_LIGAND = _DATA_DIR / "dist.dat"

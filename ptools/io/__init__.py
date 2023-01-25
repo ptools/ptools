@@ -5,6 +5,7 @@ import pathlib
 from typing import Optional
 from .._typing import FilePath
 
+from .pdb import read_pdb
 from .formatters.pdb import to_pdb, write_pdb
 from .formatters.reduced import to_reduced_pdb, write_reduced_pdb
 

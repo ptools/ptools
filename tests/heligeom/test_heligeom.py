@@ -1,25 +1,28 @@
 import math
 import os
+from pathlib import Path
 import unittest
 
 import numpy as np
+from pytest import approx
 
 from ptools import RigidBody
-from ptools.heligeom import heli_analyze, heli_construct, dist_axis, contact
+from ptools.heligeom import heli_analyze, heli_construct, dist_axis
+from ptools.measure import contacts_by_residue
 from ptools.io import to_pdb
 from ptools import transform
 
 
 from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
 
-TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-TEST_1A74_PROT_RED = os.path.join(TEST_DATA_DIR, "1A74_prot.red")
-TEST_2GLSA = os.path.join(TEST_DATA_DIR, "2GLS_A.pdb")
-TEST_2GLSB = os.path.join(TEST_DATA_DIR, "2GLS_B.pdb")
-TEST_REF_2GLSAB_N6 = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N6.pdb")
-TEST_REF_COORDS_2GLSAB_N6 = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N6.npy")
-TEST_REF_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N3-Zalign.pdb")
-TEST_REF_COORDS_2GLSAB_N3_Z = os.path.join(TEST_DATA_DIR, "ref_2GLSAB-N3-Zalign.npy")
+TEST_DATA_DIR = Path(__file__).parent / "data"
+TEST_1A74_PROT_RED = TEST_DATA_DIR / "1A74_prot.red"
+TEST_2GLSA = TEST_DATA_DIR / "2GLS_A.pdb"
+TEST_2GLSB = TEST_DATA_DIR / "2GLS_B.pdb"
+TEST_REF_2GLSAB_N6 = TEST_DATA_DIR /  "ref_2GLSAB-N6.pdb"
+TEST_REF_COORDS_2GLSAB_N6 = TEST_DATA_DIR /  "ref_2GLSAB-N6.npy"
+TEST_REF_2GLSAB_N3_Z = TEST_DATA_DIR /  "ref_2GLSAB-N3-Zalign.pdb"
+TEST_REF_COORDS_2GLSAB_N3_Z = TEST_DATA_DIR /  "ref_2GLSAB-N3-Zalign.npy"
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -36,11 +39,11 @@ class TestHeligeomSimple(unittest.TestCase):
 
     def test_analyze_x_translate(self):
         hp = heli_analyze(self.mono1, self.mono2)
-        self.assertAlmostEqual(hp.angle, 0.0)
-        self.assertAlmostEqual(hp.normtranslation, self.dx)
-        self.assertAlmostEqual(hp.unit[0], 1.0)
-        self.assertAlmostEqual(hp.unit[1], 0.0)
-        self.assertAlmostEqual(hp.unit[2], 0.0)
+        assert hp.angle == approx(0.0)
+        assert hp.normtranslation == approx(self.dx)
+        assert hp.unit[0] == approx(1.0)
+        assert hp.unit[1] == approx(0.0)
+        assert hp.unit[2] == approx(0.0)
 
     def test_analyze_x_translate_rotate(self):
         point = np.array((0, 0, 0))
@@ -49,11 +52,12 @@ class TestHeligeomSimple(unittest.TestCase):
         transform.ab_rotate(self.mono2, point, axis, angle, degrees=False)
 
         hp = heli_analyze(self.mono1, self.mono2)
-        self.assertAlmostEqual(hp.angle, angle)
-        self.assertAlmostEqual(hp.normtranslation, self.dx)
-        self.assertAlmostEqual(hp.unit[0], 1.0)
-        self.assertAlmostEqual(hp.unit[1], 0.0)
-        self.assertAlmostEqual(hp.unit[2], 0.0)
+
+        assert hp.angle == approx(angle)
+        assert hp.normtranslation == approx(self.dx)
+        assert hp.unit[0] == approx(1.0)
+        assert hp.unit[1] == approx(0.0)
+        assert hp.unit[2] == approx(0.0)
 
     def test_heli_construct(self):
         """Non-regression test for heligeom.heli_construct."""
@@ -65,17 +69,10 @@ class TestHeligeomSimple(unittest.TestCase):
         reference = np.load(reference_file)
         assert_array_almost_equal(result.coordinates, reference)
 
-    # Ignores W0703: Catching too general exception Exception
-    # pylint: disable=W0703
     def test_Z_true(self):
         """Tests that using heligeom.extend with Z=true does not raises an error."""
-        hp = heli_analyze(self.mono1, self.mono2)  # N is random
-        try:
-            heli_construct(self.mono1, hp, N=15, Z=True)
-        except Exception as error:
-            self.fail(
-                f"heli_construct with Z=True unexpectedly raised an exception: '{error}'"
-            )
+        hp = heli_analyze(self.mono1, self.mono2)
+        heli_construct(self.mono1, hp, N=15, Z=True)  # should not raise an error
 
 
 class TestHeligeom(unittest.TestCase):
@@ -88,17 +85,18 @@ class TestHeligeom(unittest.TestCase):
 
     def test_hp_data(self):
         """Test heligeom.heli_analyze results"""
-        self.assertAlmostEqual(self.hp.angle, 1.04719867)
-        assert_array_almost_equal(self.hp.point, [0.000436, -0.000296, 0])
-        assert_array_almost_equal(self.hp.unit, [8.47123119e-07, -2.80109302e-06, 1])
+        assert self.hp.angle == approx(1.04719867)
+        assert self.hp.point == approx((0.000436, -0.000296, 0), abs=1e-6)
+        assert self.hp.unit == approx((8.47123119e-07, -2.80109302e-06, 1))
+
 
     def test_heli_construct(self):
         """Tests that heligeom.heli_construct"""
         result = heli_construct(self.mono1, self.hp, N=self.n_monomers)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N6)
+        assert to_pdb(result) == to_pdb(self.ref)
+        assert result.coordinates == approx(ref_coords)
 
-        self.assertEqual(to_pdb(result), to_pdb(self.ref))
-        assert_array_almost_equal(result.coordinates, ref_coords)
 
     def test_heli_construct_Zalign(self):
         """Tests that heligeom.heli_construct"""
@@ -106,19 +104,20 @@ class TestHeligeom(unittest.TestCase):
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N3_Z)
         result = heli_construct(self.mono1, self.hp, N=3, Z=True)
 
-        self.assertEqual(to_pdb(result), to_pdb(ref))
-        assert_array_almost_equal(result.coordinates, ref_coords)
+        assert to_pdb(result) == to_pdb(ref)
+        assert result.coordinates == approx(ref_coords)
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
         dmin, dmax = dist_axis(self.mono1, self.hp)
-        self.assertAlmostEqual(dmin, 12.1986158)
-        self.assertAlmostEqual(dmax, 73.5932897)
+        assert dmin == approx(12.1986158)
+        assert dmax == approx(73.5932897)
 
     def test_contact(self):
         """Test for heligeom.contact"""
-        residues_in_contacts = contact(self.mono1, self.mono2)
-        assert set(((57, 338), (32, 193), (37, 205))).issubset(residues_in_contacts)
+        residues_in_contacts = contacts_by_residue(self.mono1, self.mono2, 5)
+        expected = set(((57, 338), (32, 193), (37, 205)))
+        assert expected.issubset(residues_in_contacts)
 
 
 if __name__ == "__main__":

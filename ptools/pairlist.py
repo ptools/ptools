@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from .particlecollection import ParticleCollection
+from ._typing import HasCoordinatesType
 
 
 def zeros3f():
@@ -14,17 +14,18 @@ def zeros3f():
 
 @dataclass
 class PairList:
-    """Retrieve atoms that are within a certain cutoff in ``ParticleCollection`` instances.
+    """Retrieve indices of element that are within a certain cutoff of each other.
 
     By construction, contacts stored in PairList are sorted by increasing
     atom indices.
+
     This sort applies for the second element of the pair as well, meaning that
     if a pair list contains [[1, 2], [1, 3]], element [1, 2] will always come
     before element [1, 3].
     """
 
-    receptor: ParticleCollection
-    ligand: ParticleCollection
+    receptor: HasCoordinatesType
+    ligand: HasCoordinatesType
     cutoff: float
     _all_sqdistances: np.ndarray = field(
         init=False, repr=False, default_factory=zeros3f

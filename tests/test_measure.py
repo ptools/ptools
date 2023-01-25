@@ -9,6 +9,7 @@ from pytest import approx
 
 from .generators import generate_particlecollection, generate_balloon
 from .testing import assert_array_almost_equal
+from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 
 
 def test_distance_to_axis():
@@ -50,8 +51,6 @@ def test_center_of_masses():
 
 
 def test_inertia_tensor():
-    from . import TEST_LIGAND
-
     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
 
     # Reference calculated with MDAnalysis 0.20.1:
@@ -66,8 +65,6 @@ def test_inertia_tensor():
 
 
 def test_principal_axes():
-    from . import TEST_LIGAND
-
     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
 
     # Calculated with MDAnalysis 0.20.1:
@@ -86,3 +83,40 @@ def test_radius_of_gyration():
     rgyr = measure.radius_of_gyration(atoms)
     # Reference value calculated with VMD.
     assert rgyr == approx(4.9749369621276855, 1e-6)
+
+
+
+def get_reference_contacts(cutoff: float) -> list[tuple[int, int]]:
+    distances = np.loadtxt(TEST_DISTANCES_RECEPTOR_LIGAND)
+    indices = np.where(distances < cutoff)
+    return list(zip(*indices))
+
+
+def test_measure_contacts():
+    receptor = ptools.read_pdb(TEST_RECEPTOR)
+    ligand = ptools.read_pdb(TEST_LIGAND)
+
+    cutoff = 5
+    expected = get_reference_contacts(cutoff)
+    actual = measure.contacts(receptor, ligand, cutoff)
+
+    assert np.shape(expected) == np.shape(actual)
+    assert expected == actual
+
+
+def test_measure_contacts_by_residue():
+    cutoff = 5
+    expected_by_atom = get_reference_contacts(cutoff)
+
+    receptor = ptools.read_pdb(TEST_RECEPTOR)
+    ligand = ptools.read_pdb(TEST_LIGAND)
+
+    expected = set(
+        (receptor[i].residue_index, ligand[j].residue_index) for i, j in expected_by_atom
+    )
+
+    actual = measure.contacts_by_residue(receptor, ligand, cutoff)
+
+    assert np.shape(expected) == np.shape(actual)
+    assert expected == actual
+

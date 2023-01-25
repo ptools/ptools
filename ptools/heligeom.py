@@ -6,42 +6,11 @@ Some more documentation coming soon.
 import string
 import numpy as np
 
-from .pairlist import PairList
+from . import measure
 from .rigidbody import RigidBody
 from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform, linalg
 
-
-def contact(rb1: RigidBody, rb2: RigidBody, cutoff: float = 5):
-    """Compute the residues in interaction between 2 Rigidbodies.
-
-        A residue is in interaction of another if one of its atoms is
-        within a cutoff, default 5 A of the atoms of the other residue.
-
-        It returns a set of tuples containing the residues indexes of both.
-
-        Args:
-            rb1: the 1st RigidBody
-            rb2: the 2nd RigidBody
-
-        Returns:
-            A set of tuple where each tuple contains the residues index
-             in interaction of each RigidBody
-    """
-
-    pl = PairList(rb1, rb2, cutoff)
-    res_indexes = set()  # residue list in interaction
-
-    for id_atom_rb1, id_atom_rb2 in pl.contacts():
-        res_indexes.add(
-            (
-                rb1[id_atom_rb1].residue_index,
-                rb2[id_atom_rb2].residue_index,
-            )
-        )
-
-
-    return res_indexes
 
 
 def fnat(receptor1: RigidBody, lig1: RigidBody, receptor2: RigidBody, lig2: RigidBody) -> float:
@@ -56,12 +25,13 @@ def fnat(receptor1: RigidBody, lig1: RigidBody, receptor2: RigidBody, lig2: Rigi
     Returns:
         float: the fraction computed.
     """
+    contact_cutoff = 5.0
 
-    res_pair1 = contact(receptor1, lig1)
+    res_pair1 = measure.contacts_by_residue(receptor1, lig1, contact_cutoff)
     if len(res_pair1) == 0:
         return 0
 
-    res_pair2 = contact(receptor2, lig2)
+    res_pair2 = measure.contacts_by_residue(receptor2, lig2, contact_cutoff)
 
     intersect = res_pair1 & res_pair2
 
