@@ -12,6 +12,7 @@ After the bead coodinates, the reduced PDB file contains
 from typing import Any, Iterable, Protocol
 from ..._typing import FilePath
 
+
 class ReducedPDBConvertible(Protocol):
     """Protocol for objects that can be converted to Reduced PDB format.
 
@@ -55,7 +56,6 @@ class ReducedPDBConvertible(Protocol):
         ...
 
 
-
 REDUCED_PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "
     "{atom_name:4s}{altloc}{residue_name:<4s}{chain:s}{residue_index:>4s}{insertion}   "
@@ -63,13 +63,18 @@ REDUCED_PDB_FORMAT = (
 )
 
 
-def write_reduced_pdb(atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible], path: FilePath):
+def write_reduced_pdb(
+    atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible],
+    path: FilePath,
+):
     """Write a PDB file from an atom or a collection of atoms."""
     with open(path, "w") as f:
         f.write(to_reduced_pdb(atom_or_collection))
 
 
-def to_reduced_pdb(atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible]) -> str:
+def to_reduced_pdb(
+    atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible],
+) -> str:
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)
     return format_atom(atom_or_collection)

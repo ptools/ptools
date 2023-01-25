@@ -15,6 +15,7 @@ def generate_arrays() -> list[NamedArray]:
         NamedArray("three", "threes", np.ones(5) + 3),
     ]
 
+
 def test_initialization_empty():
     container = NamedArrayContainer()
     assert container.number_of_properties() == 0
@@ -91,7 +92,7 @@ def test_register_copies_values():
 
 def test_getitem():
     container = NamedArrayContainer(generate_arrays())
-    subset = container[1: 3]
+    subset = container[1:3]
     assert container.number_of_properties() == subset.number_of_properties()
     assert container.number_of_elements() == 5
     assert subset.number_of_elements() == 2

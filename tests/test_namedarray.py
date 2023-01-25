@@ -5,7 +5,11 @@ from ptools.namedarray import NamedArray
 import numpy as np
 import pytest
 
-from .testing import assert_array_almost_equal, assert_array_not_almost_equal, assert_array_equal
+from .testing import (
+    assert_array_almost_equal,
+    assert_array_not_almost_equal,
+    assert_array_equal,
+)
 
 
 def test_initialization_converts_to_numpy():

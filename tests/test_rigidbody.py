@@ -45,7 +45,6 @@ def test_copy_does_not_contain_any_reference():
     assert not (rigid_copy.coordinates == 0).all()
 
 
-
 # class TestRigidBody(unittest.TestCase):
 #     def setUp(self):
 #         with mk_pdb_10_atoms() as tmp_pdb:

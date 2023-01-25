@@ -33,7 +33,6 @@ def test_topdb():
     assert to_pdb(atom) == reference_string
 
 
-
 def test_topdb_long_atomid():
     atom = generate_atom(index=110000)
     reference_string = (

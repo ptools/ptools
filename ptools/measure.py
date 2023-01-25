@@ -81,7 +81,9 @@ def contacts_by_atom(
     return contacts(obj1, obj2, cutoff)
 
 
-def contacts_by_residue(lhs: ParticleCollection, rhs: ParticleCollection, cutoff: float) -> set[tuple[int, int]]:
+def contacts_by_residue(
+    lhs: ParticleCollection, rhs: ParticleCollection, cutoff: float
+) -> set[tuple[int, int]]:
     """Returns the indexes of the residues of `obj1` that are in contact with
     the residues of `obj2`.
     """

@@ -49,7 +49,11 @@ def rotate(obj: HasCoordinatesType, rotation: ArrayLike):
 
 
 def ab_rotate(
-    obj: HasCoordinatesType, A: ArrayLike, B: ArrayLike, amount: float, degrees: bool = True
+    obj: HasCoordinatesType,
+    A: ArrayLike,
+    B: ArrayLike,
+    amount: float,
+    degrees: bool = True,
 ):
     """Rotates object using PTools rotation around axis."""
     T.ab_rotate(obj.coordinates, A, B, amount, degrees)

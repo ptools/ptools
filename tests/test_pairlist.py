@@ -11,8 +11,6 @@ from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 from .testing.moreassert import assert_array_almost_equal
 
 
-
-
 class TestPairList(unittest.TestCase):
     def setup_class(self):
         self.cutoff = 5.0
@@ -54,4 +52,3 @@ class TestPairList(unittest.TestCase):
         distances = self.read_reference_distance_file()
         indices = np.where(distances < self.cutoff)
         return list(zip(*indices))
-

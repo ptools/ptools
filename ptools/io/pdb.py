@@ -147,7 +147,6 @@ def parse_atom_line(buffer: str) -> AtomAttrs:
     return line.to_atom()
 
 
-
 def read_single_model_pdb(path: FilePath) -> ParticleCollection:
     """Read a Protein Data Bank file containing a single model.
 
@@ -165,7 +164,9 @@ def read_single_model_pdb(path: FilePath) -> ParticleCollection:
 
 def read_pdb(
     path: FilePath, as_dict=False
-) -> Union[dict[str, ParticleCollection], Sequence[ParticleCollection], ParticleCollection]:
+) -> Union[
+    dict[str, ParticleCollection], Sequence[ParticleCollection], ParticleCollection
+]:
     """Read a Protein Data Bank file.
 
     Args:

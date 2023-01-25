@@ -53,7 +53,7 @@ def create_subparser(parent):
         "--ff",
         help="force field to use for reduction.",
         choices=[name.lower() for name in reduce.FORCEFIELDS.keys()],
-        default="attract1"
+        default="attract1",
     )
 
     parser.add_argument(
@@ -85,12 +85,13 @@ def parse_args(args: argparse.Namespace):
         args.reduction_parameters = reduce.FORCEFIELDS[args.ff]
 
     if args.optimize_charges and args.ff != "scorpion":
-        raise ValueError("Charge optimization is only supported for the scorpion force field.")
+        raise ValueError(
+            "Charge optimization is only supported for the scorpion force field."
+        )
 
     assert_file_exists(args.topology)
     assert_file_exists(args.reduction_parameters)
     assert_file_exists(args.name_conversion_rules)
-
 
 
 def run(args: argparse.Namespace):
@@ -104,14 +105,20 @@ def run(args: argparse.Namespace):
         args.ignore_errors = reduce.exceptions.all_exceptions_names()
     ignore_exceptions = reduce.exceptions.exceptions_from_names(args.ignore_errors)
 
-    reducer = reduce.Reducer(args.topology, args.reduction_parameters, args.name_conversion_rules)
+    reducer = reduce.Reducer(
+        args.topology, args.reduction_parameters, args.name_conversion_rules
+    )
     reducer.reduce(ignore_exceptions)
 
-    logger.info("Reduced atomistic model from %d to %d", reducer.number_of_atoms(), reducer.number_of_beads())
+    logger.info(
+        "Reduced atomistic model from %d to %d",
+        reducer.number_of_atoms(),
+        reducer.number_of_beads(),
+    )
 
     if args.ff == "scorpion":
         # Sets charges of the first and last "CA" bead to 1 and -1, respectively
-        ca_beads = [bead for bead in reducer.beads if bead.type == 'CA']
+        ca_beads = [bead for bead in reducer.beads if bead.type == "CA"]
         ca_beads[0].charge = 1.0
         ca_beads[-1].charge = -1.0
 

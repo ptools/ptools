@@ -66,7 +66,7 @@ class Atom:
         self.charge = random_charge()
 
 
-def generate_atoms(size: int = 10, names: Optional[list[str]] = None ) -> list[Atom]:
+def generate_atoms(size: int = 10, names: Optional[list[str]] = None) -> list[Atom]:
     """Creates a dummy atom collection composed of `size` atoms.
 
     The atoms have those properties:
@@ -104,8 +104,6 @@ def random_atom_name():
 def random_charge(lower: float = -1, upper: float = 1):
     """Returns a random charge."""
     return random.uniform(lower, upper)
-
-
 
 
 @dataclass

@@ -146,7 +146,9 @@ class NamedArrayContainer(collections.abc.Container):
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
-            raise TypeError(f"cannot compare {self.__class__.__qualname__} and {type(other)}")
+            raise TypeError(
+                f"cannot compare {self.__class__.__qualname__} and {type(other)}"
+            )
         if not self._properties.keys() == other._properties.keys():
             return False
         for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays()):
@@ -156,7 +158,9 @@ class NamedArrayContainer(collections.abc.Container):
 
     def __add__(self, other: object) -> NamedArrayContainer:
         if not isinstance(other, self.__class__):
-            raise TypeError(f"cannot add {self.__class__.__qualname__} and {type(other)}")
+            raise TypeError(
+                f"cannot add {self.__class__.__qualname__} and {type(other)}"
+            )
         if not self._properties.keys() == other._properties.keys():
             raise ValueError("cannot add two collections with different properties")
         return NamedArrayContainer(
@@ -176,7 +180,9 @@ class NamedArrayContainer(collections.abc.Container):
         return [prop.singular for prop in self._properties.values()]
 
     def plural_names(self) -> list[str]:
-        return [prop.plural for prop in self._properties.values()]  # equivalent to self.names()
+        return [
+            prop.plural for prop in self._properties.values()
+        ]  # equivalent to self.names()
 
     def iter_arrays(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())

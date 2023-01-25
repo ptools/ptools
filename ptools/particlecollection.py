@@ -10,6 +10,7 @@ from . import spelling
 
 ParticleType = TypeVar("ParticleType", bound="Particle")
 
+
 class Particle:
     """Represents a single particle in a collection."""
 
@@ -21,11 +22,8 @@ class Particle:
         }
 
     def properties(self) -> dict[str, Any]:
-        """"Returns a dictionary of all particle properties."""
-        return {
-            k: getattr(self, k)
-            for k in self._singular_to_plural.keys()
-        }
+        """ "Returns a dictionary of all particle properties."""
+        return {k: getattr(self, k) for k in self._singular_to_plural.keys()}
 
     def copy(self: ParticleType) -> ParticleType:
         return self.__class__(self._collection, self._index)
@@ -202,4 +200,3 @@ class ParticleCollection:
             self.atom_properties.add_array("mass", "masses", values)
         else:
             self.atom_properties.get("masses").values = values
-

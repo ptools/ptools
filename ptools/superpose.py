@@ -11,6 +11,7 @@ from .particlecollection import ParticleCollection
 from . import linalg, measure, transform
 from ._typing import ArrayLike
 
+
 def zeros3f():
     return np.zeros(3, dtype="float64")
 
@@ -82,7 +83,9 @@ def fit(mobile: ParticleCollection, target: ParticleCollection):
     transform.move(mobile, matrix)
 
 
-def rmsd(mobile: ParticleCollection, target: ParticleCollection, do_fit: bool = False) -> float:
+def rmsd(
+    mobile: ParticleCollection, target: ParticleCollection, do_fit: bool = False
+) -> float:
     """Returns the Root Mean Square Deviation between two groups of atoms."""
     assert len(mobile) == len(target)
     if do_fit:

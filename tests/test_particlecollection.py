@@ -61,7 +61,6 @@ class RandomParticleContainer:
         ]
 
 
-
 def test_initialization_from_empty_list():
     """Test that the default initialization works."""
     pc = ParticleCollection()
@@ -246,6 +245,7 @@ def test_inplace_add():
 def test_masses():
     """Test that the ``guess_masses`` method."""
     from ptools.tables import atomic_masses
+
     pc = ParticleCollection(generate_atoms())
     pc.guess_masses()
 
@@ -262,4 +262,3 @@ def test_set_property():
     pc.atom_properties.set("indices", expected)
     assert isinstance(pc.atom_properties.get("indices"), NamedArray)
     assert pc.atom_properties.get("indices") == expected
-

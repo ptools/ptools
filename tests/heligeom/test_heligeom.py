@@ -19,10 +19,10 @@ TEST_DATA_DIR = Path(__file__).parent / "data"
 TEST_1A74_PROT_RED = TEST_DATA_DIR / "1A74_prot.red"
 TEST_2GLSA = TEST_DATA_DIR / "2GLS_A.pdb"
 TEST_2GLSB = TEST_DATA_DIR / "2GLS_B.pdb"
-TEST_REF_2GLSAB_N6 = TEST_DATA_DIR /  "ref_2GLSAB-N6.pdb"
-TEST_REF_COORDS_2GLSAB_N6 = TEST_DATA_DIR /  "ref_2GLSAB-N6.npy"
-TEST_REF_2GLSAB_N3_Z = TEST_DATA_DIR /  "ref_2GLSAB-N3-Zalign.pdb"
-TEST_REF_COORDS_2GLSAB_N3_Z = TEST_DATA_DIR /  "ref_2GLSAB-N3-Zalign.npy"
+TEST_REF_2GLSAB_N6 = TEST_DATA_DIR / "ref_2GLSAB-N6.pdb"
+TEST_REF_COORDS_2GLSAB_N6 = TEST_DATA_DIR / "ref_2GLSAB-N6.npy"
+TEST_REF_2GLSAB_N3_Z = TEST_DATA_DIR / "ref_2GLSAB-N3-Zalign.pdb"
+TEST_REF_COORDS_2GLSAB_N3_Z = TEST_DATA_DIR / "ref_2GLSAB-N3-Zalign.npy"
 
 
 def move_rigidbody(rb, x=0, y=0, z=0):
@@ -89,14 +89,12 @@ class TestHeligeom(unittest.TestCase):
         assert self.hp.point == approx((0.000436, -0.000296, 0), abs=1e-6)
         assert self.hp.unit == approx((8.47123119e-07, -2.80109302e-06, 1))
 
-
     def test_heli_construct(self):
         """Tests that heligeom.heli_construct"""
         result = heli_construct(self.mono1, self.hp, N=self.n_monomers)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N6)
         assert to_pdb(result) == to_pdb(self.ref)
         assert result.coordinates == approx(ref_coords)
-
 
     def test_heli_construct_Zalign(self):
         """Tests that heligeom.heli_construct"""

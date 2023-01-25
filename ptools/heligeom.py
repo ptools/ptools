@@ -12,8 +12,9 @@ from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform, linalg
 
 
-
-def fnat(receptor1: RigidBody, lig1: RigidBody, receptor2: RigidBody, lig2: RigidBody) -> float:
+def fnat(
+    receptor1: RigidBody, lig1: RigidBody, receptor2: RigidBody, lig2: RigidBody
+) -> float:
     """Compute the fraction of native contacts between 2 pairs of RigidBodies.
 
     Args:
@@ -69,7 +70,10 @@ def dist_axis(rb: RigidBody, hp: Screw) -> tuple[float, float]:
 
     return dmin, dmax
 
-def chain_intersect(rb1: RigidBody, rb2: RigidBody, delta_resid: int = 0) -> tuple[RigidBody, RigidBody]:
+
+def chain_intersect(
+    rb1: RigidBody, rb2: RigidBody, delta_resid: int = 0
+) -> tuple[RigidBody, RigidBody]:
     """Return new RigidBodies containing only the common residues of the input RigidBodies.
 
     - Assumes RigidBodies contain a single chain. If multiple chains, split before calling
@@ -87,11 +91,11 @@ def chain_intersect(rb1: RigidBody, rb2: RigidBody, delta_resid: int = 0) -> tup
     Returns:
         A tuple wit the 2 new RigidBodies.
     """
-    resids1 = set( a.resid for a in rb1.select_atom_type("CA"))
-    resids2 = set( a.resid - delta_resid for a in rb2.select_atom_type("CA"))
+    resids1 = set(a.resid for a in rb1.select_atom_type("CA"))
+    resids2 = set(a.resid - delta_resid for a in rb2.select_atom_type("CA"))
     resids = resids1.intersection(resids2)
-    rb1new = RigidBody(atoms=[ a for a in rb1 if a.resid in resids])
-    rb2new = RigidBody(atoms=[ a for a in rb2 if a.resid - delta_resid in resids])
+    rb1new = RigidBody(atoms=[a for a in rb1 if a.resid in resids])
+    rb2new = RigidBody(atoms=[a for a in rb2 if a.resid - delta_resid in resids])
     return rb1new, rb2new
 
 
@@ -138,7 +142,6 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
         transform.transform(rb_orig, t_matrix)
 
         origin[:] = np.inner(origin, t_matrix[:3, :3])
-
 
     chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
     rb_orig.atom_properties.set("chains", chains)

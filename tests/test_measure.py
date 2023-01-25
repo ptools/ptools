@@ -85,7 +85,6 @@ def test_radius_of_gyration():
     assert rgyr == approx(4.9749369621276855, 1e-6)
 
 
-
 def get_reference_contacts(cutoff: float) -> list[tuple[int, int]]:
     distances = np.loadtxt(TEST_DISTANCES_RECEPTOR_LIGAND)
     indices = np.where(distances < cutoff)
@@ -112,11 +111,11 @@ def test_measure_contacts_by_residue():
     ligand = ptools.read_pdb(TEST_LIGAND)
 
     expected = set(
-        (receptor[i].residue_index, ligand[j].residue_index) for i, j in expected_by_atom
+        (receptor[i].residue_index, ligand[j].residue_index)
+        for i, j in expected_by_atom
     )
 
     actual = measure.contacts_by_residue(receptor, ligand, cutoff)
 
     assert np.shape(expected) == np.shape(actual)
     assert expected == actual
-

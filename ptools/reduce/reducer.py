@@ -32,7 +32,6 @@ FORCEFIELDS = {
 }
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +42,8 @@ class Reducer:
     atom_rename_map: dict[str, dict[str, str]]
     beads: list[Bead]
 
-    def __init__(self,
+    def __init__(
+        self,
         topology_file: PathLike,
         reduction_parameters_file: PathLike,
         name_conversion_file: PathLike,
@@ -61,7 +61,8 @@ class Reducer:
     def number_of_beads(self) -> int:
         return len(self.beads)
 
-    def reduce(self,
+    def reduce(
+        self,
         ignore_exceptions: Optional[ExceptionTypeContainer] = None,
         warn_exceptions: Optional[ExceptionTypeContainer] = None,
     ) -> None:
