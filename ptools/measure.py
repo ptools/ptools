@@ -18,9 +18,17 @@ def distance(lhs: HasCoordinatesType, rhs: HasCoordinatesType) -> float:
     return L.distance(lhs.coordinates, rhs.coordinates)
 
 
-def distance_to_axis(obj: HasCoordinatesType, axis: ArrayLike) -> float:
+def distance_to_axis(obj: HasCoordinatesType, axis: ArrayLike, center: bool | ArrayLike = False) -> float:
     """Returns the distance between an object and an arbitrary axis."""
-    return L.distance_to_axis(obj.coordinates, axis)
+    return L.distance_to_axis(obj.coordinates, axis, center)
+
+
+def minmax_distance_to_axis(
+    obj: HasCoordinatesType, axis: ArrayLike, center: bool | ArrayLike = False
+) -> tuple[float, float]:
+    """Returns the minimum and maximum distance between an object and an
+    arbitrary axis."""
+    return L.minmax_distance_to_axis(obj.coordinates, axis, center)
 
 
 def centroid(obj: HasCoordinatesType) -> np.ndarray:
@@ -84,12 +92,28 @@ def contacts_by_atom(
 def contacts_by_residue(
     lhs: ParticleCollection, rhs: ParticleCollection, cutoff: float
 ) -> set[tuple[int, int]]:
-    """Returns the indexes of the residues of `obj1` that are in contact with
-    the residues of `obj2`.
-    """
+    """Returns the indexes of the residues of `obj1` that are in contact with the residues of `obj2`."""
     by_atom = contacts(lhs, rhs, cutoff)
     res_indexes = set(
         (lhs[index1].residue_index, rhs[index2].residue_index)
         for index1, index2 in by_atom
     )
     return res_indexes
+
+
+def fnat(
+    receptor1: ParticleCollection,
+    lig1: ParticleCollection,
+    receptor2: ParticleCollection,
+    lig2: ParticleCollection,
+    cutoff: float,
+) -> float:
+    """Computes the fraction of native contacts between 2 pairs of `RigidBody` instances."""
+
+    res_pair1 = contacts_by_residue(receptor1, lig1, cutoff)
+    if len(res_pair1) == 0:
+        return 0
+
+    res_pair2 = contacts_by_residue(receptor2, lig2, cutoff)
+    intersect = res_pair1 & res_pair2
+    return len(intersect) / len(res_pair1)

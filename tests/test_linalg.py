@@ -338,7 +338,7 @@ class TestCenterOfMass:
     def test_empty_coordinates(self):
         x = generate_empty_coordinates()
         w = np.ones(x.shape[0])
-        err = "cannot compute center of mass of empty array"
+        err = "cannot compute the center of mass of an empty array"
         with pytest.raises(ZeroDivisionError, match=err):
             linalg.center_of_mass(x, w)
 

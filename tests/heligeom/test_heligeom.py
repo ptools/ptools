@@ -7,8 +7,8 @@ import numpy as np
 from pytest import approx
 
 from ptools import RigidBody
-from ptools.heligeom import heli_analyze, heli_construct, dist_axis
-from ptools.measure import contacts_by_residue
+from ptools.heligeom import heli_analyze, heli_construct
+from ptools.measure import contacts_by_residue, minmax_distance_to_axis
 from ptools.io import to_pdb
 from ptools import transform
 
@@ -107,7 +107,7 @@ class TestHeligeom(unittest.TestCase):
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
-        dmin, dmax = dist_axis(self.mono1, self.hp)
+        dmin, dmax = minmax_distance_to_axis(self.mono1, self.hp.unit, center=self.hp.point)
         assert dmin == approx(12.1986158)
         assert dmax == approx(73.5932897)
 

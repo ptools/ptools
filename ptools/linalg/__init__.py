@@ -32,11 +32,23 @@ def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
     return (np.sum((lhs - rhs) ** 2.0)) ** 0.5
 
 
-def distance_to_axis(x: ArrayLike, axis: ArrayLike) -> float:
+def distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False) -> float:
     """Returns the distance between `x` and an arbitrary axis."""
-    result = np.linalg.norm(np.cross(x, axis))
+    x_ = np.asarray(x)
+    if isinstance(center, bool) and center:
+            x_ = x_ - np.mean(axis, axis=0)
+    else:
+        center_ = np.asarray(center)
+        x_ = x_ - center_
+    result = np.linalg.norm(np.cross(x_, axis))
     assert isinstance(result, float)
     return result
+
+
+def minmax_distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False) -> tuple[float, float]:
+    """Returns the minimal and maximal distances between `x` and an arbitrary axis."""
+    all_distances = [distance_to_axis(x[i], axis, center) for i in range(x.shape[0])]
+    return min(all_distances), max(all_distances)
 
 
 def angle(u: ArrayLike, v: ArrayLike) -> float:
@@ -50,7 +62,7 @@ def center_of_mass(x: ArrayLike, weights: ArrayLike) -> np.ndarray:
     weights = np.asarray(weights)
     N = x.shape[0]
     if N == 0:
-        raise ZeroDivisionError("cannot compute center of mass of empty array")
+        raise ZeroDivisionError("cannot compute the center of mass of an empty array")
     if weights.shape != (N,):
         raise ValueError(
             f"input array and weights should be the same size ({N} != {weights.shape[0]})"

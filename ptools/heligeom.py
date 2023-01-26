@@ -6,75 +6,15 @@ Some more documentation coming soon.
 import string
 import numpy as np
 
-from . import measure
 from .rigidbody import RigidBody
 from .superpose import Screw, mat_trans_2_screw, fit_matrix
 from . import transform, linalg
 
 
-def fnat(
-    receptor1: RigidBody, lig1: RigidBody, receptor2: RigidBody, lig2: RigidBody
-) -> float:
-    """Compute the fraction of native contacts between 2 pairs of RigidBodies.
-
-    Args:
-        receptor1: 1st RigidBody of the 1st pair.
-        lig1: 2nd RigidBody of the 1st pair.
-        receptor2: 1st RigidBody of the 2nd pair.
-        lig2: 2nd RigidBody of the 2nd pair.
-
-    Returns:
-        float: the fraction computed.
-    """
-    contact_cutoff = 5.0
-
-    res_pair1 = measure.contacts_by_residue(receptor1, lig1, contact_cutoff)
-    if len(res_pair1) == 0:
-        return 0
-
-    res_pair2 = measure.contacts_by_residue(receptor2, lig2, contact_cutoff)
-
-    intersect = res_pair1 & res_pair2
-
-    return float(len(intersect)) / float(len(res_pair1))
-
-
-def dist_axis(rb: RigidBody, hp: Screw) -> tuple[float, float]:
-    """compute the minimal and maximal distances between the axis of the Screw
-       and all the atoms of the RigidBody rb.
-
-    Args:
-        rb: a RigidBody
-        hp: a Screw transformation
-
-    Returns:
-        a tuple of float containing the minimal and maximal distances.
-    """
-
-    dmin, dmax = -1.0, -1.0
-
-    for atom in rb:
-
-        v = atom.coordinates - hp.point
-        d = float(np.linalg.norm(np.cross(v, hp.unit)))
-
-        if dmin == -1:
-            dmin = d
-        elif d < dmin:
-            dmin = d
-
-        if dmax == -1:
-            dmax = d
-        elif d > dmax:
-            dmax = d
-
-    return dmin, dmax
-
-
 def chain_intersect(
     rb1: RigidBody, rb2: RigidBody, delta_resid: int = 0
 ) -> tuple[RigidBody, RigidBody]:
-    """Return new RigidBodies containing only the common residues of the input RigidBodies.
+    """Returns new RigidBodies containing only the common residues of the input RigidBodies.
 
     - Assumes RigidBodies contain a single chain. If multiple chains, split before calling
     and assemble results chain-by-chain.
