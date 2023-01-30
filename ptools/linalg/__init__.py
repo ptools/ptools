@@ -47,7 +47,8 @@ def distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = F
 
 def minmax_distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False) -> tuple[float, float]:
     """Returns the minimal and maximal distances between `x` and an arbitrary axis."""
-    all_distances = [distance_to_axis(x[i], axis, center) for i in range(x.shape[0])]
+    x_ = np.asarray(x)
+    all_distances = [distance_to_axis(x_[i], axis, center) for i in range(x_.shape[0])]
     return min(all_distances), max(all_distances)
 
 

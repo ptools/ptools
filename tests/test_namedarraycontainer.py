@@ -187,3 +187,17 @@ def test_modify_slices():
     subset = container.get("ones")[1:3]
     subset[:] = 3
     assert container.get("ones") == [1, 3, 3, 1, 1]
+
+
+def test_from_objects():
+    class Dummy:
+        def __init__(self):
+            self.prop1 = 1
+            self.prop2 = 2
+
+    objects = [Dummy() for _ in range(3)]
+    container = NamedArrayContainer.from_objects(objects)
+    assert container.number_of_properties() == 2
+    assert container.number_of_elements() == 3
+    assert container.get("prop1s") == [1, 1, 1]
+    assert container.get("prop2s") == [2, 2, 2]

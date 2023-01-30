@@ -1,13 +1,11 @@
 from __future__ import annotations
-from collections.abc import KeysView
 import itertools
-from typing import Any, Callable, Iterable, Optional, TypeVar, Iterator
+from typing import Any, Callable, Iterable, Optional, TypeVar, Type
 
 import numpy as np
 
 from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
-from . import spelling
 
 ParticleType = TypeVar("ParticleType", bound="Particle")
 
@@ -36,7 +34,7 @@ class Particle:
             other_properties = __o._collection.atom_properties[__o._index]
             return self_properties == other_properties
 
-        rhs = ParticleCollection.from_objects([__o])
+        rhs = ParticleCollection(atoms=[__o])
         self_properties = self._collection.atom_properties[self._index]
         other_properties = rhs.atom_properties[0]
         return self_properties == other_properties
@@ -77,25 +75,14 @@ class ParticleCollection:
 
     atom_properties: NamedArrayContainer
 
-    # == Initialization methods =========================================================
+    # == Initialization =================================================================
 
     def __init__(self, atoms: Optional[Iterable[Any]] = None):
         """Initializes a new collection of particles from a list of particles."""
-        self.atom_properties = NamedArrayContainer()
-        if atoms is not None:
-            attrs = self._get_attrs_from_object_list(atoms)
-            for name in attrs:
-                plural = spelling.pluralize(name)
-                values = [getattr(o, name) for o in atoms]
-                self.atom_properties.add_array(name, plural, values)
-
-    @staticmethod
-    def _get_attrs_from_object_list(iterable: Optional[Iterable[Any]]) -> KeysView[str]:
-        """Returns the attributes of the first object in the list."""
-        if iterable is None:
-            return dict().keys()
-        obj = next(iter(iterable), None)
-        return vars(obj).keys()
+        if atoms:
+            self.atom_properties = NamedArrayContainer.from_objects(atoms)
+        else:
+            self.atom_properties = NamedArrayContainer()
 
     # ===================================================================================
 
@@ -107,7 +94,7 @@ class ParticleCollection:
     def __len__(self) -> int:
         """Returns the number of atoms in the collection.
 
-        This is an alias for the ``ParticleCollection.size()`` method.
+        This is an alias for ``ParticleCollection.size()``.
         """
         return self.size()
 
@@ -136,7 +123,6 @@ class ParticleCollection:
             return self.atom_properties.get(name).values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
 
-
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} with {self.size()} particles>"
 
@@ -151,16 +137,6 @@ class ParticleCollection:
         obj.atom_properties = properties
         return obj
 
-    @classmethod
-    def from_objects(
-        cls: type[ParticleCollectionType], objects: Iterable[Any]
-    ) -> ParticleCollectionType:
-        """Creates a new collection from a list of objects.
-
-        Reads the first object's attributes and stores all atom
-        properties in a new ParticleCollection.
-        """
-        return cls(objects)
 
     # ===================================================================================
 
@@ -179,7 +155,7 @@ class ParticleCollection:
 
     @property
     def particles(self):
-        """Returns an iterator over the particles."""
+        """Returns the list of particles in the collection."""
         return list(Particle(self, i) for i in range(self.size()))
 
     # ===================================================================================

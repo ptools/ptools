@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Any, Iterable, Iterator, Optional, Self
+from typing import Any, Iterable, Iterator, Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
 
 from .array3d import array3d
+from . import spelling
 
 
 class NamedArray:
@@ -123,6 +124,18 @@ class NamedArrayContainer(collections.abc.Container):
         if array_list:
             for prop in array_list:
                 self.register(prop)
+
+    @classmethod
+    def from_objects(cls, objects: Iterable[object]) -> NamedArrayContainer:
+        """Creates a new container from a list of objects."""
+        new_container = cls()
+        obj = next(iter(objects))
+        attrs = vars(obj).keys()
+        for name in attrs:
+            plural = spelling.pluralize(name)
+            values = [getattr(o, name) for o in objects]
+            new_container.add_array(name, plural, values)
+        return new_container
 
     def __contains__(self, name_or_item: object) -> bool:
         """Returns whether a property is present in the collections."""
