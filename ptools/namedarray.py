@@ -197,6 +197,12 @@ class NamedArrayContainer(collections.abc.Container):
         """Sets the property with the given plural name."""
         if not isinstance(plural, str):
             raise ValueError("expects string to set property using its plural name")
+        if plural not in self._properties:
+            raise ValueError(f"property {plural} not registered")
+        if not self._properties[plural].values.shape == np.shape(value):
+            raise ValueError(
+                f"cannot set property {plural} with array of shape {np.shape(value)} (expected {self._properties[plural].values})"
+            )
         self._properties[plural].values = np.asarray(value)
 
     def number_of_properties(self) -> int:

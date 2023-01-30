@@ -1,6 +1,7 @@
 from __future__ import annotations
 from collections.abc import KeysView
-from typing import Any, Iterable, Optional, TypeVar
+import itertools
+from typing import Any, Callable, Iterable, Optional, TypeVar, Iterator
 
 import numpy as np
 
@@ -79,6 +80,7 @@ class ParticleCollection:
     # == Initialization methods =========================================================
 
     def __init__(self, atoms: Optional[Iterable[Any]] = None):
+        """Initializes a new collection of particles from a list of particles."""
         self.atom_properties = NamedArrayContainer()
         if atoms is not None:
             attrs = self._get_attrs_from_object_list(atoms)
@@ -133,6 +135,10 @@ class ParticleCollection:
         if name in self.atom_properties:
             return self.atom_properties.get(name).values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
+
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} with {self.size()} particles>"
 
     # == Factory methods ================================================================
 
@@ -200,3 +206,40 @@ class ParticleCollection:
             self.atom_properties.add_array("mass", "masses", values)
         else:
             self.atom_properties.get("masses").values = values
+
+    # == Selection methods ==============================================================
+
+    def groupby(self: ParticleCollectionType, key: Callable) -> dict[Any, ParticleCollectionType]:
+        data = sorted(self, key=key)
+        grouped = itertools.groupby(data, key=key)
+        return {key: self.__class__(list(group)) for key, group in grouped}
+
+    def select_atom_type(self: ParticleCollectionType, atom_type: str) -> ParticleCollectionType:
+        """Returns a new collection with the selected atom type."""
+        raise NotImplementedError
+
+    def select_atom_types(self: ParticleCollectionType, atom_types: Iterable[str]) -> ParticleCollectionType:
+        """Returns a new collection with the selected atom types."""
+        raise NotImplementedError
+
+    def select_residue_range(self: ParticleCollectionType, start: int, end: int) -> ParticleCollectionType:
+        """Returns a new collection with the selected residue range."""
+        raise NotImplementedError
+
+    def select_chain(self: ParticleCollectionType, chain: str) -> ParticleCollectionType:
+        """Returns a new collection with the selected chain."""
+        raise NotImplementedError
+
+    # == Iteration methods ==============================================================
+
+    # def iter_particles(self) -> Iterator[Particle]:
+    #     return iter(self)
+
+    # def iter_residues(self) -> Iterator[ParticleCollectionType]:
+    #     by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
+    #     return iter(by_residue.values())
+
+    # def iter_chains(self) -> Iterator[ParticleCollectionType]:
+    #     by_chain = self.groupby(lambda atom: atom.chain)
+    #     return iter(by_chain.values())
+

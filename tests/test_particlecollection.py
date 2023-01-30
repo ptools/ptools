@@ -4,12 +4,13 @@ import numpy as np
 
 from pytest import approx
 
+import ptools
 from ptools.namedarray import NamedArray, NamedArrayContainer
 from ptools.particlecollection import Particle, ParticleCollection
 
 from .generators import generate_atoms
 from .testing import assert_array_almost_equal, assert_array_equal
-
+from . import TEST_LIGAND
 
 class RandomParticleContainer:
     """Stores a list of dummy particles and provides accessors to their properties."""
@@ -61,6 +62,8 @@ class RandomParticleContainer:
         ]
 
 
+# == Initialization  ===================================================================
+
 def test_initialization_from_empty_list():
     """Test that the default initialization works."""
     pc = ParticleCollection()
@@ -96,6 +99,27 @@ def test_initialization_from_properties():
     assert pc.atom_properties.get("zs") == [7, 8, 9]
 
 
+# == __getitem__  ======================================================================
+
+def test_getitem_with_int_returns_a_particle():
+    """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
+    expected = RandomParticleContainer()
+    pc = ParticleCollection(expected.particles)
+    for i, atom in enumerate(expected.particles):
+        assert isinstance(pc[i], Particle)
+        assert pc[i] == atom
+
+
+def test_getitem_with_int_returns_reference_to_the_original_object():
+    """Test that the ``getitem`` operator returns a reference to the original object."""
+    pc = ParticleCollection(generate_atoms())
+    pc[0].name = "banana"
+    assert pc[0].name == "banana"
+
+    pc[0].coordinates = [12, 12, 12]
+    assert pc[0].coordinates == approx([12, 12, 12])
+
+
 def test_getitem_with_slice():
     expected = RandomParticleContainer(10)
     atoms = ParticleCollection(expected.particles)
@@ -111,7 +135,26 @@ def test_getitem_with_slice():
     assert subset[1] == atoms[2]
 
 
-def test_setitem_with_slice():
+def test_subset_with_int_returns_a_reference_to_the_original_object():
+    """Test that the ``subset`` method returns a reference to the original object."""
+    pc = ParticleCollection(generate_atoms())
+    atom = pc[0]
+    atom.name = "banana"
+    assert pc[0].name == "banana"
+
+
+def test_subset_with_slice_returns_a_reference_to_the_original_object():
+    """Test that the ``subset`` method returns a reference to the original object."""
+    pc = ParticleCollection(generate_atoms())
+    subset = pc[0:2]
+    for atom in subset:
+        atom.name = "banana"
+    assert pc.names[0:2].tolist() == ["banana", "banana"]
+
+
+# == __setitem__  ======================================================================
+
+def test_set_property_using_slice():
     expected = RandomParticleContainer(10)
     atoms = ParticleCollection(expected.particles)
     assert expected.size() == 10
@@ -125,6 +168,8 @@ def test_setitem_with_slice():
 
     assert_array_equal(atoms.names, expected_names)
 
+
+# == Container methods  ================================================================
 
 def test_size_and_len():
     """Test that the ``len`` and ``size`` functions work."""
@@ -141,15 +186,6 @@ def test_contains():
     atoms = ParticleCollection(expected.particles)
     for atom in expected.particles:
         assert atom in atoms
-
-
-def test_getitem_with_int_returns_a_particle():
-    """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
-    expected = RandomParticleContainer()
-    pc = ParticleCollection(expected.particles)
-    for i, atom in enumerate(expected.particles):
-        assert isinstance(pc[i], Particle)
-        assert pc[i] == atom
 
 
 def test_iter():
@@ -186,26 +222,7 @@ def test_iter_returns_a_reference():
     assert actual == expected
 
 
-def test_getitem_with_int_returns_reference_to_the_original_object():
-    """Test that the ``getitem`` operator returns a reference to the original object."""
-    pc = ParticleCollection(generate_atoms())
-    pc[0].name = "banana"
-    assert pc[0].name == "banana"
-
-    pc[0].coordinates = pc[0].coordinates + 12
-    assert pc[0].coordinates == approx([12, 12, 12])
-
-
-def test_copy():
-    """Test that the ``copy`` method returns a deep copy."""
-    pc = ParticleCollection(generate_atoms())
-    pc_copy = pc.copy()
-    assert pc_copy is not pc
-    assert pc_copy == pc
-
-    pc_copy[0].name = "XXX"
-    assert pc_copy[0].name != pc[0].name
-
+# == ParticleCollection merging  ========================================================
 
 def test_add():
     """Test that the ``+`` operator works."""
@@ -242,6 +259,19 @@ def test_inplace_add():
     assert pc1[-1] == pc2[-1]
 
 
+# ======================================================================================
+
+def test_copy():
+    """Test that the ``copy`` method returns a deep copy."""
+    pc = ParticleCollection(generate_atoms())
+    pc_copy = pc.copy()
+    assert pc_copy is not pc
+    assert pc_copy == pc
+
+    pc_copy[0].name = "XXX"
+    assert pc_copy[0].name != pc[0].name
+
+
 def test_masses():
     """Test that the ``guess_masses`` method."""
     from ptools.tables import atomic_masses
@@ -262,3 +292,34 @@ def test_set_property():
     pc.atom_properties.set("indices", expected)
     assert isinstance(pc.atom_properties.get("indices"), NamedArray)
     assert pc.atom_properties.get("indices") == expected
+
+
+# def test_select_atom_type():
+#     atoms = ptools.read_pdb(TEST_LIGAND)
+#     sel = atoms.select_atom_type("CA")
+#     self.assertEqual(len(sel), 426)
+#     self.assertEqual([atom.name for atom in sel], ["CA"] * 426)
+
+
+# def test_select_atom_types(self):
+#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+#     sel = atoms.select_atom_types(["CA", "CB"])
+#     self.assertEqual(len(sel), 426 + 64)
+#     self.assertEqual(
+#         [atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426
+#     )
+#     self.assertEqual(
+#         [atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64
+#     )
+
+# def test_select_residue_range(self):
+#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+#     sel = atoms.select_residue_range(10, 20)
+#     self.assertEqual(len(sel), 23)
+#     self.assertTrue(all(10 <= atom.residue_index <= 20 for atom in sel))
+
+# def test_select_chain(self):
+#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+#     sel = atoms.select_chain("B")
+#     self.assertEqual(len(sel), 974)
+#     self.assertTrue(all(atom.chain == "B" for atom in sel))

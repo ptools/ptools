@@ -8,11 +8,11 @@ import pytest
 from .testing import assert_array_almost_equal, assert_array_not_almost_equal
 
 
-def generate_arrays() -> list[NamedArray]:
+def generate_arrays(size: int = 5) -> list[NamedArray]:
     return [
-        NamedArray("one", "ones", np.ones(5)),
-        NamedArray("two", "twos", np.ones(5) + 1),
-        NamedArray("three", "threes", np.ones(5) + 3),
+        NamedArray("one", "ones", np.ones(size)),
+        NamedArray("two", "twos", np.ones(size) + 1),
+        NamedArray("three", "threes", np.ones(size) + 3),
     ]
 
 
@@ -61,7 +61,6 @@ def test_add_array():
 
 def test_register():
     expected = NamedArray("index", "indices", (1, 2, 3))
-
     container = NamedArrayContainer()
     container.register(expected)
 
@@ -70,12 +69,16 @@ def test_register():
 
 
 def test_register_checks_for_size():
-    ones = NamedArray("one", "ones", np.ones(5))
-    twos = NamedArray("two", "twos", np.ones(6) + 1)
-    container = NamedArrayContainer()
-    container.register(ones)
+    container = NamedArrayContainer(generate_arrays(size=5))
+    candidate = NamedArray("some_array", "some_array", np.zeros(6))
     with pytest.raises(ValueError):
-        container.register(twos)
+        container.register(candidate)
+
+
+def test_add_array_checks_for_size():
+    container = NamedArrayContainer(generate_arrays(size=5))
+    with pytest.raises(ValueError):
+        container.add_array("index", "indices", np.zeros(6))
 
 
 def test_register_copies_values():
@@ -153,3 +156,34 @@ def test_set_values():
 
     container.set("ones", [2, 2, 2, 2, 2])
     assert container.get("ones") == [2, 2, 2, 2, 2]
+
+
+def test_set_values_with_wrong_dimensions_fails():
+    """Checks cannot set an array with wrong dimensions."""
+    container = NamedArrayContainer(generate_arrays())
+    assert container.get("ones") == [1, 1, 1, 1, 1]
+
+    with pytest.raises(ValueError):
+        not_the_expected_array_size = container.number_of_elements() + 1
+        container.set("ones", [2] * not_the_expected_array_size)
+
+
+def test_set_values_with_wrong_property_fails():
+    """Checks cannot set an array with wrong name."""
+    container = NamedArrayContainer(generate_arrays())
+    assert container.names() == ["ones", "twos", "threes"]
+    with pytest.raises(ValueError) as excinfo:
+        container.set("wrong_property", [2, 2, 2])
+    assert "wrong_property" in str(excinfo.value)
+
+
+def test_modify_slices():
+    container = NamedArrayContainer(generate_arrays())
+    assert container.get("ones") == [1, 1, 1, 1, 1]
+
+    container.get("ones")[1:3] = 2
+    assert container.get("ones") == [1, 2, 2, 1, 1]
+
+    subset = container.get("ones")[1:3]
+    subset[:] = 3
+    assert container.get("ones") == [1, 3, 3, 1, 1]
