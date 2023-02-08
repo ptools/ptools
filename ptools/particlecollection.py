@@ -3,6 +3,7 @@ import itertools
 from typing import Any, Callable, Iterable, Optional, TypeVar, Type
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
@@ -73,20 +74,71 @@ ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollec
 class ParticleCollection:
     """Represents a collection of particles."""
 
-    atom_properties: NamedArrayContainer
+    class Selection:
+        """A class that can be used to set the parent of a collection."""
+
+        parent: ParticleCollection
+        indices: np.ndarray
+
+        def __init__(self, parent: ParticleCollection, indices: ArrayLike | slice):
+            self.parent = parent
+            if isinstance(indices, slice):
+                indices = np.arange(*indices.indices(len(parent)), dtype=np.int64)
+            self.indices = np.array(indices, dtype=np.int64)
+
+
+    _atom_properties: NamedArrayContainer
+    _selection: Selection | None
 
     # == Initialization =================================================================
 
-    def __init__(self, atoms: Optional[Iterable[Any]] = None):
+    def __init__(self, atoms: Optional[Iterable[Any]] = None, selection: Optional[Selection] = None):
         """Initializes a new collection of particles from a list of particles."""
-        if atoms:
-            self.atom_properties = NamedArrayContainer.from_objects(atoms)
-        else:
-            self.atom_properties = NamedArrayContainer()
+        self._selection = None
+        self._atom_properties = NamedArrayContainer()
+
+        if selection is not None and atoms is not None:
+            raise ValueError("Cannot specify both selection and atoms.")
+
+        if selection is not None:
+            self._init_from_selection(selection)
+        elif atoms is not None:
+            self._init_from_atoms(atoms)
+
+    def _init_from_selection(self, selection: Selection):
+        assert selection is not None
+
+        if len(selection.indices) != len(np.unique(selection.indices)):
+            raise ValueError("Indices must be unique.")
+
+        self._selection = selection
+
+    def _init_from_atoms(self, atoms: Iterable[Any]):
+        assert atoms is not None
+        self._atom_properties = NamedArrayContainer.from_objects(atoms)
+
 
     # ===================================================================================
+    def has_parent(self):
+        """Returns whether the collection has a parent (i.e. is a sub-collection)."""
+        return self._selection is not None
+
+    @property
+    def atom_properties(self) -> NamedArrayContainer:
+        """Returns the properties of the atoms."""
+        if self.has_parent():
+            return self._selection.parent.atom_properties[self._selection.indices]
+        return self._atom_properties
+
+    @atom_properties.setter
+    def atom_properties(self, value: NamedArrayContainer):
+        if self.has_parent():
+            raise NotImplementedError("Cannot set atom properties on a sub-collection.")
+        self._atom_properties = value
+
 
     def __eq__(self, __o: object) -> bool:
+        """Compares two collections using their properties."""
         if not isinstance(__o, ParticleCollection):
             return NotImplemented
         return self.atom_properties == __o.atom_properties
@@ -102,7 +154,7 @@ class ParticleCollection:
         """Returns a new collection with the selected atoms."""
         if isinstance(key, (int, np.integer)):
             return Particle(self, key)
-        return ParticleCollection.from_properties(self.atom_properties[key])
+        return ParticleCollection(selection=self.__class__.Selection(self, key))
 
     def __iter__(self):
         """Iterates over the atoms."""
@@ -119,7 +171,11 @@ class ParticleCollection:
         )
 
     def __getattr__(self, name):
-        if name in self.atom_properties:
+        if name in ("_atom_properties", "atom_properties"):
+            return super().__getattribute__(name)
+
+        atom_properties = super().__getattribute__("atom_properties")
+        if name in atom_properties:
             return self.atom_properties.get(name).values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
 
@@ -142,6 +198,8 @@ class ParticleCollection:
 
     def size(self) -> int:
         """Returns the number of atoms in the collection."""
+        if self.has_parent():
+            return len(self._selection.indices)
         if self.atom_properties:
             return self.atom_properties.number_of_elements()
         return 0

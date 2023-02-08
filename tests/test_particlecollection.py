@@ -129,10 +129,12 @@ def test_getitem_with_slice():
     # Creates a subset of the atoms.
     subset = atoms[1:3]
 
-    # Checks that the subset is a new object.
+    # Checks that the subset has been successfully created.
+    assert isinstance(subset, ParticleCollection)
     assert subset.size() == 2
-    assert subset[0] == atoms[1]
-    assert subset[1] == atoms[2]
+    for i, atom in enumerate(subset):
+        assert isinstance(atom, Particle)
+        assert atom == expected.particles[i + 1]
 
 
 def test_subset_with_int_returns_a_reference_to_the_original_object():

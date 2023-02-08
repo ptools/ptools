@@ -91,14 +91,16 @@ class NamedArray:
         return iter(self.values)
 
     def __getitem__(self, key: int | slice) -> float | NamedArray:
-        if isinstance(key, slice):
-            return self.__class__(
-                self.singular,
-                self.plural,
-                self.values[key],
-                array_comparison_func=self._array_comparison_func,
-            )
-        return self.values[key]
+        if isinstance(key, (int, np.integer)):
+            return self.values[key]
+        return self.__class__(
+            self.singular,
+            self.plural,
+            self.values[key],
+            array_comparison_func=self._array_comparison_func,
+        )
+
+
 
     def __setitem__(self, key: int | slice, value: ArrayLike):
         self.values[key] = value

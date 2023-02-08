@@ -100,6 +100,9 @@ def test_getitem():
     assert container.number_of_elements() == 5
     assert subset.number_of_elements() == 2
 
+    for name, namedarray in subset._properties.items():
+        assert isinstance(namedarray, NamedArray)
+
     subset = container[1]
     assert container.number_of_properties() == subset.number_of_properties()
     assert container.number_of_elements() == 5
