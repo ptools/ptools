@@ -32,11 +32,13 @@ def distance(lhs: ArrayLike, rhs: ArrayLike) -> float:
     return (np.sum((lhs - rhs) ** 2.0)) ** 0.5
 
 
-def distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False) -> float:
+def distance_to_axis(
+    x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False
+) -> float:
     """Returns the distance between `x` and an arbitrary axis."""
     x_ = np.asarray(x)
     if isinstance(center, bool) and center:
-            x_ = x_ - np.mean(axis, axis=0)
+        x_ = x_ - np.mean(axis, axis=0)
     else:
         center_ = np.asarray(center)
         x_ = x_ - center_
@@ -45,7 +47,9 @@ def distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = F
     return result
 
 
-def minmax_distance_to_axis(x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False) -> tuple[float, float]:
+def minmax_distance_to_axis(
+    x: ArrayLike, axis: ArrayLike, center: bool | ArrayLike = False
+) -> tuple[float, float]:
     """Returns the minimal and maximal distances between `x` and an arbitrary axis."""
     x_ = np.asarray(x)
     all_distances = [distance_to_axis(x_[i], axis, center) for i in range(x_.shape[0])]

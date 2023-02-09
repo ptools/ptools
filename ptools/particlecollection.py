@@ -86,13 +86,16 @@ class ParticleCollection:
                 indices = np.arange(*indices.indices(len(parent)), dtype=np.int64)
             self.indices = np.array(indices, dtype=np.int64)
 
-
     _atom_properties: NamedArrayContainer
     _selection: Selection | None
 
     # == Initialization =================================================================
 
-    def __init__(self, atoms: Optional[Iterable[Any]] = None, selection: Optional[Selection] = None):
+    def __init__(
+        self,
+        atoms: Optional[Iterable[Any]] = None,
+        selection: Optional[Selection] = None,
+    ):
         """Initializes a new collection of particles from a list of particles."""
         self._selection = None
         self._atom_properties = NamedArrayContainer()
@@ -117,7 +120,6 @@ class ParticleCollection:
         assert atoms is not None
         self._atom_properties = NamedArrayContainer.from_objects(atoms)
 
-
     # ===================================================================================
     def has_parent(self):
         """Returns whether the collection has a parent (i.e. is a sub-collection)."""
@@ -127,7 +129,7 @@ class ParticleCollection:
     def atom_properties(self) -> NamedArrayContainer:
         """Returns the properties of the atoms."""
         if self.has_parent():
-            return self._selection.parent.atom_properties[self._selection.indices]
+            return self._selection.parent.atom_properties[self._selection.indices]  # type: ignore
         return self._atom_properties
 
     @atom_properties.setter
@@ -135,7 +137,6 @@ class ParticleCollection:
         if self.has_parent():
             raise NotImplementedError("Cannot set atom properties on a sub-collection.")
         self._atom_properties = value
-
 
     def __eq__(self, __o: object) -> bool:
         """Compares two collections using their properties."""
@@ -164,9 +165,11 @@ class ParticleCollection:
         """Returns whether the given particle is part of the collection."""
         return particle in self.particles
 
-    def __add__(self, other: ParticleCollection) -> ParticleCollection:
+    def __add__(
+        self: ParticleCollectionType, other: ParticleCollection
+    ) -> ParticleCollectionType:
         """Adds two collections together."""
-        return ParticleCollection.from_properties(
+        return self.__class__.from_properties(
             self.atom_properties + other.atom_properties
         )
 
@@ -193,13 +196,12 @@ class ParticleCollection:
         obj.atom_properties = properties
         return obj
 
-
     # ===================================================================================
 
     def size(self) -> int:
         """Returns the number of atoms in the collection."""
         if self.has_parent():
-            return len(self._selection.indices)
+            return len(self._selection.indices)  # type: ignore
         if self.atom_properties:
             return self.atom_properties.number_of_elements()
         return 0
@@ -210,6 +212,11 @@ class ParticleCollection:
     def coordinates(self):
         """Returns the coordinates of the atoms."""
         return self.atom_properties.get("coordinates").values
+
+    @coordinates.setter
+    def coordinates(self, value: ArrayLike):
+        """Sets the coordinates of the atoms."""
+        self.atom_properties.set("coordinates", value)
 
     @property
     def particles(self):
@@ -235,7 +242,7 @@ class ParticleCollection:
         if guess_element:
             self.guess_elements()
 
-        values = [guess_atom_mass(a.element) for a in self.particles]
+        values = np.array([guess_atom_mass(a.element) for a in self.particles])
         if "masses" not in self.atom_properties:
             self.atom_properties.add_array("mass", "masses", values)
         else:
@@ -243,24 +250,34 @@ class ParticleCollection:
 
     # == Selection methods ==============================================================
 
-    def groupby(self: ParticleCollectionType, key: Callable) -> dict[Any, ParticleCollectionType]:
+    def groupby(
+        self: ParticleCollectionType, key: Callable
+    ) -> dict[Any, ParticleCollectionType]:
         data = sorted(self, key=key)
         grouped = itertools.groupby(data, key=key)
         return {key: self.__class__(list(group)) for key, group in grouped}
 
-    def select_atom_type(self: ParticleCollectionType, atom_type: str) -> ParticleCollectionType:
+    def select_atom_type(
+        self: ParticleCollectionType, atom_type: str
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         raise NotImplementedError
 
-    def select_atom_types(self: ParticleCollectionType, atom_types: Iterable[str]) -> ParticleCollectionType:
+    def select_atom_types(
+        self: ParticleCollectionType, atom_types: Iterable[str]
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
         raise NotImplementedError
 
-    def select_residue_range(self: ParticleCollectionType, start: int, end: int) -> ParticleCollectionType:
+    def select_residue_range(
+        self: ParticleCollectionType, start: int, end: int
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
         raise NotImplementedError
 
-    def select_chain(self: ParticleCollectionType, chain: str) -> ParticleCollectionType:
+    def select_chain(
+        self: ParticleCollectionType, chain: str
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
         raise NotImplementedError
 
@@ -276,4 +293,3 @@ class ParticleCollection:
     # def iter_chains(self) -> Iterator[ParticleCollectionType]:
     #     by_chain = self.groupby(lambda atom: atom.chain)
     #     return iter(by_chain.values())
-

@@ -65,7 +65,7 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
     Returns:
         A RigidBody of the constructed oligomer.
     """
-    rb_orig: RigidBody = rb.copy()
+    rb_orig = rb.copy()
     chain_id = 0
     origin = hp.point
     axis = hp.unit
@@ -87,7 +87,7 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
     rb_orig.atom_properties.set("chains", chains)
     chain_id += 1
 
-    final: RigidBody = rb_orig.copy()
+    final = rb_orig.copy()
 
     for _ in range(N - 1):
         transform.ab_rotate(rb_orig, origin, origin + axis, hp.angle, degrees=False)

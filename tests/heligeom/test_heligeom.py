@@ -107,7 +107,9 @@ class TestHeligeom(unittest.TestCase):
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
-        dmin, dmax = minmax_distance_to_axis(self.mono1, self.hp.unit, center=self.hp.point)
+        dmin, dmax = minmax_distance_to_axis(
+            self.mono1, self.hp.unit, center=self.hp.point
+        )
         assert dmin == approx(12.1986158)
         assert dmax == approx(73.5932897)
 

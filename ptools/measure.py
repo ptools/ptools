@@ -18,7 +18,9 @@ def distance(lhs: HasCoordinatesType, rhs: HasCoordinatesType) -> float:
     return L.distance(lhs.coordinates, rhs.coordinates)
 
 
-def distance_to_axis(obj: HasCoordinatesType, axis: ArrayLike, center: bool | ArrayLike = False) -> float:
+def distance_to_axis(
+    obj: HasCoordinatesType, axis: ArrayLike, center: bool | ArrayLike = False
+) -> float:
     """Returns the distance between an object and an arbitrary axis."""
     return L.distance_to_axis(obj.coordinates, axis, center)
 

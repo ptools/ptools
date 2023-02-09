@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Any, Iterable, Iterator, Optional
+from typing import Any, Iterable, Iterator, Optional, Sequence
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -100,8 +100,6 @@ class NamedArray:
             array_comparison_func=self._array_comparison_func,
         )
 
-
-
     def __setitem__(self, key: int | slice, value: ArrayLike):
         self.values[key] = value
 
@@ -157,7 +155,8 @@ class NamedArrayContainer(collections.abc.Container):
         """Returns a new collection with a slice of all properties."""
         if isinstance(key, int):
             key = slice(key, key + 1)
-        return NamedArrayContainer(prop[key] for prop in self._properties.values())
+        # mypy-ignore: ``key`` is a slice, ``prop[key]`` is NamedArray
+        return NamedArrayContainer(prop[key] for prop in self._properties.values())  # type: ignore
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -228,7 +227,9 @@ class NamedArrayContainer(collections.abc.Container):
             return 0
         return len(next(iter(self._properties.values())).values)
 
-    def add_array(self, singular: str, plural: str, values: ArrayLike):
+    def add_array(
+        self, singular: str, plural: str, values: Sequence[float] | np.ndarray
+    ):
         if values and isinstance(values[0], array3d):
             values = array3d(values)
         else:
