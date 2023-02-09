@@ -6,14 +6,14 @@ from __future__ import annotations
 # Python core libraries.
 import copy
 
+# Type-hinting specific import
+from typing import Any, Optional
+
 # Scientific libraries.
 import numpy as np
 
 # Other third-party libraries.
 from attrs import define, field
-
-# Type-hinting specific import
-from typing import Any, Optional
 
 # PTools imports.
 from . import tables

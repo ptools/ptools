@@ -10,11 +10,11 @@ stages:
   - Check
   - Test
 
-pylint:
+mypy:
   stage: Check
   allow_failure: true
   script:
-    - make lint
+    - mypy ptools
 
 unit_test:
   stage: Test
