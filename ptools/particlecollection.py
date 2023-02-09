@@ -246,7 +246,7 @@ class ParticleCollection:
         if "masses" not in self.atom_properties:
             self.atom_properties.add_array("mass", "masses", values)
         else:
-            self.atom_properties.get("masses").values = values
+            self.atom_properties.set("masses", values)
 
     # == Selection methods ==============================================================
 

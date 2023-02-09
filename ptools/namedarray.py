@@ -230,7 +230,7 @@ class NamedArrayContainer(collections.abc.Container):
     def add_array(
         self, singular: str, plural: str, values: Sequence[float] | np.ndarray
     ):
-        if values and isinstance(values[0], array3d):
+        if len(values) > 0 and isinstance(values[0], array3d):
             values = array3d(values)
         else:
             values = np.asarray(values)
