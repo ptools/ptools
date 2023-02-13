@@ -269,25 +269,34 @@ class ParticleCollection:
         self: ParticleCollectionType, atom_type: str
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
-        raise NotImplementedError
+        indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
+        return self[indices]
 
     def select_atom_types(
         self: ParticleCollectionType, atom_types: Iterable[str]
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
-        raise NotImplementedError
+        indices = np.where(np.isin(self.atom_properties.get("names").values, atom_types))[0]
+        return self[indices]
 
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
-        raise NotImplementedError
+        indices = np.where(
+            np.logical_and(
+                self.atom_properties.get("residue_indices").values >= start,
+                self.atom_properties.get("residue_indices").values <= end,
+            )
+        )[0]
+        return self[indices]
 
     def select_chain(
         self: ParticleCollectionType, chain: str
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
-        raise NotImplementedError
+        indices = np.where(self.atom_properties.get("chains").values == chain)[0]
+        return self[indices]
 
     # == Iteration methods ==============================================================
 

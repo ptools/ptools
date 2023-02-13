@@ -303,32 +303,29 @@ def test_set_property():
     assert pc.atom_properties.get("indices") == expected
 
 
-# def test_select_atom_type():
-#     atoms = ptools.read_pdb(TEST_LIGAND)
-#     sel = atoms.select_atom_type("CA")
-#     self.assertEqual(len(sel), 426)
-#     self.assertEqual([atom.name for atom in sel], ["CA"] * 426)
+def test_select_atom_type():
+    atoms = ptools.read_pdb(TEST_LIGAND)
+    sel = atoms.select_atom_type("CA")
+    assert len(sel) == 426
+    assert sel.names.tolist() == ["CA"] * 426
 
 
-# def test_select_atom_types(self):
-#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
-#     sel = atoms.select_atom_types(["CA", "CB"])
-#     self.assertEqual(len(sel), 426 + 64)
-#     self.assertEqual(
-#         [atom.name for atom in sel if atom.name.strip() == "CA"], ["CA"] * 426
-#     )
-#     self.assertEqual(
-#         [atom.name for atom in sel if atom.name.strip() == "CB"], ["CB"] * 64
-#     )
+def test_select_atom_types():
+    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    sel = atoms.select_atom_types(["CA", "CB"])
+    assert len(sel) == 426 + 64
+    assert sorted(sel.names.tolist()) == ["CA"] * 426 + ["CB"] * 64
 
-# def test_select_residue_range(self):
-#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
-#     sel = atoms.select_residue_range(10, 20)
-#     self.assertEqual(len(sel), 23)
-#     self.assertTrue(all(10 <= atom.residue_index <= 20 for atom in sel))
 
-# def test_select_chain(self):
-#     atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
-#     sel = atoms.select_chain("B")
-#     self.assertEqual(len(sel), 974)
-#     self.assertTrue(all(atom.chain == "B" for atom in sel))
+def test_select_residue_range():
+    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    sel = atoms.select_residue_range(10, 20)
+    assert len(sel) == 23
+    assert all(10 <= atom.residue_index <= 20 for atom in sel)
+
+
+def test_select_chain():
+    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    sel = atoms.select_chain("B")
+    assert len(sel) == 974
+    assert sel.chains.tolist() == ["B"] * 974
