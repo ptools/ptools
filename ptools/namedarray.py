@@ -219,6 +219,14 @@ class NamedArrayContainer(collections.abc.Container):
             )
         self._properties[plural].values = np.asarray(value)
 
+    def get_at(self, plural: str, index: int) -> Any:
+        """Returns the value of the property with the given plural name at the given index."""
+        return self._properties[plural].values[index]
+
+    def set_at(self, plural: str, index: int, value: Any):
+        """Sets the value of the property with the given plural name at the given index."""
+        self._properties[plural].values[index] = value
+
     def number_of_properties(self) -> int:
         return len(self._properties)
 

@@ -148,13 +148,13 @@ def test_subset_with_int_returns_a_reference_to_the_original_object():
     assert pc[0].name == "banana"
 
 
-# def test_subset_with_slice_returns_a_reference_to_the_original_object():
-#     """Test that the ``subset`` method returns a reference to the original object."""
-#     pc = ParticleCollection(generate_atoms())
-#     subset = pc[0:2]
-#     for atom in subset:
-#         atom.name = "banana"
-#     assert pc.names[0:2].tolist() == ["banana", "banana"]
+def test_subset_with_slice_returns_a_reference_to_the_original_object():
+    """Test that the ``subset`` method returns a reference to the original object."""
+    pc = ParticleCollection(generate_atoms())
+    subset = pc[0:2]
+    for atom in subset:
+        atom.name = "banana"
+    assert pc.names[0:2].tolist() == ["banana", "banana"]
 
 
 # == __setitem__  ======================================================================

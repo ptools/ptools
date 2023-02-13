@@ -54,12 +54,12 @@ class Particle:
             return
 
         # Setting the attributes of the particle via the collection.
-        if name in self._singular_to_plural:
-            self._collection.atom_properties.get(self._singular_to_plural[name])[
-                self._index
-            ] = value
-        else:
+        if name not in self._singular_to_plural:
             raise KeyError(f"No such property: {name!r}")
+
+        property_name = self._singular_to_plural[name]
+        self._collection._set_particle_property(property_name, self._index, value)
+        # self._collection.atom_properties.set_at(property_name, self._index, value)
 
     def __str__(self) -> str:
         attrs = ", ".join(
@@ -119,6 +119,14 @@ class ParticleCollection:
     def _init_from_atoms(self, atoms: Iterable[Any]):
         assert atoms is not None
         self._atom_properties = NamedArrayContainer.from_objects(atoms)
+
+
+    def _set_particle_property(self, name: str, index: int, value: Any):
+        """Sets the value of a property of a particle."""
+        if self.has_parent():
+            self._selection.parent.atom_properties.set_at(name, self._selection.indices[index], value)  # type: ignore[union-attr]
+            return
+        self._atom_properties.set_at(name, index, value)
 
     # ===================================================================================
     def has_parent(self):
