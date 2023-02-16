@@ -120,7 +120,6 @@ class ParticleCollection:
         assert atoms is not None
         self._atom_properties = NamedArrayContainer.from_objects(atoms)
 
-
     def _set_particle_property(self, name: str, index: int, value: Any):
         """Sets the value of a property of a particle."""
         if self.has_parent():
@@ -258,13 +257,6 @@ class ParticleCollection:
 
     # == Selection methods ==============================================================
 
-    def groupby(
-        self: ParticleCollectionType, key: Callable
-    ) -> dict[Any, ParticleCollectionType]:
-        data = sorted(self, key=key)
-        grouped = itertools.groupby(data, key=key)
-        return {key: self.__class__(list(group)) for key, group in grouped}
-
     def select_atom_type(
         self: ParticleCollectionType, atom_type: str
     ) -> ParticleCollectionType:
@@ -276,7 +268,9 @@ class ParticleCollection:
         self: ParticleCollectionType, atom_types: Iterable[str]
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
-        indices = np.where(np.isin(self.atom_properties.get("names").values, atom_types))[0]
+        indices = np.where(
+            np.isin(self.atom_properties.get("names").values, atom_types)
+        )[0]
         return self[indices]
 
     def select_residue_range(
@@ -298,15 +292,26 @@ class ParticleCollection:
         indices = np.where(self.atom_properties.get("chains").values == chain)[0]
         return self[indices]
 
+    # == Grouping methods ===============================================================
+    def groupby(
+        self: ParticleCollectionType, key: Callable
+    ) -> dict[Any, ParticleCollectionType]:
+        sorted_atoms = sorted(enumerate(self), key=lambda i_atom: key(i_atom[1]))
+        grouped = itertools.groupby(sorted_atoms, key=lambda i_atom: key(i_atom[1]))
+        grouped_collections = {
+            key: self[[i for i, _ in group]] for key, group in grouped
+        }
+        return grouped_collections
+
     # == Iteration methods ==============================================================
 
-    # def iter_particles(self) -> Iterator[Particle]:
-    #     return iter(self)
+    def iter_particles(self) -> Iterator[Particle]:
+        return iter(self)
 
-    # def iter_residues(self) -> Iterator[ParticleCollectionType]:
-    #     by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
-    #     return iter(by_residue.values())
+    def iter_residues(self) -> Iterator[ParticleCollectionType]:
+        by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
+        return iter(by_residue.values())
 
-    # def iter_chains(self) -> Iterator[ParticleCollectionType]:
-    #     by_chain = self.groupby(lambda atom: atom.chain)
-    #     return iter(by_chain.values())
+    def iter_chains(self) -> Iterator[ParticleCollectionType]:
+        by_chain = self.groupby(lambda atom: atom.chain)
+        return iter(by_chain.values())

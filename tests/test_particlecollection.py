@@ -19,9 +19,6 @@ class RandomParticleContainer:
     def __init__(self, size: int = 5):
         self.particles = generate_atoms(size)
 
-    def size(self) -> int:
-        return len(self.particles)
-
     @property
     def chains(self):
         return [atom.chain for atom in self.particles]
@@ -62,6 +59,15 @@ class RandomParticleContainer:
             "charges",
         ]
 
+    def number_of_particles(self) -> int:
+        return len(self.particles)
+
+    def number_of_residues(self) -> int:
+        return len(set(self.residue_indices))
+
+    def number_of_chains(self) -> int:
+        return len(set(self.chains))
+
 
 # == Initialization  ===================================================================
 
@@ -79,7 +85,7 @@ def test_initialization_from_list_of_particles():
     pc = ParticleCollection(expected.particles)
 
     assert pc.atom_properties is not None
-    assert pc.size() == expected.size()
+    assert pc.size() == expected.number_of_particles()
 
     for prop in expected.properties():
         assert pc.atom_properties.get(prop) == getattr(expected, prop)
@@ -108,6 +114,7 @@ def test_getitem_with_int_returns_a_particle():
     """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
     expected = RandomParticleContainer()
     pc = ParticleCollection(expected.particles)
+    assert pc.size() == expected.number_of_particles()
     for i, atom in enumerate(expected.particles):
         assert isinstance(pc[i], Particle)
         assert pc[i] == atom
@@ -126,8 +133,8 @@ def test_getitem_with_int_returns_reference_to_the_original_object():
 def test_getitem_with_slice():
     expected = RandomParticleContainer(10)
     atoms = ParticleCollection(expected.particles)
-    assert expected.size() == 10
-    assert atoms.size() == expected.size()
+    assert expected.number_of_particles() == 10
+    assert atoms.size() == expected.number_of_particles()
 
     # Creates a subset of the atoms.
     subset = atoms[1:3]
@@ -163,8 +170,8 @@ def test_subset_with_slice_returns_a_reference_to_the_original_object():
 def test_set_property_using_slice():
     expected = RandomParticleContainer(10)
     atoms = ParticleCollection(expected.particles)
-    assert expected.size() == 10
-    assert atoms.size() == expected.size()
+    assert expected.number_of_particles() == 10
+    assert atoms.size() == expected.number_of_particles()
 
     expected_names = list(expected.names)
     assert_array_equal(atoms.names, expected_names)
@@ -183,8 +190,8 @@ def test_size_and_len():
     expected = RandomParticleContainer()
     atoms = ParticleCollection(expected.particles)
 
-    assert len(atoms) == expected.size()
-    assert atoms.size() == expected.size()
+    assert len(atoms) == expected.number_of_particles()
+    assert atoms.size() == expected.number_of_particles()
 
 
 def test_contains():
@@ -193,40 +200,6 @@ def test_contains():
     atoms = ParticleCollection(expected.particles)
     for atom in expected.particles:
         assert atom in atoms
-
-
-def test_iter():
-    expected = RandomParticleContainer()
-    atoms = ParticleCollection(expected.particles)
-    assert atoms.size() == expected.size()
-
-    for expected_atom, actual_atom in zip(expected.particles, atoms):  # calls __iter__
-        assert expected_atom == actual_atom
-
-
-def test_iter_returs_a_reference_to_original_object():
-    """Test that the ``in`` operator returns a reference to the original object."""
-    expected = RandomParticleContainer()
-    pc = ParticleCollection(expected.particles)
-
-    for expected_atom, actual_atom in zip(expected.particles, pc):
-        assert expected_atom == actual_atom
-
-    for actual_atom in pc:
-        actual_atom.name = "banana"
-
-    assert pc.atom_properties.get("names") == ["banana"] * len(expected.particles)
-
-
-def test_iter_returns_a_reference():
-    """Test that the ``in`` operator returns a reference to the original object."""
-    expected = RandomParticleContainer()
-    pc = ParticleCollection(expected.particles)
-    for p in pc:
-        p.name = "banana"
-    expected = ["banana"] * len(expected.particles)
-    actual = pc.atom_properties.get("names")
-    assert actual == expected
 
 
 # == ParticleCollection merging  ========================================================
@@ -303,6 +276,9 @@ def test_set_property():
     assert pc.atom_properties.get("indices") == expected
 
 
+# == Selections  ========================================================================
+
+
 def test_select_atom_type():
     atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_atom_type("CA")
@@ -329,3 +305,63 @@ def test_select_chain():
     sel = atoms.select_chain("B")
     assert len(sel) == 974
     assert sel.chains.tolist() == ["B"] * 974
+
+
+# == Grouping  ==========================================================================
+
+
+def test_groupby():
+    """Test that the ``groupby`` method works.
+
+    Very basic test, just makes sure that grouping by the residue name attribute
+    returns the 20 groups (very dependant on the input PDB file).
+    """
+    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    grouped = atoms.groupby(key=lambda atom: atom.residue_name)
+    assert len(grouped) == 20
+
+
+# == Iteration methods  =================================================================
+
+
+def test_iter():
+    expected = RandomParticleContainer()
+    atoms = ParticleCollection(expected.particles)
+    assert atoms.size() == expected.number_of_particles()
+
+    for expected_atom, actual_atom in zip(expected.particles, atoms):  # calls __iter__
+        assert expected_atom == actual_atom
+
+
+def test_iter_returs_a_reference_to_original_object():
+    """Test that the ``in`` operator returns a reference to the original object."""
+    expected = RandomParticleContainer()
+    pc = ParticleCollection(expected.particles)
+
+    for expected_atom, actual_atom in zip(expected.particles, pc):
+        assert expected_atom == actual_atom
+
+    for actual_atom in pc:
+        actual_atom.name = "banana"
+
+    assert pc.atom_properties.get("names") == ["banana"] * len(expected.particles)
+
+
+def test_iter_returns_a_reference():
+    """Test that the ``in`` operator returns a reference to the original object."""
+    expected = RandomParticleContainer()
+    pc = ParticleCollection(expected.particles)
+    for p in pc:
+        p.name = "banana"
+    expected = ["banana"] * len(expected.particles)
+    actual = pc.atom_properties.get("names")
+    assert actual == expected
+
+
+def test_iter_residues():
+    """Test that the ``iter_residues`` method works."""
+    expected = RandomParticleContainer()
+    pc = ParticleCollection(expected.particles)
+
+    iterator = pc.iter_residues()
+    # assert
