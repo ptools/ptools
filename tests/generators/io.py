@@ -1,10 +1,12 @@
 from contextlib import contextmanager
 import tempfile
 
+
 def generate_random_filename() -> str:
     """Returns a random file name."""
     with tempfile.NamedTemporaryFile() as tmpfile:
         return tmpfile.name
+
 
 @contextmanager
 def generate_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:

@@ -10,8 +10,8 @@ from ptools.io.pdb import InvalidPDBFormatError
 from .generators import generate_red_file
 
 
-
 # == Tests for AttractRigidBody initialization =========================================
+
 
 def test_initialization_from_pdb():
     with generate_red_file() as temporary_file:

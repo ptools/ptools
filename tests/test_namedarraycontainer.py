@@ -38,6 +38,7 @@ def test_initialization_fails():
 
 # == Test ParticleCollection.add_array =================================================
 
+
 def test_add_array():
     class expected:
         singular = "index"
@@ -75,6 +76,7 @@ def test_add_array_checks_for_size():
 
 # == Test ParticleCollection.register ==================================================
 
+
 def test_register():
     expected = NamedArray("index", "indices", (1, 2, 3))
     container = NamedArrayContainer()
@@ -105,6 +107,7 @@ def test_register_copies_values():
 
 # == Test ParticleCollection.remove_array ==============================================
 
+
 def test_remove_array():
     container = NamedArrayContainer(generate_arrays())
     assert container.number_of_properties() == 3
@@ -121,6 +124,7 @@ def test_remove_array_fails_when_not_found():
 
 
 # =======================================================================================
+
 
 def test_getitem():
     container = NamedArrayContainer(generate_arrays())

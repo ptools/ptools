@@ -126,9 +126,7 @@ class AttractForceField1(ForceFieldBase):
         )
 
         # Categorie pairs.
-        C = np.array(
-            np.meshgrid(self.receptor.categories, self.ligand.categories)
-        ).T
+        C = np.array(np.meshgrid(self.receptor.categories, self.ligand.categories)).T
 
         # Numpy insane trickery
         # pylint: disable=E1126

@@ -35,7 +35,6 @@ class RigidBody(ParticleCollection):
             )
         ParticleCollection.__init__(self, atoms)
 
-
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
         atom_container = io_read_pdb(path)
@@ -63,18 +62,21 @@ class AttractRigidBody(RigidBody):
 
     def _initialize_attract_properties(self):
         """Initializes atom categories, charges and forces from PDB extra field."""
-        N = len(self)
-        self.add_atom_property("category", "categories", np.zeros(N, dtype=int))
-        self.add_atom_property("charge", "charges", np.zeros(N, dtype=int))
-        self.add_atom_property("force", "forces", np.zeros((N, 3), dtype=int))
+        n_atoms = len(self)
+        self.add_atom_property("category", "categories", np.zeros(n_atoms, dtype=int))
+        self.add_atom_property("charge", "charges", np.zeros(n_atoms, dtype=int))
+        self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=int))
 
     def _initialize_attract_properties_from_pdb_extra(self):
         """Initializes atom categories, charges and forces from PDB extra field."""
         extra = self._parse_extra_from_atoms()
-        self.add_atom_property("category", "categories", [int(tokens[0]) - 1 for tokens in extra])
-        self.add_atom_property("charge", "charges", [float(tokens[1]) for tokens in extra])
+        self.add_atom_property(
+            "category", "categories", [int(tokens[0]) - 1 for tokens in extra]
+        )
+        self.add_atom_property(
+            "charge", "charges", [float(tokens[1]) for tokens in extra]
+        )
         self.add_atom_property("force", "forces", np.zeros((len(self), 3), dtype=float))
-
 
     @classmethod
     def from_pdb(

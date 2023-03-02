@@ -81,7 +81,7 @@ class Reducer:
             except Exception as error:
                 if type(error) in warn_exceptions:
                     logger.warning("%s", error)
-                elif not type(error) in ignore_exceptions:
+                elif type(error) not in ignore_exceptions:
                     raise error
             self.beads.extend(coarse_residue.beads)
 

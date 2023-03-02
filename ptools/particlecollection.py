@@ -1,6 +1,6 @@
 from __future__ import annotations
 import itertools
-from typing import Any, Callable, Iterable, Optional, Sequence, TypeVar
+from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -11,6 +11,7 @@ from .namedarray import NamedArrayContainer
 ParticleType = TypeVar("ParticleType", bound="Particle")
 ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
 ParticleCollectionKeyType = int | slice | Sequence[int] | np.ndarray
+
 
 class Particle:
     """Represents a single particle in a collection."""
@@ -156,7 +157,9 @@ class ParticleCollection:
         """
         return self.size()
 
-    def __getitem__(self, key: ParticleCollectionKeyType) -> Particle | ParticleCollection:
+    def __getitem__(
+        self, key: ParticleCollectionKeyType
+    ) -> Particle | ParticleCollection:
         """Returns a new collection with the selected atoms."""
         if isinstance(key, (int, np.integer)):
             return Particle(self, key)
@@ -202,7 +205,9 @@ class ParticleCollection:
         return obj
 
     # == Properties manipulation ========================================================
-    def add_atom_property(self, singular: str, plural: str, value: Sequence | np.ndarray):
+    def add_atom_property(
+        self, singular: str, plural: str, value: Sequence | np.ndarray
+    ):
         """Adds a property to the collection."""
         if self.has_parent():
             raise NotImplementedError("Cannot add properties to a sub-collection.")

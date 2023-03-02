@@ -78,5 +78,9 @@ def generate_red_file(
 ) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file (RED format) that contains 10 atoms."""
     if invalid_charges:
-        return generate_tmp_file(content=TestREDBuilder(has_invalid_charges=True).content)
-    return generate_tmp_file(content=TestREDBuilder(has_categories, has_charges).content)
+        return generate_tmp_file(
+            content=TestREDBuilder(has_invalid_charges=True).content
+        )
+    return generate_tmp_file(
+        content=TestREDBuilder(has_categories, has_charges).content
+    )

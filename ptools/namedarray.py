@@ -235,9 +235,7 @@ class NamedArrayContainer(collections.abc.Container):
             return 0
         return len(next(iter(self._properties.values())).values)
 
-    def add_array(
-        self, singular: str, plural: str, values: Sequence | np.ndarray
-    ):
+    def add_array(self, singular: str, plural: str, values: Sequence | np.ndarray):
         if len(values) > 0 and isinstance(values[0], array3d):
             values = array3d(values)
         else:

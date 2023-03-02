@@ -109,7 +109,7 @@ def inertia_tensor(coords: ArrayLike, weights: ArrayLike) -> np.ndarray:
     Iyz = -np.sum(weights * y * z)
     Ixz = -np.sum(weights * x * z)
 
-    I = np.array(
+    tensors = np.array(
         [
             [Ixx, Ixy, Ixz],
             [Ixy, Iyy, Iyz],
@@ -117,7 +117,7 @@ def inertia_tensor(coords: ArrayLike, weights: ArrayLike) -> np.ndarray:
         ]
     )
 
-    return I
+    return tensors
 
 
 def principal_axes(tensor: ArrayLike, sort: bool = True) -> np.ndarray:

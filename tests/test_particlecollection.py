@@ -72,6 +72,7 @@ class RandomParticleContainer:
 
 # == Initialization  ===================================================================
 
+
 def test_initialization_from_empty_list():
     """Test that the default initialization works."""
     pc = ParticleCollection()
@@ -108,6 +109,7 @@ def test_initialization_from_properties():
 
 
 # == __getitem__  ======================================================================
+
 
 def test_getitem_with_int_returns_a_particle():
     """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
@@ -164,6 +166,7 @@ def test_subset_with_slice_returns_a_reference_to_the_original_object():
 
 
 # == __setitem__  ======================================================================
+
 
 def test_set_property():
     expected = RandomParticleContainer()
@@ -238,6 +241,7 @@ def test_set_property_using_slice():
 
 # == Container methods  ================================================================
 
+
 def test_size_and_len():
     """Test that the ``len`` and ``size`` functions work."""
     expected = RandomParticleContainer()
@@ -256,6 +260,7 @@ def test_contains():
 
 
 # == ParticleCollection merging  ========================================================
+
 
 def test_add():
     """Test that the ``+`` operator works."""
@@ -294,6 +299,7 @@ def test_inplace_add():
 
 # ======================================================================================
 
+
 def test_copy():
     """Test that the ``copy`` method returns a deep copy."""
     pc = ParticleCollection(generate_atoms())
@@ -329,6 +335,7 @@ def test_set_property():
 
 # == Selections  ========================================================================
 
+
 def test_select_atom_type():
     atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_atom_type("CA")
@@ -359,6 +366,7 @@ def test_select_chain():
 
 # == Grouping  ==========================================================================
 
+
 def test_groupby():
     """Test that the ``groupby`` method works.
 
@@ -371,6 +379,7 @@ def test_groupby():
 
 
 # == Iteration methods  =================================================================
+
 
 def test_iter():
     expected = RandomParticleContainer()
@@ -416,6 +425,7 @@ def test_iter_residues():
 
 
 # == Add/remove atom properties  ========================================================
+
 
 def test_add_atom_property():
     """Test that the ``add_property`` method works."""

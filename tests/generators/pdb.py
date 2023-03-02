@@ -5,6 +5,7 @@ import tempfile
 
 from .io import generate_tmp_file
 
+
 @dataclass
 class PDBBuilder:
     """Creates a standard PDB file."""
@@ -127,4 +128,6 @@ def generate_pdb_file(
     n_atoms: int = 10, n_models: int = 1, has_model_header: bool = True
 ) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file that contains n_atoms atoms with a 'MODEL' entry."""
-    return generate_tmp_file(content=PDBBuilder(n_atoms, n_models, has_model_header).content)
+    return generate_tmp_file(
+        content=PDBBuilder(n_atoms, n_models, has_model_header).content
+    )

@@ -88,7 +88,7 @@ class AttractFileParameters:
 
         # Read file ignoring comments.
         with open(path, "rt", encoding="utf-8") as f:
-            lines = [line for line in f if not line[0] in ("#", "!")]
+            lines = [line for line in f if line[0] not in ("#", "!")]
 
         # First number is the number of minimizations to perform.
         self.nbminim = read_number_of_minimizations()

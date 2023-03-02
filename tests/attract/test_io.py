@@ -11,7 +11,11 @@ from . import (
     TEST_DUM_PDB_CONTENT,
     TEST_AMINON_CONTENT,
 )
-from ..generators import generate_random_filename, generate_tmp_file, generate_empty_file
+from ..generators import (
+    generate_random_filename,
+    generate_tmp_file,
+    generate_empty_file,
+)
 
 
 with open(TEST_ATTRACT_PARAMS, "rt", encoding="utf-8") as f:

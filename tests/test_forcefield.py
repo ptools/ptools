@@ -22,8 +22,6 @@ from .testing.moreassert import assert_array_almost_equal
 #     assert 1 == 2
 
 
-
-
 # Ignores W0212: Access to a protected member of a client class
 # pylint: disable=W0212
 class TestAttractForceField1DummyRigid(unittest.TestCase):

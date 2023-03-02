@@ -99,7 +99,7 @@ def run(args: argparse.Namespace):
     print_header(__COMMAND__)
     parse_args(args)
 
-    logger.info(f"Start time: %s", str(datetime.datetime.now()))
+    logger.info("Start time: %s", str(datetime.datetime.now()))
 
     if "all" in args.ignore_errors:
         args.ignore_errors = reduce.exceptions.all_exceptions_names()
@@ -129,4 +129,4 @@ def run(args: argparse.Namespace):
     logger.info("Writing reduced model to %s", args.output)
     write_reduced_pdb(reducer.beads, args.output)
 
-    logger.info(f"End time: %s", str(datetime.datetime.now()))
+    logger.info("End time: %s", str(datetime.datetime.now()))
