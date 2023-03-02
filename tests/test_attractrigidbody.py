@@ -7,21 +7,16 @@ from pytest import approx
 from ptools.rigidbody import AttractRigidBody
 from ptools.io.pdb import InvalidPDBFormatError
 
-from .testing.io.red import mk_red, mk_red_invalid_charges
+from .generators import generate_red_file
 
-
-def generate_rigid():
-    with mk_red() as temporary_file:
-        rigid = AttractRigidBody.from_pdb(temporary_file.name)
-    return rigid
 
 
 # == Tests for AttractRigidBody initialization =========================================
 
-
 def test_initialization_from_pdb():
-    with mk_red() as temporary_file:
+    with generate_red_file() as temporary_file:
         rigid = AttractRigidBody.from_pdb(temporary_file.name)
+
     assert len(rigid) == 10
     assert hasattr(rigid, "categories")
     assert hasattr(rigid, "charges")
@@ -29,21 +24,21 @@ def test_initialization_from_pdb():
 
 
 def test_initialization_from_pdb_fails_no_categories():
-    with mk_red(has_categories=False) as temporary_file:
+    with generate_red_file(has_categories=False) as temporary_file:
         err = "Expected atom categories and charges, found"
         with pytest.raises(InvalidPDBFormatError, match=err):
             AttractRigidBody.from_pdb(temporary_file.name)
 
 
 def test_initialization_from_pdb_fails_no_charges():
-    with mk_red(has_charges=False) as temporary_file:
+    with generate_red_file(has_charges=False) as temporary_file:
         err = "Expected atom categories and charges, found"
         with pytest.raises(InvalidPDBFormatError, match=err):
             AttractRigidBody.from_pdb(temporary_file.name)
 
 
 def test_constructor_fails_invalid_charges():
-    with mk_red_invalid_charges() as temporary_file:
+    with generate_red_file(invalid_charges=True) as temporary_file:
         err = "Atom charge expects a float"
         with pytest.raises(InvalidPDBFormatError, match=err):
             AttractRigidBody.from_pdb(temporary_file.name)
@@ -53,7 +48,8 @@ def test_constructor_fails_invalid_charges():
 
 
 def test_apply_forces():
-    rigid = generate_rigid()
+    with generate_red_file() as temporary_file:
+        rigid = AttractRigidBody.from_pdb(temporary_file.name)
 
     # Forces should be initialized to zero.
     expected = np.zeros((rigid.size(), 3))
@@ -70,7 +66,9 @@ def test_apply_forces():
 
 
 def test_reset_forces():
-    rigid = generate_rigid()
+    with generate_red_file() as temporary_file:
+        rigid = AttractRigidBody.from_pdb(temporary_file.name)
+
     assert rigid.forces == approx(0.0)
 
     rigid.forces[0] = [1, 2, 3]

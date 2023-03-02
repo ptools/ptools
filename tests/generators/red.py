@@ -1,11 +1,18 @@
 """Helper classes and functions for RED format I/O testing."""
 
+from dataclasses import dataclass
 import tempfile
-from .temporaryfile import mk_tmp_file
+
+from .io import generate_tmp_file
 
 
+@dataclass
 class TestREDBuilder:
     """Creates a standard RED file."""
+
+    has_categories: bool = True
+    has_charges: bool = True
+    has_invalid_charges: bool = False
 
     @staticmethod
     def base_atom_list() -> list[str]:
@@ -23,20 +30,27 @@ class TestREDBuilder:
             "ATOM     10  CSE TYR     4      -3.525  -1.079   3.005",
         ]
 
-    @classmethod
-    def atom(cls, has_categories: bool = True, has_charges: bool = True) -> str:
-        """Atoms in RED format."""
-        atoms = cls.base_atom_list()
+    @property
+    def _natoms(self) -> int:
+        """Number of atoms in the RED file."""
+        return len(self.base_atom_list())
 
-        if has_categories:
-            categories = cls.categories()
+    def atoms(self) -> str:
+        """Atoms in RED format."""
+        atoms = self.base_atom_list()
+
+        if self.has_categories:
+            categories = self.categories()
             for i, atom in enumerate(atoms):
                 atoms[i] = atom + f"{categories[i]:5d}"
 
-        if has_charges:
-            charges = cls.charges()
+        if self.has_charges:
+            if self.has_invalid_charges:
+                charges = self.invalid_charges()
+            else:
+                charges = [f"{charge:8.3f}" for charge in self.charges()]
             for i, atom in enumerate(atoms):
-                atoms[i] = atom + f"{charges[i]:8.3f}"
+                atoms[i] = atom + f"{charges[i]:>8s}"
 
         return "\n".join(atoms)
 
@@ -45,30 +59,24 @@ class TestREDBuilder:
         """Atom categories as presented in default atoms."""
         return [1, 27, 28, 1, 23, 1, 23, 1, 27, 28]
 
-    @classmethod
-    def charges(cls) -> list[float]:
+    def charges(self) -> list[float]:
         """Atom charges as presented in default atoms."""
-        return [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        return [0.0] * self._natoms
 
-    @classmethod
-    def redfile(cls, has_categories: bool = True, has_charges: bool = True) -> str:
-        return cls.atom(has_categories, has_charges)
+    def invalid_charges(self) -> list[str]:
+        """Atom invalid charges (strings instead of floats)."""
+        return ["FOO"] * self._natoms
 
-    @classmethod
-    def redfile_invalid_charges(cls) -> str:
-        atoms = cls.redfile(has_charges=False).splitlines()
-        for i, atom in enumerate(atoms):
-            atoms[i] = atom + f"{'FOO':>8s}"
-        return "\n".join(atoms)
+    @property
+    def content(self) -> str:
+        """Returns the content of the RED file."""
+        return self.atoms()
 
 
-def mk_red(
-    has_categories: bool = True, has_charges: bool = True
+def generate_red_file(
+    has_categories: bool = True, has_charges: bool = True, invalid_charges: bool = False
 ) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file (RED format) that contains 10 atoms."""
-    return mk_tmp_file(content=TestREDBuilder.redfile(has_categories, has_charges))
-
-
-def mk_red_invalid_charges() -> tempfile.NamedTemporaryFile:
-    """Creates a temporary file (RED format) that contains 10 atoms and dummy charges."""
-    return mk_tmp_file(content=TestREDBuilder.redfile_invalid_charges())
+    if invalid_charges:
+        return generate_tmp_file(content=TestREDBuilder(has_invalid_charges=True).content)
+    return generate_tmp_file(content=TestREDBuilder(has_categories, has_charges).content)

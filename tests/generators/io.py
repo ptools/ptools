@@ -1,11 +1,13 @@
-"""Utilities to create temporary files."""
-
 from contextlib import contextmanager
 import tempfile
 
+def generate_random_filename() -> str:
+    """Returns a random file name."""
+    with tempfile.NamedTemporaryFile() as tmpfile:
+        return tmpfile.name
 
 @contextmanager
-def mk_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
+def generate_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file."""
     try:
         tmpfile = tempfile.NamedTemporaryFile("wt", **kwargs)
@@ -17,6 +19,6 @@ def mk_tmp_file(content: str = "", **kwargs) -> tempfile.NamedTemporaryFile:
         tmpfile.close()
 
 
-def mk_empty_file(**kwargs) -> tempfile.NamedTemporaryFile:
+def generate_empty_file(**kwargs) -> tempfile.NamedTemporaryFile:
     """Creates a temporary empty file."""
-    return mk_tmp_file(content="", **kwargs)
+    return generate_tmp_file(content="", **kwargs)

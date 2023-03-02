@@ -1,6 +1,4 @@
-"""Generators for testing."""
 
-from dataclasses import dataclass, field
 import random
 from typing import Optional
 
@@ -8,7 +6,6 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from ptools.atomattrs import AtomAttrs
-from ptools.particlecollection import ParticleCollection
 
 
 AMINO_ACID_NAMES = [
@@ -99,22 +96,3 @@ def generate_atoms(size: int = 10, names: Optional[list[str]] = None) -> list[At
         for atom, name in zip(atoms, names):
             atom.name = name
     return atoms
-
-
-def generate_particlecollection(**kwargs) -> ParticleCollection:
-    """Creates a dummy particle collection."""
-    return ParticleCollection(generate_atoms(**kwargs))
-
-
-@dataclass
-class Balloon:
-    """Dummy object with coordinates."""
-
-    coordinates: np.ndarray = field(default_factory=lambda: np.zeros((5, 3)))
-
-
-def generate_balloon(coordinates: Optional[np.typing.ArrayLike] = None) -> Balloon:
-    """Returns a ``Balloon`` with given coordinates"""
-    if coordinates is None:
-        return Balloon()
-    return Balloon(np.asarray(coordinates))

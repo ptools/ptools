@@ -11,7 +11,7 @@ from . import (
     TEST_DUM_PDB_CONTENT,
     TEST_AMINON_CONTENT,
 )
-from ..testing.io import random_filename, mk_tmp_file, mk_empty_file
+from ..generators import generate_random_filename, generate_tmp_file, generate_empty_file
 
 
 with open(TEST_ATTRACT_PARAMS, "rt", encoding="utf-8") as f:
@@ -20,7 +20,7 @@ with open(TEST_ATTRACT_PARAMS, "rt", encoding="utf-8") as f:
 
 class TestAttractIO(unittest.TestCase):
     def test_read_aminon(self):
-        with mk_tmp_file(content=TEST_AMINON_CONTENT) as tmpfile:
+        with generate_tmp_file(content=TEST_AMINON_CONTENT) as tmpfile:
             params = io.read_aminon(tmpfile.name)
 
         self.assertEqual(len(params), 5)
@@ -41,12 +41,12 @@ class TestAttractIO(unittest.TestCase):
         self.assertEqual(params[4][1], 0.600)
 
     def test_read_forcefield_from_reduced(self):
-        with mk_tmp_file(content=TEST_DUM_RED_CONTENT) as tmpfile:
+        with generate_tmp_file(content=TEST_DUM_RED_CONTENT) as tmpfile:
             ff = io.read_forcefield_from_reduced(tmpfile.name)
             self.assertEqual("attract1", ff)
 
     def test_read_forcefield_from_reduced_no_header(self):
-        with mk_tmp_file(content=TEST_DUM_PDB_CONTENT) as tmpfile:
+        with generate_tmp_file(content=TEST_DUM_PDB_CONTENT) as tmpfile:
             err = "reduced PDB file first line must be a HEADER line"
             with self.assertRaisesRegex(IOError, err):
                 io.read_forcefield_from_reduced(tmpfile.name)
@@ -58,14 +58,14 @@ class TestAttractIO(unittest.TestCase):
         lines.insert(0, "HEADER    ")
 
         # Make sure the proper exeception is raised.
-        with mk_tmp_file(content="\n".join(lines)) as tmpfile:
+        with generate_tmp_file(content="\n".join(lines)) as tmpfile:
             err = ".* cannot read force field name from first line .*"
             with self.assertRaisesRegex(IOError, err):
                 io.read_forcefield_from_reduced(tmpfile.name)
 
     def test_check_ff_version_match(self):
-        with mk_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_receptor:
-            with mk_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_ligand:
+        with generate_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_receptor:
+            with generate_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_ligand:
                 ff = io.check_ff_version_match(
                     tmpfile_receptor.name, tmpfile_ligand.name
                 )
@@ -73,8 +73,8 @@ class TestAttractIO(unittest.TestCase):
 
     def test_check_ff_version_match_fail(self):
         content = TEST_DUM_RED_CONTENT.replace("ATTRACT1", "ATTRACT2")
-        with mk_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_receptor:
-            with mk_tmp_file(content) as tmpfile_ligand:
+        with generate_tmp_file(TEST_DUM_RED_CONTENT) as tmpfile_receptor:
+            with generate_tmp_file(content) as tmpfile_ligand:
                 err = "receptor and ligand force field names do not match"
                 with self.assertRaisesRegex(ValueError, err):
                     io.check_ff_version_match(
@@ -84,13 +84,13 @@ class TestAttractIO(unittest.TestCase):
 
 class TestReadAttractParameters(unittest.TestCase):
     def test_file_does_not_exist(self):
-        filename = random_filename()
+        filename = generate_random_filename()
         err = f"No such file or directory: '{filename}'"
         with self.assertRaisesRegex(IOError, err):
             io.read_attract_parameter(filename)
 
     def test_cannot_read_number_of_minimizations(self):
-        with mk_empty_file() as tmpfile:
+        with generate_empty_file() as tmpfile:
             filename = tmpfile.name
             err = "Cannot read number of minimizations from attract parameter file"
             with self.assertRaisesRegex(ValueError, err):
@@ -98,7 +98,7 @@ class TestReadAttractParameters(unittest.TestCase):
 
     def test_file_contains_only_one_line(self):
         content = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[0]
-        with mk_tmp_file(content=content) as tmpfile:
+        with generate_tmp_file(content=content) as tmpfile:
             filename = tmpfile.name
             err = "Unexpectedly reached end of attract parameter file"
             with self.assertRaisesRegex(ValueError, err):
@@ -108,7 +108,7 @@ class TestReadAttractParameters(unittest.TestCase):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:2]
         lines[-1] = " ".join(lines[-1].split()[:-1])  # remove rstk from example
         content = "\n".join(lines)
-        with mk_tmp_file(content=content) as tmpfile:
+        with generate_tmp_file(content=content) as tmpfile:
             filename = tmpfile.name
             err = "Cannot read rstk from attract parameter file"
             with self.assertRaisesRegex(ValueError, err):
@@ -117,7 +117,7 @@ class TestReadAttractParameters(unittest.TestCase):
     def test_cannot_read_too_many_minimizations(self):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:2]
         content = "\n".join(lines)
-        with mk_tmp_file(content=content) as tmpfile:
+        with generate_tmp_file(content=content) as tmpfile:
             filename = tmpfile.name
             err = "Cannot read minimizations from attract parameter file: expected 4, found 0"
             with self.assertRaisesRegex(ValueError, err):
@@ -127,7 +127,7 @@ class TestReadAttractParameters(unittest.TestCase):
         lines = TEST_ATTRACT_PARAMETER_CONTENT.splitlines()[:3]
         lines[2] = " ".join(lines[-1].split()[:2])
         content = "\n".join(lines)
-        with mk_tmp_file(content=content) as tmpfile:
+        with generate_tmp_file(content=content) as tmpfile:
             filename = tmpfile.name
             err = (
                 "Cannot read minimization line from attract parameter file: "
