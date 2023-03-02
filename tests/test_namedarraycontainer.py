@@ -36,6 +36,8 @@ def test_initialization_fails():
         NamedArrayContainer(properties)
 
 
+# == Test ParticleCollection.add_array =================================================
+
 def test_add_array():
     class expected:
         singular = "index"
@@ -59,6 +61,20 @@ def test_add_array():
     assert_array_almost_equal(prop.values, expected.values)
 
 
+def test_add_array_fails_if_already_exists():
+    container = NamedArrayContainer(generate_arrays())
+    with pytest.raises(KeyError):
+        container.add_array("one", "ones", np.ones(5))
+
+
+def test_add_array_checks_for_size():
+    container = NamedArrayContainer(generate_arrays(size=5))
+    with pytest.raises(ValueError):
+        container.add_array("index", "indices", np.zeros(6))
+
+
+# == Test ParticleCollection.register ==================================================
+
 def test_register():
     expected = NamedArray("index", "indices", (1, 2, 3))
     container = NamedArrayContainer()
@@ -75,12 +91,6 @@ def test_register_checks_for_size():
         container.register(candidate)
 
 
-def test_add_array_checks_for_size():
-    container = NamedArrayContainer(generate_arrays(size=5))
-    with pytest.raises(ValueError):
-        container.add_array("index", "indices", np.zeros(6))
-
-
 def test_register_copies_values():
     item = NamedArray("index", "indices", (1, 2, 3))
     container = NamedArrayContainer()
@@ -92,6 +102,25 @@ def test_register_copies_values():
     assert_array_not_almost_equal(item.values, container.get(item.plural).values)
     assert_array_almost_equal((1, 2, 3), container.get(item.plural).values)
 
+
+# == Test ParticleCollection.remove_array ==============================================
+
+def test_remove_array():
+    container = NamedArrayContainer(generate_arrays())
+    assert container.number_of_properties() == 3
+
+    container.remove_array("ones")
+    assert container.number_of_properties() == 2
+    assert "ones" not in container
+
+
+def test_remove_array_fails_when_not_found():
+    container = NamedArrayContainer(generate_arrays())
+    with pytest.raises(KeyError):
+        container.remove_array("not_an_actual_property")
+
+
+# =======================================================================================
 
 def test_getitem():
     container = NamedArrayContainer(generate_arrays())

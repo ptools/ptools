@@ -1,6 +1,6 @@
 from __future__ import annotations
 import itertools
-from typing import Any, Callable, Iterable, Optional, TypeVar, Type
+from typing import Any, Callable, Iterable, Optional, Sequence, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -9,7 +9,8 @@ from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
 
 ParticleType = TypeVar("ParticleType", bound="Particle")
-
+ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
+ParticleCollectionKeyType = int | slice | Sequence[int] | np.ndarray
 
 class Particle:
     """Represents a single particle in a collection."""
@@ -66,9 +67,6 @@ class Particle:
             f"{k}={getattr(self, k)!r}" for k in self._singular_to_plural.keys()
         )
         return f"Particle({attrs})"
-
-
-ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
 
 
 class ParticleCollection:
@@ -158,7 +156,7 @@ class ParticleCollection:
         """
         return self.size()
 
-    def __getitem__(self, key: int | slice) -> Particle | ParticleCollection:
+    def __getitem__(self, key: ParticleCollectionKeyType) -> Particle | ParticleCollection:
         """Returns a new collection with the selected atoms."""
         if isinstance(key, (int, np.integer)):
             return Particle(self, key)
@@ -202,6 +200,19 @@ class ParticleCollection:
         obj = cls()
         obj.atom_properties = properties
         return obj
+
+    # == Properties manipulation ========================================================
+    def add_atom_property(self, singular: str, plural: str, value: Sequence | np.ndarray):
+        """Adds a property to the collection."""
+        if self.has_parent():
+            raise NotImplementedError("Cannot add properties to a sub-collection.")
+        self.atom_properties.add_array(singular, plural, value)
+
+    def remove_atom_property(self, plural: str):
+        """Removes a property from the collection."""
+        if self.has_parent():
+            raise NotImplementedError("Cannot remove properties from a sub-collection.")
+        self.atom_properties.remove_array(plural)
 
     # ===================================================================================
 
@@ -296,6 +307,7 @@ class ParticleCollection:
     def groupby(
         self: ParticleCollectionType, key: Callable
     ) -> dict[Any, ParticleCollectionType]:
+        """Groups the atoms by the given key."""
         sorted_atoms = sorted(enumerate(self), key=lambda i_atom: key(i_atom[1]))
         grouped = itertools.groupby(sorted_atoms, key=lambda i_atom: key(i_atom[1]))
         grouped_collections = {
@@ -306,12 +318,15 @@ class ParticleCollection:
     # == Iteration methods ==============================================================
 
     def iter_particles(self) -> Iterator[Particle]:
+        """Iterates over the particles in the collection."""
         return iter(self)
 
     def iter_residues(self) -> Iterator[ParticleCollectionType]:
+        """Iterates over the residues in the collection."""
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
         return iter(by_residue.values())
 
     def iter_chains(self) -> Iterator[ParticleCollectionType]:
+        """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
         return iter(by_chain.values())

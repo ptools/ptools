@@ -127,7 +127,7 @@ class AttractForceField1(ForceFieldBase):
 
         # Categorie pairs.
         C = np.array(
-            np.meshgrid(self.receptor.atom_categories, self.ligand.atom_categories)
+            np.meshgrid(self.receptor.categories, self.ligand.categories)
         ).T
 
         # Numpy insane trickery
@@ -174,15 +174,15 @@ class AttractForceField1(ForceFieldBase):
             forces = np.zeros((len(self.receptor), len(self.ligand), 3))
             forces[keep] = fdb
 
-            self.receptor.atom_forces += forces.sum(axis=1)
-            self.ligand.atom_forces -= forces.sum(axis=0)
+            self.receptor.forces += forces.sum(axis=1)
+            self.ligand.forces -= forces.sum(axis=0)
 
             return vlj.sum()
 
         def electrostatics(dx, rr2):
             charge = (
-                self.receptor.atom_charges[:, None]
-                * self.ligand.atom_charges
+                self.receptor.charges[:, None]
+                * self.ligand.charges
                 * (332.053986 / 20.0)
             )
             charge = charge[keep]
@@ -193,8 +193,8 @@ class AttractForceField1(ForceFieldBase):
             forces = np.zeros((len(self.receptor), len(self.ligand), 3))
             forces[keep] = fdb
 
-            self.receptor.atom_forces += forces.sum(axis=1)
-            self.ligand.atom_forces -= forces.sum(axis=0)
+            self.receptor.forces += forces.sum(axis=1)
+            self.ligand.forces -= forces.sum(axis=0)
 
             return et.sum()
 
@@ -224,20 +224,20 @@ class AttractForceField1(ForceFieldBase):
             fb = 6.0 * vlj + 2.0 * rep * rr23
             fdb = dx * fb[:, :, None]
 
-            self.receptor.atom_forces += fdb.sum(axis=1)
-            self.ligand.atom_forces -= fdb.sum(axis=0)
+            self.receptor.forces += fdb.sum(axis=1)
+            self.ligand.forces -= fdb.sum(axis=0)
             return vlj.sum()
 
         def electrostatics(dx, rr2):
             charge = (
-                self.receptor.atom_charges[:, None]
-                * self.ligand.atom_charges
+                self.receptor.charges[:, None]
+                * self.ligand.charges
                 * (332.053986 / 20.0)
             )
             et = charge * rr2
             fdb = dx * (2.0 * et)[:, :, None]
-            self.receptor.atom_forces += fdb.sum(axis=1)
-            self.ligand.atom_forces -= fdb.sum(axis=0)
+            self.receptor.forces += fdb.sum(axis=1)
+            self.ligand.forces -= fdb.sum(axis=0)
             return et.sum()
 
         dx = np.asarray(self.receptor.coordinates[:, None] - self.ligand.coordinates)
@@ -248,7 +248,7 @@ class AttractForceField1(ForceFieldBase):
         exclude = np.where(sq_distances > self.cutoff * self.cutoff)
 
         rr2 = 1.0 / np.power(dx, 2).sum(axis=2)
-        rr2[exclude] = 0.0  # exclude pairs with distance > cutoff
+        rr2[exclude] = 0.0
         dx = dx + rr2[:, :, None]
 
         self._vdw_energy = van_der_waals(dx, rr2)
@@ -262,6 +262,7 @@ class AttractForceField1(ForceFieldBase):
 
         Very slow.
         """
+        raise NotImplementedError
         vdw = 0.0
         elec = 0.0
 
@@ -295,12 +296,12 @@ class AttractForceField1(ForceFieldBase):
             fb = 6.0 * vlj + 2.0 * rep * rr23
             fdb = fb * dx
 
-            self.receptor.atom_forces[ir] += fdb
-            self.ligand.atom_forces[il] -= fdb
+            self.receptor.forces[ir] += fdb
+            self.ligand.forces[il] -= fdb
 
             # Electrostatics.
-            charge_rec = self.receptor.atom_charges[ir]
-            charge_lig = self.ligand.atom_charges[il]
+            charge_rec = self.receptor.charges[ir]
+            charge_lig = self.ligand.charges[il]
             charge = charge_rec * charge_lig * (332.053986 / 20.0)
 
             if abs(charge) > 0.0:
@@ -308,8 +309,8 @@ class AttractForceField1(ForceFieldBase):
                 elec += et
 
                 fdb = (2.0 * et) * dx
-                self.receptor.atom_forces[ir] += fdb
-                self.ligand.atom_forces[il] -= fdb
+                self.receptor.forces[ir] += fdb
+                self.ligand.forces[il] -= fdb
 
         self._vdw_energy = vdw
         self._electrostatic_energy = elec

@@ -35,6 +35,21 @@ AMINO_ACID_NAMES = [
 ]
 
 
+def random_amino_acid_name():
+    """Returns a random amino acid name."""
+    return random.choice(AMINO_ACID_NAMES)
+
+
+def random_atom_name():
+    """Returns a random atom name."""
+    return random.choice(["H", "C", "N", "O", "S"])
+
+
+def random_charge(lower: float = -1, upper: float = 1):
+    """Returns a random charge."""
+    return random.uniform(lower, upper)
+
+
 def generate_atom_attrs(**kwargs) -> AtomAttrs:
     """Creates an ``AtomAttrs`` instance."""
     attrs = {
@@ -89,21 +104,6 @@ def generate_atoms(size: int = 10, names: Optional[list[str]] = None) -> list[At
 def generate_particlecollection(**kwargs) -> ParticleCollection:
     """Creates a dummy particle collection."""
     return ParticleCollection(generate_atoms(**kwargs))
-
-
-def random_amino_acid_name():
-    """Returns a random amino acid name."""
-    return random.choice(AMINO_ACID_NAMES)
-
-
-def random_atom_name():
-    """Returns a random atom name."""
-    return random.choice(["H", "C", "N", "O", "S"])
-
-
-def random_charge(lower: float = -1, upper: float = 1):
-    """Returns a random charge."""
-    return random.uniform(lower, upper)
 
 
 @dataclass

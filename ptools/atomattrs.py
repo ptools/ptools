@@ -31,7 +31,7 @@ class AtomAttrs:
     residue_name: str = "XXX"
     residue_index: int = 0
     chain: str = "X"
-    charge: float = 0.0
+    # charge: float = 0.0
     coordinates: array3d = field(
         factory=lambda: array3d((0, 0, 0)), converter=lambda x: array3d(x)
     )

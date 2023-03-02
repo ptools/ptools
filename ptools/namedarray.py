@@ -212,10 +212,10 @@ class NamedArrayContainer(collections.abc.Container):
         if not isinstance(plural, str):
             raise ValueError("expects string to set property using its plural name")
         if plural not in self._properties:
-            raise ValueError(f"property {plural} not registered")
+            raise ValueError(f"property {plural!r} not registered")
         if not self._properties[plural].values.shape == np.shape(value):
             raise ValueError(
-                f"cannot set property {plural} with array of shape {np.shape(value)} (expected {self._properties[plural].values})"
+                f"cannot set property {plural!r} with array of shape {np.shape(value)} (expected {self._properties[plural].values})"
             )
         self._properties[plural].values = np.asarray(value)
 
@@ -236,7 +236,7 @@ class NamedArrayContainer(collections.abc.Container):
         return len(next(iter(self._properties.values())).values)
 
     def add_array(
-        self, singular: str, plural: str, values: Sequence[float] | np.ndarray
+        self, singular: str, plural: str, values: Sequence | np.ndarray
     ):
         if len(values) > 0 and isinstance(values[0], array3d):
             values = array3d(values)
@@ -257,6 +257,10 @@ class NamedArrayContainer(collections.abc.Container):
             )
             raise ValueError(err)
         self._properties[item.plural] = item.copy()
+
+    def remove_array(self, plural: str):
+        """Removes a property from the collection."""
+        del self._properties[plural]
 
     def copy(self) -> NamedArrayContainer:
         return self.__class__(self._properties.values())

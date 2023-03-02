@@ -2,6 +2,7 @@
 
 import numpy as np
 
+import pytest
 from pytest import approx
 
 import ptools
@@ -71,7 +72,6 @@ class RandomParticleContainer:
 
 # == Initialization  ===================================================================
 
-
 def test_initialization_from_empty_list():
     """Test that the default initialization works."""
     pc = ParticleCollection()
@@ -108,7 +108,6 @@ def test_initialization_from_properties():
 
 
 # == __getitem__  ======================================================================
-
 
 def test_getitem_with_int_returns_a_particle():
     """Test that the ``getitem`` operator works with an integer and returns a ``Particle``."""
@@ -166,6 +165,61 @@ def test_subset_with_slice_returns_a_reference_to_the_original_object():
 
 # == __setitem__  ======================================================================
 
+def test_set_property():
+    expected = RandomParticleContainer()
+    atoms = ParticleCollection(expected.particles)
+
+    expected_names = list(expected.names)
+    assert_array_equal(atoms.names, expected_names)
+
+    for i, atom in enumerate(atoms):
+        atom.name = atom.name + "random suffix"
+        expected_names[i] = expected_names[i] + "random suffix"
+
+    assert_array_equal(atoms.names, expected_names)
+
+
+def test_set_property_with_inplace_add():
+    expected = RandomParticleContainer()
+    atoms = ParticleCollection(expected.particles)
+
+    expected_names = list(expected.names)
+    assert_array_equal(atoms.names, expected_names)
+
+    for i, atom in enumerate(atoms):
+        atom.name += "random suffix"
+        expected_names[i] += "random suffix"
+
+    assert_array_equal(atoms.names, expected_names)
+
+
+def test_set_property_with_getitem():
+    expected = RandomParticleContainer()
+    atoms = ParticleCollection(expected.particles)
+
+    expected_names = list(expected.names)
+    assert_array_equal(atoms.names, expected_names)
+
+    for i in range(len(atoms)):
+        atoms[i].name = atoms[i].name + "random suffix"
+        expected_names[i] = expected_names[i] + "random suffix"
+
+    assert_array_equal(atoms.names, expected_names)
+
+
+def test_set_property_with_getitem_and_inplace_add():
+    expected = RandomParticleContainer()
+    atoms = ParticleCollection(expected.particles)
+
+    expected_names = list(expected.names)
+    assert_array_equal(atoms.names, expected_names)
+
+    for i in range(len(atoms)):
+        atoms[i].name += "random suffix"
+        expected_names[i] += "random suffix"
+
+    assert_array_equal(atoms.names, expected_names)
+
 
 def test_set_property_using_slice():
     expected = RandomParticleContainer(10)
@@ -183,7 +237,6 @@ def test_set_property_using_slice():
 
 
 # == Container methods  ================================================================
-
 
 def test_size_and_len():
     """Test that the ``len`` and ``size`` functions work."""
@@ -203,7 +256,6 @@ def test_contains():
 
 
 # == ParticleCollection merging  ========================================================
-
 
 def test_add():
     """Test that the ``+`` operator works."""
@@ -242,7 +294,6 @@ def test_inplace_add():
 
 # ======================================================================================
 
-
 def test_copy():
     """Test that the ``copy`` method returns a deep copy."""
     pc = ParticleCollection(generate_atoms())
@@ -278,7 +329,6 @@ def test_set_property():
 
 # == Selections  ========================================================================
 
-
 def test_select_atom_type():
     atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_atom_type("CA")
@@ -309,7 +359,6 @@ def test_select_chain():
 
 # == Grouping  ==========================================================================
 
-
 def test_groupby():
     """Test that the ``groupby`` method works.
 
@@ -322,7 +371,6 @@ def test_groupby():
 
 
 # == Iteration methods  =================================================================
-
 
 def test_iter():
     expected = RandomParticleContainer()
@@ -365,3 +413,39 @@ def test_iter_residues():
 
     iterator = pc.iter_residues()
     # assert
+
+
+# == Add/remove atom properties  ========================================================
+
+def test_add_atom_property():
+    """Test that the ``add_property`` method works."""
+    pc = ParticleCollection(generate_atoms())
+    bananas = [0] * pc.size()
+    pc.add_atom_property("banana", "bananas", bananas)
+    assert hasattr(pc, "bananas")
+    assert pc.atom_properties.get("bananas") == bananas
+
+
+def test_add_atom_property_fails_if_property_already_exists():
+    """Test that the ``add_property`` method fails if the property already exists."""
+    pc = ParticleCollection(generate_atoms())
+    bananas = [0] * pc.size()
+    pc.add_atom_property("banana", "bananas", bananas)
+    with pytest.raises(KeyError):
+        pc.add_atom_property("banana", "bananas", bananas)
+
+
+def test_add_atom_property_fails_when_propery_has_wrong_dimensions():
+    """Test that the ``add_property`` method fails if the property has the wrong dimensions."""
+    pc = ParticleCollection(generate_atoms())
+    bananas = [0] * (pc.size() - 1)
+    with pytest.raises(ValueError):
+        pc.add_atom_property("banana", "bananas", bananas)
+
+
+def test_remove_atom_property():
+    """Test that the ``remove_property`` method works."""
+    pc = ParticleCollection(generate_atoms())
+    assert hasattr(pc, "names")
+    pc.remove_atom_property("names")
+    assert not hasattr(pc, "names")

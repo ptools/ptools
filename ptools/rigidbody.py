@@ -24,15 +24,7 @@ AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 class RigidBody(ParticleCollection):
     """RigidBody is an ParticleCollection that can be initialized from a PDB file.
 
-    It has 3 additionnal arrays compared to ParticleCollection:
-        - atom_categories (np.ndarray(N, )):
-            1 x N shaped array for atom categories
-        - atom_charges (np.ndarray(N, )):O
-            1 x N shaped array for atom charges
-        - atom_forces (np.ndarray(N, 3)):
-            N x 3 shaped array for atom forces
-
-    Also, it can be initialized from a file.
+    It can be initialized from a file.
     """
 
     def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
@@ -42,6 +34,7 @@ class RigidBody(ParticleCollection):
                 "Use RigidBody.from_pdb instead."
             )
         ParticleCollection.__init__(self, atoms)
+
 
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
@@ -53,29 +46,43 @@ class RigidBody(ParticleCollection):
 class AttractRigidBody(RigidBody):
     """AttractRigidBody is a RigidBody on which one can calculate the energy.
 
-    Atom categories and charges are parsed from input PDB file."""
+    It has 3 additionnal arrays compared to ParticleCollection:
+        - atom_categories (np.ndarray(N, )):
+            1 x N shaped array for atom categories
+        - atom_charges (np.ndarray(N, )):O
+            1 x N shaped array for atom charges
+        - atom_forces (np.ndarray(N, 3)):
+            N x 3 shaped array for atom forces
+
+    Atom categories and charges are parsed from input PDB file.
+    """
 
     def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
         super().__init__(atoms)
+        self._initialize_attract_properties()
+
+    def _initialize_attract_properties(self):
+        """Initializes atom categories, charges and forces from PDB extra field."""
         N = len(self)
-        self.atom_categories = np.zeros(N, dtype=int)
-        self.atom_charges = np.zeros(N, dtype=float)
-        self.atom_forces = np.zeros((N, 3), dtype=float)
+        self.add_atom_property("category", "categories", np.zeros(N, dtype=int))
+        self.add_atom_property("charge", "charges", np.zeros(N, dtype=int))
+        self.add_atom_property("force", "forces", np.zeros((N, 3), dtype=int))
+
+    def _initialize_attract_properties_from_pdb_extra(self):
+        """Initializes atom categories, charges and forces from PDB extra field."""
+        extra = self._parse_extra_from_atoms()
+        self.add_atom_property("category", "categories", [int(tokens[0]) - 1 for tokens in extra])
+        self.add_atom_property("charge", "charges", [float(tokens[1]) for tokens in extra])
+        self.add_atom_property("force", "forces", np.zeros((len(self), 3), dtype=float))
+
 
     @classmethod
     def from_pdb(
         cls: Type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
         rigid = super().from_pdb(path)
-        rigid._init_categories_and_charges_from_pdb_extra()
+        rigid._initialize_attract_properties_from_pdb_extra()
         return rigid
-
-    def _init_categories_and_charges_from_pdb_extra(self):
-        """Initializes atom and charges arrays from data read from PDB."""
-        extra = self._parse_extra_from_atoms()
-        self.atom_categories = np.array([int(tokens[0]) - 1 for tokens in extra])
-        self.atom_charges = np.array([float(tokens[1]) for tokens in extra])
-        self.atom_forces = np.zeros((len(self), 3), dtype=float)
 
     def _parse_extra_from_atoms(self):
         """Parses extra atom field.
@@ -115,8 +122,8 @@ class AttractRigidBody(RigidBody):
 
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""
-        self.atom_forces.fill(0)
+        self.forces.fill(0)
 
     def apply_forces(self, forces: np.ndarray):
         """Adds forces to atoms."""
-        self.atom_forces += forces
+        self.forces += forces

@@ -17,7 +17,6 @@ def test_empty_initializer():
     assert atom.residue_name == "XXX"
     assert atom.residue_index == 0
     assert atom.chain == "X"
-    assert atom.charge == 0.0
     assert atom.coordinates == approx((0, 0, 0))
 
 
