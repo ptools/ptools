@@ -38,7 +38,8 @@ def transformation_matrix(
         matrix[:3, :3] = rotation
     else:
         raise ValueError(
-            f"rotation expects either vector of size 3 or 3 x 3 rotation matrix (found {np.shape(rotation)})"
+            f"rotation expects either vector of size 3 or 3 x 3 rotation matrix "
+            f"(found {np.shape(rotation)})"
         )
 
     if np.shape(translation) == (3,):
@@ -47,7 +48,8 @@ def transformation_matrix(
         matrix[:, 3] = translation[:, 3]
     else:
         raise ValueError(
-            f"translation expects either vector of size 3 or 3 x 3 translation matrix (found {np.shape(translation)})"
+            f"translation expects either vector of size 3 or 3 x 3 translation matrix "
+            f"(found {np.shape(translation)})"
         )
     return matrix
 

@@ -215,7 +215,8 @@ class NamedArrayContainer(collections.abc.Container):
             raise ValueError(f"property {plural!r} not registered")
         if not self._properties[plural].values.shape == np.shape(value):
             raise ValueError(
-                f"cannot set property {plural!r} with array of shape {np.shape(value)} (expected {self._properties[plural].values})"
+                f"cannot set property {plural!r} with array of shape {np.shape(value)} "
+                f"(expected {self._properties[plural].values})"
             )
         self._properties[plural].values = np.asarray(value)
 
@@ -250,8 +251,8 @@ class NamedArrayContainer(collections.abc.Container):
             item.values
         ):
             err = (
-                f"cannot add property {item.plural!r}: expected {self.number_of_elements()} elements, "
-                f"got {len(item.values)}"
+                f"cannot add property {item.plural!r}: expected {self.number_of_elements()} "
+                f"elements, got {len(item.values)}"
             )
             raise ValueError(err)
         self._properties[item.plural] = item.copy()

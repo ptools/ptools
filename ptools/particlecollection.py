@@ -122,7 +122,11 @@ class ParticleCollection:
     def _set_particle_property(self, name: str, index: int, value: Any):
         """Sets the value of a property of a particle."""
         if self.has_parent():
-            self._selection.parent.atom_properties.set_at(name, self._selection.indices[index], value)  # type: ignore[union-attr]
+            self._selection.parent.atom_properties.set_at( # type: ignore[union-attr]
+                name,
+                self._selection.indices[index], # type: ignore[union-attr]
+                value
+            )
             return
         self._atom_properties.set_at(name, index, value)
 

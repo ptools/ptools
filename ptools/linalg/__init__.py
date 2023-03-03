@@ -9,12 +9,12 @@ import numpy.linalg as L
 from .._typing import ArrayLike
 
 from .matrix import (
-    translation_matrix,
-    transformation_matrix,
-    rotation_matrix,
-    rotation_matrix_around_axis,
-    attract_euler_rotation_matrix,
-    orientation_matrix,
+    translation_matrix as translation_matrix,
+    transformation_matrix as transformation_matrix,
+    rotation_matrix as rotation_matrix,
+    rotation_matrix_around_axis as rotation_matrix_around_axis,
+    attract_euler_rotation_matrix as attract_euler_rotation_matrix,
+    orientation_matrix as orientation_matrix,
 )
 
 
