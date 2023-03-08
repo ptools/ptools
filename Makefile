@@ -47,6 +47,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .cache/
+	rm -fr .pytest_cache/
+	rm -fr .mypy_cache/
 
 lint: lint-package lint-tests ## check style with pylint
 
