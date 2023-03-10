@@ -123,10 +123,14 @@ def run(args: argparse.Namespace):
         ca_beads[-1].charge = -1.0
 
         if args.optimize_charges:
-            raise NotImplementedError("Charge optimization is not yet implemented.")
-        #     reducer.optimize_charges()
+            optimize_charges(reducer)
 
     logger.info("Writing reduced model to %s", args.output)
     write_reduced_pdb(reducer.beads, args.output)
 
     logger.info("End time: %s", str(datetime.datetime.now()))
+
+
+def optimize_charges(reducer: reduce.Reducer):
+    """Optimizes charges of the reduced model."""
+    print(reducer.reduction_parameters)

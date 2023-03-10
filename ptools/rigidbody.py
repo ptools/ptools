@@ -50,6 +50,8 @@ class AttractRigidBody(RigidBody):
             1 x N shaped array for atom categories
         - atom_charges (np.ndarray(N, )):O
             1 x N shaped array for atom charges
+        - atom_radii (np.ndarray(N, )):O
+            1 x N shaped array for atom radii
         - atom_forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
 
@@ -65,23 +67,36 @@ class AttractRigidBody(RigidBody):
         n_atoms = len(self)
         self.add_atom_property("category", "categories", np.zeros(n_atoms, dtype=int))
         self.add_atom_property("charge", "charges", np.zeros(n_atoms, dtype=int))
+        self.add_atom_property("radius", "radii", np.zeros(n_atoms, dtype=int))
         self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=int))
 
-    def _initialize_attract_properties_from_pdb_extra(self):
+    def _initialize_attract_properties_from_red_extra(self):
         """Initializes atom categories, charges and forces from PDB extra field."""
         extra = self._parse_extra_from_atoms()
         self.add_atom_property(
-            "category", "categories", [int(tokens[0]) - 1 for tokens in extra]
+            "category", "categories", [int(tokens[0]) for tokens in extra]
         )
         self.add_atom_property(
             "charge", "charges", [float(tokens[1]) for tokens in extra]
         )
+        self.add_atom_property(
+            "radius", "radii", np.zeros(len(self), dtype=float)
+        )
         self.add_atom_property("force", "forces", np.zeros((len(self), 3), dtype=float))
+
+    @classmethod
+    def from_red(
+        cls: Type[AttractRigidBodyType], path: FilePath
+    ) -> AttractRigidBodyType:
+        rigid = super().from_pdb(path)
+        rigid._initialize_attract_properties_from_red_extra()
+        return rigid
 
     @classmethod
     def from_pdb(
         cls: Type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
+        raise NotImplementedError("Use AttractRigidBody.from_red instead.")
         rigid = super().from_pdb(path)
         rigid._initialize_attract_properties_from_pdb_extra()
         return rigid
