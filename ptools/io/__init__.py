@@ -12,7 +12,7 @@ from .formatters.pdb import (
 )
 from .formatters.reduced import (
     to_reduced_pdb as to_reduced_pdb,
-    write_reduced_pdb as write_reduced_pdb
+    write_reduced_pdb as write_reduced_pdb,
 )
 
 

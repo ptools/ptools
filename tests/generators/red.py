@@ -7,7 +7,7 @@ from .io import generate_tmp_file
 
 
 @dataclass
-class TestREDBuilder:
+class RedFileBuilder:
     """Creates a standard RED file."""
 
     has_categories: bool = True
@@ -59,13 +59,15 @@ class TestREDBuilder:
         """Atom categories as presented in default atoms."""
         return [1, 27, 28, 1, 23, 1, 23, 1, 27, 28]
 
-    def charges(self) -> list[float]:
+    @classmethod
+    def charges(cls) -> list[float]:
         """Atom charges as presented in default atoms."""
-        return [0.0] * self._natoms
+        return [0.0] * len(cls.base_atom_list())
 
-    def invalid_charges(self) -> list[str]:
+    @classmethod
+    def invalid_charges(cls) -> list[str]:
         """Atom invalid charges (strings instead of floats)."""
-        return ["FOO"] * self._natoms
+        return ["FOO"] * len(cls.base_atom_list())
 
     @property
     def content(self) -> str:
@@ -79,8 +81,8 @@ def generate_red_file(
     """Creates a temporary file (RED format) that contains 10 atoms."""
     if invalid_charges:
         return generate_tmp_file(
-            content=TestREDBuilder(has_invalid_charges=True).content
+            content=RedFileBuilder(has_invalid_charges=True).content
         )
     return generate_tmp_file(
-        content=TestREDBuilder(has_categories, has_charges).content
+        content=RedFileBuilder(has_categories, has_charges).content
     )

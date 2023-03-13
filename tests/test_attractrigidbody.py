@@ -8,7 +8,7 @@ from ptools.attract import AttractRigidBody
 from ptools.io.exceptions import InvalidREDFormatError
 
 from .generators import generate_red_file
-
+from .generators.red import RedFileBuilder
 
 # == Tests for AttractRigidBody initialization =========================================
 
@@ -17,10 +17,16 @@ def test_initialization_from_pdb():
     with generate_red_file() as temporary_file:
         rigid = AttractRigidBody.from_red(temporary_file.name)
 
+    assert isinstance(rigid, AttractRigidBody)
     assert len(rigid) == 10
     assert hasattr(rigid, "categories")
     assert hasattr(rigid, "charges")
     assert hasattr(rigid, "forces")
+
+    assert rigid.categories == approx(np.array(RedFileBuilder.categories()) - 1)
+    assert rigid.charges == approx(RedFileBuilder.charges())
+    assert rigid.radii == approx(np.zeros((10,)))
+    assert rigid.forces == approx(np.zeros((10, 3)))
 
 
 def test_initialization_from_pdb_fails_no_categories():

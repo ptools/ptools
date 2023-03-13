@@ -1,5 +1,6 @@
 """Defines the exceptions used in ``ptoos.io``."""
 
+
 class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
