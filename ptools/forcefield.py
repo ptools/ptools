@@ -66,49 +66,33 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 )
 
 
-class ForceFieldBase(Protocol):
-    """Base class for a force field.
 
-    All force field must be derivated from this class or child.
-    """
-
-    receptor: AttractRigidBody
-    ligand: AttractRigidBody
-    cutoff: float
-
-    def energy(self) -> float:
-        """Return the total energy between the two molecules"""
-
-    def update(self):
-        """Calculates all energy terms."""
-
-
-def empty():
-    return np.empty(0)
-
-
-@dataclass
-class AttractForceField1(ForceFieldBase):
+class AttractForceField1:
     """The AttractForceField1."""
 
     receptor: AttractRigidBody
     ligand: AttractRigidBody
-    cutoff: float = 10
+    cutoff: float
+    paramfile: str
 
-    paramfile: str = ""
-    _repulsive_parameters: np.ndarray = field(
-        init=False, repr=False, default_factory=empty
-    )
-    _attractive_parameters: np.ndarray = field(
-        init=False, repr=False, default_factory=empty
-    )
-    _repulsive_pairs: np.ndarray = field(init=False, repr=False, default_factory=empty)
-    _attractive_pairs: np.ndarray = field(init=False, repr=False, default_factory=empty)
+    def __init__(self, receptor: AttractRigidBody, ligand: AttractRigidBody, cutoff: float = 10, paramfile: str = ""):
+        self.receptor = receptor
+        self.ligand = ligand
+        self.cutoff = cutoff
+        self.paramfile = paramfile
 
-    _vdw_energy: float = field(init=False, repr=False, default=0.0)
-    _electrostatic_energy: float = field(init=False, repr=False, default=0.0)
+        self._vdw_energy = 0.0
+        self._electrostatic_energy = 0.0
 
-    def __post_init__(self):
+        _repulsive_parameters = np.empty(0)
+        _attractive_parameters = np.empty(0)
+        _repulsive_pairs = np.empty(0)
+        _attractive_pairs = np.empty(0)
+
+        self._initialize_parameters()
+
+
+    def _initialize_parameters(self):
         if self.paramfile != "":
             params = read_aminon(self.paramfile)
         else:
