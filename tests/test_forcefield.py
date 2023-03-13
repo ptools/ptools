@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from ptools.rigidbody import AttractRigidBody, RigidBody
+from ptools.attract import AttractRigidBody
 from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED

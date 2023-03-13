@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from pytest import approx
 
-from ptools.rigidbody import AttractRigidBody
+from ptools.attract import AttractRigidBody
 from ptools.io.exceptions import InvalidREDFormatError
 
 from .generators import generate_red_file

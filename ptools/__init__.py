@@ -20,7 +20,8 @@ from . import (
     tables,
 )
 
-from .rigidbody import AttractRigidBody, RigidBody
+from .attract import AttractRigidBody
+from .rigidbody import RigidBody
 
 __all__ = [
     "atomattrs",

@@ -9,7 +9,7 @@ from scipy.spatial.distance import cdist
 
 from .io.attract import read_aminon
 from .pairlist import PairList
-from .rigidbody import AttractRigidBody
+from .attract import AttractRigidBody
 
 
 # Name of the force fields implemented in pyattract.
