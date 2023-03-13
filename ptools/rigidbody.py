@@ -18,6 +18,7 @@ from .particlecollection import ParticleCollection
 
 RigidBodyType = TypeVar("RigidBodyType", bound="RigidBody")
 
+
 class RigidBody(ParticleCollection):
     """RigidBody is an ParticleCollection that can be initialized from a PDB file.
 

@@ -122,10 +122,8 @@ class ParticleCollection:
     def _set_particle_property(self, name: str, index: int, value: Any):
         """Sets the value of a property of a particle."""
         if self.has_parent():
-            self._selection.parent.atom_properties.set_at( # type: ignore[union-attr]
-                name,
-                self._selection.indices[index], # type: ignore[union-attr]
-                value
+            self._selection.parent.atom_properties.set_at(  # type: ignore[union-attr]
+                name, self._selection.indices[index], value  # type: ignore[union-attr]
             )
             return
         self._atom_properties.set_at(name, index, value)
@@ -162,12 +160,12 @@ class ParticleCollection:
         return self.size()
 
     def __getitem__(
-        self, key: ParticleCollectionKeyType
-    ) -> Particle | ParticleCollection:
+        self: ParticleCollectionType, key: ParticleCollectionKeyType
+    ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected atoms."""
         if isinstance(key, (int, np.integer)):
             return Particle(self, key)
-        return ParticleCollection(selection=self.__class__.Selection(self, key))
+        return self.__class__(selection=self.__class__.Selection(self, key))
 
     def __iter__(self):
         """Iterates over the atoms."""
@@ -279,14 +277,14 @@ class ParticleCollection:
 
     def select_atom_type(
         self: ParticleCollectionType, atom_type: str
-    ) -> ParticleCollectionType:
+    ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
         return self[indices]
 
     def select_atom_types(
         self: ParticleCollectionType, atom_types: Iterable[str]
-    ) -> ParticleCollectionType:
+    ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
         indices = np.where(
             np.isin(self.atom_properties.get("names").values, atom_types)
@@ -295,7 +293,7 @@ class ParticleCollection:
 
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
-    ) -> ParticleCollectionType:
+    ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
         indices = np.where(
             np.logical_and(
@@ -307,7 +305,7 @@ class ParticleCollection:
 
     def select_chain(
         self: ParticleCollectionType, chain: str
-    ) -> ParticleCollectionType:
+    ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected chain."""
         indices = np.where(self.atom_properties.get("chains").values == chain)[0]
         return self[indices]

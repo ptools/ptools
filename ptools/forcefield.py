@@ -66,7 +66,6 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 )
 
 
-
 class AttractForceField1:
     """The AttractForceField1."""
 
@@ -75,7 +74,13 @@ class AttractForceField1:
     cutoff: float
     paramfile: str
 
-    def __init__(self, receptor: AttractRigidBody, ligand: AttractRigidBody, cutoff: float = 10, paramfile: str = ""):
+    def __init__(
+        self,
+        receptor: AttractRigidBody,
+        ligand: AttractRigidBody,
+        cutoff: float = 10,
+        paramfile: str = "",
+    ):
         self.receptor = receptor
         self.ligand = ligand
         self.cutoff = cutoff
@@ -90,7 +95,6 @@ class AttractForceField1:
         _attractive_pairs = np.empty(0)
 
         self._initialize_parameters()
-
 
     def _initialize_parameters(self):
         if self.paramfile != "":
