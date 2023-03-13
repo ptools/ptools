@@ -5,7 +5,7 @@ import pytest
 from pytest import approx
 
 from ptools.rigidbody import AttractRigidBody
-from ptools.io.pdb import InvalidPDBFormatError
+from ptools.io.exceptions import InvalidREDFormatError
 
 from .generators import generate_red_file
 
@@ -26,21 +26,21 @@ def test_initialization_from_pdb():
 def test_initialization_from_pdb_fails_no_categories():
     with generate_red_file(has_categories=False) as temporary_file:
         err = "Expected atom categories and charges, found"
-        with pytest.raises(InvalidPDBFormatError, match=err):
+        with pytest.raises(InvalidREDFormatError, match=err):
             AttractRigidBody.from_red(temporary_file.name)
 
 
 def test_initialization_from_pdb_fails_no_charges():
     with generate_red_file(has_charges=False) as temporary_file:
         err = "Expected atom categories and charges, found"
-        with pytest.raises(InvalidPDBFormatError, match=err):
+        with pytest.raises(InvalidREDFormatError, match=err):
             AttractRigidBody.from_red(temporary_file.name)
 
 
 def test_constructor_fails_invalid_charges():
     with generate_red_file(invalid_charges=True) as temporary_file:
         err = "Atom charge expects a float"
-        with pytest.raises(InvalidPDBFormatError, match=err):
+        with pytest.raises(InvalidREDFormatError, match=err):
             AttractRigidBody.from_red(temporary_file.name)
 
 

@@ -12,7 +12,7 @@ import numpy as np
 
 # PTools.
 from .atomattrs import AtomAttrs
-from .io.pdb import InvalidPDBFormatError
+from .io.exceptions import InvalidREDFormatError
 from .io.pdb import read_pdb as io_read_pdb
 from .particlecollection import ParticleCollection
 
@@ -102,12 +102,12 @@ class AttractRigidBody(RigidBody):
         """Parses extra atom field.
 
         Raises:
-            InvalidPDBFormatError: if category or charge cannot be found or is invalid type
+            InvalidREDFormatError: if category or charge cannot be found or is invalid type
         """
 
         def assert_has_valid_category_and_charge(tokens):
             if len(tokens) < 2:
-                raise InvalidPDBFormatError(
+                raise InvalidREDFormatError(
                     f"Expected atom categories and charges, found {tokens}"
                 )
             assert_is_valid_category(tokens[0])
@@ -116,7 +116,7 @@ class AttractRigidBody(RigidBody):
         def assert_is_valid_category(token):
             """Returns True if token is an integer."""
             if not token.isdigit():
-                raise InvalidPDBFormatError(
+                raise InvalidREDFormatError(
                     f"Atom category expects an int, found '{token}'"
                 )
 
@@ -125,7 +125,7 @@ class AttractRigidBody(RigidBody):
             try:
                 float(token)
             except ValueError as error:
-                raise InvalidPDBFormatError(
+                raise InvalidREDFormatError(
                     f"Atom charge expects a float, found '{token}'"
                 ) from error
 

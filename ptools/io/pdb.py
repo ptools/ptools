@@ -5,18 +5,7 @@ from typing import Sequence, Tuple, Union
 from ..atomattrs import AtomAttrs
 from ..particlecollection import ParticleCollection
 from .._typing import FilePath
-
-
-class InvalidPDBFormatError(IOError):
-    """Raised when the PDB format is incorrect."""
-
-
-class InvalidPDBAtomLineError(ValueError):
-    """Raised when the a PDB line does not describe an atom."""
-
-    def __init__(self, header, *args):
-        message = f'Invalid atom line: expected "ATOM" or "HETATM" as header, found "{header}"'
-        super().__init__(message, *args)
+from .exceptions import InvalidPDBFormatError, InvalidPDBAtomLineError
 
 
 class PDBLine(str):
