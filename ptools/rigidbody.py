@@ -74,7 +74,7 @@ class AttractRigidBody(RigidBody):
         """Initializes atom categories, charges and forces from PDB extra field."""
         extra = self._parse_extra_from_atoms()
         self.add_atom_property(
-            "category", "categories", [int(tokens[0]) for tokens in extra]
+            "category", "categories", [int(tokens[0]) - 1 for tokens in extra]
         )
         self.add_atom_property(
             "charge", "charges", [float(tokens[1]) for tokens in extra]
@@ -97,9 +97,6 @@ class AttractRigidBody(RigidBody):
         cls: Type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
         raise NotImplementedError("Use AttractRigidBody.from_red instead.")
-        rigid = super().from_pdb(path)
-        rigid._initialize_attract_properties_from_pdb_extra()
-        return rigid
 
     def _parse_extra_from_atoms(self):
         """Parses extra atom field.

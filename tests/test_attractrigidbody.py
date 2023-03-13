@@ -15,7 +15,7 @@ from .generators import generate_red_file
 
 def test_initialization_from_pdb():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_pdb(temporary_file.name)
+        rigid = AttractRigidBody.from_red(temporary_file.name)
 
     assert len(rigid) == 10
     assert hasattr(rigid, "categories")
@@ -27,21 +27,21 @@ def test_initialization_from_pdb_fails_no_categories():
     with generate_red_file(has_categories=False) as temporary_file:
         err = "Expected atom categories and charges, found"
         with pytest.raises(InvalidPDBFormatError, match=err):
-            AttractRigidBody.from_pdb(temporary_file.name)
+            AttractRigidBody.from_red(temporary_file.name)
 
 
 def test_initialization_from_pdb_fails_no_charges():
     with generate_red_file(has_charges=False) as temporary_file:
         err = "Expected atom categories and charges, found"
         with pytest.raises(InvalidPDBFormatError, match=err):
-            AttractRigidBody.from_pdb(temporary_file.name)
+            AttractRigidBody.from_red(temporary_file.name)
 
 
 def test_constructor_fails_invalid_charges():
     with generate_red_file(invalid_charges=True) as temporary_file:
         err = "Atom charge expects a float"
         with pytest.raises(InvalidPDBFormatError, match=err):
-            AttractRigidBody.from_pdb(temporary_file.name)
+            AttractRigidBody.from_red(temporary_file.name)
 
 
 # =======================================================================================
@@ -49,7 +49,7 @@ def test_constructor_fails_invalid_charges():
 
 def test_apply_forces():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_pdb(temporary_file.name)
+        rigid = AttractRigidBody.from_red(temporary_file.name)
 
     # Forces should be initialized to zero.
     expected = np.zeros((rigid.size(), 3))
@@ -67,7 +67,7 @@ def test_apply_forces():
 
 def test_reset_forces():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_pdb(temporary_file.name)
+        rigid = AttractRigidBody.from_red(temporary_file.name)
 
     assert rigid.forces == approx(0.0)
 
