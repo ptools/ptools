@@ -38,6 +38,14 @@ def centroid(obj: HasCoordinatesType) -> np.ndarray:
     return L.centroid(obj.coordinates)
 
 
+def center(obj: HasCoordinatesType) -> np.ndarray:
+    """Returns an object geometric center, i.e. isobarycenter.
+
+    This is an alias for `centroid`.
+    """
+    return centroid(obj)
+
+
 def center_of_mass(obj: TopologyType) -> np.ndarray:
     """Returns an object center of mass, i.e. barycenter."""
     return L.center_of_mass(obj.coordinates, obj.masses)
