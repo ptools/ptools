@@ -13,6 +13,11 @@ from ._typing import ArrayLike, HasCoordinatesType, TopologyType
 from .particlecollection import ParticleCollection
 
 
+def bounding_box(obj: HasCoordinatesType) -> np.ndarray:
+    """Returns the bounding box of object with coordinates."""
+    return np.array((np.min(obj.coordinates, axis=0), np.max(obj.coordinates, axis=0)))
+
+
 def distance(lhs: HasCoordinatesType, rhs: HasCoordinatesType) -> float:
     """Returns the euclidean distance between two objects."""
     return L.distance(lhs.coordinates, rhs.coordinates)

@@ -12,6 +12,13 @@ from .testing import assert_array_almost_equal
 from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 
 
+
+def test_bounding_box():
+    atoms = generate_particlecollection()
+    box = measure.bounding_box(atoms)
+    assert_array_almost_equal(box, [[0, 0, 0], [9, 9, 9]])
+
+
 def test_distance_to_axis():
     obj = generate_balloon((0, 0, 0))
 
