@@ -12,7 +12,6 @@ from .testing import assert_array_almost_equal
 from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 
 
-
 def test_bounding_box():
     atoms = generate_particlecollection()
     box = measure.bounding_box(atoms)

@@ -4,6 +4,7 @@ from numpy.typing import DTypeLike
 from ptools.particlecollection import ParticleCollection
 from .measure import bounding_box
 
+
 class Grid:
 
     coordinates: np.ndarray
@@ -51,7 +52,6 @@ class Grid:
         return iter(zip(self.coordinates, self.data))
 
 
-
 def generate_grid(bounds: np.ndarray, spacing: float, dtype: DTypeLike) -> Grid:
     """Generate grid"""
     return Grid.from_boundaries(bounds, spacing, dtype)
@@ -65,4 +65,3 @@ def generate_solvation_grid(atoms: ParticleCollection, spacing: float) -> Grid:
         distance = np.linalg.norm(grid.coordinates - atom.coordinates, axis=1)
         grid.data[(distance - atom.radius) < 1e-6] = False
     return grid
-

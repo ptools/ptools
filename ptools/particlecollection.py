@@ -328,12 +328,12 @@ class ParticleCollection:
         """Iterates over the particles in the collection."""
         return iter(self)
 
-    def iter_residues(self) -> Iterator[ParticleCollectionType]:
+    def iter_residues(self) -> Iterator[Iterator[ParticleCollectionType]]:
         """Iterates over the residues in the collection."""
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
         return iter(by_residue.values())
 
-    def iter_chains(self) -> Iterator[ParticleCollectionType]:
+    def iter_chains(self) -> Iterator[Iterator[ParticleCollectionType]]:
         """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
         return iter(by_chain.values())
