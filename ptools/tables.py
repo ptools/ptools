@@ -119,3 +119,12 @@ atomic_masses = {
     "ZN": 65.37000,
     "Zr": 91.224,
 }
+
+# https://en.wikipedia.org/wiki/Atomic_radii_of_the_elements_(data_page)
+atomic_radii = {
+    "C": 1.7,
+    "H": 1.2,
+    "N": 1.55,
+    "O": 1.52,
+    "S": 1.8,
+}

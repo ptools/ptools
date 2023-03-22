@@ -31,20 +31,22 @@ class AtomAttrs:
     residue_name: str = "XXX"
     residue_index: int = 0
     chain: str = "X"
-    # charge: float = 0.0
     coordinates: array3d = field(
         factory=lambda: array3d((0, 0, 0)), converter=lambda x: array3d(x)
     )
     meta: dict[str, Any] = field(factory=dict)
-    element: Optional[str] = None
-    mass: Optional[float] = None
+    element: str = ""
+    mass: float = -1.0  # -1.0 means "not set"
+    radius: float = -1.0  # -1.0 means "not set"
 
     def __attrs_post_init__(self):
         """Post-initialization method."""
-        if self.element is None:
+        if not self.element:
             self.element = guess_atom_element(self.name)
-        if self.mass is None:
+        if self.mass < 0:
             self.mass = guess_atom_mass(self.element)
+        if self.radius < 0:
+            self.radius = guess_atom_radius(self.element)
 
     def __eq__(self, other: object) -> bool:
         """Tests for equality.
@@ -92,3 +94,11 @@ def guess_atom_element(name: str) -> str:
         if char.isalpha():
             return char
     return "X"
+
+
+def guess_atom_radius(element: str) -> float:
+    """Returns the atom radius based on the element name.
+
+    Returns 0.0 if the element is not found in the table.
+    """
+    return tables.atomic_radii.get(element, 0.0)

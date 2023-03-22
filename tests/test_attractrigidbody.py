@@ -25,7 +25,7 @@ def test_initialization_from_pdb():
 
     assert rigid.categories == approx(np.array(RedFileBuilder.categories()) - 1)
     assert rigid.charges == approx(RedFileBuilder.charges())
-    assert rigid.radii == approx(np.zeros((10,)))
+    assert rigid.radii == approx(RedFileBuilder.radii())
     assert rigid.forces == approx(np.zeros((10, 3)))
 
 

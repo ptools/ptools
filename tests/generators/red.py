@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 import tempfile
 
+from ptools.tables import atomic_radii
+
 from .io import generate_tmp_file
 
 
@@ -63,6 +65,11 @@ class RedFileBuilder:
     def charges(cls) -> list[float]:
         """Atom charges as presented in default atoms."""
         return [0.0] * len(cls.base_atom_list())
+
+    @classmethod
+    def radii(cls) -> list[float]:
+        """Atom radii as presented in default atoms."""
+        return [atomic_radii["C"]] * len(cls.base_atom_list())
 
     @classmethod
     def invalid_charges(cls) -> list[str]:

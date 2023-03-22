@@ -80,5 +80,4 @@ def _initialize_properties_from_extra(atoms: ParticleCollection):
     natoms = len(atoms)
     atoms.add_atom_property("category", "categories", [tok.category() for tok in extra])
     atoms.add_atom_property("charge", "charges", [tok.charge() for tok in extra])
-    atoms.add_atom_property("radius", "radii", np.zeros(natoms, dtype=float))
     atoms.add_atom_property("force", "forces", np.zeros((natoms, 3), dtype=float))
