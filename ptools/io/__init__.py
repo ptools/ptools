@@ -66,8 +66,8 @@ def backup_if_exists(source: FilePath):
     source = pathlib.Path(source)
     if source.exists():
         idx = 1
-        target = source.with_suffix(f".{idx}")
+        target = source.with_suffix(source.suffix + f".{idx}")
         while target.exists():
             idx += 1
-            target = source.with_suffix(f".{idx}")
+            target = source.with_suffix(source.suffix + f".{idx}")
         source.rename(target)
