@@ -27,9 +27,10 @@ class RigidBody(ParticleCollection):
 
     def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
         if isinstance(atoms, str):
+            class_name = self.__class__.__qualname__
             raise TypeError(
-                "RigidBody class can not longer be instantiated from a path. "
-                "Use RigidBody.from_pdb instead."
+                f"{class_name} class can not longer be instantiated from a path. "
+                f"Use {class_name}.from_pdb instead."
             )
         ParticleCollection.__init__(self, atoms)
 
