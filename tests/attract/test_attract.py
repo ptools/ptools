@@ -19,11 +19,11 @@ class CaptureStderrTest(unittest.TestCase):
 
 class TestAttract(CaptureStderrTest):
     def test_receptor_not_found(self):
-        args = ["attract", "-r", "foo", "-l", TEST_LIGAND_RED]
+        args = ["attract", "-r", "foo", "-l", str(TEST_LIGAND_RED)]
         with self.assertRaises(FileNotFoundError):
             ptools_cli(args)
 
     def test_ligand_not_found(self):
-        args = ["attract", "-r", TEST_RECEPTOR_RED, "-l", "bar"]
+        args = ["attract", "-r", str(TEST_RECEPTOR_RED), "-l", "bar"]
         with self.assertRaises(FileNotFoundError):
             ptools_cli(args)

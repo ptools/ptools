@@ -1,6 +1,5 @@
 """linalg - Defines functions to read/write files."""
 
-import os
 import pathlib
 from typing import Optional
 from .._typing import FilePath
@@ -64,17 +63,11 @@ def backup_if_exists(source: FilePath):
 
     Files will be renamed file.1, file.2, etc.
     """
-
-    def new_backup_name():
-        return os.path.join(dirname, f"{basename}.{idx}")
-
-    if os.path.exists(source):
-        dirname = os.path.dirname(source)
-        basename = os.path.basename(source)
+    source = pathlib.Path(source)
+    if source.exists():
         idx = 1
-        target = new_backup_name()
-
-        while os.path.exists(target):
+        target = source.with_suffix(f".{idx}")
+        while target.exists():
             idx += 1
-            target = new_backup_name()
-        os.rename(source, target)
+            target = source.with_suffix(f".{idx}")
+        source.rename(target)

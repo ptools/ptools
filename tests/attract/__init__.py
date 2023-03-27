@@ -1,15 +1,16 @@
 import os
+from pathlib import Path
 
 
-TEST_ATTRACT_PARAMS = os.path.join(os.path.dirname(__file__), "data", "attract.inp")
-TEST_ATTRACT_PARAMS_WITH_LIGAND = os.path.join(
-    os.path.dirname(__file__), "data", "attract_ligand.inp"
-)
+ATTRACT_DATA_TEST_DIR = Path(__file__).parent / "data"
 
-TEST_RECEPTOR_RED = os.path.join(os.path.dirname(__file__), "data", "receptor.red")
-TEST_LIGAND_RED = os.path.join(os.path.dirname(__file__), "data", "ligand.red")
+TEST_ATTRACT_PARAMS = ATTRACT_DATA_TEST_DIR / "attract.inp"
+TEST_ATTRACT_PARAMS_WITH_LIGAND = ATTRACT_DATA_TEST_DIR / "attract_ligand.inp"
 
-TEST_AMINON = os.path.join(os.path.dirname(__file__), "data", "aminon.par")
+TEST_RECEPTOR_RED = ATTRACT_DATA_TEST_DIR / "receptor.red"
+TEST_LIGAND_RED = ATTRACT_DATA_TEST_DIR / "ligand.red"
+
+TEST_AMINON = ATTRACT_DATA_TEST_DIR / "aminon.par"
 
 
 # Example of a reduced PDB (RED) file content.

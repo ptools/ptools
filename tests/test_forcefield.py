@@ -1,6 +1,7 @@
 """Test for ptools.forcefield module."""
 
 import os
+from pathlib import Path
 import unittest
 
 import numpy as np
@@ -27,9 +28,7 @@ from .testing.moreassert import assert_array_almost_equal
 class TestAttractForceField1DummyRigid(unittest.TestCase):
     """Tests for AttractForceField1 that do not required an actual AttractRigidBody."""
 
-    path_ff_parameters = os.path.join(
-        os.path.dirname(__file__), "data", "ff_parameters.np"
-    )
+    path_ff_parameters = Path(__file__).parent / "data" / "ff_parameters.np"
 
     def setUp(self):
         self.receptor = AttractRigidBody.from_red(TEST_RECEPTOR_RED)
@@ -42,13 +41,13 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
 
     def _save_forcefield_parameters(self):
         """Save forcefield parameters for later use in regression tests."""
-        with open(self.path_ff_parameters, "wb") as f:
+        with self.path_ff_parameters.open("wb") as f:
             np.save(f, self.ff._attractive_parameters)
             np.save(f, self.ff._repulsive_parameters)
 
     def _load_forcefield_parameters(self) -> tuple[np.ndarray, np.ndarray]:
         """Load forcefield parameters for regression tests."""
-        with open(self.path_ff_parameters, "rb") as f:
+        with self.path_ff_parameters.open("rb") as f:
             attractive = np.load(f)
             repulsive = np.load(f)
         return (attractive, repulsive)
