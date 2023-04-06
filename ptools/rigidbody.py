@@ -12,7 +12,7 @@ import numpy as np
 
 # PTools.
 from .atomattrs import AtomAttrs
-from .io.pdb import read_pdb as io_read_pdb
+from .io.readers.pdb import read_pdb as io_read_pdb
 from .particlecollection import ParticleCollection
 
 

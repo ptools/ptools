@@ -5,6 +5,7 @@ __email__ = "benoistlaurent@gmail.com"
 __version__ = "0.1.0"
 
 from .io import read_pdb as read_pdb
+from .io import write_pdb as write_pdb
 
 from . import (
     atomattrs,

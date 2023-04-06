@@ -6,7 +6,7 @@ import yaml
 
 
 from ..io import assert_file_exists
-from ..io.pdb import read_single_model_pdb
+from ..io.readers.pdb import read_single_model_pdb
 from ..particlecollection import ParticleCollection
 
 from .bead import Bead

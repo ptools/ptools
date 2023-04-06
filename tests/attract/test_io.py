@@ -2,7 +2,7 @@
 
 import unittest
 
-import ptools.io.attract as io
+import ptools.io.readers.attract as io
 
 from . import (
     TEST_ATTRACT_PARAMS,

@@ -6,9 +6,9 @@ in the extra field.
 
 import numpy as np
 
-from ..particlecollection import ParticleCollection
-from .._typing import FilePath
-from .exceptions import InvalidREDFormatError
+from ...particlecollection import ParticleCollection
+from ..._typing import FilePath
+from ..exceptions import InvalidREDFormatError
 from .pdb import read_single_model_pdb
 
 

@@ -344,21 +344,21 @@ def test_select_atom_type():
 
 
 def test_select_atom_types():
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_atom_types(["CA", "CB"])
     assert len(sel) == 426 + 64
     assert sorted(sel.names.tolist()) == ["CA"] * 426 + ["CB"] * 64
 
 
 def test_select_residue_range():
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_residue_range(10, 20)
     assert len(sel) == 23
     assert all(10 <= atom.residue_index <= 20 for atom in sel)
 
 
 def test_select_chain():
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_chain("B")
     assert len(sel) == 974
     assert sel.chains.tolist() == ["B"] * 974
@@ -373,7 +373,7 @@ def test_groupby():
     Very basic test, just makes sure that grouping by the residue name attribute
     returns the 20 groups (very dependant on the input PDB file).
     """
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
     grouped = atoms.groupby(key=lambda atom: atom.residue_name)
     assert len(grouped) == 20
 

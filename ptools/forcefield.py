@@ -7,7 +7,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 
-from .io.attract import read_aminon
+from .io.readers.attract import read_aminon
 from .pairlist import PairList
 from .attract import AttractRigidBody
 
@@ -121,6 +121,7 @@ class AttractForceField1:
         self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
 
+
     def vdw_energy(self):
         """Returns the van der Waals energy."""
         return self._vdw_energy
@@ -198,7 +199,7 @@ class AttractForceField1:
 
         self._vdw_energy = van_der_waals(dx, rr2)
         self._electrostatic_energy = electrostatics(dx, rr2)
-        return self._vdw_energy + self._electrostatic_energy
+        return self._vdw_energy # + self._electrostatic_energy
 
     def __nb_energy_large_cutoff(self) -> float:
         """Private method for non-bonded energy calculation with large cutoffs."""

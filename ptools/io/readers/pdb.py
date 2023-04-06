@@ -2,10 +2,10 @@
 
 from typing import Sequence, Tuple, Union
 
-from ..atomattrs import AtomAttrs
-from ..particlecollection import ParticleCollection
-from .._typing import FilePath
-from .exceptions import InvalidPDBFormatError, InvalidPDBAtomLineError
+from ...atomattrs import AtomAttrs
+from ...particlecollection import ParticleCollection
+from ..._typing import FilePath
+from ..exceptions import InvalidPDBFormatError, InvalidPDBAtomLineError
 
 
 class PDBLine(str):

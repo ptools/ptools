@@ -57,7 +57,7 @@ def test_center_of_masses():
 
 
 def test_inertia_tensor():
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
 
     # Reference calculated with MDAnalysis 0.20.1:
     # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").moment_of_inertia()
@@ -71,7 +71,7 @@ def test_inertia_tensor():
 
 
 def test_principal_axes():
-    atoms = ptools.io.pdb.read_pdb(TEST_LIGAND)
+    atoms = ptools.read_pdb(TEST_LIGAND)
 
     # Calculated with MDAnalysis 0.20.1:
     # >>> MDAnalysis.Universe("ligand.pdb").select_atoms("all").principal_axes()

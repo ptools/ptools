@@ -4,15 +4,14 @@ import pathlib
 from typing import Optional
 from .._typing import FilePath
 
-from .pdb import read_pdb as read_pdb
-from .formatters.pdb import (
-    to_pdb as to_pdb,
-    write_pdb as write_pdb,
-)
+from .readers.pdb import read_pdb as read_pdb
+from .formatters.pdb import to_pdb as to_pdb
 from .formatters.reduced import (
     to_reduced_pdb as to_reduced_pdb,
     write_reduced_pdb as write_reduced_pdb,
 )
+from .writers.pdb import write_pdb as write_pdb
+
 
 
 def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> bool:

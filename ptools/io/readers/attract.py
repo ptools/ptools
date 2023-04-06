@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from ..rigidbody import RigidBody
-from .._typing import FilePath
+from ...rigidbody import RigidBody
+from ..._typing import FilePath
 
 
 class AttractFileParameters:

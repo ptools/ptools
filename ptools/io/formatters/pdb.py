@@ -1,5 +1,4 @@
 from typing import Any, Iterable, Protocol
-from ..._typing import FilePath
 
 PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "
@@ -50,14 +49,6 @@ class PDBConvertible(Protocol):
     @property
     def element(self) -> str:
         ...
-
-
-def write_pdb(
-    atom_or_collection: PDBConvertible | Iterable[PDBConvertible], path: FilePath
-):
-    """Write a PDB file from an atom or a collection of atoms."""
-    with open(path, "w") as f:
-        f.write(to_pdb(atom_or_collection))
 
 
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:

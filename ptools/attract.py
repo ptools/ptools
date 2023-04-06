@@ -7,7 +7,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from .atomattrs import AtomAttrs
-from .io.red import read_red
+from .io.readers.red import read_red
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
 from ._typing import FilePath

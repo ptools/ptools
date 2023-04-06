@@ -85,10 +85,10 @@ def run(args):
     print("Start time:", time_start)
 
     print(f"Reading parameters file: {args.conf}")
-    parameters = ptools.io.attract.read_attract_parameter(args.conf)
+    parameters = ptools.io.readers.attract.read_attract_parameter(args.conf)
     print(f"{parameters.nbminim} series of minimizations")
 
-    ff_name = ptools.io.attract.check_ff_version_match(
+    ff_name = ptools.io.readers.attract.check_ff_version_match(
         args.receptor_name, args.ligand_name
     )
     if ff_name != "attract1":
