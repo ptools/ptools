@@ -48,6 +48,32 @@ def test_angle():
     assert math.degrees(angle) == approx(45)
 
 
+class TestDistanceToAxis:
+    """Namespace that holds unit-tests for `ptools.linalg.distance_to_axis`."""
+
+    def test_center_true(self):
+        x = generate_random_coordinates()
+        axis = generate_random_array(shape=(3,))
+        actual = linalg.distance_to_axis(x, axis, center=True)
+        expected = linalg.distance_to_axis(x - np.mean(axis, axis=0), axis, center=False)
+        assert actual == approx(expected)
+
+    def test_center_array(self):
+        x = generate_random_coordinates()
+        axis = generate_random_array(shape=(3,))
+        center = generate_random_array(shape=(3,))
+        actual = linalg.distance_to_axis(x, axis, center=center)
+        expected = linalg.distance_to_axis(x - center, axis, center=False)
+        assert actual == approx(expected)
+
+    def test_center_false(self):
+        x = generate_random_coordinates()
+        axis = generate_random_array(shape=(3,))
+        actual = linalg.distance_to_axis(x, axis, center=False)
+        expected = np.linalg.norm(np.cross(x, axis))
+        assert actual == approx(expected)
+
+
 class TestTranslationMatrix:
     """Namespace that holds unit-tests for `ptools.linalg.translation_matrix`."""
 
