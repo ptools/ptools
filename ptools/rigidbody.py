@@ -25,14 +25,14 @@ class RigidBody(ParticleCollection):
     It can be initialized from a file.
     """
 
-    def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
-        if isinstance(atoms, str):
+    def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None, *args, **kwargs):
+        if isinstance(atoms, FilePath):
             class_name = self.__class__.__qualname__
             raise TypeError(
                 f"{class_name} class can not longer be instantiated from a path. "
                 f"Use {class_name}.from_pdb instead."
             )
-        ParticleCollection.__init__(self, atoms)
+        ParticleCollection.__init__(self, atoms, *args, **kwargs)
 
     @classmethod
     def from_pdb(cls: Type[RigidBodyType], path: FilePath) -> RigidBodyType:
