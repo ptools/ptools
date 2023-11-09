@@ -37,7 +37,7 @@ def distance_to_axis(
 ) -> float:
     """Returns the distance between `x` and an arbitrary axis."""
     x_ = np.asarray(x)
-    if isinstance(center, bool) and center:
+    if center is True:
         x_ = x_ - np.mean(axis, axis=0)
     else:
         center_ = np.asarray(center)
