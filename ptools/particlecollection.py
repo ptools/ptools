@@ -1,6 +1,6 @@
 from __future__ import annotations
 import itertools
-from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar
+from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -158,6 +158,18 @@ class ParticleCollection:
         This is an alias for ``ParticleCollection.size()``.
         """
         return self.size()
+
+    @overload
+    def __getitem__(
+        self: ParticleCollectionType, key: int
+    ) -> Particle:
+        ...
+
+    @overload
+    def __getitem__(
+        self: ParticleCollectionType, key: slice | Sequence[int] | np.ndarray
+    ) -> ParticleCollectionType:
+        ...
 
     def __getitem__(
         self: ParticleCollectionType, key: ParticleCollectionKeyType
@@ -318,7 +330,7 @@ class ParticleCollection:
         sorted_atoms = sorted(enumerate(self), key=lambda i_atom: key(i_atom[1]))
         grouped = itertools.groupby(sorted_atoms, key=lambda i_atom: key(i_atom[1]))
         grouped_collections = {
-            key: self[[i for i, _ in group]] for key, group in grouped
+            dict_key: self[[i for i, _ in group]] for dict_key, group in grouped
         }
         return grouped_collections
 
@@ -328,12 +340,12 @@ class ParticleCollection:
         """Iterates over the particles in the collection."""
         return iter(self)
 
-    def iter_residues(self) -> Iterator[Iterator[ParticleCollectionType]]:
+    def iter_residues(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the residues in the collection."""
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
-        return iter(by_residue.values())
+        return iter(by_residue.values()) #type: ignore[arg-type]
 
-    def iter_chains(self) -> Iterator[Iterator[ParticleCollectionType]]:
+    def iter_chains(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
-        return iter(by_chain.values())
+        return iter(by_chain.values()) #type: ignore[arg-type]

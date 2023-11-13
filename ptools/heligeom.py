@@ -31,11 +31,11 @@ def chain_intersect(
     Returns:
         A tuple wit the 2 new RigidBodies.
     """
-    resids1 = set(a.resid for a in rb1.select_atom_type("CA"))
-    resids2 = set(a.resid - delta_resid for a in rb2.select_atom_type("CA"))
+    resids1 = set(a.residue_index for a in rb1.select_atom_type("CA"))
+    resids2 = set(a.residue_index - delta_resid for a in rb2.select_atom_type("CA"))
     resids = resids1.intersection(resids2)
-    rb1new = RigidBody(atoms=[a for a in rb1 if a.resid in resids])
-    rb2new = RigidBody(atoms=[a for a in rb2 if a.resid - delta_resid in resids])
+    rb1new = RigidBody(atoms=[a for a in rb1 if a.residue_index in resids])
+    rb2new = RigidBody(atoms=[a for a in rb2 if a.residue_index - delta_resid in resids])
     return rb1new, rb2new
 
 

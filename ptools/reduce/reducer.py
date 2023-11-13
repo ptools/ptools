@@ -71,10 +71,9 @@ class Reducer:
         ignore_exceptions = ignore_exceptions or []
 
         self._rename_atoms_and_residues()
-        residue_list = list(self.all_atoms.iter_residues())
 
         # Reduces each residue.
-        for residue in residue_list:
+        for residue in self.all_atoms.iter_residues(): #type: ignore[var-annotated]
             coarse_residue = self._reduce_residue(residue)
             try:
                 coarse_residue.check_composition()

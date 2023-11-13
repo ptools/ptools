@@ -69,7 +69,7 @@ class AttractRigidBody(RigidBody):
 
     def apply_forces(self, forces: np.ndarray):
         """Adds forces to atoms."""
-        self.forces += forces
+        self.forces += forces #type: ignore[attr-defined]
 
 
 def _function(x: np.ndarray, ff: "AttractForceField1") -> float:

@@ -26,7 +26,7 @@ class RigidBody(ParticleCollection):
     """
 
     def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None, *args, **kwargs):
-        if isinstance(atoms, FilePath):
+        if isinstance(atoms, FilePath): #type: ignore
             class_name = self.__class__.__qualname__
             raise TypeError(
                 f"{class_name} class can not longer be instantiated from a path. "
