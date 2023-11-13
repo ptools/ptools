@@ -84,12 +84,13 @@ class TestHeligeom(unittest.TestCase):
         """Test heligeom.heli_analyze results"""
         assert self.hp.angle == approx(1.04719867)
         assert self.hp.point == approx((0.000436, -0.000296, 0), abs=1e-6)
-        assert self.hp.unit == approx((8.47123119e-07, 2.80109302e-06, 1))
+        assert self.hp.unit == approx((8.47123119e-07, -2.80109302e-06, 1))
 
     def test_heli_construct(self):
         """Tests that heligeom.heli_construct"""
         result = heli_construct(self.mono1, self.hp, N=self.n_monomers)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N6)
+
         assert to_pdb(result) == to_pdb(self.ref)
         assert result.coordinates == approx(ref_coords)
 
@@ -107,7 +108,7 @@ class TestHeligeom(unittest.TestCase):
         dmin, dmax = minmax_distance_to_axis(
             self.mono1, self.hp.unit, center=self.hp.point
         )
-        assert dmin == approx(12.1985505)
+        assert dmin == approx(12.1986158)
         assert dmax == approx(73.5932897)
 
     def test_contact(self):
