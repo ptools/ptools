@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Type hinting specific imports
 from collections.abc import Sequence
-from typing import Optional, Type, TypeVar
+from typing import Optional, Type, TypeVar, get_args
 from ._typing import FilePath
 
 # Scientific libraries.
@@ -26,7 +26,7 @@ class RigidBody(ParticleCollection):
     """
 
     def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None, *args, **kwargs):
-        if isinstance(atoms, FilePath): #type: ignore
+        if isinstance(atoms, get_args(FilePath)):
             class_name = self.__class__.__qualname__
             raise TypeError(
                 f"{class_name} class can not longer be instantiated from a path. "
