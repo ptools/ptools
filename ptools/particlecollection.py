@@ -287,25 +287,30 @@ class ParticleCollection:
 
     # == Selection methods ==============================================================
 
-    def select_atom_type(
-        self: ParticleCollectionType, atom_type: str
-    ) -> Particle | ParticleCollectionType:
+    def select_atom_type(self: ParticleCollectionType, atom_type: str
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_atom_types(
         self: ParticleCollectionType, atom_types: Iterable[str]
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
         indices = np.where(
-            np.isin(self.atom_properties.get("names").values, atom_types)
+            np.isin(self.atom_properties.get("names").values, atom_types) #type: ignore[arg-type]
         )[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
         indices = np.where(
             np.logical_and(
@@ -313,13 +318,19 @@ class ParticleCollection:
                 self.atom_properties.get("residue_indices").values <= end,
             )
         )[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_chain(
         self: ParticleCollectionType, chain: str
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
         indices = np.where(self.atom_properties.get("chains").values == chain)[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     # == Grouping methods ===============================================================
