@@ -1,6 +1,6 @@
 from __future__ import annotations
 import itertools
-from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar
+from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -159,6 +159,18 @@ class ParticleCollection:
         """
         return self.size()
 
+    @overload
+    def __getitem__(
+        self: ParticleCollectionType, key: int
+    ) -> Particle:
+        ...
+
+    @overload
+    def __getitem__(
+        self: ParticleCollectionType, key: slice | Sequence[int] | np.ndarray
+    ) -> ParticleCollectionType:
+        ...
+
     def __getitem__(
         self: ParticleCollectionType, key: ParticleCollectionKeyType
     ) -> Particle | ParticleCollectionType:
@@ -275,25 +287,30 @@ class ParticleCollection:
 
     # == Selection methods ==============================================================
 
-    def select_atom_type(
-        self: ParticleCollectionType, atom_type: str
-    ) -> Particle | ParticleCollectionType:
+    def select_atom_type(self: ParticleCollectionType, atom_type: str
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_atom_types(
         self: ParticleCollectionType, atom_types: Iterable[str]
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
         indices = np.where(
-            np.isin(self.atom_properties.get("names").values, atom_types)
+            np.isin(self.atom_properties.get("names").values, atom_types) #type: ignore[arg-type]
         )[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
         indices = np.where(
             np.logical_and(
@@ -301,13 +318,19 @@ class ParticleCollection:
                 self.atom_properties.get("residue_indices").values <= end,
             )
         )[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_chain(
         self: ParticleCollectionType, chain: str
-    ) -> Particle | ParticleCollectionType:
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
         indices = np.where(self.atom_properties.get("chains").values == chain)[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     # == Grouping methods ===============================================================
@@ -318,7 +341,7 @@ class ParticleCollection:
         sorted_atoms = sorted(enumerate(self), key=lambda i_atom: key(i_atom[1]))
         grouped = itertools.groupby(sorted_atoms, key=lambda i_atom: key(i_atom[1]))
         grouped_collections = {
-            key: self[[i for i, _ in group]] for key, group in grouped
+            dict_key: self[[i for i, _ in group]] for dict_key, group in grouped
         }
         return grouped_collections
 
@@ -328,12 +351,12 @@ class ParticleCollection:
         """Iterates over the particles in the collection."""
         return iter(self)
 
-    def iter_residues(self) -> Iterator[Iterator[ParticleCollectionType]]:
+    def iter_residues(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the residues in the collection."""
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
-        return iter(by_residue.values())
+        return iter(by_residue.values()) #type: ignore[arg-type]
 
-    def iter_chains(self) -> Iterator[Iterator[ParticleCollectionType]]:
+    def iter_chains(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
-        return iter(by_chain.values())
+        return iter(by_chain.values()) #type: ignore[arg-type]
