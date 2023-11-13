@@ -187,8 +187,10 @@ def mat_trans_2_screw(matrix: np.ndarray) -> Screw:
     if sint < 0:
         screw.angle = -screw.angle
 
-    # Make sure that screw.normtranslation and screw.unit are always positive.
-    screw.normtranslation = np.absolute(screw.normtranslation)
-    screw.unit = np.absolute(screw.unit)
+    # Make sure that screw.normtranslation is always positive.
+    # and update the unit vector to it's opposite
+    if screw.normtranslation < 0:
+        screw.normtranslation = np.absolute(screw.normtranslation)
+        screw.unit = -screw.unit
 
     return screw
