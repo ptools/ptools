@@ -34,9 +34,11 @@ def chain_intersect(
     resids1 = set(a.residue_index for a in rb1.select_atom_type("CA"))
     resids2 = set(a.residue_index - delta_resid for a in rb2.select_atom_type("CA"))
     resids = resids1.intersection(resids2)
-    rb1new = RigidBody(atoms=[a for a in rb1 if a.residue_index in resids])
-    rb2new = RigidBody(atoms=[a for a in rb2 if a.residue_index - delta_resid in resids])
-    return rb1new, rb2new
+
+    atom_ids1 = np.where(np.isin(rb1.atom_properties["residue_indices"], resids))[0]
+    atom_ids2 = np.where(np.isin(rb2.atom_properties["residue_indices"], resids))[0]
+
+    return rb1[atom_ids1], rb2[atom_ids2]
 
 
 def heli_analyze(rb1: RigidBody, rb2: RigidBody) -> Screw:
