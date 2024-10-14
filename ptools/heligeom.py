@@ -35,8 +35,8 @@ def chain_intersect(
     resids2 = set(a.residue_index - delta_resid for a in rb2.select_atom_type("CA"))
     resids = resids1.intersection(resids2)
 
-    atom_ids1 = np.where(np.isin(rb1.atom_properties["residue_indices"], resids))[0]
-    atom_ids2 = np.where(np.isin(rb2.atom_properties["residue_indices"], resids))[0]
+    atom_ids1 = np.where(np.isin(rb1.atom_properties.get("residue_indices").values, list(resids)))[0]
+    atom_ids2 = np.where(np.isin(rb2.atom_properties.get("residue_indices").values, list(resids)))[0]
 
     return rb1[atom_ids1], rb2[atom_ids2]
 
