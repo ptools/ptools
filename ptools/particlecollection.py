@@ -308,6 +308,14 @@ class ParticleCollection:
             indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
+    def select_residue_indices(self: ParticleCollectionType, residues: Iterable[int]) -> ParticleCollectionType:
+        """Returns a new collection with the selected residues."""
+        indices = np.where(np.isin(self.atom_properties.get("residue_indices").values, residues))[0]
+        # Always return a ParticleCollection even with only one indice
+        if indices.size == 1:
+            indices = np.array([indices[0], indices[0] + 1])
+        return self[indices]
+
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
     ) -> ParticleCollectionType:

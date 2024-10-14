@@ -350,6 +350,12 @@ def test_select_atom_types():
     assert sorted(sel.names.tolist()) == ["CA"] * 426 + ["CB"] * 64
 
 
+def test_select_residue_indices():
+    atoms = ptools.read_pdb(TEST_LIGAND)
+    sel = atoms.select_residue_indices([8, 18])
+    assert len(sel) == 5
+    assert sel.atom_properties.get("residue_names").tolist() == ["GLN", "GLN", "GLN", "ALA", "ALA"]
+
 def test_select_residue_range():
     atoms = ptools.read_pdb(TEST_LIGAND)
     sel = atoms.select_residue_range(10, 20)

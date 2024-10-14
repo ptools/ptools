@@ -67,6 +67,10 @@ class NamedArray:
         """Returns the number of elements stored in the property."""
         return self.values.size
 
+    def tolist(self) -> list:
+        """Returns the values as a list."""
+        return self.values.tolist()
+
     def copy(self):
         return copy.deepcopy(self)
 
