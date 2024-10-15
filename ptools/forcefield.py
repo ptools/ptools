@@ -1,6 +1,5 @@
 """Ptools forcefield implementation."""
 
-from dataclasses import dataclass, field
 from typing import Protocol
 
 import numpy as np
