@@ -288,7 +288,7 @@ class ParticleCollection:
     # == Selection methods ==============================================================
 
     def select_atom_type(self: ParticleCollectionType, atom_type: str
-    ) -> ParticleCollectionType:
+                         ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
         # Always return a ParticleCollection even with only one indice
@@ -301,14 +301,14 @@ class ParticleCollection:
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
         indices = np.where(
-            np.isin(self.atom_properties.get("names").values, atom_types) #type: ignore[arg-type]
+            np.isin(self.atom_properties.get("names").values, atom_types)  # type: ignore[arg-type]
         )[0]
         # Always return a ParticleCollection even with only one indice
         if indices.size == 1:
             indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
-    def select_residue_indices(self: ParticleCollectionType, residues: Iterable[int]) -> ParticleCollectionType:
+    def select_residue_indices(self: ParticleCollectionType, residues: ArrayLike) -> ParticleCollectionType:
         """Returns a new collection with the selected residues."""
         indices = np.where(np.isin(self.atom_properties.get("residue_indices").values, residues))[0]
         # Always return a ParticleCollection even with only one indice
@@ -362,9 +362,9 @@ class ParticleCollection:
     def iter_residues(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the residues in the collection."""
         by_residue = self.groupby(lambda atom: (atom.residue_index, atom.chain))
-        return iter(by_residue.values()) #type: ignore[arg-type]
+        return iter(by_residue.values())  # type: ignore[arg-type]
 
     def iter_chains(self) -> Iterator[ParticleCollectionType]:
         """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
-        return iter(by_chain.values()) #type: ignore[arg-type]
+        return iter(by_chain.values())  # type: ignore[arg-type]
