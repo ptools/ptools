@@ -109,12 +109,11 @@ def contacts_by_residue(
 ) -> set[tuple[int, int]]:
     """Returns the indexes of the residues of `obj1` that are in contact with the
     residues of `obj2`."""
-    by_atom = contacts(lhs, rhs, cutoff)
-    res_indexes = set(
-        (lhs[index1].residue_index, rhs[index2].residue_index)
-        for index1, index2 in by_atom
-    )
-    return res_indexes
+    lhs_atom_ids, rhs_atom_ids = PairList(lhs, rhs, cutoff).raw_contacts()
+    lhs_residue_ids = lhs.residue_indices[lhs_atom_ids]
+    rhs_residue_ids = rhs.residue_indices[rhs_atom_ids]
+    by_residue = set(zip(lhs_residue_ids, rhs_residue_ids))
+    return by_residue
 
 
 def fnat(

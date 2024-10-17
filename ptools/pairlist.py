@@ -35,29 +35,36 @@ class PairList:
     def __post_init__(self):
         self.update()
 
+    def raw_contacts(self) -> tuple[np.ndarray, np.ndarray]:
+        """Returns the indices of atoms that are within a cutoff of each other.
+
+        Returns:
+            tuple[np.ndarray, np.ndarray]: receptor and ligand atom indexes.
+        """
+        return self._contacts
+
     def contacts(self) -> list[tuple[int, int]]:
-        """Get the indices of atoms pairs that are within a cutoff of
-        each other."""
+        """Returns the indices of atoms pairs that are within a cutoff of each other."""
         return list(zip(*self._contacts))
 
     def all_sqdistances(self) -> np.ndarray:
-        """Return the matrix of squared distances between every atom pairs."""
+        """Returns the matrix of squared distances between every atom pairs."""
         return self._all_sqdistances
 
     def sqdistances(self) -> np.ndarray:
-        """Return the matrix of squared distances between atoms within cutoff."""
+        """Returns the matrix of squared distances between atoms within cutoff."""
         return self._all_sqdistances[self._contacts]
 
     def all_distances(self) -> np.ndarray:
-        """Return the matrix of distances between every atom pairs."""
+        """Returns the matrix of distances between every atom pairs."""
         return np.sqrt(self.all_sqdistances())
 
     def distances(self) -> np.ndarray:
-        """Return the matrix of distances between atoms within cutoff."""
+        """Returns the matrix of distances between atoms within cutoff."""
         return np.sqrt(self.sqdistances())
 
     def update(self):
-        """Update contact and distance lists with the neighbor searching
+        """Updates contact and distance lists with the neighbor searching
         algorithm."""
         self._all_sqdistances = cdist(
             self.receptor.coordinates, self.ligand.coordinates, metric="sqeuclidean"
@@ -67,7 +74,7 @@ class PairList:
 
     @staticmethod
     def sort(receptor: list[int], ligand: list[int]) -> list[tuple[int, int]]:
-        """Sort a contact list.
+        """Sorts a contact list.
 
         Returns:
             list[(int, int)]: pairs of atom indexes.
