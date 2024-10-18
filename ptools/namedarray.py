@@ -7,8 +7,8 @@ from typing import Any, Iterable, Iterator, Optional, Sequence
 import numpy as np
 from numpy.typing import ArrayLike
 
-from .array3d import array3d
 from . import spelling
+from .array3d import array3d
 
 
 class NamedArray:
@@ -179,8 +179,11 @@ class NamedArrayContainer(collections.abc.Container):
             raise TypeError(
                 f"cannot add {self.__class__.__qualname__} and {type(other)}"
             )
-        if not self._properties.keys() == other._properties.keys():
+
+        # If not empty, check that both collections have the same properties
+        if (len(self._properties) > 0 and len(other._properties) > 0) and (not self._properties.keys() == other._properties.keys()):
             raise ValueError("cannot add two collections with different properties")
+
         return NamedArrayContainer(
             NamedArray(
                 lhs.singular,
