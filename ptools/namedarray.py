@@ -67,6 +67,10 @@ class NamedArray:
         """Returns the number of elements stored in the property."""
         return self.values.size
 
+    def empty(self) -> bool:
+        """Returns whether the property is empty."""
+        return self.size() == 0
+
     def tolist(self) -> list:
         """Returns the values as a list."""
         return self.values.tolist()
@@ -180,8 +184,14 @@ class NamedArrayContainer(collections.abc.Container):
                 f"cannot add {self.__class__.__qualname__} and {type(other)}"
             )
 
+        if self.empty():
+            return other.copy()
+
+        if other.empty():
+            return self.copy()
+
         # If not empty, check that both collections have the same properties
-        if (len(self._properties) > 0 and len(other._properties) > 0) and (not self._properties.keys() == other._properties.keys()):
+        if not self._properties.keys() == other._properties.keys():
             raise ValueError("cannot add two collections with different properties")
 
         return NamedArrayContainer(
@@ -193,6 +203,10 @@ class NamedArrayContainer(collections.abc.Container):
             )
             for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays())
         )
+
+    def empty(self) -> bool:
+        """Returns whether the collection is empty."""
+        return len(self._properties) == 0
 
     def names(self) -> list[str]:
         return list(self._properties.keys())

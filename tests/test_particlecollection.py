@@ -261,6 +261,17 @@ def test_contains():
 
 # == ParticleCollection merging  ========================================================
 
+def test_add_from_empty():
+    """Test that the ``+`` operator works with an empty particle collection."""
+    pc1 = ParticleCollection()
+    pc2 = ParticleCollection(generate_atoms())
+
+    pc3 = pc1 + pc2
+
+    assert pc3.size() == pc2.size()
+    assert pc3[0] == pc2[0]
+    assert pc3[-1] == pc2[-1]
+
 
 def test_add():
     """Test that the ``+`` operator works."""
