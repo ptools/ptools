@@ -17,6 +17,7 @@ from . import (
     particlecollection,
     reduce,
     rigidbody,
+    selection,
     superpose,
     tables,
 )
@@ -34,6 +35,7 @@ __all__ = [
     "particlecollection",
     "reduce",
     "rigidbody",
+    "selection",
     "superpose",
     "tables",
     "AttractRigidBody",

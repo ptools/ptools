@@ -128,10 +128,26 @@ class ParticleCollection:
             return
         self._atom_properties.set_at(name, index, value)
 
+
+    @property
+    def serial(self) -> np.ndarray:
+        """Returns the serial numbers of the atoms, i.e. location in the parent collection."""
+        if self.has_parent():
+            return self._selection.indices
+        return np.arange(self.size())
+
+
     # ===================================================================================
     def has_parent(self):
         """Returns whether the collection has a parent (i.e. is a sub-collection)."""
         return self._selection is not None
+
+    @property
+    def parent(self) -> ParticleCollection | None:
+        """Returns the parent collection of the sub-collection."""
+        if self.has_parent():
+            return self._selection.parent
+        return None
 
     @property
     def atom_properties(self) -> NamedArrayContainer:
