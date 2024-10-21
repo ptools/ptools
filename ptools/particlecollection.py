@@ -291,9 +291,6 @@ class ParticleCollection:
                          ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
         indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
-        # Always return a ParticleCollection even with only one indice
-        if indices.size == 1:
-            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_atom_types(
@@ -303,17 +300,11 @@ class ParticleCollection:
         indices = np.where(
             np.isin(self.atom_properties.get("names").values, atom_types)  # type: ignore[arg-type]
         )[0]
-        # Always return a ParticleCollection even with only one indice
-        if indices.size == 1:
-            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_residue_indices(self: ParticleCollectionType, residues: ArrayLike) -> ParticleCollectionType:
         """Returns a new collection with the selected residues."""
         indices = np.where(np.isin(self.atom_properties.get("residue_indices").values, residues))[0]
-        # Always return a ParticleCollection even with only one indice
-        if indices.size == 1:
-            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_residue_range(
@@ -326,9 +317,6 @@ class ParticleCollection:
                 self.atom_properties.get("residue_indices").values <= end,
             )
         )[0]
-        # Always return a ParticleCollection even with only one indice
-        if indices.size == 1:
-            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     def select_chain(
@@ -336,9 +324,6 @@ class ParticleCollection:
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
         indices = np.where(self.atom_properties.get("chains").values == chain)[0]
-        # Always return a ParticleCollection even with only one indice
-        if indices.size == 1:
-            indices = np.array([indices[0], indices[0] + 1])
         return self[indices]
 
     # == Grouping methods ===============================================================
