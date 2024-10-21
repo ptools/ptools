@@ -35,11 +35,11 @@ class PairList:
     def __post_init__(self):
         self.update()
 
-    def raw_contacts(self) -> tuple[np.ndarray, np.ndarray]:
+    def raw_contacts(self) -> np.ndarray:
         """Returns the indices of atoms that are within a cutoff of each other.
 
         Returns:
-            tuple[np.ndarray, np.ndarray]: receptor and ligand atom indexes.
+            np.ndarray: [N, N] array containing receptor and ligand atom indexes.
         """
         return self._contacts
 
