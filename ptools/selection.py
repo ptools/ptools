@@ -8,17 +8,21 @@ from typing import Any, Union
 
 import numpy as np
 
-from .particlecollection import Particle, ParticleCollection
+from .particlecollection import ParticleCollection
+from .spelling import pluralize
 
 
 # Translation from selection language tokens to ParticleCollection attributes.
+# Only usefull for special cases where the property name (in the code) is different
+# from the token used in the selection language.
 TOKEN_TO_ATTR = {
-    "index": "indices",
-    "name": "names",
     "resid": "residue_indices",
     "resname": "residue_names",
-    "chain": "chains",
 }
+
+
+def token_to_atom_property(token: str) -> str:
+    return TOKEN_TO_ATTR.get(token, pluralize(token))
 
 
 class UnexpectedTokenError(Exception):
@@ -99,7 +103,8 @@ class NotOperator(OperatorBase):
     precedence = 5
     operands = 1
 
-    def eval(self, notsel: ParticleCollection):
+    def eval(self, *args):
+        notsel = args[0]
         indices = np.setdiff1d(notsel.parent.serial, notsel.serial)
         return notsel.parent[indices]
 
@@ -111,41 +116,23 @@ UNARY_OPERATORS = {op.token: op for op in OPERATORS if op.is_unary()}
 SELECTION_TOKENS = {}
 
 
-class SelectionMeta(type):
-    """Metaclass for Selection classes.
-
-    Only purpose is to automatically register itself to SELECTION_TOKENS.
-    """
-
-    def __init__(cls, class_name, bases, attrs):
-        type.__init__(type, class_name, bases, attrs)
-        try:
-            SELECTION_TOKENS[attrs["token"]] = cls
-        except KeyError:
-            # A SelectionBase child class may not have a "token" attribute
-            # if it is supposed to be a parent class for actual selection
-            # classes itself.
-            pass
-
-
-class SelectionBase(metaclass=SelectionMeta):
+class SelectionBase(ABC):
     """Base class for a Selection."""
 
-    token: str
     precedence: int
 
-    def eval(self, atoms: ParticleCollection, values: Any):
+    @abstractmethod
+    def eval(self, token: str, atoms: ParticleCollection, values: Any):
         """Evaluation: should be override by children classes."""
-        raise NotImplementedError("This method should be overriden in subclasses")
 
 
 class IntegerAttributeSelection(SelectionBase):
     """Base class for selections based on integer attribute (e.g. atom or residue index)."""
 
-    def eval(self, atoms, values):
-        if attr := TOKEN_TO_ATTR.get(self.token) is None:
-            raise UnknownTokenError(self.token)
-        attr = TOKEN_TO_ATTR[self.token]
+    precedence = 1
+
+    def eval(self, token, atoms, values):
+        attr = token_to_atom_property(token)
 
         # Range selection in fashion attr <number>:<number>.
         if len(values) == 1 and ":" in values[0]:
@@ -179,47 +166,23 @@ class IntegerAttributeSelection(SelectionBase):
 class StringAttributeSelection(SelectionBase):
     """Base class for selections based on integer attribute (e.g. atom or residue name)."""
 
-    def eval(self, atoms, values):
-        if attr := TOKEN_TO_ATTR.get(self.token) is None:
-            raise UnknownTokenError(self.token)
-        attr = TOKEN_TO_ATTR[self.token]
+    precedence = 1
+
+    def eval(self, token, atoms, values):
+        attr = token_to_atom_property(token)
         indices = np.where(np.isin(atoms.atom_properties.get(attr).values, values))[0]
         return atoms[indices]
 
 
-class ResidueIndexSelection(IntegerAttributeSelection):
-    """Selection by residue index."""
-
-    token = "resid"
-    precedence = 1
+def register_selection_token(token: str, selection_class: SelectionBase):
+    SELECTION_TOKENS[token] = selection_class
 
 
-class ParticleIndexSelection(IntegerAttributeSelection):
-    """Selection by atom index."""
-
-    token = "index"
-    precedence = 1
-
-
-class ChainSelection(StringAttributeSelection):
-    """Selection by chain identifier."""
-
-    token = "chain"
-    precedence = 1
-
-
-class ParticleNameSelection(StringAttributeSelection):
-    """Selection by atom name."""
-
-    token = "name"
-    precedence = 1
-
-
-class ResidueNameSelection(StringAttributeSelection):
-    """Selection by residue name."""
-
-    token = "resname"
-    precedence = 1
+register_selection_token("resid", IntegerAttributeSelection)
+register_selection_token("index", IntegerAttributeSelection)
+register_selection_token("chain", StringAttributeSelection)
+register_selection_token("name", StringAttributeSelection)
+register_selection_token("resname", StringAttributeSelection)
 
 
 def binary(token):
@@ -234,11 +197,7 @@ def unary(token):
 
 def is_keyword(token):
     """Returns True if a token is a reserved keyword."""
-    return (
-        token in SELECTION_TOKENS
-        or token in BINARY_OPERATORS
-        or token in UNARY_OPERATORS
-    )
+    return (token in SELECTION_TOKENS or token in BINARY_OPERATORS or token in UNARY_OPERATORS)
 
 
 class EvaluatorBase(ABC):
@@ -339,7 +298,7 @@ class SelectionParser(PrecedenceClimbingEvaluator):
 
     def _eval_leaf(self, token):
         values = super()._eval_leaf(token)
-        return SELECTION_TOKENS[token]().eval(self.atoms, values)
+        return SELECTION_TOKENS[token]().eval(token, self.atoms, values)
 
 
 def select(selection_str: str, atoms: ParticleCollection = None):

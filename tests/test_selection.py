@@ -1,10 +1,10 @@
 import unittest
 from pathlib import Path
 
-import pytest
+import numpy as np
 
 from ptools.io import read_pdb
-from ptools.selection import MisformattedExpressionError, select, UnknownTokenError
+from ptools.selection import MisformattedExpressionError, select, UnknownTokenError, register_selection_token, StringAttributeSelection
 
 PDB_TEST_SELECTION = Path(__file__).parent / "data" / "test_selection.pdb"
 
@@ -155,4 +155,16 @@ class TestSelectionNotOperator(TestSelectionBase):
 
         atoms = select("not resname ALA and chain A", self.atoms)
         assert len(atoms) == 19
+
+
+
+class TestSelectionWhatever(TestSelectionBase):
+    """Test selection on dynamic properties."""
+
+    def test_selection_whatever(self):
+        self.atoms.add_atom_property("cherry", "cherries", np.full(len(self.atoms), "foo"))
+        register_selection_token("cherry", StringAttributeSelection)
+
+        atoms = select("cherry foo", self.atoms)
+        assert len(atoms) == 66
 
