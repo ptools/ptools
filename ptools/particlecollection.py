@@ -7,6 +7,7 @@ from numpy.typing import ArrayLike
 
 from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
+from .selection import select as select_atoms
 
 ParticleType = TypeVar("ParticleType", bound="Particle")
 ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
@@ -302,6 +303,9 @@ class ParticleCollection:
             self.atom_properties.set("masses", values)
 
     # == Selection methods ==============================================================
+    def select(self: ParticleCollectionType, selection_str: str) -> ParticleCollectionType:
+        """Returns a new collection with the selected atoms."""
+        return select_atoms(selection_str, self)
 
     def select_atom_type(self: ParticleCollectionType, atom_type: str
                          ) -> ParticleCollectionType:
