@@ -155,6 +155,14 @@ class TestSelectionNotOperator(TestSelectionBase):
         assert len(result) == 19
 
 
+class TestSelectionArithmeticOperator(TestSelectionBase):
+
+    def test_selection_arithmetic_operator(self):
+        raise NotImplementedError
+        result = self.atoms.select("resid < 5")
+        assert len(result) == 8
+
+
 
 class TestSelectionWhatever(TestSelectionBase):
     """Test selection on dynamic properties."""
