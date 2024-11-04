@@ -195,6 +195,10 @@ class ParticleCollection:
             return Particle(self, key)
         return self.__class__(selection=self.__class__.Selection(self, key))
 
+    def reset_atom_indices(self, start=1):
+        """Resets the atom indices to a new range."""
+        self.atom_properties.set("indices", np.arange(start, start + self.size()))
+
     def __iter__(self):
         """Iterates over the atoms."""
         return iter(self.particles)
