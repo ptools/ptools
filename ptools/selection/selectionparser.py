@@ -161,15 +161,19 @@ class StringPropertySelection:
 # Keyword Selection
 #
 # ===========================================================================
-# class WaterSelection(LeafOperator):
-#     """Selection operator for water molecules"""
-#
-#     token = "water"
-#
-#     def eval(self, atoms: "ParticleCollection", values: list[Any]):
-#         assert len(values) == 0
-#         indices = np.where(np.isin(atoms.atom_properties.get(self.attr).values, values))[0]
-#
+class WaterSelection:
+    """Selection operator for water molecules"""
+
+    operands = 0
+    precedence = 1
+    token = "water"
+
+    def eval(self, atoms: "ParticleCollection", values: list[Any]):
+        assert len(values) == self.operands
+        water_residues = ["HOH", "WAT", "TIP3", "TIP4", "TIP5"]
+        indices = np.where(np.isin(atoms.atom_properties.get("residue_names").values, water_residues))[0]
+        return atoms[indices]
+
 
 # ===========================================================================
 #
@@ -201,7 +205,7 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         self.leaf_operators["resname"] = self.leaf_operators["residue_name"]
 
         # Registers keyword operators.
-        # self.register_leaf_operator(WaterSelection())
+        self.register_leaf_operator(WaterSelection())
 
     def parse(self, selection_str: str):
         """Parses and evaluates the selection string."""
