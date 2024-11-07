@@ -7,7 +7,7 @@ from __future__ import annotations
 import copy
 
 # Type-hinting specific import
-from typing import Any, Optional
+from typing import Any
 
 # Scientific libraries.
 import numpy as np
@@ -38,6 +38,7 @@ class AtomAttrs:
     element: str = ""
     mass: float = -1.0  # -1.0 means "not set"
     radius: float = -1.0  # -1.0 means "not set"
+    hetero: bool = False
 
     def __attrs_post_init__(self):
         """Post-initialization method."""
