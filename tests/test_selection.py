@@ -157,11 +157,24 @@ class TestSelectionNotOperator(TestSelectionBase):
 
 class TestSelectionArithmeticOperator(TestSelectionBase):
 
-    def test_selection_arithmetic_operator(self):
-        raise NotImplementedError
+    def test_selection_arithmetic_operator_syntax(self):
+        self.atoms.select("resid < 5")
+        self.atoms.select("resid< 5")
+        self.atoms.select("resid <5")
+        self.atoms.select("resid <5")
+        self.atoms.select("resid <= 5")
+
+    def test_selection_less_than(self):
         result = self.atoms.select("resid < 5")
         assert len(result) == 8
+        for atom in result:
+            assert atom.residue_index < 5
 
+    def test_selection_less_than_or_equal(self):
+        result = self.atoms.select("resid <= 5")
+        assert len(result) == 10
+        for atom in result:
+            assert atom.residue_index <= 5
 
 
 class TestSelectionWhatever(TestSelectionBase):

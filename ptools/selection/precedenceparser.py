@@ -1,6 +1,7 @@
 """Implements an operator-precedence parser for the selection language."""
 
 from abc import ABC, abstractmethod
+import re
 from typing import Union
 
 from .errors import (
@@ -8,6 +9,7 @@ from .errors import (
     UnexpectedTrailingTokenError,
     UnknownTokenError
 )
+
 
 class Operator(ABC):
 
@@ -29,7 +31,6 @@ class LeafOperator(Operator):
 
     precedence = 1
     operands = 1
-
 
 
 class EvaluatorBase(ABC):
@@ -124,4 +125,3 @@ class PrecedenceClimbingEvaluator(EvaluatorBase):
         # At this point, the keyword has not been understood.
         raise UnknownTokenError(self._next())
         return None
-

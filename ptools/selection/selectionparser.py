@@ -1,8 +1,13 @@
 """ptools.selection - Selection language and parsing."""
+from __future__ import annotations
 
-from typing import Any
+import re
+from typing import Any, TYPE_CHECKING
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from .particlecollection import ParticleCollection
 
 
 from .precedenceparser import (
@@ -86,6 +91,19 @@ class IntegerAttributeSelection(SelectionOperator):
         assert len(args) == 3
         attr, atoms, values = args
 
+        ops = {
+            ">": np.greater,
+            "<": np.less,
+            ">=": np.greater_equal,
+            "<=": np.less_equal,
+            "==": np.equal,
+            "!=": np.not_equal,
+        }
+
+        print(values)
+        if values[0] in ops:
+            return self.select_from_operator(atoms, attr, ops[values[0]], int(values[1]))
+
         # Range selection in fashion attr <number>:<number>.
         if len(values) == 1 and ":" in values[0]:
             start, end = values[0].split(":")
@@ -98,6 +116,12 @@ class IntegerAttributeSelection(SelectionOperator):
 
         values = [int(resid) for resid in values]
         return self.select_from_values(atoms, attr, values)
+
+    @classmethod
+    def select_from_operator(cls, atoms: "ParticleCollection", attr: str, op, value: int | float):
+        """Selection from a single operator."""
+        indices = np.where(op(atoms.atom_properties.get(attr).values, value))[0]
+        return atoms[indices]
 
     @classmethod
     def select_from_values(cls, atoms: "ParticleCollection", attr: str, value: list[Any]):
@@ -133,23 +157,28 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         super().__init__(logic_operators=[AndOperator(), OrOperator(), NotOperator()])
         self.atoms = atoms
 
+        # Pattern for tokenizing the selection string, i.e. separating
+        # arithmetic operators from other elements (e.g. 'resid<5' -> 'resid < 5').
+        pattern = r'\w+|<=|>=|==|!=|[+\-*/=<>()]'
+        self._tokenize_regex = re.compile(pattern)
+
         # Dynamically creates selection operators based on the ParticleCollection
         # atom properties.
         # Importantly, the selection string uses the singular form of particle
         # properties, e.g. 'names' -> 'name CA'.
-
         for prop in self.atoms.atom_properties:
             if np.issubdtype(prop.values.dtype, np.number):
-                self.leaf_operators[prop.singular] = IntegerAttributeSelection(prop.singular, prop.plural)
+                self.register_leaf_operator(IntegerAttributeSelection(prop.singular, prop.plural))
             else:
-                self.leaf_operators[prop.singular] = StringAttributeSelection(prop.singular, prop.plural)
+                self.register_leaf_operator(StringAttributeSelection(prop.singular, prop.plural))
 
         # Aliases for 'residue_index' and 'residue_name'.
         self.leaf_operators["resid"] = self.leaf_operators["residue_index"]
         self.leaf_operators["resname"] = self.leaf_operators["residue_name"]
 
     def parse(self, selection_str: str):
-        self.tokens = selection_str.split()
+        """Parses and evaluates the selection string."""
+        self.tokens = self._tokenize_regex.findall(selection_str)
         return self.evaluate()
 
     def _eval_leaf(self, token):
@@ -158,7 +187,8 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         return operator.eval(operator.attr, self.atoms, values)
 
 
-def select(selection_str: str, atoms: "ParticleCollection"):
+def select(selection_str: str, atoms: ParticleCollection):
     """Selection function."""
     parser = SelectionParser(atoms)
+    selection_str = selection_str.replace(":", " to ")
     return parser.parse(selection_str)
