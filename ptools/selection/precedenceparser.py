@@ -1,8 +1,7 @@
 """Implements an operator-precedence parser for the selection language."""
 
 from abc import ABC, abstractmethod
-import re
-from typing import Union
+from typing import Protocol, Union
 
 from .errors import (
     UnexpectedTokenError,
@@ -11,15 +10,14 @@ from .errors import (
 )
 
 
-class Operator(ABC):
+class Operator(Protocol):
 
     token: str
     precedence: int
     operands: int
 
-    @abstractmethod
     def eval(self, *args):
-        """Evaluation: should be override by children classes."""
+        ...
 
 
 class LogicOperator(Operator):

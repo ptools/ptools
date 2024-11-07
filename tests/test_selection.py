@@ -177,11 +177,17 @@ class TestSelectionArithmeticOperator(TestSelectionBase):
             assert atom.residue_index <= 5
 
 
-class TestSelectionWhatever(TestSelectionBase):
-    """Test selection on dynamic properties."""
+class TestSelectionDynamicProperty(TestSelectionBase):
 
-    def test_selection_whatever(self):
+    def test_selection_dynamic_property(self):
         self.atoms.add_atom_property("cherry", "cherries", np.full(len(self.atoms), "foo"))
 
         result = self.atoms.select("cherry foo")
         assert len(result) == 66
+
+
+class TestSelectionKeywords(TestSelectionBase):
+
+    def test_selection_water(self):
+        result = self.atoms.select("water")
+        assert len(result) == 0
