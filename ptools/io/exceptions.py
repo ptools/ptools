@@ -5,7 +5,7 @@ class InvalidPDBFormatError(IOError):
     """Raised when the PDB format is incorrect."""
 
 
-class InvalidPDBAtomLineError(ValueError):
+class InvalidPDBAtomLineError(InvalidPDBFormatError):
     """Raised when the a PDB line does not describe an atom."""
 
     def __init__(self, header, *args):
