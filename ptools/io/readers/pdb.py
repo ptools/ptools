@@ -50,6 +50,11 @@ class AtomLine(PDBLine):
             raise InvalidPDBAtomLineError(self.header)
 
     @property
+    def is_hetero(self) -> bool:
+        """Returns True if the atom is a heteroatom."""
+        return self.header == "HETATM"
+
+    @property
     def atom_index(self) -> int:
         """Atom index.
 
@@ -124,6 +129,7 @@ class AtomLine(PDBLine):
             residue_index=self.residue_index,
             chain=self.chain,
             coordinates=self.coordinates,
+            hetero=self.is_hetero,
             meta={"extra": self.extra},
         )
 

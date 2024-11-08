@@ -7,6 +7,7 @@ from numpy.typing import ArrayLike
 
 from .atomattrs import guess_atom_element, guess_atom_mass
 from .namedarray import NamedArrayContainer
+from .selection import select as select_atoms
 
 ParticleType = TypeVar("ParticleType", bound="Particle")
 ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollection")
@@ -128,10 +129,25 @@ class ParticleCollection:
             return
         self._atom_properties.set_at(name, index, value)
 
+    @property
+    def serial(self) -> np.ndarray:
+        """Returns the serial numbers of the atoms, i.e. location in the parent collection."""
+        if self.has_parent():
+            return self._selection.indices
+        return np.arange(self.size())
+
     # ===================================================================================
+
     def has_parent(self):
         """Returns whether the collection has a parent (i.e. is a sub-collection)."""
         return self._selection is not None
+
+    @property
+    def parent(self) -> ParticleCollection | None:
+        """Returns the parent collection of the sub-collection."""
+        if self.has_parent():
+            return self._selection.parent
+        return None
 
     @property
     def atom_properties(self) -> NamedArrayContainer:
@@ -290,47 +306,44 @@ class ParticleCollection:
             self.atom_properties.set("masses", values)
 
     # == Selection methods ==============================================================
+    def select(self: ParticleCollectionType, selection_str: str) -> ParticleCollectionType:
+        """Returns a new collection with the selected atoms."""
+        return select_atoms(selection_str, self)
+
+    # == DEPRECATED =====================================================================
 
     def select_atom_type(self: ParticleCollectionType, atom_type: str
                          ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom type."""
-        indices = np.where(self.atom_properties.get("names").values == atom_type)[0]
-        return self[indices]
+        return self.select(f"name {atom_type}")
 
     def select_atom_types(
         self: ParticleCollectionType, atom_types: Iterable[str]
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected atom types."""
-        indices = np.where(
-            np.isin(self.atom_properties.get("names").values, atom_types)  # type: ignore[arg-type]
-        )[0]
-        return self[indices]
+        return self.select(f"name {' '.join(atom_types)}")
 
     def select_residue_indices(self: ParticleCollectionType, residues: ArrayLike) -> ParticleCollectionType:
         """Returns a new collection with the selected residues."""
-        indices = np.where(np.isin(self.atom_properties.get("residue_indices").values, residues))[0]
-        return self[indices]
+        indexes = " ".join(map(str, residues))
+        return self.select(f"residue_index {indexes}")
 
     def select_residue_range(
         self: ParticleCollectionType, start: int, end: int
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected residue range."""
-        indices = np.where(
-            np.logical_and(
-                self.atom_properties.get("residue_indices").values >= start,
-                self.atom_properties.get("residue_indices").values <= end,
-            )
-        )[0]
-        return self[indices]
+        return self.select(f"residue_index {start} to {end}")
 
     def select_chain(
         self: ParticleCollectionType, chain: str
     ) -> ParticleCollectionType:
         """Returns a new collection with the selected chain."""
-        indices = np.where(self.atom_properties.get("chains").values == chain)[0]
-        return self[indices]
+        return self.select(f"chain {chain}")
+
+    # == DEPRECATED - END ===============================================================
 
     # == Grouping methods ===============================================================
+
     def groupby(
         self: ParticleCollectionType, key: Callable
     ) -> dict[Any, ParticleCollectionType]:

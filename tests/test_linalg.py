@@ -24,6 +24,7 @@ from .testing import assert_array_almost_equal
 def generate_random_array(
     low: float = -10.0, high: float = 10.0, shape: int | tuple[int] = 1
 ) -> np.ndarray:
+    """Generates a random array of floats."""
     return np.random.uniform(low, high, shape)
 
 
@@ -346,8 +347,9 @@ class TestCentroid:
 
     def test_empty_coordinates(self):
         x = generate_empty_coordinates()
-        with pytest.warns(RuntimeWarning, match="Mean of empty slice"):
-            assert np.isnan(linalg.centroid(x)).all()
+        err = "cannot compute the centroid of an empty array"
+        with pytest.raises(ZeroDivisionError, match=err):
+            linalg.centroid(x)
 
 
 # ======================================================================================

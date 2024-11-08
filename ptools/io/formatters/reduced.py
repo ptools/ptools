@@ -10,7 +10,17 @@ After the bead coodinates, the reduced PDB file contains
 """
 
 from typing import Any, Iterable, Protocol
+
 from ..._typing import FilePath
+from ...particlecollection import ParticleCollection
+from ...namedarray import NamedArrayContainer
+from .pdb import (
+    format_chain_token,
+    format_atom_name_token,
+    format_atom_index_token,
+    format_residue_name_token,
+    format_residue_index_token,
+)
 
 
 class ReducedPDBConvertible(Protocol):
@@ -56,6 +66,21 @@ class ReducedPDBConvertible(Protocol):
         ...
 
 
+class ParticleBuffer:
+    """Returns a Particle properties."""
+
+    def __init__(self, properties: NamedArrayContainer, i: int):
+        self.coordinates = properties.get("coordinates")[i]
+        self.name = properties.get("names")[i]
+        self.index = properties.get("indices")[i]
+        self.residue_name = properties.get("residue_names")[i]
+        self.residue_index = properties.get("residue_indices")[i]
+        self.chain = properties.get("chains")[i]
+        self.element = properties.get("elements")[i]
+        self.typeid = properties.get("typeids")[i]
+        self.charge = properties.get("charges")[i]
+
+
 REDUCED_PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "
     "{atom_name:4s}{altloc}{residue_name:<4s}{chain:s}{residue_index:>4s}{insertion}   "
@@ -68,13 +93,19 @@ def write_reduced_pdb(
     path: FilePath,
 ):
     """Write a PDB file from an atom or a collection of atoms."""
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(to_reduced_pdb(atom_or_collection))
 
 
 def to_reduced_pdb(
     atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible],
 ) -> str:
+    """Converts an atom or a collection of atoms to Reduced PDB format."""
+
+    if isinstance(atom_or_collection, ParticleCollection):
+        properties = atom_or_collection.atom_properties
+        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))
+
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)
     return format_atom(atom_or_collection)
@@ -87,11 +118,11 @@ def format_atom(atom: ReducedPDBConvertible) -> str:
         "insertion": " ",
         "occupancy": 1.0,
         "bfactor": 0.0,
-        "chain": _format_chain(atom.chain),
-        "atom_name": _format_atom_name(atom.name),
-        "atom_index": _format_atom_index(atom.index),
-        "residue_name": _format_residue_name(atom.residue_name),
-        "residue_index": _format_residue_index(atom.residue_index),
+        "chain": format_chain_token(atom.chain),
+        "atom_name": format_atom_name_token(atom.name),
+        "atom_index": format_atom_index_token(atom.index),
+        "residue_name": format_residue_name_token(atom.residue_name),
+        "residue_index": format_residue_index_token(atom.residue_index),
         "x": atom.coordinates[0],
         "y": atom.coordinates[1],
         "z": atom.coordinates[2],
@@ -99,24 +130,3 @@ def format_atom(atom: ReducedPDBConvertible) -> str:
         "charge": atom.charge,
     }
     return REDUCED_PDB_FORMAT.format(**fmt_args)
-
-
-def _format_chain(chain: str) -> str:
-    assert len(chain) < 2
-    return " " if not chain else chain
-
-
-def _format_atom_name(name: str) -> str:
-    return f"{name:>4s}" if len(name) > 2 else name.center(4)
-
-
-def _format_atom_index(index: int) -> str:
-    return f"{index:5d}" if index < 100000 else f"{index:05x}"
-
-
-def _format_residue_name(name: str) -> str:
-    return f"{name:<4s}" if len(name) > 3 else name.center(4)
-
-
-def _format_residue_index(index: int) -> str:
-    return f"{index:4d}" if index < 10000 else f"{index:04x}"
