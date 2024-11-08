@@ -142,7 +142,7 @@ class IntegerPropertySelection:
 
 
 class StringPropertySelection:
-    """Base class for selections based on integer attribute (e.g. atom or residue name)."""
+    """Base class for selections based on string attribute (e.g. atom or residue name)."""
 
     operands = 1
     precedence = 1
@@ -153,6 +153,21 @@ class StringPropertySelection:
 
     def eval(self, atoms: "ParticleCollection", values: list[str]):
         indices = np.where(np.isin(atoms.atom_properties.get(self.attr).values, values))[0]
+        return atoms[indices]
+
+
+class BoolPropertySelection:
+    """Base class for selections based on boolean attribute (e.g. hetero)."""
+
+    operands = 1
+    precedence = 1
+
+    def __init__(self, token: str, attr: str):
+        self.token = token
+        self.attr = attr
+
+    def eval(self, atoms: "ParticleCollection", values: list[str]):
+        indices = np.where(atoms.atom_properties.get(self.attr).values == True)[0]
         return atoms[indices]
 
 
@@ -197,6 +212,8 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         for prop in self.atoms.atom_properties:
             if np.issubdtype(prop.values.dtype, np.number):
                 self.register_leaf_operator(IntegerPropertySelection(prop.singular, prop.plural))
+            elif np.issubdtype(prop.values.dtype, np.bool_):
+                self.register_leaf_operator(BoolPropertySelection(prop.singular, prop.plural))
             else:
                 self.register_leaf_operator(StringPropertySelection(prop.singular, prop.plural))
 

@@ -27,7 +27,6 @@ class TestSelectionBase(unittest.TestCase):
 
 
 class TestSelectionAtomIndex(TestSelectionBase):
-
     def test_selection_atom_index(self):
         result = self.atoms.select("index 1")
         assert result == self.atoms[:1]
@@ -45,7 +44,6 @@ class TestSelectionAtomIndex(TestSelectionBase):
 
 
 class TestSelectionResidueIndex(TestSelectionBase):
-
     def test_selection_residue_index(self):
         result = self.atoms.select("resid 2")
         assert len(result) == 3
@@ -71,7 +69,6 @@ class TestSelectionResidueIndex(TestSelectionBase):
 
 
 class TestSelectionAtomName(TestSelectionBase):
-
     def test_selection_single_atom_name(self):
         result = self.atoms.select("name CA")
         assert len(result) == 29
@@ -86,7 +83,6 @@ class TestSelectionAtomName(TestSelectionBase):
 
 
 class TestSelectionResidueName(TestSelectionBase):
-
     def test_selection_single_residue_name(self):
         result = self.atoms.select("resname ALA")
         assert len(result) == 4
@@ -101,7 +97,6 @@ class TestSelectionResidueName(TestSelectionBase):
 
 
 class TestSelectionChainName(TestSelectionBase):
-
     def test_selection_single_chain(self):
         result = self.atoms.select("chain A")
         assert len(result) == 21
@@ -117,8 +112,8 @@ class TestSelectionChainName(TestSelectionBase):
 
 # == Operator Tests ===============================================================
 
-class TestSelectionAndOperator(TestSelectionBase):
 
+class TestSelectionAndOperator(TestSelectionBase):
     def test_selection_and_simple(self):
         atoms = self.atoms.select("resid 1 to 14")
         assert len(atoms) == 29
@@ -134,7 +129,6 @@ class TestSelectionAndOperator(TestSelectionBase):
 
 
 class TestSelectionOrOperator(TestSelectionBase):
-
     def test_selection_or_operator(self):
         result = self.atoms.select("resid 2 or resid 3")
         assert len(result) == 6
@@ -143,7 +137,6 @@ class TestSelectionOrOperator(TestSelectionBase):
 
 
 class TestSelectionNotOperator(TestSelectionBase):
-
     def test_selection_not_chain(self):
         result = self.atoms.select("not chain B")
         assert len(result) == 44
@@ -156,7 +149,6 @@ class TestSelectionNotOperator(TestSelectionBase):
 
 
 class TestSelectionArithmeticOperator(TestSelectionBase):
-
     def test_selection_arithmetic_operator_syntax(self):
         self.atoms.select("resid < 5")
         self.atoms.select("resid< 5")
@@ -177,17 +169,26 @@ class TestSelectionArithmeticOperator(TestSelectionBase):
             assert atom.residue_index <= 5
 
 
-class TestSelectionDynamicProperty(TestSelectionBase):
+class TestSelectionBooleanProperty(TestSelectionBase):
+    def test_selection_boolean_property(self):
+        result = self.atoms.select("hetero")
+        assert len(result) == 3
 
+        result = self.atoms.select("not hetero")
+        assert len(result) == 63
+
+
+class TestSelectionDynamicProperty(TestSelectionBase):
     def test_selection_dynamic_property(self):
-        self.atoms.add_atom_property("cherry", "cherries", np.full(len(self.atoms), "foo"))
+        self.atoms.add_atom_property(
+            "cherry", "cherries", np.full(len(self.atoms), "foo")
+        )
 
         result = self.atoms.select("cherry foo")
         assert len(result) == 66
 
 
 class TestSelectionKeywords(TestSelectionBase):
-
     def test_selection_water(self):
         result = self.atoms.select("water")
         assert len(result) == 0
