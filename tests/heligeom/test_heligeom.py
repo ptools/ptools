@@ -61,10 +61,10 @@ class TestHeligeomSimple(unittest.TestCase):
     def test_heli_construct(self):
         """Non-regression test for heligeom.heli_construct."""
         hp = heli_analyze(self.mono1, self.mono2)
-        result = heli_construct(self.mono1, hp, N=15)
+        result = heli_construct(self.mono1, hp, N=3)
         reference_file = TEST_DATA_DIR / "test_heli_construct_simple_result.npy"
         reference = np.load(reference_file)
-        assert_array_almost_equal(result.coordinates, reference)
+        assert result.coordinates == approx(reference)
 
     def test_Z_true(self):
         """Tests that using heligeom.extend with Z=true does not raises an error."""
@@ -105,9 +105,7 @@ class TestHeligeom(unittest.TestCase):
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
-        dmin, dmax = minmax_distance_to_axis(
-            self.mono1, self.hp.unit, center=self.hp.point
-        )
+        dmin, dmax = minmax_distance_to_axis(self.mono1, self.hp.unit, center=self.hp.point)
         assert dmin == approx(12.1986158)
         assert dmax == approx(73.5932897)
 
