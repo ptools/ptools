@@ -81,7 +81,10 @@ def centroid(x: ArrayLike) -> np.ndarray:
 
     Centroid is the average coordinate along axis 0.
     """
-    return np.mean(x, axis=0)
+    x_ = np.asarray(x)
+    if x_.shape[0] == 0:
+        raise ZeroDivisionError("cannot compute the centroid of an empty array")
+    return np.mean(x_, axis=0)
 
 
 def inertia_tensor(coords: ArrayLike, weights: ArrayLike) -> np.ndarray:
