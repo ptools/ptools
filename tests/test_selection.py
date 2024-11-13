@@ -192,3 +192,24 @@ class TestSelectionKeywords(TestSelectionBase):
     def test_selection_water(self):
         result = self.atoms.select("water")
         assert len(result) == 0
+
+
+class TestSelectionByProperty(TestSelectionBase):
+
+    def test_single_value(self):
+        result = self.atoms.select_by_property("index", 1)
+        assert result == self.atoms[:1]
+
+        result = self.atoms.select_by_property("chain", "A")
+        assert len(result) == 21
+
+        result = self.atoms.select_by_property("resid", 2)
+        assert len(result) == 3
+
+    def test_list(self):
+        result = self.atoms.select_by_property("index", [1, 2, 3])
+        assert result == self.atoms[:3]
+
+        result = self.atoms.select_by_property("resid", [5, 6, 7])
+        assert len(result) == 7
+

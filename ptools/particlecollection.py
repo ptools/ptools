@@ -310,37 +310,14 @@ class ParticleCollection:
         """Returns a new collection with the selected atoms."""
         return select_atoms(selection_str, self)
 
-    # == DEPRECATED =====================================================================
 
-    def select_atom_type(self: ParticleCollectionType, atom_type: str
-                         ) -> ParticleCollectionType:
-        """Returns a new collection with the selected atom type."""
-        return self.select(f"name {atom_type}")
-
-    def select_atom_types(
-        self: ParticleCollectionType, atom_types: Iterable[str]
-    ) -> ParticleCollectionType:
-        """Returns a new collection with the selected atom types."""
-        return self.select(f"name {' '.join(atom_types)}")
-
-    def select_residue_indices(self: ParticleCollectionType, residues: ArrayLike) -> ParticleCollectionType:
-        """Returns a new collection with the selected residues."""
-        indexes = " ".join(map(str, residues))
-        return self.select(f"residue_index {indexes}")
-
-    def select_residue_range(
-        self: ParticleCollectionType, start: int, end: int
-    ) -> ParticleCollectionType:
-        """Returns a new collection with the selected residue range."""
-        return self.select(f"residue_index {start} to {end}")
-
-    def select_chain(
-        self: ParticleCollectionType, chain: str
-    ) -> ParticleCollectionType:
-        """Returns a new collection with the selected chain."""
-        return self.select(f"chain {chain}")
-
-    # == DEPRECATED - END ===============================================================
+    def select_by_property(self: ParticleCollectionType, property_name: str, value: Any) -> ParticleCollectionType:
+        """Selects atoms based on a property."""
+        if isinstance(value, list):
+            selection_str = f"{property_name} {' '.join(str(v) for v in value)}"
+        else:
+            selection_str = f"{property_name} {value}"
+        return self.select(selection_str)
 
     # == Grouping methods ===============================================================
 
