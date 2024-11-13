@@ -313,7 +313,9 @@ class ParticleCollection:
 
     def select_by_property(self: ParticleCollectionType, property_name: str, value: Any) -> ParticleCollectionType:
         """Selects atoms based on a property."""
-        if isinstance(value, list):
+        if isinstance(value, str):
+            selection_str = f"{property_name} {value}"
+        elif hasattr(value, "__iter__"):
             selection_str = f"{property_name} {' '.join(str(v) for v in value)}"
         else:
             selection_str = f"{property_name} {value}"
