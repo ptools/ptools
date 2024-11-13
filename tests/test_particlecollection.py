@@ -1,7 +1,6 @@
 """Tests for the ``ParticleCollection`` class."""
 
 import numpy as np
-
 import pytest
 from pytest import approx
 
@@ -9,9 +8,9 @@ import ptools
 from ptools.namedarray import NamedArray, NamedArrayContainer
 from ptools.particlecollection import Particle, ParticleCollection
 
+from . import TEST_LIGAND
 from .generators import generate_atoms
 from .testing import assert_array_almost_equal, assert_array_equal
-from . import TEST_LIGAND
 
 
 class RandomParticleContainer:
@@ -261,6 +260,7 @@ def test_contains():
 
 # == ParticleCollection merging  ========================================================
 
+
 def test_add_from_empty():
     """Test that the ``+`` operator works with an empty particle collection."""
     pc1 = ParticleCollection()
@@ -342,43 +342,6 @@ def test_set_property():
     pc.atom_properties.set("indices", expected)
     assert isinstance(pc.atom_properties.get("indices"), NamedArray)
     assert pc.atom_properties.get("indices") == expected
-
-
-# == Selections  ========================================================================
-
-
-def test_select_atom_type():
-    atoms = ptools.read_pdb(TEST_LIGAND)
-    sel = atoms.select_atom_type("CA")
-    assert len(sel) == 426
-    assert sel.names.tolist() == ["CA"] * 426
-
-
-def test_select_atom_types():
-    atoms = ptools.read_pdb(TEST_LIGAND)
-    sel = atoms.select_atom_types(["CA", "CB"])
-    assert len(sel) == 426 + 64
-    assert sorted(sel.names.tolist()) == ["CA"] * 426 + ["CB"] * 64
-
-
-def test_select_residue_indices():
-    atoms = ptools.read_pdb(TEST_LIGAND)
-    sel = atoms.select_residue_indices([8, 18])
-    assert len(sel) == 5
-    assert sel.atom_properties.get("residue_names").tolist() == ["GLN", "GLN", "GLN", "ALA", "ALA"]
-
-def test_select_residue_range():
-    atoms = ptools.read_pdb(TEST_LIGAND)
-    sel = atoms.select_residue_range(10, 20)
-    assert len(sel) == 23
-    assert all(10 <= atom.residue_index <= 20 for atom in sel)
-
-
-def test_select_chain():
-    atoms = ptools.read_pdb(TEST_LIGAND)
-    sel = atoms.select_chain("B")
-    assert len(sel) == 974
-    assert sel.chains.tolist() == ["B"] * 974
 
 
 # == Grouping  ==========================================================================

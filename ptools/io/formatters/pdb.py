@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Protocol
+from typing import Any, Iterable, Protocol, Optional
 from ...particlecollection import ParticleCollection
 from ...namedarray import NamedArrayContainer
 
@@ -49,7 +49,15 @@ class PDBConvertible(Protocol):
         ...
 
     @property
-    def element(self) -> str:
+    def occupancy(self) -> Optional[float]:
+        ...
+
+    @property
+    def bfactor(self) -> Optional[float]:
+        ...
+
+    @property
+    def element(self) -> Optional[str]:
         ...
 
 
@@ -63,7 +71,17 @@ class ParticleBuffer:
         self.residue_name = properties.get("residue_names")[i]
         self.residue_index = properties.get("residue_indices")[i]
         self.chain = properties.get("chains")[i]
-        self.element = properties.get("elements")[i]
+
+        self.element = ''
+        self.bfactor = 0.0
+        self.occupancy = 1.0
+
+        if "elements" in properties:
+            self.element = properties.get("elements")[i]
+        if "bfactors" in properties:
+            self.bfactor = properties.get("bfactors")[i]
+        if "occupancies" in properties:
+            self.occupancy = properties.get("occupancies")[i]
 
 
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:
@@ -79,13 +97,16 @@ def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str
 
 
 def format_atom(atom: PDBConvertible) -> str:
+    bfactor = getattr(atom, "bfactor", 0.0)
+    occupancy = getattr(atom, "occupancy", 1.0)
+    element = getattr(atom, "element", '')
     fmt_args: dict[str, Any] = {
         "record": "ATOM",
         "altloc": " ",
         "insertion": " ",
-        "occupancy": 1.0,
-        "bfactor": 0.0,
-        "element": atom.element,
+        "occupancy": occupancy,
+        "bfactor": bfactor,
+        "element": element,
         "chain": format_chain_token(atom.chain),
         "atom_name": format_atom_name_token(atom.name),
         "atom_index": format_atom_index_token(atom.index),
