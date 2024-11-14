@@ -224,6 +224,16 @@ class ParticleCollection:
             return self.atom_properties.get(name).values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
 
+    def __setattr__(self, name, value):
+        if name in ("_atom_properties", "atom_properties", "_selection"):
+            super().__setattr__(name, value)
+            return
+
+        if name in self.atom_properties:
+            self.atom_properties.set(name, value)
+            return
+        super().__setattr__(name, value)
+
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} with {self.size()} particles>"
 
