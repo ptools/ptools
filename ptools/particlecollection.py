@@ -230,7 +230,13 @@ class ParticleCollection:
             return
 
         if name in self.atom_properties:
-            self.atom_properties.set(name, value)
+            # If the collection has a parent (i.e. is a slice), we need to update
+            # the parent's properties.
+            if self.has_parent():
+                values = self._selection.parent.atom_properties.get(name).values
+                values[self._selection.indices] = value
+            else:
+                self.atom_properties.set(name, value)
             return
         super().__setattr__(name, value)
 

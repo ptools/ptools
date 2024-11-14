@@ -224,18 +224,55 @@ def test_set_property_with_getitem_and_inplace_add():
 
 
 def test_set_property_using_slice():
-    expected = RandomParticleContainer(10)
-    atoms = ParticleCollection(expected.particles)
-    assert expected.number_of_particles() == 10
-    assert atoms.size() == expected.number_of_particles()
+    atoms = ParticleCollection(RandomParticleContainer(10).particles)
+    assert atoms.size() == 10
 
-    expected_names = list(expected.names)
-    assert_array_equal(atoms.names, expected_names)
+    atoms.names = ["banana"] * atoms.size()
+    assert_array_equal(atoms.names, ["banana"] * atoms.size())
 
-    atoms.names[1:3] = [name + "random suffix" for name in atoms[1:3].names]
-    expected_names[1:3] = [name + "random suffix" for name in expected_names[1:3]]
+    atoms.names[1:3] = ["apple", "orange"]
+    assert_array_equal(atoms.names[:4], ["banana", "apple", "orange", "banana"])
 
-    assert_array_equal(atoms.names, expected_names)
+
+def test_set_property_from_atom_slice():
+    atoms = ParticleCollection(RandomParticleContainer().particles)
+    atoms.names = ["banana"] * atoms.size()
+    assert_array_equal(atoms.names, ["banana"] * atoms.size())
+
+    atoms[1:3].names = ["apple", "orange"]
+    assert_array_equal(atoms.names[:3], ["banana", "apple", "orange"])
+
+
+def test_modify_property_after_select():
+    atoms = ParticleCollection(RandomParticleContainer(5).particles)
+    assert atoms.size() == 5
+
+    atoms.names[0:3] = ["apple", "orange", "banana"]
+
+    sel = atoms.select("name apple")
+    assert sel.size() == 1
+
+    sel.names = ["orange"]
+    assert atoms.names[0] == "orange"
+
+
+# == New property  =====================================================================
+
+
+def test_set_new_property():
+    atoms = ParticleCollection(RandomParticleContainer().particles)
+
+    atoms.add_atom_property("banana", "bananas", [0] * atoms.size())
+    assert hasattr(atoms, "bananas")
+    assert "bananas" in atoms.atom_properties
+    assert_array_equal(atoms.bananas, [0] * atoms.size())
+
+    atoms.bananas = [42] * atoms.size()
+    assert_array_equal(atoms.bananas, [42] * atoms.size())
+
+    atoms[:3].bananas = [1, 2, 3]
+    assert_array_equal(atoms.bananas[:3], [1, 2, 3])
+    assert_array_equal(atoms.bananas[3:], [42] * (atoms.size() - 3))
 
 
 # == Container methods  ================================================================
