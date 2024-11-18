@@ -1,6 +1,5 @@
 """Superposition methods."""
 
-
 from dataclasses import dataclass, field
 import math
 
@@ -186,11 +185,5 @@ def mat_trans_2_screw(matrix: np.ndarray) -> Screw:
     screw.angle = math.acos(cost)
     if sint < 0:
         screw.angle = -screw.angle
-
-    # Make sure that screw.normtranslation is always positive.
-    # and update the unit vector to it's opposite
-    if screw.normtranslation < 0:
-        screw.normtranslation = np.absolute(screw.normtranslation)
-        screw.unit = -screw.unit
 
     return screw
