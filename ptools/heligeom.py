@@ -31,8 +31,8 @@ def chain_intersect(
     Returns:
         A tuple wit the 2 new RigidBodies.
     """
-    resids1 = set(rb1.select_atom_type("CA").residue_indices)
-    resids2 = set(rb2.select_atom_type("CA").residue_indices - delta_resid)
+    resids1 = set(rb1.select("name CA").residue_indices)
+    resids2 = set(rb2.select("name CA").residue_indices - delta_resid)
     resids = list(resids1.intersection(resids2))
 
     atom_ids1 = np.where(np.isin(rb1.residue_indices, resids))[0]
