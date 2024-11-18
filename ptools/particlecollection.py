@@ -219,7 +219,7 @@ class ParticleCollection:
         if name in ("_atom_properties", "atom_properties"):
             return super().__getattribute__(name)
 
-        atom_properties = super().__getattribute__("atom_properties")
+        atom_properties = self.__getattribute__("atom_properties")
         if name in atom_properties:
             return self.atom_properties.get(name).values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")

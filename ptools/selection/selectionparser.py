@@ -35,6 +35,8 @@ class AndOperator:
         assert len(args) == self.operands
         left, right = args
         indices = np.intersect1d(left.serial, right.serial)
+        if left.has_parent():
+            return left.parent[indices]
         return left[indices]
 
 

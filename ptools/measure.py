@@ -93,6 +93,17 @@ def contacts(
     return PairList(obj1, obj2, cutoff).contacts()
 
 
+def raw_contacts(
+    obj1: HasCoordinatesType, obj2: HasCoordinatesType, cutoff: float
+) -> tuple[list[int], list[int]]:
+    """Returns the indexes of the atoms of `obj1` that are in contact with
+    the atoms of `obj2`.
+
+    Returns two lists of atom indexes, one for each object.
+    """
+    return PairList(obj1, obj2, cutoff).raw_contacts()
+
+
 def contacts_by_atom(
     obj1: HasCoordinatesType, obj2: HasCoordinatesType, cutoff: float
 ) -> list[tuple[int, int]]:
