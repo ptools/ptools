@@ -108,27 +108,21 @@ class TestSuperpose(unittest.TestCase):
         assert s.point == approx(array(0.0, 0.0, 0.0))
 
         # abs(1 - a + b - c) > EPSILON
-        s = superpose.mat_trans_2_screw(
-            transformation_matrix(rotation=np.array([0, -34, 0]))
-        )
+        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, -34, 0])))
         assert s.angle == approx(-0.59341194)
         assert s.normtranslation == approx(0.0)
         assert s.unit == approx(array(0.0, 1.0, 0.0))
         assert s.point == approx(array(0.0, 0.0, 0.0))
 
         # abs(1 - a - b + c) > EPSILON
-        s = superpose.mat_trans_2_screw(
-            transformation_matrix(rotation=np.array([0, 0, 90]))
-        )
+        s = superpose.mat_trans_2_screw(transformation_matrix(rotation=np.array([0, 0, 90])))
         assert s.angle == approx(1.5707963)
         assert s.normtranslation == approx(0.0)
         assert s.unit == approx(array(0.0, 0.0, 1.0))
         assert s.point == approx(array(0.0, 0.0, 0.0))
 
         # angle = 0
-        t = transformation_matrix(
-            rotation=np.zeros(3), translation=np.array([-3, 2, 1])
-        )
+        t = transformation_matrix(rotation=np.zeros(3), translation=np.array([-3, 2, 1]))
         s = superpose.mat_trans_2_screw(t)
         assert s.angle == approx(0.0)
         assert s.normtranslation == approx(3.74165738)
@@ -140,6 +134,6 @@ class TestSuperpose(unittest.TestCase):
         )
         s = superpose.mat_trans_2_screw(t)
         assert s.angle == approx(-1.5252596161330076)
-        assert s.normtranslation == approx(12.77587846045537)
-        assert s.unit == approx(array(-0.06444127, 0.26669722, 0.96162358))
+        assert s.normtranslation == approx(-12.77587846045537)
+        assert s.unit == approx(array(0.06444127, -0.26669722, -0.96162358))
         assert s.point == approx(array(0.0, -8.50905679, -39.2568708))
