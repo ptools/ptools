@@ -45,9 +45,8 @@ class Particle:
 
     def __getattr__(self, name):
         if name in self._singular_to_plural:
-            return self._collection.atom_properties.get(self._singular_to_plural[name])[
-                self._index
-            ]
+            plural = self._singular_to_plural[name]
+            return self._collection.atom_properties[plural][self._index]
         raise AttributeError(f"No such attribute: {name!r}")
 
     def __setattr__(self, name, value):
@@ -194,7 +193,7 @@ class ParticleCollection:
 
     def reset_atom_indices(self, start=1):
         """Resets the atom indices to a new range."""
-        self.atom_properties.set("indices", np.arange(start, start + self.size()))
+        self.atom_properties["indices"] = np.arange(start, start + self.size())
 
     def __iter__(self):
         """Iterates over the atoms."""
@@ -218,7 +217,7 @@ class ParticleCollection:
 
         atom_properties = self.__getattribute__("atom_properties")
         if name in atom_properties:
-            return self.atom_properties.get(name).values
+            return self.atom_properties[name].values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
 
     def __setattr__(self, name, value):
@@ -230,10 +229,10 @@ class ParticleCollection:
             # If the collection has a parent (i.e. is a slice), we need to update
             # the parent's properties.
             if self.has_parent():
-                values = self._selection.parent.atom_properties.get(name).values
+                values = self._selection.parent.atom_properties[name].values
                 values[self._selection.indices] = value
             else:
-                self.atom_properties.set(name, value)
+                self.atom_properties[name] = value
             return
         super().__setattr__(name, value)
 
@@ -305,7 +304,7 @@ class ParticleCollection:
         if "elements" not in self.atom_properties:
             self.atom_properties.add_array("element", "elements", values)
         else:
-            self.atom_properties.get("elements").values = values
+            self.atom_properties["elements"].values = values
 
     def guess_masses(self, guess_element: bool = True):
         """Guesses the masses of the atoms."""
@@ -316,13 +315,12 @@ class ParticleCollection:
         if "masses" not in self.atom_properties:
             self.atom_properties.add_array("mass", "masses", values)
         else:
-            self.atom_properties.set("masses", values)
+            self.atom_properties["masses"] = values
 
     # == Selection methods ==============================================================
     def select(self: ParticleCollectionType, selection_str: str) -> ParticleCollectionType:
         """Returns a new collection with the selected atoms."""
         return select_atoms(selection_str, self)
-
 
     def select_by_property(self: ParticleCollectionType, property_name: str, value: Any) -> ParticleCollectionType:
         """Selects atoms based on a property."""

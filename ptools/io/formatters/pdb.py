@@ -65,23 +65,23 @@ class ParticleBuffer:
     """Returns a Particle properties."""
 
     def __init__(self, properties: NamedArrayContainer, i: int):
-        self.coordinates = properties.get("coordinates")[i]
-        self.name = properties.get("names")[i]
-        self.index = properties.get("indices")[i]
-        self.residue_name = properties.get("residue_names")[i]
-        self.residue_index = properties.get("residue_indices")[i]
-        self.chain = properties.get("chains")[i]
+        self.coordinates = properties["coordinates"][i]
+        self.name = properties["names"][i]
+        self.index = properties["indices"][i]
+        self.residue_name = properties["residue_names"][i]
+        self.residue_index = properties["residue_indices"][i]
+        self.chain = properties["chains"][i]
 
         self.element = ''
         self.bfactor = 0.0
         self.occupancy = 1.0
 
         if "elements" in properties:
-            self.element = properties.get("elements")[i]  # type: ignore
+            self.element = properties["elements"][i]  # type: ignore
         if "bfactors" in properties:
-            self.bfactor = properties.get("bfactors")[i]  # type: ignore
+            self.bfactor = properties["bfactors"][i]  # type: ignore
         if "occupancies" in properties:
-            self.occupancy = properties.get("occupancies")[i]  # type: ignore
+            self.occupancy = properties["occupancies"][i]  # type: ignore
 
 
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:

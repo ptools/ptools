@@ -88,7 +88,7 @@ def test_initialization_from_list_of_particles():
     assert pc.size() == expected.number_of_particles()
 
     for prop in expected.properties():
-        assert pc.atom_properties.get(prop) == getattr(expected, prop)
+        assert pc.atom_properties[prop] == getattr(expected, prop)
 
 
 def test_initialization_from_properties():
@@ -102,9 +102,9 @@ def test_initialization_from_properties():
     assert pc.atom_properties is not None
     assert pc.size() == 3
 
-    assert pc.atom_properties.get("xs") == [1, 2, 3]
-    assert pc.atom_properties.get("ys") == [4, 5, 6]
-    assert pc.atom_properties.get("zs") == [7, 8, 9]
+    assert pc.atom_properties["xs"] == [1, 2, 3]
+    assert pc.atom_properties["ys"] == [4, 5, 6]
+    assert pc.atom_properties["zs"] == [7, 8, 9]
 
 
 # == __getitem__  ======================================================================
@@ -367,18 +367,18 @@ def test_masses():
     pc.guess_masses()
 
     expected = [atomic_masses[a.name] for a in pc]
-    assert pc.atom_properties.get("masses") == expected
+    assert pc.atom_properties["masses"] == expected
 
 
 def test_set_property():
     """Test that the ``set_property`` method works."""
     pc = ParticleCollection(generate_atoms())
-    assert pc.atom_properties.get("indices") == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    assert pc.atom_properties["indices"] == [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     expected = [42] * pc.size()
-    pc.atom_properties.set("indices", expected)
-    assert isinstance(pc.atom_properties.get("indices"), NamedArray)
-    assert pc.atom_properties.get("indices") == expected
+    pc.atom_properties["indices"] = expected
+    assert isinstance(pc.atom_properties["indices"], NamedArray)
+    assert pc.atom_properties["indices"] == expected
 
 
 # == Grouping  ==========================================================================
@@ -418,7 +418,7 @@ def test_iter_returs_a_reference_to_original_object():
     for actual_atom in pc:
         actual_atom.name = "banana"
 
-    assert pc.atom_properties.get("names") == ["banana"] * len(expected.particles)
+    assert pc.atom_properties["names"] == ["banana"] * len(expected.particles)
 
 
 def test_iter_returns_a_reference():
@@ -428,7 +428,7 @@ def test_iter_returns_a_reference():
     for p in pc:
         p.name = "banana"
     expected = ["banana"] * len(expected.particles)
-    actual = pc.atom_properties.get("names")
+    actual = pc.atom_properties["names"]
     assert actual == expected
 
 
@@ -450,7 +450,7 @@ def test_add_atom_property():
     bananas = [0] * pc.size()
     pc.add_atom_property("banana", "bananas", bananas)
     assert hasattr(pc, "bananas")
-    assert pc.atom_properties.get("bananas") == bananas
+    assert pc.atom_properties["bananas"] == bananas
 
 
 def test_add_atom_property_fails_if_property_already_exists():

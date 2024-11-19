@@ -56,7 +56,7 @@ def test_add_array():
     assert expected.plural in container
 
     # Retrieves the property and checks its attributes.
-    prop = container.get(expected.plural)
+    prop = container[expected.plural]
     assert prop.singular == expected.singular
     assert prop.plural == expected.plural
     assert_array_almost_equal(prop.values, expected.values)
@@ -82,7 +82,7 @@ def test_register():
     container = NamedArrayContainer()
     container.register(expected)
 
-    actual = container.get(expected.plural)
+    actual = container[expected.plural]
     assert actual == expected
 
 
@@ -98,11 +98,11 @@ def test_register_copies_values():
     container = NamedArrayContainer()
     container.register(item)
 
-    assert_array_almost_equal(item.values, container.get(item.plural).values)
+    assert_array_almost_equal(item.values, container[item.plural].values)
 
     item.values = 1
-    assert_array_not_almost_equal(item.values, container.get(item.plural).values)
-    assert_array_almost_equal((1, 2, 3), container.get(item.plural).values)
+    assert_array_not_almost_equal(item.values, container[item.plural].values)
+    assert_array_almost_equal((1, 2, 3), container[item.plural].values)
 
 
 # == Test ParticleCollection.remove_array ==============================================
@@ -150,7 +150,7 @@ def test_equality():
 
     # Checks inequality of containers where one array differs from one container
     # to the other.
-    r_ones = rhs.get("ones")
+    r_ones = rhs["ones"]
     r_ones.values[:] = 13
     assert lhs != rhs
 
@@ -168,7 +168,7 @@ def test_copy():
     assert container == copy
 
     # Checks that the copy is independent from the original.
-    copy.get("ones").values[:] = 13
+    copy["ones"].values[:] = 13
     assert container != copy
 
 
@@ -181,48 +181,48 @@ def test_add():
     assert result.number_of_elements() == lhs.number_of_elements() * 2
     for prop in lhs:
         assert_array_almost_equal(
-            result.get(prop.plural).values,
-            np.concatenate((lhs.get(prop.plural).values, rhs.get(prop.plural).values)),
+            result[prop.plural].values,
+            np.concatenate((lhs[prop.plural].values, rhs[prop.plural].values)),
         )
 
 
 def test_set_values():
     container = NamedArrayContainer(generate_arrays())
-    assert container.get("ones") == [1, 1, 1, 1, 1]
+    assert container["ones"] == [1, 1, 1, 1, 1]
 
-    container.set("ones", [2, 2, 2, 2, 2])
-    assert container.get("ones") == [2, 2, 2, 2, 2]
+    container["ones"] = [2, 2, 2, 2, 2]
+    assert container["ones"] == [2, 2, 2, 2, 2]
 
 
 def test_set_values_with_wrong_dimensions_fails():
     """Checks cannot set an array with wrong dimensions."""
     container = NamedArrayContainer(generate_arrays())
-    assert container.get("ones") == [1, 1, 1, 1, 1]
+    assert container["ones"] == [1, 1, 1, 1, 1]
 
     with pytest.raises(ValueError):
         not_the_expected_array_size = container.number_of_elements() + 1
-        container.set("ones", [2] * not_the_expected_array_size)
+        container["ones"] = [2] * not_the_expected_array_size
 
 
 def test_set_values_with_wrong_property_fails():
     """Checks cannot set an array with wrong name."""
     container = NamedArrayContainer(generate_arrays())
     assert container.names() == ["ones", "twos", "threes"]
-    with pytest.raises(ValueError) as excinfo:
-        container.set("wrong_property", [2, 2, 2])
+    with pytest.raises(KeyError) as excinfo:
+        container["wrong_property"] = [2, 2, 2]
     assert "wrong_property" in str(excinfo.value)
 
 
 def test_modify_slices():
     container = NamedArrayContainer(generate_arrays())
-    assert container.get("ones") == [1, 1, 1, 1, 1]
+    assert container["ones"] == [1, 1, 1, 1, 1]
 
-    container.get("ones")[1:3] = 2
-    assert container.get("ones") == [1, 2, 2, 1, 1]
+    container["ones"][1:3] = 2
+    assert container["ones"] == [1, 2, 2, 1, 1]
 
-    subset = container.get("ones")[1:3]
+    subset = container["ones"][1:3]
     subset[:] = 3
-    assert container.get("ones") == [1, 3, 3, 1, 1]
+    assert container["ones"] == [1, 3, 3, 1, 1]
 
 
 def test_from_objects():
@@ -235,5 +235,5 @@ def test_from_objects():
     container = NamedArrayContainer.from_objects(objects)
     assert container.number_of_properties() == 2
     assert container.number_of_elements() == 3
-    assert container.get("prop1s") == [1, 1, 1]
-    assert container.get("prop2s") == [2, 2, 2]
+    assert container["prop1s"] == [1, 1, 1]
+    assert container["prop2s"] == [2, 2, 2]

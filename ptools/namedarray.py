@@ -159,12 +159,19 @@ class NamedArrayContainer(collections.abc.Container):
     def __iter__(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
 
-    def __getitem__(self, key: int | slice) -> NamedArrayContainer:
-        """Returns a new collection with a slice of all properties."""
+    def __getitem__(self, key: str | int | slice) -> NamedArrayContainer:
+        if isinstance(key, str):
+            return self._get_by_name(key)
         if isinstance(key, int):
             key = slice(key, key + 1)
         # mypy-ignore: ``key`` is a slice, ``prop[key]`` is NamedArray
         return NamedArrayContainer(prop[key] for prop in self._properties.values())  # type: ignore
+
+    def __setitem__(self, key: str, value: NamedArrayContainer):
+        if isinstance(key, str):
+            self._set_by_name(key, value)
+            return
+        raise KeyError(f"cannot set item with key {key!r}")
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
@@ -222,18 +229,18 @@ class NamedArrayContainer(collections.abc.Container):
     def iter_arrays(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
 
-    def get(self, plural: object) -> NamedArray:
+    def _get_by_name(self, plural: object) -> NamedArray:
         """Returns the property with the given plural name."""
         if not isinstance(plural, str):
             raise ValueError("expects string to fetch property using its plural name")
         return self._properties[plural]
 
-    def set(self, plural: object, value: ArrayLike):
+    def _set_by_name(self, plural: object, value: ArrayLike):
         """Sets the property with the given plural name."""
         if not isinstance(plural, str):
-            raise ValueError("expects string to set property using its plural name")
+            raise KeyError("expects string to set property using its plural name")
         if plural not in self._properties:
-            raise ValueError(f"property {plural!r} not registered")
+            raise KeyError(f"property {plural!r} not registered")
         if not self._properties[plural].values.shape == np.shape(value):
             raise ValueError(
                 f"cannot set property {plural!r} with array of shape {np.shape(value)} "

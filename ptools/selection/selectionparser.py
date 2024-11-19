@@ -124,20 +124,20 @@ class IntegerPropertySelection:
 
     def select_from_operator(self, atoms: "ParticleCollection", op: Callable, value: Numeric):
         """Selection from a single operator."""
-        indices = np.where(op(atoms.atom_properties.get(self.attr).values, value))[0]
+        indices = np.where(op(atoms.atom_properties[self.attr].values, value))[0]
         return atoms[indices]
 
     def select_from_values(self, atoms: "ParticleCollection", value: list[Numeric]):
         """Selection from a single or multiple values."""
-        indices = np.where(np.isin(atoms.atom_properties.get(self.attr).values, value))[0]
+        indices = np.where(np.isin(atoms.atom_properties[self.attr].values, value))[0]
         return atoms[indices]
 
     def select_from_range(self, atoms: "ParticleCollection", start: Numeric, end: Numeric):
         """Selection from a range of values."""
         indices = np.where(
             np.logical_and(
-                atoms.atom_properties.get(self.attr).values >= start,
-                atoms.atom_properties.get(self.attr).values <= end,
+                atoms.atom_properties[self.attr].values >= start,
+                atoms.atom_properties[self.attr].values <= end,
             )
         )[0]
         return atoms[indices]
@@ -154,7 +154,7 @@ class StringPropertySelection:
         self.attr = attr
 
     def eval(self, atoms: "ParticleCollection", values: list[str]):
-        indices = np.where(np.isin(atoms.atom_properties.get(self.attr).values, values))[0]
+        indices = np.where(np.isin(atoms.atom_properties[self.attr].values, values))[0]
         return atoms[indices]
 
 
@@ -169,7 +169,7 @@ class BoolPropertySelection:
         self.attr = attr
 
     def eval(self, atoms: "ParticleCollection", values: list[str]):
-        indices = np.where(atoms.atom_properties.get(self.attr).values == True)[0]
+        indices = np.where(atoms.atom_properties[self.attr].values == True)[0]
         return atoms[indices]
 
 
@@ -189,7 +189,7 @@ class WaterSelection:
     def eval(self, atoms: "ParticleCollection", values: list[Any]):
         assert len(values) == self.operands
         water_residues = ["HOH", "WAT", "TIP3", "TIP4", "TIP5"]
-        indices = np.where(np.isin(atoms.atom_properties.get("residue_names").values, water_residues))[0]
+        indices = np.where(np.isin(atoms.atom_properties["residue_names"].values, water_residues))[0]
         return atoms[indices]
 
 

@@ -1,7 +1,5 @@
 """test_atom - Tests for `ptools.atom` module."""
 
-# Unit-test specific imports
-from pytest import approx
 from .generators import generate_particlecollection
 
 from ptools.tables import atomic_masses

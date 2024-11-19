@@ -65,8 +65,6 @@ class EvaluatorBase(ABC):
         return token
 
     def _expect(self, token: str):
-        if not self._has_next():
-            raise UnexpectedTrailingTokenError("")
         if self._next() == token:
             self._consume()
         else:
