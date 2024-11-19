@@ -109,7 +109,6 @@ class ParticleCollection:
 
     def _init_from_selection(self, selection: Selection):
         assert selection is not None
-
         self._selection = selection
 
     def _init_from_atoms(self, atoms: Iterable[Any]):
@@ -212,11 +211,7 @@ class ParticleCollection:
         )
 
     def __getattr__(self, name):
-        if name in ("_atom_properties", "atom_properties"):
-            return super().__getattribute__(name)
-
-        atom_properties = self.__getattribute__("atom_properties")
-        if name in atom_properties:
+        if name in self.atom_properties:
             return self.atom_properties[name].values
         raise AttributeError(f"{self.__class__.__name__} has no attribute: {name!r}")
 

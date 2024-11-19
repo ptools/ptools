@@ -219,15 +219,19 @@ class NamedArrayContainer(collections.abc.Container):
         return len(self._properties) == 0
 
     def names(self) -> list[str]:
+        """Returns the plural names of the properties."""
         return list(self._properties.keys())
 
     def singular_names(self) -> list[str]:
+        """Returns the singular names of the properties."""
         return [prop.singular for prop in self._properties.values()]
 
     def plural_names(self) -> list[str]:
-        return [
-            prop.plural for prop in self._properties.values()
-        ]  # equivalent to self.names()
+        """Returns the plural names of the properties.
+
+        This is equivalent to the names() method.
+        """
+        return [prop.plural for prop in self._properties.values()]
 
     def iter_arrays(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
