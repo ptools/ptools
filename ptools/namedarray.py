@@ -90,7 +90,10 @@ class NamedArray:
                 and self._array_comparison_func(self.values, other.values)
             )
         if isinstance(other, collections.abc.Iterable):
-            return self._array_comparison_func(self.values, other)
+            other_values = np.asarray(other)
+            if other_values.shape != self.values.shape:
+                return False
+            return self._array_comparison_func(self.values, other_values)
         if not isinstance(other, self.__class__):
             raise ValueError(f"cannot compare {self.__class__} and {type(other)}")
         raise NotImplementedError
@@ -241,12 +244,15 @@ class NamedArrayContainer(collections.abc.Container):
             raise KeyError("expects string to set property using its plural name")
         if plural not in self._properties:
             raise KeyError(f"property {plural!r} not registered")
-        if not self._properties[plural].values.shape == np.shape(value):
+        value = np.asarray(value)
+        if value.shape != () and value.shape != self._properties[plural].values.shape:
             raise ValueError(
-                f"cannot set property {plural!r} with array of shape {np.shape(value)} "
-                f"(expected {self._properties[plural].values})"
+                f"cannot set property {plural!r} with array of shape {value.shape} "
+                f"(expected {self._properties[plural].values.shape})"
             )
-        self._properties[plural].values = np.asarray(value)
+        if value.shape == ():
+            value = np.full(self._properties[plural].values.shape, value)
+        self._properties[plural].values = value
 
     def get_at(self, plural: str, index: int) -> Any:
         """Returns the value of the property with the given plural name at the given index."""

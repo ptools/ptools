@@ -204,6 +204,14 @@ def test_set_values_with_wrong_dimensions_fails():
         container["ones"] = [2] * not_the_expected_array_size
 
 
+def test_set_values_with_single_value():
+    container = NamedArrayContainer(generate_arrays())
+    assert container["ones"] == [1, 1, 1, 1, 1]
+
+    container["ones"] = 2
+    assert container["ones"] == [2, 2, 2, 2, 2]
+
+
 def test_set_values_with_wrong_property_fails():
     """Checks cannot set an array with wrong name."""
     container = NamedArrayContainer(generate_arrays())
