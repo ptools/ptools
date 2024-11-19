@@ -111,9 +111,6 @@ class ParticleCollection:
     def _init_from_selection(self, selection: Selection):
         assert selection is not None
 
-        if len(selection.indices) != len(np.unique(selection.indices)):
-            raise ValueError("Indices must be unique.")
-
         self._selection = selection
 
     def _init_from_atoms(self, atoms: Iterable[Any]):
