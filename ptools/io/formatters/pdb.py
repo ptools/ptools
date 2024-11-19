@@ -77,11 +77,11 @@ class ParticleBuffer:
         self.occupancy = 1.0
 
         if "elements" in properties:
-            self.element = properties.get("elements")[i]
+            self.element = properties.get("elements")[i]  # type: ignore
         if "bfactors" in properties:
-            self.bfactor = properties.get("bfactors")[i]
+            self.bfactor = properties.get("bfactors")[i]  # type: ignore
         if "occupancies" in properties:
-            self.occupancy = properties.get("occupancies")[i]
+            self.occupancy = properties.get("occupancies")[i]  # type: ignore
 
 
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:
@@ -89,7 +89,7 @@ def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str
 
     if isinstance(atom_or_collection, ParticleCollection):
         properties = atom_or_collection.atom_properties
-        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))
+        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))  # type: ignore
 
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)

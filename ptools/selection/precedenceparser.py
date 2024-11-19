@@ -37,9 +37,9 @@ class EvaluatorBase(ABC):
     def __init__(self, logic_operators: list[LogicOperator]):
         self.binary_operators = {op.token: op for op in logic_operators if op.operands == 2}
         self.unary_operators = {op.token: op for op in logic_operators if op.operands == 1}
-        self.leaf_operators = {}
-        self.tokens = []
-        self.cursor = 0
+        self.leaf_operators: dict[str, Operator] = {}
+        self.tokens: list[str] = []
+        self.cursor: int = 0
 
     def register_leaf_operator(self, operator: LeafOperator):
         self.leaf_operators[operator.token] = operator
@@ -65,10 +65,12 @@ class EvaluatorBase(ABC):
         return token
 
     def _expect(self, token: str):
+        if not self._has_next():
+            raise UnexpectedTrailingTokenError("")
         if self._next() == token:
             self._consume()
         else:
-            raise UnexpectedTokenError(token, self._next())
+            raise UnexpectedTokenError(token, self._next())  # type: ignore
 
     def _expect_end(self):
         try:
@@ -99,13 +101,15 @@ class PrecedenceClimbingEvaluator(EvaluatorBase):
         return tree
 
     def parse_expression(self, precedence: int):
+        # mypy is actually quite dumb on this one: not able to properly infer that arguments
+        # are cannot be None when they reach each particular instruction.
         t = self._parse_subexpression()
         while (
             self._next() in self.binary_operators and
-            self.binary_operators[self._next()].precedence >= precedence
+                self.binary_operators[self._next()].precedence >= precedence  # type: ignore
         ):
             op = self.binary_operators.get(self._consume())
-            t1 = self.parse_expression(op.precedence + 1)
+            t1 = self.parse_expression(op.precedence + 1)  # type: ignore
             t = self._eval_node(op, t, t1)
         return t
 

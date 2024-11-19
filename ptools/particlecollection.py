@@ -133,12 +133,12 @@ class ParticleCollection:
     def serial(self) -> np.ndarray:
         """Returns the serial numbers of the atoms, i.e. location in the parent collection."""
         if self.has_parent():
-            return self._selection.indices
+            return self._selection.indices  # type: ignore[union-attr]
         return np.arange(self.size())
 
     # ===================================================================================
 
-    def has_parent(self):
+    def has_parent(self) -> bool:
         """Returns whether the collection has a parent (i.e. is a sub-collection)."""
         return self._selection is not None
 
@@ -146,7 +146,7 @@ class ParticleCollection:
     def parent(self) -> ParticleCollection | None:
         """Returns the parent collection of the sub-collection."""
         if self.has_parent():
-            return self._selection.parent
+            return self._selection.parent  # type: ignore[union-attr]
         return None
 
     @property

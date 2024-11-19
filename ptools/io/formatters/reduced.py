@@ -104,7 +104,7 @@ def to_reduced_pdb(
 
     if isinstance(atom_or_collection, ParticleCollection):
         properties = atom_or_collection.atom_properties
-        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))
+        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))  # type: ignore
 
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)

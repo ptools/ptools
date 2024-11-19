@@ -9,7 +9,6 @@ import numpy as np
 from .precedenceparser import (
     PrecedenceClimbingEvaluator,
     LeafOperator,
-    LogicOperator,
 )
 
 if TYPE_CHECKING:
@@ -21,11 +20,12 @@ Numeric = Union[int, float]
 #
 # Logic Operators
 #
+# These classes should conform the precedenceparser.LogicOperator protocol.
 # ===========================================================================
 
 
 class AndOperator:
-    """Selection 'and' operator."""
+    """Selection 'and' operator. """
 
     token = "and"
     precedence = 3
@@ -101,8 +101,8 @@ class IntegerPropertySelection:
         self.token = token
         self.attr = attr
 
-    def eval(self, atoms: "ParticleCollection", values: list[Numeric]):
-        ops = {
+    def eval(self, atoms: "ParticleCollection", values: list[Numeric | str]):
+        ops: dict[str, Callable] = {
             ">": np.greater,
             "<": np.less,
             ">=": np.greater_equal,
@@ -112,15 +112,15 @@ class IntegerPropertySelection:
         }
 
         if values[0] in ops:
-            return self.select_from_operator(atoms, ops[values[0]], int(values[1]))
+            return self.select_from_operator(atoms, ops[values[0]], int(values[1]))  # type: ignore
 
         # Range selection in fashion attr <number> to <number>.
         if len(values) == 3 and values[1] == "to":
             start, end = int(values[0]), int(values[2])
             return self.select_from_range(atoms, start, end)
 
-        values = [int(resid) for resid in values]
-        return self.select_from_values(atoms, values)
+        numeric_values: list[Numeric] = [int(item) for item in values]
+        return self.select_from_values(atoms, numeric_values)
 
     def select_from_operator(self, atoms: "ParticleCollection", op: Callable, value: Numeric):
         """Selection from a single operator."""
@@ -185,6 +185,7 @@ class WaterSelection:
     precedence = 1
     token = "water"
 
+    # def eval(self, atoms: "ParticleCollection", values: list[Any]):
     def eval(self, atoms: "ParticleCollection", values: list[Any]):
         assert len(values) == self.operands
         water_residues = ["HOH", "WAT", "TIP3", "TIP4", "TIP5"]
@@ -199,7 +200,7 @@ class WaterSelection:
 # ===========================================================================
 class SelectionParser(PrecedenceClimbingEvaluator):
     def __init__(self, atoms: "ParticleCollection"):
-        super().__init__(logic_operators=[AndOperator(), OrOperator(), NotOperator()])
+        super().__init__(logic_operators=[AndOperator(), OrOperator(), NotOperator()])  # type: ignore
         self.atoms = atoms
 
         # Pattern for tokenizing the selection string, i.e. separating
@@ -213,18 +214,18 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         # properties, e.g. 'names' -> 'name CA'.
         for prop in self.atoms.atom_properties:
             if np.issubdtype(prop.values.dtype, np.number):
-                self.register_leaf_operator(IntegerPropertySelection(prop.singular, prop.plural))
+                self.register_leaf_operator(IntegerPropertySelection(prop.singular, prop.plural))  # type: ignore
             elif np.issubdtype(prop.values.dtype, np.bool_):
-                self.register_leaf_operator(BoolPropertySelection(prop.singular, prop.plural))
+                self.register_leaf_operator(BoolPropertySelection(prop.singular, prop.plural))  # type: ignore
             else:
-                self.register_leaf_operator(StringPropertySelection(prop.singular, prop.plural))
+                self.register_leaf_operator(StringPropertySelection(prop.singular, prop.plural))  # type: ignore
 
         # Aliases for 'residue_index' and 'residue_name'.
         self.leaf_operators["resid"] = self.leaf_operators["residue_index"]
         self.leaf_operators["resname"] = self.leaf_operators["residue_name"]
 
         # Registers keyword operators.
-        self.register_leaf_operator(WaterSelection())
+        self.register_leaf_operator(WaterSelection())  # type: ignore
 
     def parse(self, selection_str: str):
         """Parses and evaluates the selection string."""

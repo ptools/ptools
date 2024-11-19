@@ -98,7 +98,7 @@ class NamedArray:
     def __iter__(self) -> Any:
         return iter(self.values)
 
-    def __getitem__(self, key: int | slice) -> float | NamedArray:
+    def __getitem__(self, key: int | slice | Sequence[int]) -> Any | NamedArray:
         if isinstance(key, (int, np.integer)):
             return self.values[key]
         return self.__class__(

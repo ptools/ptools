@@ -54,7 +54,6 @@ class AttractRigidBody(RigidBody):
         cls: Type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
         rigid = cls.from_properties(read_red(path).atom_properties)
-        n_atoms = len(rigid)
         return rigid
 
     @classmethod

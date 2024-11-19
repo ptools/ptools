@@ -101,7 +101,7 @@ def raw_contacts(
 
     Returns two lists of atom indexes, one for each object.
     """
-    return PairList(obj1, obj2, cutoff).raw_contacts()
+    return PairList(obj1, obj2, cutoff).raw_contacts()  # type: ignore[return-value]
 
 
 def contacts_by_atom(
