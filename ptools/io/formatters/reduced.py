@@ -77,7 +77,7 @@ class ParticleBuffer:
         self.residue_index = properties["residue_indices"][i]
         self.chain = properties["chains"][i]
         self.element = properties["elements"][i]
-        self.typeid = properties["typeids"][i]
+        self.typeid = properties["categories"][i] + 1
         self.charge = properties["charges"][i]
 
 
