@@ -70,15 +70,15 @@ class ParticleBuffer:
     """Returns a Particle properties."""
 
     def __init__(self, properties: NamedArrayContainer, i: int):
-        self.coordinates = properties.get("coordinates")[i]
-        self.name = properties.get("names")[i]
-        self.index = properties.get("indices")[i]
-        self.residue_name = properties.get("residue_names")[i]
-        self.residue_index = properties.get("residue_indices")[i]
-        self.chain = properties.get("chains")[i]
-        self.element = properties.get("elements")[i]
-        self.typeid = properties.get("typeids")[i]
-        self.charge = properties.get("charges")[i]
+        self.coordinates = properties["coordinates"][i]
+        self.name = properties["names"][i]
+        self.index = properties["indices"][i]
+        self.residue_name = properties["residue_names"][i]
+        self.residue_index = properties["residue_indices"][i]
+        self.chain = properties["chains"][i]
+        self.element = properties["elements"][i]
+        self.typeid = properties["typeids"][i]
+        self.charge = properties["charges"][i]
 
 
 REDUCED_PDB_FORMAT = (

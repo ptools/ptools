@@ -275,12 +275,12 @@ class ParticleCollection:
     @property
     def coordinates(self):
         """Returns the coordinates of the atoms."""
-        return self.atom_properties.get("coordinates").values
+        return self.atom_properties["coordinates"].values
 
     @coordinates.setter
     def coordinates(self, value: ArrayLike):
         """Sets the coordinates of the atoms."""
-        self.atom_properties.set("coordinates", value)
+        self.atom_properties["coordinates"] = value
 
     @property
     def particles(self):
