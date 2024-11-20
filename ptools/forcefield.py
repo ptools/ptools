@@ -198,7 +198,7 @@ class AttractForceField1:
 
         self._vdw_energy = van_der_waals(dx, rr2)
         self._electrostatic_energy = electrostatics(dx, rr2)
-        return self._vdw_energy # + self._electrostatic_energy
+        return self._vdw_energy + self._electrostatic_energy
 
     def __nb_energy_large_cutoff(self) -> float:
         """Private method for non-bonded energy calculation with large cutoffs."""
