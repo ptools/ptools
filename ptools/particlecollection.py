@@ -85,6 +85,10 @@ class ParticleCollection:
                 indices = np.arange(*indices.indices(len(parent)), dtype=np.int64)
             self.indices = np.array(indices, dtype=np.int64)
 
+        @property
+        def atom_properties(self) -> NamedArrayContainer:
+            return self.parent.atom_properties[self.indices]
+
     _atom_properties: NamedArrayContainer
     _selection: Selection | None
 
@@ -148,7 +152,7 @@ class ParticleCollection:
     def atom_properties(self) -> NamedArrayContainer:
         """Returns the properties of the atoms."""
         if self.has_parent():
-            return self._selection.parent.atom_properties[self._selection.indices]  # type: ignore
+            return self._selection.atom_properties
         return self._atom_properties
 
     @atom_properties.setter
