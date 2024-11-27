@@ -1,16 +1,14 @@
+import logging
 from pathlib import Path
 from typing import Any, Container, Optional, Type
-import logging
 
 import yaml
-
 
 from ..io import assert_file_exists
 from ..io.readers.pdb import read_single_model_pdb
 from ..particlecollection import ParticleCollection
-
 from .bead import Bead
-from .exceptions import NoReductionRulesError
+from .exceptions import EmptyModelError, NoReductionRulesError
 from .residue import Residue
 
 PathLike = str | Path
@@ -36,7 +34,6 @@ logger = logging.getLogger(__name__)
 
 
 class Reducer:
-
     all_atoms: ParticleCollection
     reduction_parameters: dict[str, Any]
     atom_rename_map: dict[str, dict[str, str]]
@@ -77,7 +74,7 @@ class Reducer:
         self._rename_atoms_and_residues()
 
         # Reduces each residue.
-        for residue in self.all_atoms.iter_residues(): #type: ignore[var-annotated]
+        for residue in self.all_atoms.iter_residues():  # type: ignore[var-annotated]
             try:
                 coarse_residue = self._reduce_residue(residue)
                 coarse_residue.check_composition()
@@ -92,6 +89,9 @@ class Reducer:
         # Properly sets the bead indices.
         for i, bead in enumerate(self.beads):
             bead.index = i + 1
+
+        if not self.beads:
+            raise EmptyModelError()
 
     def _reduce_residue(self, residue: ParticleCollection) -> Residue:
         """Reduces a single residue."""

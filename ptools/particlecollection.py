@@ -89,7 +89,7 @@ class ParticleCollection:
 
         @property
         def atom_properties(self) -> NamedArrayContainer:
-            return self.parent.atom_properties[self.indices]
+            return self.parent.atom_properties[self.indices]  # type: ignore
 
     _atom_properties: NamedArrayContainer
     _selection: Selection | None
@@ -150,8 +150,11 @@ class ParticleCollection:
 
     @property
     def parent(self) -> ParticleCollection | None:
-        """Returns the parent collection of the sub-collection."""
-        return self._selection.parent
+        """Returns the parent collection of the sub-collection.
+
+        Check if has parent should be dealt with prior to calling this method.
+        """
+        return self._selection.parent  # type: ignore[union-attr]
 
     @property
     def atom_properties(self) -> NamedArrayContainer:

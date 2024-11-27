@@ -162,7 +162,7 @@ class NamedArrayContainer(collections.abc.Container):
     def __iter__(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
 
-    def __getitem__(self, key: str | int | slice) -> NamedArrayContainer:
+    def __getitem__(self, key: str | int | slice) -> NamedArrayContainer | NamedArray:
         if isinstance(key, str):
             return self._get_by_name(key)
         if isinstance(key, int):
@@ -170,7 +170,7 @@ class NamedArrayContainer(collections.abc.Container):
         # mypy-ignore: ``key`` is a slice, ``prop[key]`` is NamedArray
         return NamedArrayContainer(prop[key] for prop in self._properties.values())  # type: ignore
 
-    def __setitem__(self, key: str, value: NamedArrayContainer):
+    def __setitem__(self, key: str, value: ArrayLike):
         if isinstance(key, str):
             self._set_by_name(key, value)
             return
@@ -236,13 +236,13 @@ class NamedArrayContainer(collections.abc.Container):
     def iter_arrays(self) -> Iterator[NamedArray]:
         return iter(self._properties.values())
 
-    def _get_by_name(self, plural: object) -> NamedArray:
+    def _get_by_name(self, plural: str) -> NamedArray:
         """Returns the property with the given plural name."""
         if not isinstance(plural, str):
             raise ValueError("expects string to fetch property using its plural name")
         return self._properties[plural]
 
-    def _set_by_name(self, plural: object, value: ArrayLike):
+    def _set_by_name(self, plural: str, value: ArrayLike):
         """Sets the property with the given plural name."""
         if not isinstance(plural, str):
             raise KeyError("expects string to set property using its plural name")

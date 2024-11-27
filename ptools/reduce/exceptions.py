@@ -4,7 +4,6 @@ import inspect
 import sys
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from .residue import Residue
 
@@ -110,6 +109,14 @@ class UnexpectedAtomsError(Exception):
             f"any bead: {self.unexpected_atoms}"
         )
         super().__init__(self.message)
+
+
+class EmptyModelError(Exception):
+    """Exception raised when a reduced model is empty."""
+
+    def __init__(self):
+        """Initializes the exception."""
+        super().__init__("The reduced model is empty.")
 
 
 def exceptions_from_names(names: list[str]) -> list[type[Exception]]:
