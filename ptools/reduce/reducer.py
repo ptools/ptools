@@ -125,6 +125,11 @@ class Reducer:
             if atom.name in atom_rename_:
                 atom.name = atom_rename_[atom.name]
 
+    def get_reduced_model(self) -> ParticleCollection:
+        """Returns bead atoms concatenated into a single ParticleCollection."""
+        atoms = sum(bead.atoms for bead in self.beads)
+        return ParticleCollection(atoms)
+
 
 def read_reduction_parameters(path: PathLike) -> dict[str, Any]:
     """Reads reduction parameters from a YAML file."""
