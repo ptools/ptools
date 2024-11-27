@@ -74,15 +74,16 @@ class Reducer:
 
         # Reduces each residue.
         for residue in self.all_atoms.iter_residues(): #type: ignore[var-annotated]
-            coarse_residue = self._reduce_residue(residue)
             try:
+                coarse_residue = self._reduce_residue(residue)
                 coarse_residue.check_composition()
             except Exception as error:
                 if type(error) in warn_exceptions:
                     logger.warning("%s", error)
                 elif type(error) not in ignore_exceptions:
                     raise error
-            self.beads.extend(coarse_residue.beads)
+            else:
+                self.beads.extend(coarse_residue.beads)
 
         # Properly sets the bead indices.
         for i, bead in enumerate(self.beads):
