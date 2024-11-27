@@ -71,7 +71,6 @@ class RandomParticleContainer:
 
 # == Initialization  ===================================================================
 
-
 def test_initialization_from_empty_list():
     """Test that the default initialization works."""
     pc = ParticleCollection()
@@ -106,6 +105,18 @@ def test_initialization_from_properties():
     assert pc.atom_properties["ys"] == [4, 5, 6]
     assert pc.atom_properties["zs"] == [7, 8, 9]
 
+
+def test_copy_constructor():
+    """Test that the copy constructor works."""
+    expected = RandomParticleContainer()
+    pc = ParticleCollection(expected.particles)
+
+    copy = ParticleCollection(pc)
+    assert copy is not pc
+    assert copy == pc
+
+    copy[0].name = "XXX"
+    assert copy[0].name != pc
 
 # == __getitem__  ======================================================================
 

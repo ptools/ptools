@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import itertools
-from typing import Any, Callable, Iterable, Iterator, Optional, Sequence, TypeVar, overload
+from typing import (Any, Callable, Iterable, Iterator, Optional, Sequence,
+                    TypeVar, overload)
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -103,6 +105,11 @@ class ParticleCollection:
         self._selection = None
         self._atom_properties = NamedArrayContainer()
 
+        # Copy constructor.
+        if isinstance(atoms, ParticleCollection):
+            self._atom_properties = atoms._atom_properties.copy()
+            return
+
         if selection is not None and atoms is not None:
             raise ValueError("Cannot specify both selection and atoms.")
 
@@ -173,9 +180,7 @@ class ParticleCollection:
         return self.size()
 
     @overload
-    def __getitem__(
-        self: ParticleCollectionType, key: int
-    ) -> Particle:
+    def __getitem__(self: ParticleCollectionType, key: int) -> Particle:
         ...
 
     @overload
@@ -244,7 +249,7 @@ class ParticleCollection:
     ) -> ParticleCollectionType:
         """Creates a new collection from a list of properties."""
         obj = cls()
-        obj.atom_properties = properties
+        obj.atom_properties = properties.copy()
         return obj
 
     # == Properties manipulation ========================================================
@@ -293,7 +298,7 @@ class ParticleCollection:
 
     def copy(self: ParticleCollectionType) -> ParticleCollectionType:
         """Returns a copy of the collection."""
-        return self.__class__.from_properties(self.atom_properties.copy())
+        return self.from_properties(self.atom_properties)
 
     def guess_elements(self):
         """Guesses the elements of the atoms."""
@@ -315,11 +320,15 @@ class ParticleCollection:
             self.atom_properties["masses"] = values
 
     # == Selection methods ==============================================================
-    def select(self: ParticleCollectionType, selection_str: str) -> ParticleCollectionType:
+    def select(
+        self: ParticleCollectionType, selection_str: str
+    ) -> ParticleCollectionType:
         """Returns a new collection with the selected atoms."""
         return select_atoms(selection_str, self)
 
-    def select_by_property(self: ParticleCollectionType, property_name: str, value: Any) -> ParticleCollectionType:
+    def select_by_property(
+        self: ParticleCollectionType, property_name: str, value: Any
+    ) -> ParticleCollectionType:
         """Selects atoms based on a property."""
         if isinstance(value, str):
             selection_str = f"{property_name} {value}"
