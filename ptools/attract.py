@@ -1,18 +1,17 @@
 """Attract docking."""
 
 import time
-from typing import Any, Optional, Sequence, Type, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional, Sequence, Type, TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
 
+from . import measure, transform
+from ._typing import FilePath
 from .atomattrs import AtomAttrs
 from .io.readers.red import read_red
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
-from ._typing import FilePath
-from . import measure, transform
-
 
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
@@ -44,10 +43,20 @@ class AttractRigidBody(RigidBody):
     def _initialize_attract_properties(self):
         """Initializes atom categories, charges and forces from PDB extra field."""
         n_atoms = len(self)
-        self.add_atom_property("category", "categories", np.zeros(n_atoms, dtype=int))
-        self.add_atom_property("charge", "charges", np.zeros(n_atoms, dtype=float))
-        self.add_atom_property("radius", "radii", np.zeros(n_atoms, dtype=float))
-        self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=float))
+
+        if "categories" not in self.atom_properties:
+            self.add_atom_property(
+                "category", "categories", np.zeros(n_atoms, dtype=int)
+            )
+
+        if "charges" not in self.atom_properties:
+            self.add_atom_property("charge", "charges", np.zeros(n_atoms, dtype=float))
+
+        if "radii" not in self.atom_properties:
+            self.add_atom_property("radius", "radii", np.zeros(n_atoms, dtype=float))
+
+        if "forces" not in self.atom_properties:
+            self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=float))
 
     @classmethod
     def from_red(
@@ -68,7 +77,7 @@ class AttractRigidBody(RigidBody):
 
     def apply_forces(self, forces: np.ndarray):
         """Adds forces to atoms."""
-        self.forces += forces #type: ignore[attr-defined]
+        self.forces += forces  # type: ignore[attr-defined]
 
 
 def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
