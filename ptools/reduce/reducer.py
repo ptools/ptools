@@ -44,11 +44,15 @@ class Reducer:
 
     def __init__(
         self,
-        topology_file: PathLike,
+        topology_file_or_atoms: PathLike | ParticleCollection,
         reduction_parameters_file: PathLike,
         name_conversion_file: PathLike,
     ):
-        self.all_atoms = read_single_model_pdb(topology_file)
+        if isinstance(topology_file_or_atoms, Path):
+            self.all_atoms = read_single_model_pdb(topology_file_or_atoms)
+        else:
+            self.all_atoms = topology_file_or_atoms
+
         self.reduction_parameters = read_reduction_parameters(
             reduction_parameters_file
         )["beads"]
