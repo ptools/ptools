@@ -119,11 +119,16 @@ class ParticleCollection:
             self._init_from_atoms(atoms)
 
     def _init_from_selection(self, selection: Selection):
-        assert selection is not None
+        """Initializes from a selection."""
         self._selection = selection
 
     def _init_from_atoms(self, atoms: Iterable[Any]):
-        assert atoms is not None
+        """Initializes from a list of atoms."""
+        if isinstance(atoms[0], Particle):
+            objects = [a.youpi() for a in atoms]
+            self._atom_properties = NamedArrayContainer.from_objects(objects)
+            return
+
         self._atom_properties = NamedArrayContainer.from_objects(atoms)
 
     def _set_particle_property(self, name: str, index: int, value: Any):

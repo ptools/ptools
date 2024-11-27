@@ -41,6 +41,9 @@ class Residue:
         self.reduction_parameters = bead_reduction_parameters
         self.create_beads()
 
+    def __repr__(self) -> str:
+        return f"<Residue(names={self.name!r}, {len(self.atoms)} atoms {len(self.beads)} beads)>"
+
     def create_beads(self):
         """Create beads from atoms and bead reduction parameters."""
         for bead_parameters in self.reduction_parameters:

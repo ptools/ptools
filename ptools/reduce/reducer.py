@@ -75,16 +75,15 @@ class Reducer:
 
         # Reduces each residue.
         for residue in self.all_atoms.iter_residues():  # type: ignore[var-annotated]
+            coarse_residue = self._reduce_residue(residue)
             try:
-                coarse_residue = self._reduce_residue(residue)
                 coarse_residue.check_composition()
             except Exception as error:
                 if type(error) in warn_exceptions:
                     logger.warning("%s", error)
                 elif type(error) not in ignore_exceptions:
                     raise error
-            else:
-                self.beads.extend(coarse_residue.beads)
+            self.beads.extend(coarse_residue.beads)
 
         # Properly sets the bead indices.
         for i, bead in enumerate(self.beads):
@@ -127,7 +126,15 @@ class Reducer:
 
     def get_reduced_model(self) -> ParticleCollection:
         """Returns bead atoms concatenated into a single ParticleCollection."""
-        atoms = sum(bead.atoms for bead in self.beads)
+        atoms = self.beads[0].atoms
+        print(atoms)
+        pc = ParticleCollection(atoms)
+        print(pc)
+
+        exit()
+        atoms = []
+        for bead in self.beads:
+            atoms.extend(bead.atoms)
         return ParticleCollection(atoms)
 
 
