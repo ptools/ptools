@@ -3,8 +3,11 @@
 from dataclasses import dataclass
 from typing import Any
 
+import numpy as np
+
 from .exceptions import IncompleteBeadError, DuplicateAtomsError
 from ..linalg import center_of_mass
+from ..particlecollection import ParticleCollection
 
 
 @dataclass(frozen=True)
@@ -23,6 +26,23 @@ class BeadIdentifier:
         return hash((self.type, self.typeid))
 
 
+@dataclass
+class BeadDump:
+    """A bead with no reference to original atoms.
+
+    Handy for conversion to ParticleCollection.
+    """
+    index: int
+    name: str
+    residue_name: str
+    residue_index: int
+    type: str
+    typeid: int
+    charge: float
+    chain: str
+    coordinates: np.ndarray
+
+
 class Bead:
     """ "A bead is a coarse-grained representation of several atoms.
 
@@ -37,7 +57,7 @@ class Bead:
         chain: chain identifier.
     """
 
-    atoms: list
+    atoms: ParticleCollection
     index: int
     residue_name: str
     residue_index: int
@@ -68,8 +88,22 @@ class Bead:
         self.charge = bead_reduction_parameters.get("charge", 0.0)
         self.atom_reduction_parameters = bead_reduction_parameters["atoms"]
 
+    def dump(self) -> BeadDump:
+        """Return a bead dump."""
+        return BeadDump(
+            index=self.index,
+            name=self.name,
+            residue_name=self.residue_name,
+            residue_index=self.residue_index,
+            type=self.type,
+            typeid=self.typeid,
+            charge=self.charge,
+            chain=self.chain,
+            coordinates=self.coordinates,
+        )
+
     @property
-    def coordinates(self):
+    def coordinates(self) -> np.ndarray:
         """Returns the coordinates of the bead.
 
         The coordinates of the bead are the center of mass of the bead atoms.

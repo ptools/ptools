@@ -7,6 +7,11 @@ __version__ = "0.1.0"
 from .io import read_pdb as read_pdb
 from .io import write_pdb as write_pdb
 
+from .attract import AttractRigidBody
+from .particlecollection import ParticleCollection
+from .rigidbody import RigidBody
+
+
 from . import (
     atomattrs,
     attract,
@@ -22,8 +27,6 @@ from . import (
     tables,
 )
 
-from .attract import AttractRigidBody
-from .rigidbody import RigidBody
 
 __all__ = [
     "atomattrs",

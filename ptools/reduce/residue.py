@@ -1,6 +1,5 @@
 """ptools.reduce.bead - Defines the ``Residue`` class."""
 
-
 from typing import Any
 
 from ..particlecollection import ParticleCollection
@@ -14,11 +13,13 @@ from .exceptions import (
 )
 
 
+
+
 class Residue:
     """Coarse-grained representation of a residue.
 
     Attributes:
-        atoms (ParticleCollection): list of atoms that compose the residue.
+        atoms (ParticleCollection): list of atoms that compose the residue in the all-atom model.
         beads (list[Bead]): list of beads that compose the residue.
         reduction_parameters: list[dict[str, Any]]: reduction parameters, where each
             element is the dictionary of parameters for a bead.
@@ -47,9 +48,7 @@ class Residue:
     def create_beads(self):
         """Create beads from atoms and bead reduction parameters."""
         for bead_parameters in self.reduction_parameters:
-            atoms = [
-                atom for atom in self.atoms if atom.name in bead_parameters["atoms"]
-            ]
+            atoms = [atom for atom in self.atoms if atom.name in bead_parameters["atoms"]]
 
             # Raises an error if no atoms are found for the bead.
             if not atoms:
@@ -114,12 +113,12 @@ class Residue:
     def find_duplicate_beads(self) -> set[BeadIdentifier]:
         """Return the list of duplicate atoms."""
         found = [BeadIdentifier(bead.type, bead.typeid) for bead in self.beads]
-        return set([x for x in found if found.count(x) > 1])
+        return {x for x in found if found.count(x) > 1}
 
     def find_unexpected_atoms(self) -> set[str]:
         """Return the list of unexpected atoms."""
         expected = self._expected_atoms()
-        found = set([atom.name for atom in self.atoms])
+        found = {atom.name for atom in self.atoms}
         return found - expected
 
     def _expected_atoms(self) -> set[str]:

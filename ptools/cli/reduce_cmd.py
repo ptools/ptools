@@ -61,7 +61,7 @@ def create_subparser(parent):
         "--output",
         help="output file name.",
         type=Path,
-        default="reduced.pdb",
+        default="reduced.red",
     )
 
     group = parser.add_argument_group("scorpion force field specific options")
@@ -126,7 +126,7 @@ def run(args: argparse.Namespace):
             optimize_charges(reducer)
 
     logger.info("Writing reduced model to %s", args.output)
-    write_reduced_pdb(reducer.beads, args.output)
+    write_reduced_pdb(reducer.reduced_model, args.output)
 
     logger.info("End time: %s", str(datetime.datetime.now()))
 

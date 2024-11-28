@@ -61,35 +61,12 @@ class PDBConvertible(Protocol):
         ...
 
 
-class ParticleBuffer:
-    """Returns a Particle properties."""
-
-    def __init__(self, properties: NamedArrayContainer, i: int):
-        self.coordinates = properties["coordinates"][i]
-        self.name = properties["names"][i]
-        self.index = properties["indices"][i]
-        self.residue_name = properties["residue_names"][i]
-        self.residue_index = properties["residue_indices"][i]
-        self.chain = properties["chains"][i]
-
-        self.element = ''
-        self.bfactor = 0.0
-        self.occupancy = 1.0
-
-        if "elements" in properties:
-            self.element = properties["elements"][i]  # type: ignore
-        if "bfactors" in properties:
-            self.bfactor = properties["bfactors"][i]  # type: ignore
-        if "occupancies" in properties:
-            self.occupancy = properties["occupancies"][i]  # type: ignore
-
-
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:
     """Converts an atom or a collection of atoms to PDB format."""
 
     if isinstance(atom_or_collection, ParticleCollection):
-        properties = atom_or_collection.atom_properties
-        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))  # type: ignore
+        atoms = atom_or_collection.dump()
+        return "\n".join(format_atom(atom) for atom in atoms)  # type: ignore
 
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)

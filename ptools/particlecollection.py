@@ -16,6 +16,11 @@ ParticleCollectionType = TypeVar("ParticleCollectionType", bound="ParticleCollec
 ParticleCollectionKeyType = int | slice | Sequence[int] | np.ndarray
 
 
+class ParticleDumped:
+    """A particle with no reference to original atoms."""
+    pass
+
+
 class Particle:
     """Represents a single particle in a collection."""
 
@@ -25,6 +30,11 @@ class Particle:
         self._singular_to_plural = {
             prop.singular: prop.plural for prop in self._collection.atom_properties
         }
+
+    @property
+    def atom_properties(self) -> NamedArrayContainer:
+        """Returns the properties of the particle."""
+        return self._collection.atom_properties[self._index]
 
     def properties(self) -> dict[str, Any]:
         """ "Returns a dictionary of all particle properties."""
@@ -125,10 +135,9 @@ class ParticleCollection:
     def _init_from_atoms(self, atoms: Iterable[Any]):
         """Initializes from a list of atoms."""
         if isinstance(atoms[0], Particle):
-            objects = [a.youpi() for a in atoms]
-            self._atom_properties = NamedArrayContainer.from_objects(objects)
+            p = sum((a.atom_properties for a in atoms), NamedArrayContainer())
+            self._atom_properties = p
             return
-
         self._atom_properties = NamedArrayContainer.from_objects(atoms)
 
     def _set_particle_property(self, name: str, index: int, value: Any):
@@ -374,3 +383,15 @@ class ParticleCollection:
         """Iterates over the chains in the collection."""
         by_chain = self.groupby(lambda atom: atom.chain)
         return iter(by_chain.values())  # type: ignore[arg-type]
+
+    # == Conversion methods =============================================================
+    def dump(self) -> list[ParticleDumped]:
+        """Returns a dump of the collection."""
+        atoms = []
+        for i in range(self.size()):
+            atom = ParticleDumped()
+            for array in self.atom_properties.iter_arrays():
+                setattr(atom, array.singular, array[i])
+            atoms.append(atom)
+        return atoms
+

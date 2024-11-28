@@ -66,21 +66,6 @@ class ReducedPDBConvertible(Protocol):
         ...
 
 
-class ParticleBuffer:
-    """Returns a Particle properties."""
-
-    def __init__(self, properties: NamedArrayContainer, i: int):
-        self.coordinates = properties["coordinates"][i]
-        self.name = properties["names"][i]
-        self.index = properties["indices"][i]
-        self.residue_name = properties["residue_names"][i]
-        self.residue_index = properties["residue_indices"][i]
-        self.chain = properties["chains"][i]
-        self.element = properties["elements"][i]
-        self.typeid = properties["categories"][i] + 1
-        self.charge = properties["charges"][i]
-
-
 REDUCED_PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "
     "{atom_name:4s}{altloc}{residue_name:<4s}{chain:s}{residue_index:>4s}{insertion}   "
@@ -101,14 +86,9 @@ def to_reduced_pdb(
     atom_or_collection: ReducedPDBConvertible | Iterable[ReducedPDBConvertible],
 ) -> str:
     """Converts an atom or a collection of atoms to Reduced PDB format."""
-
-    if isinstance(atom_or_collection, ParticleCollection):
-        properties = atom_or_collection.atom_properties
-        return "\n".join(format_atom(ParticleBuffer(properties, i)) for i in range(len(atom_or_collection)))  # type: ignore
-
     if isinstance(atom_or_collection, Iterable):
         return "\n".join(format_atom(atom) for atom in atom_or_collection)
-    return format_atom(atom_or_collection)
+    return format_atom(atom_or_collection)  # atom_or_collection is a single atom
 
 
 def format_atom(atom: ReducedPDBConvertible) -> str:

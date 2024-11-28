@@ -1,13 +1,15 @@
+import itertools
 import logging
+
 from pathlib import Path
-from typing import Any, Container, Optional, Type
+from typing import Any, Container, Optional, Type, Protocol, Iterator, Iterable
 
 import yaml
 
 from ..io import assert_file_exists
 from ..io.readers.pdb import read_single_model_pdb
 from ..particlecollection import ParticleCollection
-from .bead import Bead
+from .bead import Bead, BeadDump
 from .exceptions import EmptyModelError, NoReductionRulesError
 from .residue import Residue
 
@@ -33,6 +35,23 @@ FORCEFIELDS = {
 logger = logging.getLogger(__name__)
 
 
+class AtomType(Protocol):
+    """Protocol for an atom type."""
+
+    name: str
+    residue_name: str
+    residue_index: int
+    chain: str
+
+
+def iter_residues(atoms: Iterable[AtomType]) -> Iterator[list[AtomType]]:
+    """Iterates over residues in a list of atoms."""
+    sorted_atoms = sorted(atoms, key=lambda atom: (atom.residue_index, atom.chain))
+    grouped = itertools.groupby(sorted_atoms, key=lambda atom: (atom.residue_index, atom.chain))
+    for _, group in grouped:
+        yield list(group)
+
+
 class Reducer:
     all_atoms: ParticleCollection
     reduction_parameters: dict[str, Any]
@@ -46,7 +65,7 @@ class Reducer:
         name_conversion_file: PathLike,
     ):
         if isinstance(topology_file_or_atoms, Path):
-            self.all_atoms = read_single_model_pdb(topology_file_or_atoms)
+            self.all_atoms = read_single_model_pdb(topology_file_or_atoms).dump()
         else:
             self.all_atoms = topology_file_or_atoms
 
@@ -74,7 +93,7 @@ class Reducer:
         self._rename_atoms_and_residues()
 
         # Reduces each residue.
-        for residue in self.all_atoms.iter_residues():  # type: ignore[var-annotated]
+        for residue in iter_residues(self.all_atoms):
             coarse_residue = self._reduce_residue(residue)
             try:
                 coarse_residue.check_composition()
@@ -124,24 +143,17 @@ class Reducer:
             if atom.name in atom_rename_:
                 atom.name = atom_rename_[atom.name]
 
-    def get_reduced_model(self) -> ParticleCollection:
+    @property
+    def reduced_model(self) -> list[BeadDump]:
         """Returns bead atoms concatenated into a single ParticleCollection."""
-        atoms = self.beads[0].atoms
-        print(atoms)
-        pc = ParticleCollection(atoms)
-        print(pc)
-
-        exit()
-        atoms = []
-        for bead in self.beads:
-            atoms.extend(bead.atoms)
-        return ParticleCollection(atoms)
+        beads = [bead.dump() for bead in self.beads]
+        return beads
 
 
 def read_reduction_parameters(path: PathLike) -> dict[str, Any]:
     """Reads reduction parameters from a YAML file."""
     assert_file_exists(path)
-    with open(path) as f:
+    with open(path, "rt", encoding="utf-8") as f:
         reduction_parameters = yaml.safe_load(f)
     return reduction_parameters
 
@@ -155,6 +167,6 @@ def read_topology(path: PathLike) -> ParticleCollection:
 def read_name_conversion_rules(path: PathLike) -> dict[str, dict[str, str]]:
     """Reads a YAML file containing name conversion rules."""
     assert_file_exists(path)
-    with open(path) as f:
+    with open(path, "rt", encoding="utf-8") as f:
         name_conversion_rules = yaml.safe_load(f)
     return name_conversion_rules
