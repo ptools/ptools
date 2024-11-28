@@ -10,7 +10,7 @@ from ..io import assert_file_exists
 from ..io.readers.pdb import read_single_model_pdb
 from ..particlecollection import ParticleCollection
 from .bead import Bead, BeadDump
-from .exceptions import EmptyModelError, NoReductionRulesError
+from .exceptions import EmptyModelError, NoReductionRulesError, all_exceptions
 from .residue import Residue
 
 PathLike = str | Path
@@ -148,6 +148,20 @@ class Reducer:
         """Returns bead atoms concatenated into a single ParticleCollection."""
         beads = [bead.dump() for bead in self.beads]
         return beads
+
+
+def reduce(
+        atoms: ParticleCollection,
+        forcefield: str = "attract1",
+        renaming_rules: Path = DEFAULT_ATOM_RENAME_RULES_PATH,
+        warn_exceptions: list[Exception] = [],
+        ignore_exceptions: list[Exception] = all_exceptions(),
+) -> list[BeadDump]:
+    """Reduces an all-atom model to a coarse-grained model."""
+    reduction_parameters_file = FORCEFIELDS[forcefield]
+    reducer = Reducer(atoms, reduction_parameters_file, renaming_rules)
+    reducer.reduce(ignore_exceptions, warn_exceptions)
+    return reducer.reduced_model
 
 
 def read_reduction_parameters(path: PathLike) -> dict[str, Any]:
