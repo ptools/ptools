@@ -158,6 +158,9 @@ def reduce(
         ignore_exceptions: list[Exception] = all_exceptions(),
 ) -> list[BeadDump]:
     """Reduces an all-atom model to a coarse-grained model."""
+    if forcefield not in FORCEFIELDS:
+        raise ValueError(f"Force field {forcefield!r} is not supported "
+                         f"(choices are {', '.join(f'{name!r}' for name in FORCEFIELDS.keys())}).")
     reduction_parameters_file = FORCEFIELDS[forcefield]
     reducer = Reducer(atoms, reduction_parameters_file, renaming_rules)
     reducer.reduce(ignore_exceptions, warn_exceptions)

@@ -17,7 +17,7 @@ ParticleCollectionKeyType = int | slice | Sequence[int] | np.ndarray
 
 
 class ParticleDumped:
-    """A particle with no reference to original atoms."""
+    """A particle with no reference to original atoms (attributes are dynamic too)."""
     pass
 
 
