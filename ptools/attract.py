@@ -36,8 +36,8 @@ class AttractRigidBody(RigidBody):
     Atom categories and charges are parsed from input PDB file.
     """
 
-    def __init__(self, atoms: Optional[Sequence[AtomAttrs]] = None):
-        super().__init__(atoms)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._initialize_attract_properties()
 
     def _initialize_attract_properties(self):
