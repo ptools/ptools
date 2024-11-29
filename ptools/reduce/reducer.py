@@ -10,7 +10,12 @@ from ..io import assert_file_exists
 from ..io.readers.pdb import read_single_model_pdb
 from ..particlecollection import ParticleCollection
 from .bead import Bead, BeadDump
-from .exceptions import EmptyModelError, NoReductionRulesError, all_exceptions
+from .exceptions import (
+    EmptyModelError,
+    NoReductionRulesError,
+    NoAtomsForBeadError,
+    all_exceptions,
+)
 from .residue import Residue
 
 PathLike = str | Path
@@ -87,22 +92,29 @@ class Reducer:
         warn_exceptions: Optional[ExceptionTypeContainer] = None,
     ) -> None:
         """Actual reduction routine."""
-        warn_exceptions = warn_exceptions or []
         ignore_exceptions = ignore_exceptions or []
+        warn_exceptions = warn_exceptions or []
 
         self._rename_atoms_and_residues()
 
         # Reduces each residue.
         for residue in iter_residues(self.all_atoms):
-            coarse_residue = self._reduce_residue(residue)
             try:
-                coarse_residue.check_composition()
-            except Exception as error:
+                coarse_residue = self._reduce_residue(residue)
+            except NoAtomsForBeadError as error:
                 if type(error) in warn_exceptions:
                     logger.warning("%s", error)
                 elif type(error) not in ignore_exceptions:
                     raise error
-            self.beads.extend(coarse_residue.beads)
+            else:
+                try:
+                    coarse_residue.check_composition()
+                except Exception as error:
+                    if type(error) in warn_exceptions:
+                        logger.warning("%s", error)
+                    elif type(error) not in ignore_exceptions:
+                        raise error
+                self.beads.extend(coarse_residue.beads)
 
         # Properly sets the bead indices.
         for i, bead in enumerate(self.beads):
@@ -122,6 +134,7 @@ class Reducer:
         # No reduction parameters: this is an error.
         if not reduction_parameters:
             raise NoReductionRulesError(residue_name, residue_index)
+
 
         return Residue(residue, reduction_parameters)
 
