@@ -19,26 +19,26 @@ def test_initialization_from_pdb():
 
     assert isinstance(rigid, AttractRigidBody)
     assert len(rigid) == 10
-    assert hasattr(rigid, "categories")
+    assert hasattr(rigid, "typeids")
     assert hasattr(rigid, "charges")
     assert hasattr(rigid, "forces")
 
-    assert rigid.categories == approx(np.array(RedFileBuilder.categories()) - 1)
+    assert rigid.typeids == approx(np.array(RedFileBuilder.typeids()) - 1)
     assert rigid.charges == approx(RedFileBuilder.charges())
     assert rigid.radii == approx(RedFileBuilder.radii())
     assert rigid.forces == approx(np.zeros((10, 3)))
 
 
-def test_initialization_from_pdb_fails_no_categories():
-    with generate_red_file(has_categories=False) as temporary_file:
-        err = "Expected atom categories and charges, found"
+def test_initialization_from_pdb_fails_no_typeids():
+    with generate_red_file(has_typeids=False) as temporary_file:
+        err = "Expected atom type ids and charges, found"
         with pytest.raises(InvalidREDFormatError, match=err):
             AttractRigidBody.from_red(temporary_file.name)
 
 
 def test_initialization_from_pdb_fails_no_charges():
     with generate_red_file(has_charges=False) as temporary_file:
-        err = "Expected atom categories and charges, found"
+        err = "Expected atom type ids and charges, found"
         with pytest.raises(InvalidREDFormatError, match=err):
             AttractRigidBody.from_red(temporary_file.name)
 

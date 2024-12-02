@@ -113,7 +113,7 @@ class AttractForceField1:
         )
 
         # Categorie pairs.
-        C = np.array(np.meshgrid(self.receptor.categories, self.ligand.categories)).T
+        C = np.array(np.meshgrid(self.receptor.typeids, self.ligand.typeids)).T
 
         # Numpy insane trickery
         # pylint: disable=E1126
@@ -262,8 +262,8 @@ class AttractForceField1:
         ]
 
         for i, (ir, il) in enumerate(contacts):
-            category_rec = self.receptor.atom_categories[ir]
-            category_lig = self.ligand.atom_categories[il]
+            category_rec = self.receptor.typeids[ir]
+            category_lig = self.ligand.typeids[il]
 
             attractive_pairs = self._attractive_parameters[category_rec][category_lig]
             repulsive_pairs = self._repulsive_parameters[category_rec][category_lig]

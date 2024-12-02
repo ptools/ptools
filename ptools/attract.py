@@ -24,16 +24,16 @@ class AttractRigidBody(RigidBody):
     """AttractRigidBody is a RigidBody on which one can calculate the energy.
 
     It has 3 additionnal arrays compared to ParticleCollection:
-        - atom_categories (np.ndarray(N, )):
-            1 x N shaped array for atom categories
-        - atom_charges (np.ndarray(N, )):O
+        - typeids (np.ndarray(N, )):
+            1 x N shaped array for atom typeids
+        - charges (np.ndarray(N, )):O
             1 x N shaped array for atom charges
-        - atom_radii (np.ndarray(N, )):O
+        - radii (np.ndarray(N, )):O
             1 x N shaped array for atom radii
-        - atom_forces (np.ndarray(N, 3)):
+        - forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
 
-    Atom categories and charges are parsed from input PDB file.
+    Atom typeids and charges are parsed from input PDB file.
     """
 
     def __init__(self, *args, **kwargs):
@@ -41,13 +41,11 @@ class AttractRigidBody(RigidBody):
         self._initialize_attract_properties()
 
     def _initialize_attract_properties(self):
-        """Initializes atom categories, charges and forces from PDB extra field."""
+        """Initializes atom type ids, charges and forces from PDB extra field."""
         n_atoms = len(self)
 
-        if "categories" not in self.atom_properties:
-            self.add_atom_property(
-                "category", "categories", np.zeros(n_atoms, dtype=int)
-            )
+        if "typeids" not in self.atom_properties:
+            self.add_atom_property("typeid", "typeids", np.zeros(n_atoms, dtype=int))
 
         if "charges" not in self.atom_properties:
             self.add_atom_property("charge", "charges", np.zeros(n_atoms, dtype=float))

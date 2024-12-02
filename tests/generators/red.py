@@ -12,13 +12,13 @@ from .io import generate_tmp_file
 class RedFileBuilder:
     """Creates a standard RED file."""
 
-    has_categories: bool = True
+    has_typeids: bool = True
     has_charges: bool = True
     has_invalid_charges: bool = False
 
     @staticmethod
     def base_atom_list() -> list[str]:
-        """Returns basic atoms (no categories, no charges)."""
+        """Returns basic atoms (no type ids, no charges)."""
         return [
             "ATOM      1  CA  TYR     1       0.880   6.552  -1.114",
             "ATOM      2  CSE TYR     1      -0.313   5.011  -0.781",
@@ -41,10 +41,10 @@ class RedFileBuilder:
         """Atoms in RED format."""
         atoms = self.base_atom_list()
 
-        if self.has_categories:
-            categories = self.categories()
+        if self.has_typeids:
+            typeids = self.typeids()
             for i, atom in enumerate(atoms):
-                atoms[i] = atom + f"{categories[i]:5d}"
+                atoms[i] = atom + f"{typeids[i]:5d}"
 
         if self.has_charges:
             if self.has_invalid_charges:
@@ -57,8 +57,8 @@ class RedFileBuilder:
         return "\n".join(atoms)
 
     @classmethod
-    def categories(cls) -> list[int]:
-        """Atom categories as presented in default atoms."""
+    def typeids(cls) -> list[int]:
+        """Atom typeids as presented in default atoms."""
         return [1, 27, 28, 1, 23, 1, 23, 1, 27, 28]
 
     @classmethod
@@ -83,7 +83,7 @@ class RedFileBuilder:
 
 
 def generate_red_file(
-    has_categories: bool = True, has_charges: bool = True, invalid_charges: bool = False
+    has_typeids: bool = True, has_charges: bool = True, invalid_charges: bool = False
 ) -> tempfile.NamedTemporaryFile:
     """Creates a temporary file (RED format) that contains 10 atoms."""
     if invalid_charges:
@@ -91,5 +91,5 @@ def generate_red_file(
             content=RedFileBuilder(has_invalid_charges=True).content
         )
     return generate_tmp_file(
-        content=RedFileBuilder(has_categories, has_charges).content
+        content=RedFileBuilder(has_typeids, has_charges).content
     )

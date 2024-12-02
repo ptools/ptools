@@ -1,6 +1,6 @@
 """Provides functions to read the RED file format.
 
-The RED file format is essentially a PDB file with atoms categories and charges
+The RED file format is essentially a PDB file with atoms type ids and charges
 in the extra field.
 """
 
@@ -15,7 +15,7 @@ from .pdb import read_single_model_pdb
 class _ExtraField:
     """Extra field of a PDB file.
 
-    Provides helper functions to retrieve an atom category and charge.
+    Provides helper functions to retrieve an atom type id and charge.
     """
 
     def __init__(self, extra: str):
@@ -30,18 +30,18 @@ class _ExtraField:
         """
         if len(self.tokens) < 2:
             raise InvalidREDFormatError(
-                f"Expected atom categories and charges, found {self.tokens!r}"
+                f"Expected atom type ids and charges, found {self.tokens!r}"
             )
 
-    def category(self) -> int:
-        """Returns the atom category."""
+    def typeid(self) -> int:
+        """Returns the atom type id."""
         try:
-            category = int(self.tokens[0]) - 1
+            typeid = int(self.tokens[0]) - 1
         except ValueError as error:
             raise InvalidREDFormatError(
-                f"Atom category expects an int, found '{self.tokens[0]}'"
+                f"Atom type id expects an int, found '{self.tokens[0]}'"
             ) from error
-        return category
+        return typeid
 
     def charge(self) -> float:
         """Returns the atom charge."""
@@ -65,7 +65,7 @@ def read_red(path: FilePath) -> ParticleCollection:
 
         The ParticleCollection is a regular ParticleCollection with the following
         additional properties:
-          - categories: Atom categories,
+          - typeids: Atom type ids,
           - charges: Atom charges,
     """
     atoms = read_single_model_pdb(path)
@@ -74,10 +74,10 @@ def read_red(path: FilePath) -> ParticleCollection:
 
 
 def _initialize_properties_from_extra(atoms: ParticleCollection):
-    """Initializes atom categories, charges and forces from PDB extra field."""
+    """Initializes atom type ids, charges and forces from PDB extra field."""
     extra = [_ExtraField(atom.meta["extra"]) for atom in atoms]
 
     natoms = len(atoms)
-    atoms.add_atom_property("category", "categories", [tok.category() for tok in extra])
+    atoms.add_atom_property("typeid", "typeids", [tok.typeid() for tok in extra])
     atoms.add_atom_property("charge", "charges", [tok.charge() for tok in extra])
     atoms.add_atom_property("force", "forces", np.zeros((natoms, 3), dtype=float))
