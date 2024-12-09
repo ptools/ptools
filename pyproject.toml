@@ -10,14 +10,6 @@ description = "A fully pythonic library for building and analysing macromolecula
 readme = "README.rst"
 license = {file = "LICENSE"}
 
-
-dependencies = [
-    "numpy",
-    "scipy",
-    "attrs",
-    "PyYAML",
-]
-
 authors = [
   {name = "Benoist LAURENT"},
   {name = "Hubert SANTUZ"},
@@ -36,6 +28,13 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 
+dependencies = [
+    "attrs>=24.2.0",
+    "numpy>=2.2.0",
+    "pyyaml>=6.0.2",
+    "scipy>=1.14.1",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/ptools/ptools"
 
@@ -45,3 +44,9 @@ ptools = "ptools.cli.ptools_cli:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[project.optional-dependencies]
+test = [
+    "hypothesis>=6.122.3",
+    "pytest>=8.3.4",
+]
