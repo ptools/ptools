@@ -33,6 +33,12 @@ PTools is ready to use!
 uv run ptools --help
 ```
 
+If you're using the library, you can run your script using the following command:
+
+```bash
+uv run my_script.py
+```
+
 
 # Collaborators
 
