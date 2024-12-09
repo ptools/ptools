@@ -24,7 +24,6 @@ Then, setup ptools using the following command:
 git clone https://github.com/ptools/ptools.git
 cd ptools
 uv sync
-source .venv/bin/activate
 ```
 
 PTools is ready to use!
