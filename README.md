@@ -24,7 +24,6 @@ Then, setup ptools using the following command:
 git clone https://github.com/ptools/ptools.git
 cd ptools
 uv sync
-source .venv/bin/activate
 ```
 
 PTools is ready to use!
@@ -39,8 +38,14 @@ If you're using the library, you can run your script using the following command
 uv run my_script.py
 ```
 
+To work outside of PTools source directory, you need to activate the virtual environment:
 
-# Collaborators
+```bash
+source /path/to/ptools/.venv/bin/activate
+```
+
+
+## Contributors
 
 - Benoist LAURENT
 - Chantal PREVOST
