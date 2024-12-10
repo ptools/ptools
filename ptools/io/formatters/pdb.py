@@ -1,6 +1,5 @@
 from typing import Any, Iterable, Protocol, Optional
 from ...particlecollection import ParticleCollection
-from ...namedarray import NamedArrayContainer
 
 PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "

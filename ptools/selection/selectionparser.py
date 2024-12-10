@@ -2,14 +2,12 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Callable, Protocol, TYPE_CHECKING, Union
+from typing import Any, Callable, TYPE_CHECKING, Union
 
 import numpy as np
 
-from .precedenceparser import (
-    PrecedenceClimbingEvaluator,
-    LeafOperator,
-)
+from .precedenceparser import PrecedenceClimbingEvaluator
+
 
 if TYPE_CHECKING:
     from .particlecollection import ParticleCollection

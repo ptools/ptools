@@ -12,8 +12,6 @@ After the bead coodinates, the reduced PDB file contains
 from typing import Any, Iterable, Protocol
 
 from ..._typing import FilePath
-from ...particlecollection import ParticleCollection
-from ...namedarray import NamedArrayContainer
 from .pdb import (
     format_chain_token,
     format_atom_name_token,

@@ -1,7 +1,5 @@
 """Ptools forcefield implementation."""
 
-from typing import Protocol
-
 import numpy as np
 from scipy.spatial.distance import cdist
 
@@ -88,10 +86,10 @@ class AttractForceField1:
         self._vdw_energy = 0.0
         self._electrostatic_energy = 0.0
 
-        _repulsive_parameters = np.empty(0)
-        _attractive_parameters = np.empty(0)
-        _repulsive_pairs = np.empty(0)
-        _attractive_pairs = np.empty(0)
+        self._repulsive_parameters = np.empty(0)
+        self._attractive_parameters = np.empty(0)
+        self._repulsive_pairs = np.empty(0)
+        self._attractive_pairs = np.empty(0)
 
         self._initialize_parameters()
 
