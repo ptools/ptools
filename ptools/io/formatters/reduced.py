@@ -9,15 +9,16 @@ After the bead coodinates, the reduced PDB file contains
 
 """
 
-from typing import Any, Iterable, Protocol
+from collections.abc import Iterable
+from typing import Any, Protocol
 
 from ..._typing import FilePath
 from .pdb import (
-    format_chain_token,
-    format_atom_name_token,
     format_atom_index_token,
-    format_residue_name_token,
+    format_atom_name_token,
+    format_chain_token,
     format_residue_index_token,
+    format_residue_name_token,
 )
 
 
