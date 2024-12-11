@@ -197,7 +197,6 @@ def orientation_matrix(
     cosine = np.dot(vec1, vec2)
     amount = math.atan2(sine, cosine)
 
-    #print("orientation_matrix: amount, com", amount, com)
     return rotation_matrix_around_axis(axis, amount, center=com, degrees=False)
 
 
