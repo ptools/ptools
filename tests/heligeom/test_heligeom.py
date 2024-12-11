@@ -91,11 +91,11 @@ class TestHeligeom(unittest.TestCase):
 
     def test_heli_construct_Zalign(self):
         """Tests heligeom.heli_construct z-alignment"""
-        from ptools.io import write_pdb as write_pdb
+        ##from ptools.io import write_pdb as write_pdb
         mono1 = self.mono1.copy()
         mono2 = self.mono2.copy()
-        write_pdb(mono1, "mono1.pdb")
-        write_pdb(mono2, "mono2.pdb")
+        ##write_pdb(mono1, "mono1.pdb")
+        ##write_pdb(mono2, "mono2.pdb")
         # Test structures are have helix axis oriented along z-axis,
         # so rotate them to a different orientation
         transform.rotate_by(mono1, (0,90,0))
@@ -103,19 +103,21 @@ class TestHeligeom(unittest.TestCase):
         write_pdb(mono1, "mono1y.pdb")
         write_pdb(mono2, "mono2y.pdb")
         hp = heli_analyze(mono1, mono2)
-        print("\n", hp)
-        for k,v in hp.__dict__.items():
-            print(k, v)
+        ##print("\n", hp)
+        ##for k,v in hp.__dict__.items():
+        ##    print(k, v)
         result = heli_construct(mono1, hp, N=3, Z=True)
-        write_pdb(result, "resultz.pdb")
+        ##write_pdb(result, "resultz.pdb")
 
         ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N3_Z)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N3_Z)
         maxdiff = np.max(np.abs(result.coordinates - ref_coords))
         print("Max calculated - reference coord difference is ", maxdiff)
-
-        #assert to_pdb(result) == to_pdb(ref)
         assert maxdiff < 5e-4 
+
+        # Don't test pdbfile differences: there are +/-1 diffs in last decimal place of coordinates
+        # Perhaps reference file was written using truncation and not rounding
+        # assert to_pdb(result) == to_pdb(ref)
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
