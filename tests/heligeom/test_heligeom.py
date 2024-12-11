@@ -100,11 +100,9 @@ class TestHeligeom(unittest.TestCase):
         hp = heli_analyze(mono1, mono2)
         result = heli_construct(mono1, hp, N=3, Z=True)
 
-        ref = RigidBody.from_pdb(TEST_REF_2GLSAB_N3_Z)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N3_Z)
         maxdiff = np.max(np.abs(result.coordinates - ref_coords))
-        print("Max calculated - reference coord difference is ", maxdiff)
-        assert maxdiff < 5e-4 
+        assert maxdiff < 5e-4
 
     def test_dist_axis(self):
         """Tests for heligeom.distAxis"""
