@@ -7,9 +7,6 @@ from collections.abc import Sequence
 from typing import Optional, Type, TypeVar, get_args
 from ._typing import FilePath
 
-# Scientific libraries.
-import numpy as np
-
 # PTools.
 from .atomattrs import AtomAttrs
 from .io.readers.pdb import read_pdb as io_read_pdb

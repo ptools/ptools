@@ -1,14 +1,13 @@
 """Attract docking."""
 
 import time
-from typing import TYPE_CHECKING, Any, Optional, Sequence, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Type, TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
 
 from . import measure, transform
 from ._typing import FilePath
-from .atomattrs import AtomAttrs
 from .io.readers.red import read_red
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody

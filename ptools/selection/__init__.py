@@ -1,1 +1,1 @@
-from .selectionparser import select
+from .selectionparser import select as select
