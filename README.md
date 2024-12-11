@@ -12,9 +12,11 @@ This will ensure that all dependencies are correctly installed.
 To install `uv`, run the following command:
 
 ```bash
-# On macOS and Linux.
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# With pip.
+pip install uv
+
 ```
+More details available at [uv](https://github.com/astral-sh/uv).
 
 Then, setup ptools using the following command:
 
@@ -22,7 +24,6 @@ Then, setup ptools using the following command:
 git clone https://github.com/ptools/ptools.git
 cd ptools
 uv sync
-source .venv/bin/activate
 ```
 
 PTools is ready to use!
@@ -31,8 +32,20 @@ PTools is ready to use!
 uv run ptools --help
 ```
 
+If you're using the library, you can run your script using the following command:
 
-# Collaborators
+```bash
+uv run my_script.py
+```
+
+To work outside of PTools source directory, you need to activate the virtual environment:
+
+```bash
+source /path/to/ptools/.venv/bin/activate
+```
+
+
+## Contributors
 
 - Benoist LAURENT
 - Chantal PREVOST
@@ -44,11 +57,3 @@ Past contributors:
 - Adrien SALADIN
 - Benjamin BOYER
 - Pierre POULAIN
-
-
-# Credits
-
-This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter)
-and the [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage)
-project template.
-

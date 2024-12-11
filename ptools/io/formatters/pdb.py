@@ -1,6 +1,7 @@
-from typing import Any, Iterable, Protocol, Optional
+from collections.abc import Iterable
+from typing import Any, Protocol
+
 from ...particlecollection import ParticleCollection
-from ...namedarray import NamedArrayContainer
 
 PDB_FORMAT = (
     "{record:<6s}{atom_index:5s} "
@@ -49,15 +50,15 @@ class PDBConvertible(Protocol):
         ...
 
     @property
-    def occupancy(self) -> Optional[float]:
+    def occupancy(self) -> float | None:
         ...
 
     @property
-    def bfactor(self) -> Optional[float]:
+    def bfactor(self) -> float | None:
         ...
 
     @property
-    def element(self) -> Optional[str]:
+    def element(self) -> str | None:
         ...
 
 

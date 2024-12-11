@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from ...rigidbody import RigidBody
 from ..._typing import FilePath
+from ...rigidbody import RigidBody
 
 
 class AttractFileParameters:
@@ -87,7 +87,7 @@ class AttractFileParameters:
             return minim
 
         # Read file ignoring comments.
-        with open(path, "rt", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             lines = [line for line in f if line[0] not in ("#", "!")]
 
         # First number is the number of minimizations to perform.
@@ -122,7 +122,7 @@ def read_aminon(path: FilePath) -> list[tuple[float, float]]:
         list[(float, float)]: radius and amplitude values for each line.
     """
     params = []
-    with open(path, "rt", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for line in f:
             # Ignore empty lines and lines starting with "#".
             if line.strip() and not line.startswith("#"):
@@ -173,14 +173,14 @@ def read_forcefield_from_reduced(path: FilePath) -> str:
     """
 
     def get_header_line():
-        with open(path, "rt", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             line = f.readline()
         if not line.startswith("HEADER"):
             err = (
                 f"{path}: reduced PDB file first line must be a HEADER line"
                 "specifying the chosen force field"
             )
-            raise IOError(err)
+            raise OSError(err)
         return line
 
     def get_header_tokens():
@@ -189,7 +189,7 @@ def read_forcefield_from_reduced(path: FilePath) -> str:
         if len(tokens) < 2:
             err = "{}: cannot read force field name from first line '{}'"
             err = err.format(path, line)
-            raise IOError(err)
+            raise OSError(err)
         return tokens
 
     def get_ffname():
@@ -233,7 +233,7 @@ def read_rotations(
     nphi = []
     # read theta, phi, rot data
     # nchi is number of steps to rotate about the axis joining the ligand/receptor centers
-    with open(path, "rt", encoding="utf-8") as rotdat:
+    with open(path, encoding="utf-8") as rotdat:
         line = rotdat.readline().split()
         ntheta = int(line[0])
         nchi = int(line[1])

@@ -159,9 +159,7 @@ def read_single_model_pdb(path: FilePath) -> ParticleCollection:
 
 def read_pdb(
     path: FilePath, as_dict=False
-) -> Union[
-    dict[str, ParticleCollection], Sequence[ParticleCollection], ParticleCollection
-]:
+) -> dict[str, ParticleCollection] | Sequence[ParticleCollection] | ParticleCollection:
     """Read a Protein Data Bank file.
 
     Args:
@@ -188,7 +186,7 @@ def read_pdb(
     model_id_list: list[str] = []
     current_model: list[AtomAttrs] = []
 
-    with open(path, "rt", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         for buffer in f:
             line = PDBLine(buffer)
             if line.is_new_model():
@@ -209,7 +207,7 @@ def read_pdb(
             raise InvalidPDBFormatError(
                 "can't initialize dictionary without model identifier (no MODEL found)"
             )
-        return dict(zip(model_id_list, models))
+        return dict(zip(model_id_list, models, strict=True))
 
     # Only 1 model: returns a simple ParticleCollection
     if len(models) == 1:
