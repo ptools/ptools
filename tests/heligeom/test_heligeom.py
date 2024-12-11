@@ -100,8 +100,8 @@ class TestHeligeom(unittest.TestCase):
         # so rotate them to a different orientation
         transform.rotate_by(mono1, (0,90,0))
         transform.rotate_by(mono2, (0,90,0))
-        write_pdb(mono1, "mono1y.pdb")
-        write_pdb(mono2, "mono2y.pdb")
+        ##write_pdb(mono1, "mono1y.pdb")
+        ##write_pdb(mono2, "mono2y.pdb")
         hp = heli_analyze(mono1, mono2)
         ##print("\n", hp)
         ##for k,v in hp.__dict__.items():
