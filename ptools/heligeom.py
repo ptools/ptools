@@ -71,19 +71,6 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
     chain_id = 0
     origin = hp.point
     axis = hp.unit
-    if Z:
-        # Redefine axis to Z
-        axis = np.array([0.0, 0, 1])
-
-        # Align the screw axis on Z-axis and apply the transformation on rb_orig
-        transform.orient(rb_orig, hp.unit, [0.0, 0.0, 1.0])
-
-        # Align the screw axis on Z-axis and apply the transformation on rb_orig and origin
-        # "don't know why this works... but Charles does"
-        t_matrix = linalg.orientation_matrix(rb_orig.coordinates, hp.unit, axis)
-        transform.transform(rb_orig, t_matrix)
-
-        origin[:] = np.inner(origin, t_matrix[:3, :3])
 
     chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
     rb_orig.atom_properties["chains"] = chains
@@ -100,6 +87,9 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
         chain_id += 1
 
         final += rb_orig
+
+    if Z:
+        transform.orient(final, hp.unit, [0.0, 0.0, 1.0])
 
     final.reset_atom_indices(start=rb.indices[0])
 

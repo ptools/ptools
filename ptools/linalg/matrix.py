@@ -161,7 +161,7 @@ def attract_euler_rotation_matrix_legacy(phi: float, ssi: float, rot: float):
 
 
 def orientation_matrix(
-    coords: np.ndarray, vector: ArrayLike, target: ArrayLike
+    coords: np.ndarray, vector: ArrayLike, target: ArrayLike, center_first=False
 ) -> np.ndarray:
     """Calculates an orientation matrix.
 
@@ -180,14 +180,14 @@ def orientation_matrix(
     Example:
         >>> # Align the 3rd principal axis of inertia on the Z-axis.
         >>> I = inertia_tensors(rigidbody)
-        >>> T = orientation_matrix(rigidbody.coords, I[2], [0, 0, 1])
+        >>> T = orientation_matrix(rigidbody.coords, I[2], [0, 0, 1], center_first=True)
         >>> receptor.transform(T)
     """
     assert np.shape(vector) == np.shape(target)
     assert np.ndim(coords) == 2
     assert np.ndim(vector) == 1 and len(vector) == np.shape(coords)[1]
 
-    com = coords.mean(axis=0)
+    com = coords.mean(axis=0) if center_first else np.zeros(3)
 
     vec1 = np.asarray(vector) / np.linalg.norm(vector)
     vec2 = np.asarray(target) / np.linalg.norm(target)
@@ -197,6 +197,7 @@ def orientation_matrix(
     cosine = np.dot(vec1, vec2)
     amount = math.atan2(sine, cosine)
 
+    #print("orientation_matrix: amount, com", amount, com)
     return rotation_matrix_around_axis(axis, amount, center=com, degrees=False)
 
 
