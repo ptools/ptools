@@ -1,7 +1,7 @@
-from typing import Iterable
+from collections.abc import Iterable
 
-from ..formatters.pdb import to_pdb, PDBConvertible
 from ..._typing import FilePath
+from ..formatters.pdb import PDBConvertible, to_pdb
 
 
 def write_pdb(

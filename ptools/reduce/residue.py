@@ -3,7 +3,6 @@
 from typing import Any
 
 from ..particlecollection import ParticleCollection
-
 from .bead import Bead, BeadIdentifier
 from .exceptions import (
     DuplicateBeadsError,
@@ -11,8 +10,6 @@ from .exceptions import (
     NoAtomsForBeadError,
     UnexpectedAtomsError,
 )
-
-
 
 
 class Residue:

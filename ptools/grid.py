@@ -2,11 +2,11 @@ import numpy as np
 from numpy.typing import DTypeLike
 
 from ptools.particlecollection import ParticleCollection
+
 from .measure import bounding_box
 
 
 class Grid:
-
     coordinates: np.ndarray
     data: np.ndarray
     _dimensions: tuple[int, int, int]
@@ -18,7 +18,7 @@ class Grid:
         self._dimensions = (0, 0, 0)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__qualname__}({self.coordinates}, {self.data.dtype})"
+        return f'{self.__class__.__qualname__}({self.coordinates}, {self.data.dtype})'
 
     @classmethod
     def from_boundaries(cls, bounds: np.ndarray, spacing: float, dtype: DTypeLike):
@@ -49,7 +49,7 @@ class Grid:
 
     def __iter__(self):
         """Iterate over grid points and data."""
-        return iter(zip(self.coordinates, self.data))
+        return iter(zip(self.coordinates, self.data, strict=True))
 
 
 def generate_grid(bounds: np.ndarray, spacing: float, dtype: DTypeLike) -> Grid:
@@ -58,7 +58,8 @@ def generate_grid(bounds: np.ndarray, spacing: float, dtype: DTypeLike) -> Grid:
 
 
 def generate_solvation_grid(atoms: ParticleCollection, spacing: float) -> Grid:
-    """Generates a grid where points that are not within the radius of any atom are marked as solvent."""
+    """Generates a grid where points that are not within the radius of any
+    atom are marked as solvent."""
     grid = generate_grid(bounding_box(atoms), spacing, bool)
     grid.data = np.ones(grid.size(), dtype=bool)
     for atom in atoms:

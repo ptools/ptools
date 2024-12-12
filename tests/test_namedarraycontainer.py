@@ -1,9 +1,9 @@
 """"test_atompropertycontainerlection - Tests for ``NamedArrayContainer``."""
 
-from ptools.namedarray import NamedArray, NamedArrayContainer
-
 import numpy as np
 import pytest
+
+from ptools.namedarray import NamedArray, NamedArrayContainer
 
 from .testing import assert_array_almost_equal, assert_array_not_almost_equal
 

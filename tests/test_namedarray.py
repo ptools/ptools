@@ -1,14 +1,14 @@
 """"test_atomproperty - Tests for ``NamedArray``."""
 
-from ptools.namedarray import NamedArray
-
 import numpy as np
 import pytest
 
+from ptools.namedarray import NamedArray
+
 from .testing import (
     assert_array_almost_equal,
-    assert_array_not_almost_equal,
     assert_array_equal,
+    assert_array_not_almost_equal,
 )
 
 

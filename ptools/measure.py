@@ -1,15 +1,14 @@
 """ptools.measure - Measure geometric properties."""
 
 # Python core modules.
-from typing import Optional
 
 # Scientific libraries.
 import numpy as np
 
 # Ptools modules.
 from . import linalg as L
-from .pairlist import PairList
 from ._typing import ArrayLike, HasCoordinatesType, TopologyType
+from .pairlist import PairList
 from .particlecollection import ParticleCollection
 
 
@@ -57,7 +56,7 @@ def center_of_mass(obj: TopologyType) -> np.ndarray:
 
 
 def inertia_tensor(
-    obj: HasCoordinatesType | TopologyType, weights: Optional[ArrayLike] = None
+    obj: HasCoordinatesType | TopologyType, weights: ArrayLike | None = None
 ):
     """Returns the inertia tensors of a set of atoms."""
     if weights is None:
@@ -123,7 +122,7 @@ def contacts_by_residue(
     lhs_atom_ids, rhs_atom_ids = PairList(lhs, rhs, cutoff).raw_contacts()
     lhs_residue_ids = lhs.residue_indices[lhs_atom_ids]
     rhs_residue_ids = rhs.residue_indices[rhs_atom_ids]
-    by_residue = set(zip(lhs_residue_ids, rhs_residue_ids))
+    by_residue = set(zip(lhs_residue_ids, rhs_residue_ids, strict=False))
     return by_residue
 
 

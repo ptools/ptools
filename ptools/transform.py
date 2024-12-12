@@ -3,8 +3,10 @@
 import numpy as np
 
 from . import measure
-from .linalg import transform as T
 from ._typing import ArrayLike, HasCoordinatesType
+from .linalg import transform as T
+
+_ZEROS_3D = np.zeros(3)
 
 
 def translate(obj: HasCoordinatesType, direction: ArrayLike):
@@ -25,7 +27,7 @@ def moveby(obj: HasCoordinatesType, direction: ArrayLike):
     translate(obj, direction)
 
 
-def center_to_origin(obj: HasCoordinatesType, origin: ArrayLike = np.zeros(3)):
+def center_to_origin(obj: HasCoordinatesType, origin: ArrayLike = _ZEROS_3D):
     """Centers object on `origin`."""
     translate(obj, np.asarray(origin) - measure.centroid(obj))
 
@@ -59,7 +61,7 @@ def ab_rotate(
     T.ab_rotate(obj.coordinates, A, B, amount, degrees)
 
 
-def attract_euler_rotate(obj: HasCoordinatesType, angles: np.ndarray = np.zeros(3)):
+def attract_euler_rotate(obj: HasCoordinatesType, angles: np.ndarray = _ZEROS_3D):
     """Rotates object with Attract convention."""
     T.attract_euler_rotate(obj.coordinates, angles)
 

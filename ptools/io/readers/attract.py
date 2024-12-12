@@ -64,13 +64,13 @@ class AttractFileParameters:
                 raise ValueError(error) from e
             return rstk
 
-        def read_minimization():
+        def read_minimization(n: int):
             try:
                 tokens = lines.pop(0).split()
             except Exception as e:
                 error = (
                     "Cannot read minimizations from attract parameter file: "
-                    f"expected {self.nbminim}, found {i}"
+                    f"expected {self.nbminim}, found {n}"
                 )
                 raise ValueError(error) from e
             if len(tokens) < 3:
@@ -102,7 +102,7 @@ class AttractFileParameters:
         # Read minimization list.
         self.minimlist = []
         for i in range(self.nbminim):
-            self.minimlist.append(read_minimization())
+            self.minimlist.append(read_minimization(i))
 
 
 def read_aminon(path: FilePath) -> list[tuple[float, float]]:

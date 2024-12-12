@@ -45,7 +45,7 @@ class PairList:
 
     def contacts(self) -> list[tuple[int, int]]:
         """Returns the indices of atoms pairs that are within a cutoff of each other."""
-        return list(zip(*self._contacts))
+        return list(zip(*self._contacts, strict=True))
 
     def all_sqdistances(self) -> np.ndarray:
         """Returns the matrix of squared distances between every atom pairs."""
@@ -79,4 +79,4 @@ class PairList:
         Returns:
             list[(int, int)]: pairs of atom indexes.
         """
-        return sorted(zip(receptor, ligand), key=lambda x: (x[0], x[1]))
+        return sorted(zip(receptor, ligand, strict=True), key=lambda x: (x[0], x[1]))

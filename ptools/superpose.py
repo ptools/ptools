@@ -1,14 +1,14 @@
 """Superposition methods."""
 
-from dataclasses import dataclass, field
 import math
+from dataclasses import dataclass, field
 
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .particlecollection import ParticleCollection
 from . import linalg, measure, transform
 from ._typing import ArrayLike
+from .particlecollection import ParticleCollection
 
 
 def zeros3f():

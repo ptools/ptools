@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Any, Optional
+
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -44,11 +45,11 @@ class array3d(np.ndarray):
         """Returns an spatial object geometric center."""
         return L.centroid(self)
 
-    def center(self, target: Optional[ArrayLike] = None):
+    def center(self, target: ArrayLike | None = None):
         """Centers coordinates on target."""
         self = self.centered(target)
 
-    def centered(self, target: Optional[ArrayLike] = None) -> array3d:
+    def centered(self, target: ArrayLike | None = None) -> array3d:
         """Returns the centered coordinates relatively to target."""
         if target is None:
             target = self.centroid()

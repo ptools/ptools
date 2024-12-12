@@ -2,14 +2,6 @@
 
 __version__ = "0.2.0"
 
-from .io import read_pdb as read_pdb
-from .io import write_pdb as write_pdb
-
-from .attract import AttractRigidBody
-from .particlecollection import ParticleCollection
-from .rigidbody import RigidBody
-
-
 from . import (
     atomattrs,
     attract,
@@ -24,7 +16,11 @@ from . import (
     superpose,
     tables,
 )
-
+from .attract import AttractRigidBody
+from .io import read_pdb as read_pdb
+from .io import write_pdb as write_pdb
+from .particlecollection import ParticleCollection
+from .rigidbody import RigidBody
 
 __all__ = [
     "atomattrs",
@@ -41,4 +37,7 @@ __all__ = [
     "tables",
     "AttractRigidBody",
     "RigidBody",
+    "ParticleCollection",
+    "read_pdb",
+    "write_pdb",
 ]

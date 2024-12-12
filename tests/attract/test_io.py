@@ -4,19 +4,18 @@ import unittest
 
 import ptools.io.readers.attract as io
 
-from . import (
-    TEST_ATTRACT_PARAMS,
-    TEST_ATTRACT_PARAMS_WITH_LIGAND,
-    TEST_DUM_RED_CONTENT,
-    TEST_DUM_PDB_CONTENT,
-    TEST_AMINON_CONTENT,
-)
 from ..generators import (
+    generate_empty_file,
     generate_random_filename,
     generate_tmp_file,
-    generate_empty_file,
 )
-
+from . import (
+    TEST_AMINON_CONTENT,
+    TEST_ATTRACT_PARAMS,
+    TEST_ATTRACT_PARAMS_WITH_LIGAND,
+    TEST_DUM_PDB_CONTENT,
+    TEST_DUM_RED_CONTENT,
+)
 
 with open(TEST_ATTRACT_PARAMS, "rt", encoding="utf-8") as f:
     TEST_ATTRACT_PARAMETER_CONTENT = f.read()

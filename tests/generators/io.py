@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 import tempfile
+from contextlib import contextmanager
 
 
 def generate_random_filename() -> str:

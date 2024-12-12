@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-
 ATTRACT_DATA_TEST_DIR = Path(__file__).parent / "data"
 
 TEST_ATTRACT_PARAMS = ATTRACT_DATA_TEST_DIR / "attract.inp"

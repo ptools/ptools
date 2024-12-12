@@ -1,20 +1,18 @@
 """linalg - Defines functions to read/write files."""
 
 import pathlib
-from typing import Optional
-from .._typing import FilePath
 
-from .readers.pdb import read_pdb as read_pdb
+from .._typing import FilePath
 from .formatters.pdb import to_pdb as to_pdb
 from .formatters.reduced import (
     to_reduced_pdb as to_reduced_pdb,
     write_reduced_pdb as write_reduced_pdb,
 )
+from .readers.pdb import read_pdb as read_pdb
 from .writers.pdb import write_pdb as write_pdb
 
 
-
-def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> bool:
+def check_file_exists(path: FilePath, message: bool | str = False) -> bool:
     """Checks that a file exists.
 
     Returns a boolean and optionaly prints an error message if file does
@@ -37,7 +35,7 @@ def check_file_exists(path: FilePath, message: Optional[bool | str] = False) -> 
     return path.exists()
 
 
-def assert_file_exists(path: FilePath, message: Optional[str] = ""):
+def assert_file_exists(path: FilePath, message: str = ""):
     """Makes sure a file does exists.
 
     Args:

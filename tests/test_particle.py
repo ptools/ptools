@@ -1,7 +1,8 @@
 """Tests for `ptools.particle.Particle`."""
 
-from .generators import generate_atoms
 from ptools.particlecollection import ParticleCollection
+
+from .generators import generate_atoms
 
 
 def test_equality():

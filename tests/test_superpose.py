@@ -1,23 +1,21 @@
 # Unit-test libraries.
 import unittest
-from pytest import approx
-
-from hypothesis import given
-from hypothesis.strategies import composite, floats
-from hypothesis.extra.numpy import arrays
 
 # Type-hinting special types.
 from typing import Callable
-from hypothesis.strategies import SearchStrategy
 
 # Scientific libraries.
 import numpy as np
+from hypothesis import given
+from hypothesis.extra.numpy import arrays
+from hypothesis.strategies import SearchStrategy, composite, floats
+from pytest import approx
 from scipy.spatial.transform import Rotation
 
 # PTools imports.
 from ptools import superpose, transform
-from ptools.rigidbody import RigidBody
 from ptools.linalg import transformation_matrix
+from ptools.rigidbody import RigidBody
 from ptools.superpose import Screw
 
 # Test-specific imports.

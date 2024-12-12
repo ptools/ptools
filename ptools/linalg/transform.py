@@ -3,6 +3,9 @@
 # Scientific libraries.
 import numpy as np
 
+# Type hinting libraries
+from .._typing import ArrayLike
+
 # PTools libraries
 from .matrix import (
     attract_euler_rotation_matrix,
@@ -11,8 +14,7 @@ from .matrix import (
     rotation_matrix_around_axis,
 )
 
-# Type hinting libraries
-from .._typing import ArrayLike
+_ZEROS_3D = np.zeros(3)
 
 
 def translate(coords: np.ndarray, t: ArrayLike):
@@ -22,7 +24,7 @@ def translate(coords: np.ndarray, t: ArrayLike):
         np.add(coords, x, coords)
 
     def isscalar(s):
-        return isinstance(s, (float, int))
+        return isinstance(s, float | int)
 
     if isscalar(t):
         _translate_scalar(t)
@@ -31,13 +33,11 @@ def translate(coords: np.ndarray, t: ArrayLike):
         if t.shape == (4, 4):
             t = t[:3, 3]
         elif t.shape != (3,):
-            raise ValueError(
-                "Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {t.shape})"
-            )
+            raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {t.shape})")
         np.add(coords, t, coords)
 
 
-def rotate_by(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
+def rotate_by(coords: np.ndarray, angles: ArrayLike = _ZEROS_3D):
     """In-place rotation of coordinates around X, Y and Z axes.
 
     Args:
@@ -57,9 +57,7 @@ def rotate(coords: np.ndarray, r: ArrayLike):
     elif r.shape in ((4, 4), (3, 3)):
         matrix = r
     else:
-        raise ValueError(
-            "Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {r.shape}) "
-        )
+        raise ValueError("Dimensions error: expected 3 x 1 or 4 x 4 " f"(got {r.shape}) ")
 
     coords[:] = np.inner(coords, matrix[:3, :3])
 
@@ -102,7 +100,7 @@ def orient(coords: np.ndarray, vector: ArrayLike, target: ArrayLike):
     transform(coords, matrix)
 
 
-def attract_euler_rotate(coords: np.ndarray, angles: ArrayLike = np.zeros(3)):
+def attract_euler_rotate(coords: np.ndarray, angles: ArrayLike = _ZEROS_3D):
     """In-place Euler rotation of coordinates using the Attract convention."""
     matrix = attract_euler_rotation_matrix(angles)
     coords[:] = np.inner(coords, matrix)

@@ -4,11 +4,12 @@ Some more documentation coming soon.
 """
 
 import string
+
 import numpy as np
 
+from . import transform
 from .rigidbody import RigidBody
-from .superpose import Screw, mat_trans_2_screw, fit_matrix
-from . import transform, linalg
+from .superpose import Screw, fit_matrix, mat_trans_2_screw
 
 
 def chain_intersect(

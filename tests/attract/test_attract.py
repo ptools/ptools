@@ -5,7 +5,7 @@ import unittest
 
 from ptools.cli.ptools_cli import main as ptools_cli
 
-from . import TEST_RECEPTOR_RED, TEST_LIGAND_RED
+from . import TEST_LIGAND_RED, TEST_RECEPTOR_RED
 
 
 class CaptureStderrTest(unittest.TestCase):

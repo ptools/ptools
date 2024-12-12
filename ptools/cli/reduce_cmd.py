@@ -5,11 +5,9 @@ import datetime
 import logging
 from pathlib import Path
 
-from .header import print_header
-
 from .. import reduce
 from ..io import assert_file_exists, write_reduced_pdb
-
+from .header import print_header
 
 __COMMAND__ = "reduce"
 

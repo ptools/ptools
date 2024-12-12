@@ -8,8 +8,10 @@ import scipy
 # Type hinting libraries.
 from .._typing import ArrayLike
 
+_ZERO_3D = np.zeros(3)
 
-def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
+
+def translation_matrix(direction: ArrayLike = _ZERO_3D) -> np.ndarray:
     """Returns a 4 x 4 matrix to translate by direction vector."""
     matrix = np.identity(4)
     if np.isscalar(direction):
@@ -20,7 +22,7 @@ def translation_matrix(direction: ArrayLike = np.zeros(3)) -> np.ndarray:
 
 
 def transformation_matrix(
-    translation: ArrayLike = np.zeros(3), rotation: ArrayLike = np.zeros(3)
+    translation: ArrayLike = _ZERO_3D, rotation: ArrayLike = _ZERO_3D
 ) -> np.ndarray:
     """Returns a 4x4 transformation matrix.
 
@@ -38,8 +40,8 @@ def transformation_matrix(
         matrix[:3, :3] = rotation
     else:
         raise ValueError(
-            f"rotation expects either vector of size 3 or 3 x 3 rotation matrix "
-            f"(found {np.shape(rotation)})"
+            f'rotation expects either vector of size 3 or 3 x 3 rotation matrix '
+            f'(found {np.shape(rotation)})'
         )
 
     if np.shape(translation) == (3,):
@@ -48,14 +50,14 @@ def transformation_matrix(
         matrix[:, 3] = translation[:, 3]
     else:
         raise ValueError(
-            f"translation expects either vector of size 3 or 3 x 3 translation matrix "
-            f"(found {np.shape(translation)})"
+            f'translation expects either vector of size 3 or 3 x 3 translation matrix '
+            f'(found {np.shape(translation)})'
         )
     return matrix
 
 
 def rotation_matrix(
-    angles: ArrayLike = np.zeros(3), sequence: str = "xyz", degrees: bool = True
+    angles: ArrayLike = _ZERO_3D, sequence: str = 'xyz', degrees: bool = True
 ) -> np.ndarray:
     """Returns a rotation matrix in from Euler angles.
 
@@ -70,13 +72,11 @@ def rotation_matrix(
     Returns:
         numpy.ndarray: 3 x 3 rotation matrix.
     """
-    return scipy.spatial.transform.Rotation.from_euler(
-        sequence, angles, degrees
-    ).as_matrix()
+    return scipy.spatial.transform.Rotation.from_euler(sequence, angles, degrees).as_matrix()
 
 
 def rotation_matrix_around_axis(
-    axis: np.ndarray, amount: float, center: np.ndarray = np.zeros(3), degrees=True
+    axis: np.ndarray, amount: float, center: np.ndarray = _ZERO_3D, degrees=True
 ):
     """Returns the rotation matrix to rotate around the axis by given angle.
 
@@ -97,15 +97,13 @@ def rotation_matrix_around_axis(
 
     origin_matrix = translation_matrix(-np.array(center))
     offset_matrix = translation_matrix(+np.array(center))
-    rotation = scipy.linalg.expm(
-        np.cross(np.identity(3), axis / scipy.linalg.norm(axis) * amount)
-    )
+    rotation = scipy.linalg.expm(np.cross(np.identity(3), axis / scipy.linalg.norm(axis) * amount))
     matrix = np.identity(4)
     matrix[:3, :3] = rotation
     return offset_matrix @ matrix @ origin_matrix
 
 
-def attract_euler_rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray:
+def attract_euler_rotation_matrix(angles: ArrayLike = _ZERO_3D) -> np.ndarray:
     """Return the rotation matrix for an Euler rotation with Attract
     convention.
 
@@ -115,9 +113,7 @@ def attract_euler_rotation_matrix(angles: ArrayLike = np.zeros(3)) -> np.ndarray
     Returns:
         numpy.ndarray: 3 x 3 matrix
     """
-    by_x = rotation_matrix(
-        [0, 0, angles[2]], degrees=False
-    ).T  # what the hell is going on here???
+    by_x = rotation_matrix([0, 0, angles[2]], degrees=False).T  # what the hell is going on here???
     by_y = rotation_matrix([0, angles[1], 0], degrees=False)
     by_z = rotation_matrix([0, 0, angles[0]], degrees=False)
     return by_z @ by_y @ by_x
@@ -200,9 +196,7 @@ def orientation_matrix(
     return rotation_matrix_around_axis(axis, amount, center=com, degrees=False)
 
 
-def ab_rotation_matrix(
-    A: np.ndarray, B: np.ndarray, amount: float, degrees=True
-) -> np.ndarray:
+def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float, degrees=True) -> np.ndarray:
     """Returns the rotation matrix to rotate around axis (A, B) by amount."""
     return rotation_matrix_around_axis(B - A, amount, A, degrees)
 

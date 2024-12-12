@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from ptools.array3d import array3d, Invalid3DArrayError
+from ptools.array3d import Invalid3DArrayError, array3d
 
 from .testing.moreassert import assert_array_almost_equal
 

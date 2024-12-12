@@ -1,8 +1,8 @@
 """test_atom - Tests for `ptools.atom` module."""
 
-from .generators import generate_particlecollection
-
 from ptools.tables import atomic_masses
+
+from .generators import generate_particlecollection
 
 
 def test_mass_getter():

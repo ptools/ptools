@@ -1,15 +1,14 @@
 """test_measure.py - Tests for ptools.measure."""
 
 import numpy as np
+from pytest import approx
 
 import ptools
 from ptools import measure
 
-from pytest import approx
-
-from .generators import generate_particlecollection, generate_balloon
+from . import TEST_DISTANCES_RECEPTOR_LIGAND, TEST_LIGAND, TEST_RECEPTOR
+from .generators import generate_balloon, generate_particlecollection
 from .testing import assert_array_almost_equal
-from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
 
 
 def test_bounding_box():

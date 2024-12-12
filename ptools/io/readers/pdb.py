@@ -1,11 +1,11 @@
 """Protein Data Bank format I/O."""
 
-from typing import Sequence, Tuple, Union
+from collections.abc import Sequence
 
+from ..._typing import FilePath
 from ...atomattrs import AtomAttrs
 from ...particlecollection import ParticleCollection
-from ..._typing import FilePath
-from ..exceptions import InvalidPDBFormatError, InvalidPDBAtomLineError
+from ..exceptions import InvalidPDBAtomLineError, InvalidPDBFormatError
 
 
 class PDBLine(str):
@@ -111,7 +111,7 @@ class AtomLine(PDBLine):
         return float(self[46:54])
 
     @property
-    def coordinates(self) -> Tuple[float, float, float]:
+    def coordinates(self) -> tuple[float, float, float]:
         """Coordinates."""
         return (self.x, self.y, self.z)
 

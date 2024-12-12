@@ -5,9 +5,9 @@ from typing import Any
 
 import numpy as np
 
-from .exceptions import IncompleteBeadError, DuplicateAtomsError
 from ..linalg import center_of_mass
 from ..particlecollection import ParticleCollection
+from .exceptions import DuplicateAtomsError, IncompleteBeadError
 
 
 @dataclass(frozen=True)

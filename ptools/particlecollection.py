@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import itertools
-from typing import (Any, Callable, Iterable, Iterator, Optional, Sequence,
-                    TypeVar, overload)
+from collections.abc import Callable, Iterable, Iterator, Sequence
+from typing import Any, TypeVar, overload
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -108,8 +108,8 @@ class ParticleCollection:
 
     def __init__(
         self,
-        atoms: Optional[Iterable[Any]] = None,
-        selection: Optional[Selection] = None,
+        atoms: Iterable[Any] | None = None,
+        selection: Selection | None = None,
     ):
         """Initializes a new collection of particles from a list of particles."""
         self._selection = None
@@ -210,7 +210,7 @@ class ParticleCollection:
         self: ParticleCollectionType, key: ParticleCollectionKeyType
     ) -> Particle | ParticleCollectionType:
         """Returns a new collection with the selected atoms."""
-        if isinstance(key, (int, np.integer)):
+        if isinstance(key, int | np.integer):
             return Particle(self, key)
         return self.__class__(selection=self.__class__.Selection(self, key))
 
@@ -394,4 +394,3 @@ class ParticleCollection:
                 setattr(atom, array.singular, array[i])
             atoms.append(atom)
         return atoms
-

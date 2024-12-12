@@ -1,18 +1,16 @@
 import math
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 import numpy as np
 from pytest import approx
 
-from ptools import RigidBody
+from ptools import RigidBody, transform
 from ptools.heligeom import heli_analyze, heli_construct
-from ptools.measure import contacts_by_residue, minmax_distance_to_axis
 from ptools.io import to_pdb
-from ptools import transform
+from ptools.measure import contacts_by_residue, minmax_distance_to_axis
 
-
-from ..testing.moreassert import assert_array_equal, assert_array_almost_equal
+from ..testing.moreassert import assert_array_almost_equal, assert_array_equal
 
 TEST_DATA_DIR = Path(__file__).parent / "data"
 TEST_1A74_PROT_RED = TEST_DATA_DIR / "1A74_prot.red"

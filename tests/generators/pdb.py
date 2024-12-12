@@ -1,7 +1,7 @@
 """Helper classes and functions for PDB format I/O testing."""
 
-from dataclasses import dataclass
 import tempfile
+from dataclasses import dataclass
 
 from .io import generate_tmp_file
 

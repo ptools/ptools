@@ -7,7 +7,7 @@ import numpy as np
 import ptools
 from ptools.pairlist import PairList
 
-from . import TEST_LIGAND, TEST_RECEPTOR, TEST_DISTANCES_RECEPTOR_LIGAND
+from . import TEST_DISTANCES_RECEPTOR_LIGAND, TEST_LIGAND, TEST_RECEPTOR
 from .testing.moreassert import assert_array_almost_equal
 
 

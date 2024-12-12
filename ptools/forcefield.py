@@ -3,11 +3,9 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 
-
+from .attract import AttractRigidBody
 from .io.readers.attract import read_aminon
 from .pairlist import PairList
-from .attract import AttractRigidBody
-
 
 # Name of the force fields implemented in pyattract.
 ATTRACT_FORCEFIELDS = ("scorpion", "attract1", "attract2")
@@ -99,7 +97,7 @@ class AttractForceField1:
         else:
             params = ATTRACT_DEFAULT_FF_PARAMS
 
-        rad, amp = list(zip(*params))
+        rad, amp = list(zip(*params, strict=True))
         rad = np.array(rad)
         amp = np.array(amp)
 
@@ -117,7 +115,6 @@ class AttractForceField1:
         # pylint: disable=E1126
         self._attractive_pairs = self._attractive_parameters[C[..., 0], C[..., 1]]
         self._repulsive_pairs = self._repulsive_parameters[C[..., 0], C[..., 1]]
-
 
     def vdw_energy(self):
         """Returns the van der Waals energy."""
@@ -146,8 +143,8 @@ class AttractForceField1:
 
         def van_der_waals(dx, rr2):
             # pylint: disable=E1126
-            a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep)])
-            b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep)])
+            a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep, strict=True)])
+            b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep, strict=True)])
 
             rr23 = np.power(rr2, 3)
             rep = b * rr2

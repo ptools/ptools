@@ -1,8 +1,7 @@
-from ptools.io import to_pdb
 from ptools.atomattrs import AtomAttrs
+from ptools.io import to_pdb
 
 from .generators import generate_atom_attrs
-
 
 DEFAULT_ATOM_ATTRS = {
     "name": "CA",

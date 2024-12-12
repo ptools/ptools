@@ -1,8 +1,8 @@
 """test_rigidbody - Tests for `ptools.rigidbody module."""
 
 from ptools.rigidbody import RigidBody
-from .generators import generate_atoms
 
+from .generators import generate_atoms
 from .generators.pdb import generate_pdb_file
 
 

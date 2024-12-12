@@ -7,8 +7,8 @@ import tempfile
 import unittest
 
 from ptools import io
-from ptools.particlecollection import ParticleCollection
 from ptools.io.readers import pdb
+from ptools.particlecollection import ParticleCollection
 
 from .generators import generate_pdb_file, generate_random_filename
 

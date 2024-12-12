@@ -66,4 +66,3 @@ select = [
     "I",  # isort
     "UP", # pyugrade
 ]
-

@@ -6,7 +6,6 @@ from numpy.typing import ArrayLike
 
 from ptools.atomattrs import AtomAttrs
 
-
 AMINO_ACID_NAMES = [
     "ALA",
     "ARG",

@@ -1,18 +1,19 @@
 """ptools.selection - Selection language and parsing."""
+
 from __future__ import annotations
 
 import re
-from typing import Any, Callable, TYPE_CHECKING, Union
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from .precedenceparser import PrecedenceClimbingEvaluator
 
-
 if TYPE_CHECKING:
     from .particlecollection import ParticleCollection
 
-Numeric = Union[int, float]
+Numeric = int | float
 
 # ===========================================================================
 #
@@ -23,9 +24,9 @@ Numeric = Union[int, float]
 
 
 class AndOperator:
-    """Selection 'and' operator. """
+    """Selection 'and' operator."""
 
-    token = "and"
+    token = 'and'
     precedence = 3
     operands = 2
 
@@ -41,7 +42,7 @@ class AndOperator:
 class OrOperator:
     """Selection 'or' operator."""
 
-    token = "or"
+    token = 'or'
     precedence = 3
     operands = 2
 
@@ -51,9 +52,9 @@ class OrOperator:
 
 
 class NotOperator:
-    """Selection 'not' operator. """
+    """Selection 'not' operator."""
 
-    token = "not"
+    token = 'not'
     precedence = 5
     operands = 1
 
@@ -85,7 +86,7 @@ class PropertySelectionOperator:
     def __init__(self, token: str, attr: str):
         ...
 
-    def eval(self, atoms: "ParticleCollection", values: list):
+    def eval(self, atoms: ParticleCollection, values: list):
         ...
 
 
@@ -99,38 +100,38 @@ class IntegerPropertySelection:
         self.token = token
         self.attr = attr
 
-    def eval(self, atoms: "ParticleCollection", values: list[Numeric | str]):
+    def eval(self, atoms: ParticleCollection, values: list[Numeric | str]):
         ops: dict[str, Callable] = {
-            ">": np.greater,
-            "<": np.less,
-            ">=": np.greater_equal,
-            "<=": np.less_equal,
-            "==": np.equal,
-            "!=": np.not_equal,
+            '>': np.greater,
+            '<': np.less,
+            '>=': np.greater_equal,
+            '<=': np.less_equal,
+            '==': np.equal,
+            '!=': np.not_equal,
         }
 
         if values[0] in ops:
             return self.select_from_operator(atoms, ops[values[0]], int(values[1]))  # type: ignore
 
         # Range selection in fashion attr <number> to <number>.
-        if len(values) == 3 and values[1] == "to":
+        if len(values) == 3 and values[1] == 'to':
             start, end = int(values[0]), int(values[2])
             return self.select_from_range(atoms, start, end)
 
         numeric_values: list[Numeric] = [int(item) for item in values]
         return self.select_from_values(atoms, numeric_values)
 
-    def select_from_operator(self, atoms: "ParticleCollection", op: Callable, value: Numeric):
+    def select_from_operator(self, atoms: ParticleCollection, op: Callable, value: Numeric):
         """Selection from a single operator."""
         indices = np.where(op(atoms.atom_properties[self.attr].values, value))[0]
         return atoms[indices]
 
-    def select_from_values(self, atoms: "ParticleCollection", value: list[Numeric]):
+    def select_from_values(self, atoms: ParticleCollection, value: list[Numeric]):
         """Selection from a single or multiple values."""
         indices = np.where(np.isin(atoms.atom_properties[self.attr].values, value))[0]
         return atoms[indices]
 
-    def select_from_range(self, atoms: "ParticleCollection", start: Numeric, end: Numeric):
+    def select_from_range(self, atoms: ParticleCollection, start: Numeric, end: Numeric):
         """Selection from a range of values."""
         indices = np.where(
             np.logical_and(
@@ -151,7 +152,7 @@ class StringPropertySelection:
         self.token = token
         self.attr = attr
 
-    def eval(self, atoms: "ParticleCollection", values: list[str]):
+    def eval(self, atoms: ParticleCollection, values: list[str]):
         indices = np.where(np.isin(atoms.atom_properties[self.attr].values, values))[0]
         return atoms[indices]
 
@@ -166,8 +167,8 @@ class BoolPropertySelection:
         self.token = token
         self.attr = attr
 
-    def eval(self, atoms: "ParticleCollection", values: list[str]):
-        indices = np.where(atoms.atom_properties[self.attr].values == True)[0]
+    def eval(self, atoms: ParticleCollection, values: list[str]):
+        indices = np.where(atoms.atom_properties[self.attr].values)[0]
         return atoms[indices]
 
 
@@ -181,13 +182,14 @@ class WaterSelection:
 
     operands = 0
     precedence = 1
-    token = "water"
+    token = 'water'
 
-    # def eval(self, atoms: "ParticleCollection", values: list[Any]):
-    def eval(self, atoms: "ParticleCollection", values: list[Any]):
+    def eval(self, atoms: ParticleCollection, values: list[Any]):
         assert len(values) == self.operands
-        water_residues = ["HOH", "WAT", "TIP3", "TIP4", "TIP5"]
-        indices = np.where(np.isin(atoms.atom_properties["residue_names"].values, water_residues))[0]
+        water_residues = ['HOH', 'WAT', 'TIP3', 'TIP4', 'TIP5']
+        indices = np.where(np.isin(atoms.atom_properties['residue_names'].values, water_residues))[
+            0
+        ]
         return atoms[indices]
 
 
@@ -197,7 +199,7 @@ class WaterSelection:
 #
 # ===========================================================================
 class SelectionParser(PrecedenceClimbingEvaluator):
-    def __init__(self, atoms: "ParticleCollection"):
+    def __init__(self, atoms: ParticleCollection):
         super().__init__(logic_operators=[AndOperator(), OrOperator(), NotOperator()])  # type: ignore
         self.atoms = atoms
 
@@ -212,15 +214,15 @@ class SelectionParser(PrecedenceClimbingEvaluator):
         # properties, e.g. 'names' -> 'name CA'.
         for prop in self.atoms.atom_properties:
             if np.issubdtype(prop.values.dtype, np.number):
-                self.register_leaf_operator(IntegerPropertySelection(prop.singular, prop.plural))  # type: ignore
+                self.register_leaf_operator(IntegerPropertySelection(prop.singular, prop.plural))
             elif np.issubdtype(prop.values.dtype, np.bool_):
-                self.register_leaf_operator(BoolPropertySelection(prop.singular, prop.plural))  # type: ignore
+                self.register_leaf_operator(BoolPropertySelection(prop.singular, prop.plural))
             else:
-                self.register_leaf_operator(StringPropertySelection(prop.singular, prop.plural))  # type: ignore
+                self.register_leaf_operator(StringPropertySelection(prop.singular, prop.plural))
 
         # Aliases for 'residue_index' and 'residue_name'.
-        self.leaf_operators["resid"] = self.leaf_operators["residue_index"]
-        self.leaf_operators["resname"] = self.leaf_operators["residue_name"]
+        self.leaf_operators['resid'] = self.leaf_operators['residue_index']
+        self.leaf_operators['resname'] = self.leaf_operators['residue_name']
 
         # Registers keyword operators.
         self.register_leaf_operator(WaterSelection())  # type: ignore
@@ -239,5 +241,5 @@ class SelectionParser(PrecedenceClimbingEvaluator):
 def select(selection_str: str, atoms: ParticleCollection):
     """Selection function."""
     parser = SelectionParser(atoms)
-    selection_str = selection_str.replace(":", " to ")
+    selection_str = selection_str.replace(':', ' to ')
     return parser.parse(selection_str)

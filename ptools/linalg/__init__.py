@@ -4,21 +4,35 @@ import math
 # Scientific libraries.
 import numpy as np
 import numpy.linalg as L
+from numpy.linalg import norm as norm
 
 # Typing imports
 from .._typing import ArrayLike
-
 from .matrix import (
-    translation_matrix as translation_matrix,
-    transformation_matrix as transformation_matrix,
-    rotation_matrix as rotation_matrix,
-    rotation_matrix_around_axis as rotation_matrix_around_axis,
     attract_euler_rotation_matrix as attract_euler_rotation_matrix,
     orientation_matrix as orientation_matrix,
+    rotation_matrix as rotation_matrix,
+    rotation_matrix_around_axis as rotation_matrix_around_axis,
+    transformation_matrix as transformation_matrix,
+    translation_matrix as translation_matrix,
 )
 
-
-norm = np.linalg.norm
+__all__ = [
+    "attract_euler_rotation_matrix",
+    "orientation_matrix",
+    "rotation_matrix",
+    "rotation_matrix_around_axis",
+    "transformation_matrix",
+    "translation_matrix",
+    "norm",
+    "center_of_mass",
+    "centroid",
+    "distance",
+    "distance_to_axis",
+    "minmax_distance_to_axis",
+    "inertia_tensor",
+    "principal_axes",
+]
 
 
 def normalized(array: np.ndarray) -> np.ndarray:

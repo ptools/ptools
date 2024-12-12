@@ -2,19 +2,19 @@
 import math
 import random
 
+# Scientific libraries.
+import numpy as np
+
 # Unit-test libraries.
 import pytest
 from pytest import approx
-
-# Scientific libraries.
-import numpy as np
 
 # PTools imports.
 from ptools import linalg
 from ptools.linalg.matrix import (
     rotation_matrix,
-    translation_matrix,
     transformation_matrix,
+    translation_matrix,
 )
 
 # More test-specific imports.

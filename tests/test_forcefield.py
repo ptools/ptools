@@ -1,8 +1,8 @@
 """Test for ptools.forcefield module."""
 
 import os
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -11,7 +11,6 @@ from ptools.forcefield import AttractForceField1
 
 from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_almost_equal
-
 
 # def test_foo():
 #     receptor = AttractRigidBody.from_red(TEST_RECEPTOR_RED)

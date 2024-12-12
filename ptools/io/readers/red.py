@@ -6,8 +6,8 @@ in the extra field.
 
 import numpy as np
 
-from ...particlecollection import ParticleCollection
 from ..._typing import FilePath
+from ...particlecollection import ParticleCollection
 from ..exceptions import InvalidREDFormatError
 from .pdb import read_single_model_pdb
 

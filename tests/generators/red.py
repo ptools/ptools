@@ -1,7 +1,7 @@
 """Helper classes and functions for RED format I/O testing."""
 
-from dataclasses import dataclass
 import tempfile
+from dataclasses import dataclass
 
 from ptools.tables import atomic_radii
 

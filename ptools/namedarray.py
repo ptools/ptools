@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import collections
 import copy
-from typing import Any, Iterable, Iterator, Optional, Sequence
+from collections.abc import Iterable, Iterator, Sequence
+from typing import Any
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -33,7 +34,7 @@ class NamedArray:
         self.singular: str = singular
         self.plural: str = plural
 
-        if not isinstance(values, (collections.abc.Sequence, np.ndarray)):
+        if not isinstance(values, collections.abc.Sequence | np.ndarray):
             raise ValueError(
                 f"values must be a sequence or an array, not {type(values).__qualname__}"
             )
@@ -102,7 +103,7 @@ class NamedArray:
         return iter(self.values)
 
     def __getitem__(self, key: int | slice | Sequence[int]) -> Any | NamedArray:
-        if isinstance(key, (int, np.integer)):
+        if isinstance(key, int | np.integer):
             return self.values[key]
         return self.__class__(
             self.singular,
@@ -130,7 +131,7 @@ class NamedArrayContainer(collections.abc.Container):
             NamedArray instance.
     """
 
-    def __init__(self, array_list: Optional[Iterable[NamedArray]] = None) -> None:
+    def __init__(self, array_list: Iterable[NamedArray] | None = None) -> None:
         self._properties: dict[str, NamedArray] = {}
         if array_list:
             for prop in array_list:
@@ -150,7 +151,7 @@ class NamedArrayContainer(collections.abc.Container):
 
     def __contains__(self, name_or_item: object) -> bool:
         """Returns whether a property is present in the collections."""
-        if not isinstance(name_or_item, (str, NamedArray)):
+        if not isinstance(name_or_item, str | NamedArray):
             raise ValueError(f"expects {str} or {NamedArray}")
         plural = (
             name_or_item.plural
@@ -183,7 +184,7 @@ class NamedArrayContainer(collections.abc.Container):
             )
         if not self._properties.keys() == other._properties.keys():
             return False
-        for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays()):
+        for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays(), strict=False):
             if not lhs == rhs:
                 return False
         return True
@@ -211,7 +212,7 @@ class NamedArrayContainer(collections.abc.Container):
                 np.concatenate((lhs.values, rhs.values)),
                 array_comparison_func=lhs._array_comparison_func,
             )
-            for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays())
+            for lhs, rhs in zip(self.iter_arrays(), other.iter_arrays(), strict=False)
         )
 
     def empty(self) -> bool:

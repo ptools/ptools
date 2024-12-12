@@ -1,15 +1,15 @@
 import os
-from typing import Protocol, Sequence, Union
+from collections.abc import Sequence
+from typing import Protocol
 
 import numpy as np
 
-
-PathLike = Union[str, os.PathLike]
+PathLike = str | os.PathLike
 FilePath = PathLike
 DirectoryPath = PathLike
 
-Numeric = Union[float, int]
-ArrayLike = Union[Sequence[Numeric], np.ndarray]
+Numeric = float | int
+ArrayLike = Sequence[Numeric] | np.ndarray
 
 
 class HasCoordinatesType(Protocol):

@@ -1,17 +1,12 @@
 """Implements an operator-precedence parser for the selection language."""
 
 from abc import ABC, abstractmethod
-from typing import Protocol, Union
+from typing import Protocol
 
-from .errors import (
-    UnexpectedTokenError,
-    UnexpectedTrailingTokenError,
-    UnknownTokenError
-)
+from .errors import UnexpectedTokenError, UnexpectedTrailingTokenError, UnknownTokenError
 
 
 class Operator(Protocol):
-
     token: str
     precedence: int
     operands: int
@@ -46,12 +41,12 @@ class EvaluatorBase(ABC):
 
     def is_keyword(self, token: str) -> bool:
         return (
-            token in self.leaf_operators or
-            token in self.binary_operators or
-            token in self.unary_operators
+            token in self.leaf_operators
+            or token in self.binary_operators
+            or token in self.unary_operators
         )
 
-    def _next(self) -> Union[str, None]:
+    def _next(self) -> str | None:
         if self.cursor < len(self.tokens):
             return self.tokens[self.cursor]
         return None
@@ -103,8 +98,8 @@ class PrecedenceClimbingEvaluator(EvaluatorBase):
         # are cannot be None when they reach each particular instruction.
         t = self._parse_subexpression()
         while (
-            self._next() in self.binary_operators and
-                self.binary_operators[self._next()].precedence >= precedence  # type: ignore
+            self._next() in self.binary_operators
+            and self.binary_operators[self._next()].precedence >= precedence  # type: ignore
         ):
             op = self.binary_operators.get(self._consume())
             t1 = self.parse_expression(op.precedence + 1)  # type: ignore

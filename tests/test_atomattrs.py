@@ -3,11 +3,11 @@
 import pytest
 from pytest import approx
 
-
-from ptools.atomattrs import AtomAttrs
 from ptools.array3d import Invalid3DArrayError
-from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
+from ptools.atomattrs import AtomAttrs
+
 from .generators import generate_atom_attrs
+from .testing.moreassert import assert_array_almost_equal, assert_array_not_almost_equal
 
 
 def test_empty_initializer():

@@ -4,8 +4,8 @@ import datetime
 
 import ptools
 from ptools import attract
-from .header import print_header
 
+from .header import print_header
 
 __COMMAND__ = "attract"
 

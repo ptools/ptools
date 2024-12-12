@@ -1,7 +1,7 @@
 """Attract docking."""
 
 import time
-from typing import TYPE_CHECKING, Any, Type, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
@@ -57,14 +57,14 @@ class AttractRigidBody(RigidBody):
 
     @classmethod
     def from_red(
-        cls: Type[AttractRigidBodyType], path: FilePath
+        cls: type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
         rigid = cls.from_properties(read_red(path).atom_properties)
         return rigid
 
     @classmethod
     def from_pdb(
-        cls: Type[AttractRigidBodyType], path: FilePath
+        cls: type[AttractRigidBodyType], path: FilePath
     ) -> AttractRigidBodyType:
         raise NotImplementedError("Use AttractRigidBody.from_red instead.")
 

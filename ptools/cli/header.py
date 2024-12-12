@@ -7,7 +7,6 @@ It is intented to be used in the ``run`` function of each command-line.
 
 import ptools
 
-
 COMMAND_TEMPLATE = "PTools {command_name}"
 
 

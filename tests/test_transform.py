@@ -2,10 +2,10 @@
 
 import numpy as np
 
-from .testing import assert_array_almost_equal, assert_array_not_almost_equal
-from .generators import generate_particlecollection, generate_balloon
-
 from ptools import measure, transform
+
+from .generators import generate_balloon, generate_particlecollection
+from .testing import assert_array_almost_equal, assert_array_not_almost_equal
 
 
 def test_translate():
