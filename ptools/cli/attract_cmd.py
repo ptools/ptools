@@ -1,6 +1,8 @@
 """PTools attract command."""
 
+import argparse
 import datetime
+from pathlib import Path
 
 import ptools
 from ptools import attract
@@ -17,27 +19,37 @@ def create_subparser(parent):
     parser.add_argument(
         "-r",
         "--receptor",
-        dest="receptor_name",
+        dest="receptor_path",
         required=True,
+        type=Path,
         help="name of the receptor file",
     )
     parser.add_argument(
         "-l",
         "--ligand",
-        dest="ligand_name",
+        dest="ligand_path",
         required=True,
+        type=Path,
         help="name of the ligand file",
     )
-    parser.add_argument("--ref", dest="reffile", help="reference ligand for rmsd")
+    parser.add_argument(
+        "--ref",
+        dest="reference_path",
+        type=Path,
+        help="reference ligand for rmsd"
+    )
     parser.add_argument(
         "-c",
         "--conf",
         default="attract.inp",
+        type=Path,
         help="attract configuration file " "(default=attract.inp)",
     )
     parser.add_argument(
         "-p",
         "--param",
+        dest="parameters_path",
+        type=Path,
         help="attract force field parameter file " "(default=default force field file)",
     )
     parser.add_argument(
@@ -78,6 +90,20 @@ def create_subparser(parent):
     )
 
 
+def parse_args(args: argparse.Namespace):
+    """Parses command-line arguments."""
+    assert args.receptor_path.exists(), f"Receptor file not found: {args.receptor_path}"
+    assert args.ligand_path.exists(), f"Ligand file not found: {args.ligand_path}"
+    assert args.conf.exists(), f"Configuration file not found: {args.conf}"
+
+    if args.reference_path:
+        assert args.reference_path.exists(), f"Reference file not found: {args.reference_path}"
+
+    if args.parameters_path:
+        assert args.parameters_path.exists(), f"Parameter file not found: {args.parameters_path}"
+
+
+
 def run(args):
     """Runs attract."""
     print_header(__COMMAND__)
@@ -89,28 +115,28 @@ def run(args):
     print(f"{parameters.nbminim} series of minimizations")
 
     ff_name = ptools.io.readers.attract.check_ff_version_match(
-        args.receptor_name, args.ligand_name
+        args.receptor_path, args.ligand_path
     )
     if ff_name != "attract1":
         raise NotImplementedError(f"force field '{ff_name}' not implemented yet")
     print(f"Detected forcefield: '{ff_name}'")
 
     # ff_specs = ptools.forcefield.PTOOLS_FORCEFIELDS[ff_name]
-    if args.param:
+    if args.parameters_path:
         raise NotImplementedError("not implemented yet")
         # ff_specs["ff_file"] = args.param
 
     # Load receptor and ligand.
-    receptor = ptools.AttractRigidBody(args.receptor_name)
-    ligand = ptools.AttractRigidBody(args.ligand_name)
+    receptor = ptools.AttractRigidBody.from_red(args.receptor_path)
+    ligand = ptools.AttractRigidBody.from_red(args.ligand_path)
     print(
-        f"Read receptor (fixed): {args.receptor_name} with {len(receptor)} particules"
+        f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules"
     )
-    print(f"Read ligand (mobile): {args.ligand_name} with {len(ligand)} particules")
+    print(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
 
-    if args.reffile:
-        ref = ptools.RigidBody(args.reffile)
-        print(f"Read reference file: {args.reffile} with {len(ref)} particules")
+    if args.reference_path:
+        ref = ptools.RigidBody.from_pdb(args.reference_path)
+        print(f"Read reference file: {args.reference_path} with {len(ref)} particules")
     else:
         ref = None
 
@@ -168,8 +194,8 @@ def run(args):
 
     # output compressed ligand and receptor:
     # if not single and print_files:
-    #     print(docking.compress_file(args.receptor_name))
-    #     print(docking.compress_file(args.ligand_name))
+    #     print(docking.compress_file(args.receptor_path))
+    #     print(docking.compress_file(args.ligand_path))
     #     print(docking.compress_file(ff_specs['ff_file']))
     #     print(docking.compress_file('translation.dat'))
     #     print(docking.compress_file('rotation.dat'))

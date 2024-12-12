@@ -21,6 +21,7 @@ from .io import read_pdb as read_pdb
 from .io import write_pdb as write_pdb
 from .particlecollection import ParticleCollection
 from .rigidbody import RigidBody
+from .transform import move as move
 
 __all__ = [
     "atomattrs",
@@ -28,6 +29,7 @@ __all__ = [
     "forcefield",
     "heligeom",
     "io",
+    "move",
     "pairlist",
     "particlecollection",
     "reduce",
@@ -35,9 +37,9 @@ __all__ = [
     "selection",
     "superpose",
     "tables",
+    "read_pdb",
+    "write_pdb",
     "AttractRigidBody",
     "RigidBody",
     "ParticleCollection",
-    "read_pdb",
-    "write_pdb",
 ]

@@ -1,11 +1,15 @@
 """Ptools forcefield implementation."""
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from .attract import AttractRigidBody
 from .io.readers.attract import read_aminon
 from .pairlist import PairList
+
+if TYPE_CHECKING:
+    from .attract import AttractRigidBody
 
 # Name of the force fields implemented in pyattract.
 ATTRACT_FORCEFIELDS = ("scorpion", "attract1", "attract2")
@@ -64,15 +68,15 @@ ATTRACT_DEFAULT_FF_PARAMS = np.array(
 class AttractForceField1:
     """The AttractForceField1."""
 
-    receptor: AttractRigidBody
-    ligand: AttractRigidBody
+    receptor: "AttractRigidBody"
+    ligand: "AttractRigidBody"
     cutoff: float
     paramfile: str
 
     def __init__(
         self,
-        receptor: AttractRigidBody,
-        ligand: AttractRigidBody,
+        receptor: "AttractRigidBody",
+        ligand: "AttractRigidBody",
         cutoff: float = 10,
         paramfile: str = "",
     ):

@@ -1,13 +1,15 @@
 """Attract docking."""
 
 import time
-from typing import TYPE_CHECKING, Any, TypeVar
+from dataclasses import dataclass
+from typing import TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
 
 from . import measure, transform
 from ._typing import FilePath
+from .forcefield import AttractForceField1
 from .io.readers.red import read_red
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
@@ -15,8 +17,23 @@ from .rigidbody import RigidBody
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 
-if TYPE_CHECKING:
-    from .forcefield import AttractForceField1
+@dataclass
+class MinimizationParameters:
+
+    square_cutoff: float
+    maximum_iterations: int
+
+    @property
+    def cutoff(self) -> float:
+        return self.square_cutoff ** 0.5
+
+
+@dataclass
+class MinimizationResults:
+    start_energy: float
+    final_energy: float
+    transformation_matrix: np.ndarray
+    elapsed: float
 
 
 class AttractRigidBody(RigidBody):
@@ -56,16 +73,12 @@ class AttractRigidBody(RigidBody):
             self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=float))
 
     @classmethod
-    def from_red(
-        cls: type[AttractRigidBodyType], path: FilePath
-    ) -> AttractRigidBodyType:
+    def from_red(cls: type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
         rigid = cls.from_properties(read_red(path).atom_properties)
         return rigid
 
     @classmethod
-    def from_pdb(
-        cls: type[AttractRigidBodyType], path: FilePath
-    ) -> AttractRigidBodyType:
+    def from_pdb(cls: type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
         raise NotImplementedError("Use AttractRigidBody.from_red instead.")
 
     def reset_forces(self):
@@ -77,7 +90,7 @@ class AttractRigidBody(RigidBody):
         self.forces += forces  # type: ignore[attr-defined]
 
 
-def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
+def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     """Function to minimize.
 
     Args:
@@ -87,7 +100,7 @@ def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
     Returns:
         float: energy
     """
-    X = ff.ligand.coordinates.copy()
+    source_coordinates = ff.ligand.coordinates.copy()
 
     rotation = x[:3]
     translation = x[3:]
@@ -96,7 +109,7 @@ def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
     transform.translate(ff.ligand, translation)
 
     e = ff.non_bonded_energy()
-    ff.ligand.coordinates = X
+    ff.ligand.coordinates = source_coordinates
     return e
 
 
@@ -129,19 +142,17 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
     if minimlist is None:
         raise ValueError("argument 'minimlist' is required")
 
-    translations = kwargs.pop("translations", None)
-    rotations = kwargs.pop("rotations", None)
+    _default_translation = {0: measure.centroid(ligand)}
+    _default_rotation = {0: (0, 0, 0)}
 
-    if translations is None:
-        translations = {0: measure.centroid(ligand)}
-    if rotations is None:
-        rotations = {0: (0, 0, 0)}
+    translations = kwargs.pop("translations", _default_translation)
+    rotations = kwargs.pop("rotations", _default_rotation)
 
     for transi, transnb in enumerate(sorted(translations.keys())):
         trans = translations[transnb]
-        print(f"@@ Translation #{transnb} {transi}/{len(translations)}")
+        print(f"Translation #{transnb} {transi}/{len(translations)}")
         for roti, rotnb in enumerate(sorted(rotations.keys())):
-            print(f"@@ Rotation #{rotnb} {roti + 1}/{len(rotations)}")
+            print(f"  Rotation #{rotnb} {roti + 1}/{len(rotations)}")
             rot = rotations[rotnb]
 
             transform.translate(ligand, -measure.centroid(ligand))
@@ -149,41 +160,50 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
             transform.translate(ligand, trans)
 
             for i, minim in enumerate(minimlist):
-                print(f"- Minimization {i + 1}/{len(minimlist)}:")
-                _run_minimization(minim, receptor, ligand)
+                parameters = MinimizationParameters(
+                    square_cutoff=minim["squarecutoff"],
+                    maximum_iterations=minim["maxiter"]
+                )
+
+                results = _run_minimization(parameters, receptor, ligand)
+                print(f"    Minimization {i + 1}/{len(minimlist)}:")
+                print(f"         cutoff: {parameters.cutoff:.2f} Å")
+                print(f"        maxiter: {parameters.maximum_iterations}")
+                print("        energy:")
+                print(f"            start: {results.start_energy: 6.2f}")
+                print(f"            final: {results.final_energy: 6.2f}")
+                print("        matrix:")
+                print(results.transformation_matrix)
+                print(f"        elapsed: {results.elapsed:.1f} seconds")
+                print("=" * 40, flush=True)
+
+                transform.move(ligand, results.transformation_matrix)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
 
 
 def _run_minimization(
-    params: dict[str, Any],
+    params: MinimizationParameters,
     receptor: AttractRigidBody,
     ligand: AttractRigidBody,
-):
+) -> MinimizationResults:
+    """Run the minimization."""
+
     start = time.time()
-    cutoff = params["squarecutoff"] ** 0.5
-    niter = params["maxiter"]
+
+    cutoff = params.cutoff
+    niter = params.maximum_iterations
 
     ff = AttractForceField1(receptor, ligand, cutoff, "aminon.par")
-
-    print(f"  - cutoff: {cutoff:.2f} A")
-    print(f"  - maxiter: {niter}")
-    print(f"  - start energy: {ff.non_bonded_energy():.2f}", flush=True)
+    start_energy = ff.non_bonded_energy()
 
     x0 = np.zeros(6)
-    res = minimize(
-        _function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter}
-    )
-
-    print("  - results:")
-    print(f"    - energy: {res.fun:6.2f}")
-    print("    - transformation matrix:")
+    res = minimize(_function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter})
     m = transformation_matrix(res.x[3:], res.x[:3])
-    print(m)
-
-    # Moving ligand accordingly.
-    transform.transform(ligand, m)
-
-    print(f"    - elapsed: {time.time() - start:.1f} seconds")
-    print("=" * 40, flush=True)
+    return MinimizationResults(
+        start_energy=start_energy,
+        final_energy=res.fun,
+        transformation_matrix=m,
+        elapsed=time.time() - start,
+    )
