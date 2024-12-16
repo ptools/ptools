@@ -32,12 +32,7 @@ def create_subparser(parent):
         type=Path,
         help="name of the ligand file",
     )
-    parser.add_argument(
-        "--ref",
-        dest="reference_path",
-        type=Path,
-        help="reference ligand for rmsd"
-    )
+    parser.add_argument("--ref", dest="reference_path", type=Path, help="reference ligand for rmsd")
     parser.add_argument(
         "-c",
         "--conf",
@@ -64,8 +59,7 @@ def create_subparser(parent):
         action="store",
         type=int,
         default=1,
-        help="Which translation group (1 <= ngroup <= ngroups) "
-        "to run (requires --ngroups)",
+        help="Which translation group (1 <= ngroup <= ngroups) " "to run (requires --ngroups)",
     )
     parser.add_argument(
         "-s",
@@ -103,23 +97,26 @@ def parse_args(args: argparse.Namespace):
         assert args.parameters_path.exists(), f"Parameter file not found: {args.parameters_path}"
 
 
+def log(*args, **kwargs):
+    """Logs a message."""
+    return
+    print(*args, **kwargs)
+
 
 def run(args):
     """Runs attract."""
     print_header(__COMMAND__)
     time_start = datetime.datetime.now()
-    print("Start time:", time_start)
+    log("Start time:", time_start)
 
-    print(f"Reading parameters file: {args.conf}")
-    parameters = ptools.io.readers.attract.read_attract_parameter(args.conf)
-    print(f"{parameters.nbminim} series of minimizations")
+    log(f"Reading parameters file: {args.conf}")
+    parameters = ptools.io.readers.attract_legacy.read_attract_parameter(args.conf)
+    log(f"{parameters.nbminim} series of minimizations")
 
-    ff_name = ptools.io.readers.attract.check_ff_version_match(
-        args.receptor_path, args.ligand_path
-    )
+    ff_name = ptools.io.readers.attract.check_ff_version_match(args.receptor_path, args.ligand_path)
     if ff_name != "attract1":
         raise NotImplementedError(f"force field '{ff_name}' not implemented yet")
-    print(f"Detected forcefield: '{ff_name}'")
+    log(f"Detected forcefield: '{ff_name}'")
 
     # ff_specs = ptools.forcefield.PTOOLS_FORCEFIELDS[ff_name]
     if args.parameters_path:
@@ -129,31 +126,30 @@ def run(args):
     # Load receptor and ligand.
     receptor = ptools.AttractRigidBody.from_red(args.receptor_path)
     ligand = ptools.AttractRigidBody.from_red(args.ligand_path)
-    print(
-        f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules"
-    )
-    print(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
+    log(f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules")
+    log(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
 
     if args.reference_path:
         ref = ptools.RigidBody.from_pdb(args.reference_path)
-        print(f"Read reference file: {args.reference_path} with {len(ref)} particules")
+        log(f"Read reference file: {args.reference_path} with {len(ref)} particules")
     else:
         ref = None
 
     if args.startconfig:
-        print("Minimize from starting configuration")
+        log("Minimize from starting configuration")
         # Use transnb, rotnb = 0, 0 to indicate this
         translations = {0: ptools.measure.centroid(ligand)}
         rotations = {0: (0, 0, 0)}
     else:
-        ptools.io.assert_file_exists(
-            "rotation.dat", "rotation file 'rotation.dat' is required."
-        )
+        ptools.io.assert_file_exists("rotation.dat", "rotation file 'rotation.dat' is required.")
         ptools.io.assert_file_exists(
             "translation.dat", "translation file 'translation.dat' is required."
         )
-        translations = ptools.io.attract.read_translations()
-        rotations = ptools.io.attract.read_rotations()
+        translations = ptools.io.readers.attract.read_translations()
+        rotations = ptools.io.readers.attract.read_rotations()
+
+    log("Number of translations:", len(translations))
+    log("Number of rotations per translation:", len(rotations))
 
     # CHR some logic re-worked. "single" now used to indicate any minimization
     # run from a single configuration-- either the start config or a specified
@@ -204,5 +200,5 @@ def run(args):
     # print end and elapsed time
     time_end = datetime.datetime.now()
     # print "Finished at: ",now.strftime("%A %B %d %Y, %H:%M")
-    print("End time:", time_end)
-    print("Elapsed time:", time_end - time_start)
+    log("End time:", time_end)
+    log("Elapsed time:", time_end - time_start)

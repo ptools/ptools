@@ -211,8 +211,7 @@ def read_attract_parameter(path: FilePath) -> AttractFileParameters:
 def read_translations(path: FilePath = "translation.dat") -> dict[int, np.ndarray]:
     """Reads a translation file and returns the dictionary of translations."""
     rb = RigidBody.from_pdb(path)
-    print(f"Read {len(rb)} translations from {path}")
-    translations = [(atom.index, atom.coords) for atom in rb]
+    translations = [(atom.index, atom.coordinates) for atom in rb]
     return dict(translations)
 
 
@@ -237,19 +236,14 @@ def read_rotations(
         line = rotdat.readline().split()
         ntheta = int(line[0])
         nchi = int(line[1])
-        print(f"ntheta, nchi: {ntheta} {nchi}")
         for i in range(ntheta):
             line = rotdat.readline().split()
             theta.append(float(line[0]))
             nphi.append(int(line[1]))
             nrot_per_trans += nphi[i] * nchi
             theta[i] = twopi * theta[i] / 360.0
-            print(f"{theta[i]} {nphi[i]}")
 
     rotations = []
-
-    print(f"Read {ntheta} rotation lines from rotation.dat")
-    print(f"{nrot_per_trans} rotations per translation")
 
     rotnb = 0
     for kkk in range(ntheta):

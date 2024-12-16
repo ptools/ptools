@@ -6,6 +6,7 @@ from typing import TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
+import tqdm
 
 from . import measure, transform
 from ._typing import FilePath
@@ -148,17 +149,24 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
     translations = kwargs.pop("translations", _default_translation)
     rotations = kwargs.pop("rotations", _default_rotation)
 
+    docking_data = []
+
     for transi, transnb in enumerate(sorted(translations.keys())):
         trans = translations[transnb]
-        print(f"Translation #{transnb} {transi}/{len(translations)}")
+
         for roti, rotnb in enumerate(sorted(rotations.keys())):
-            print(f"  Rotation #{rotnb} {roti + 1}/{len(rotations)}")
+            output_data = {
+                "translation": trans.tolist(),
+                "rotation": rotations[rotnb],
+            }
+
             rot = rotations[rotnb]
 
             transform.translate(ligand, -measure.centroid(ligand))
             transform.attract_euler_rotate(ligand, rot)
             transform.translate(ligand, trans)
 
+            output_data["minimizations"] = []
             for i, minim in enumerate(minimlist):
                 parameters = MinimizationParameters(
                     square_cutoff=minim["squarecutoff"],
@@ -166,21 +174,24 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
                 )
 
                 results = _run_minimization(parameters, receptor, ligand)
-                print(f"    Minimization {i + 1}/{len(minimlist)}:")
-                print(f"         cutoff: {parameters.cutoff:.2f} Å")
-                print(f"        maxiter: {parameters.maximum_iterations}")
-                print("        energy:")
-                print(f"            start: {results.start_energy: 6.2f}")
-                print(f"            final: {results.final_energy: 6.2f}")
-                print("        matrix:")
-                print(results.transformation_matrix)
-                print(f"        elapsed: {results.elapsed:.1f} seconds")
-                print("=" * 40, flush=True)
+                output_data["minimizations"].append(
+                    {
+                        "cutoff": parameters.cutoff,
+                        "maxiter": parameters.maximum_iterations,
+                        "rstk": minim["rstk"],
+                        "start_energy": results.start_energy,
+                        "final_energy": results.final_energy,
+                        "transformation_matrix": results.transformation_matrix.tolist(),
+                        "elapsed": results.elapsed,
+                    }
+                )
 
                 transform.move(ligand, results.transformation_matrix)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
-            print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
+            output_data["final_energy"] = ff.non_bonded_energy()
+            docking_data.append(output_data)
+
 
 
 def _run_minimization(
