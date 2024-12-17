@@ -5,7 +5,7 @@ import datetime
 from pathlib import Path
 
 import ptools
-from ptools import AttractRigidBody, AttractDockingParameters
+from ptools.attract import AttractRigidBody, AttractDockingParameters, default_minimization_parameters
 from ptools.io import read_attract_docking_parameters, read_attract_topology
 
 from .header import print_header
@@ -129,17 +129,11 @@ def run(args):
     time_start = datetime.datetime.now()
     log("Start time:", time_start)
 
-    parameters = None
-    if args.conf:
-        read_docking_parameters_file(args.conf)
-
     # Load receptor and ligand.
     receptor = read_attract_topology(args.receptor_path)
     ligand = read_attract_topology(args.ligand_path)
     log(f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules")
     log(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
-
-    exit()
 
     # Sanity checks for forcefield: should be 'ATTRACT1' and match between receptor and ligand.
     assert_forcefield_match(receptor, ligand)
@@ -152,67 +146,20 @@ def run(args):
         reference_topology = ptools.read_pdb(args.reference_path)
         log(f"Read reference file: {args.reference_path} with {len(reference_topology)} particules")
 
-    # If no parameters file, minimize from starting configuration.
-    if not parameters:
-        log("Minimize from starting configuration")
-        translations = {0: ptools.measure.centroid(ligand)}
-        rotations = {0: (0, 0, 0)}
-        minimlist = None
-
-    print("coucou")
-    exit()
-
-    if args.startconfig:
-        log("Minimize from starting configuration")
-        # Use transnb, rotnb = 0, 0 to indicate this
-        translations = {0: ptools.measure.centroid(ligand)}
-        rotations = {0: (0, 0, 0)}
+    # If a configuration file is provided, read it.
+    # Otherwise, minimize from the starting configuration.
+    parameters = None
+    if args.conf:
+        parameters = read_docking_parameters_file(args.conf)
     else:
-        ptools.io.assert_file_exists("rotation.dat", "rotation file 'rotation.dat' is required.")
-        ptools.io.assert_file_exists(
-            "translation.dat", "translation file 'translation.dat' is required."
-        )
-        translations = ptools.io.readers.attract_legacy.read_translations()
-        rotations = ptools.io.readers.attract_legacy.read_rotations()
+        log("Minimize from starting configuration")
+        translations = {0: ptools.measure.centroid(ligand)}
+        rotations = {0: (0, 0, 0)}
+        minimlist = [default_minimization_parameters()]
+        parameters = AttractDockingParameters(translations, rotations, minimlist)
 
-    log("Number of translations:", len(translations))
-    log("Number of rotations per translation:", len(rotations))
-
-    # CHR some logic re-worked. "single" now used to indicate any minimization
-    # run from a single configuration-- either the start config or a specified
-    # transnb and rotnb.
-
-    # single = args.startconfig or (args.transnb is not None and args.rotnb is not None)
-
-    if args.transnb is not None:
-        # Limit to desired translation (translations dictionary is keyed by translation number)
-        translations = {args.transnb: translations[args.transnb]}
-
-    # CHR Keep the following, but I don't know what s for
-    # print_files = True
-    # if args.transnb is not None:
-    #     ntrans = len(translations)
-    #     if args.transnb != ntrans - 1:
-    #         # don't append (print?) ligand, receptor, etc.
-    #         # unless this is the last translation point of the simulation
-    #         print_files = False
-
-    if args.rotnb is not None:
-        # Limit to desired rotation (rotation dictionary is keyed by rotation number)
-        rotations = {args.rotnb: rotations[args.rotnb]}
-
-    # CHR Add translation list splitting
-    if args.ngroups > 1:
-        raise NotImplementedError("Not implemented yet")
-        # print("Working on translations group {:d} of {:d}".format(args.ngroup, args.ngroups))
-        # translations = docking.get_group(translations, args.ngroups, args.ngroup)
-
-    # core attract algorithm
-    params = {
-        "translations": translations,
-        "rotations": rotations,
-        "minimlist": parameters.minimlist,
-    }
+    # Run attract.
+    _ = ptools.attract.run_attract(ligand, receptor, parameters)
 
     # output compressed ligand and receptor:
     # if not single and print_files:

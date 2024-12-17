@@ -98,12 +98,8 @@ class AttractForceField1:
         rad = np.array(rad)
         amp = np.array(amp)
 
-        self._repulsive_parameters = (
-            amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
-        )
-        self._attractive_parameters = (
-            amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
-        )
+        self._repulsive_parameters = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 8)
+        self._attractive_parameters = amp[:, None] * amp[:] * np.power(rad[:, None] + rad[:], 6)
 
         # Categorie pairs.
         C = np.array(np.meshgrid(self.receptor.typeids, self.ligand.typeids)).T
@@ -158,11 +154,7 @@ class AttractForceField1:
             return vlj.sum()
 
         def electrostatics(dx, rr2):
-            charge = (
-                self.receptor.charges[:, None]
-                * self.ligand.charges
-                * (332.053986 / 20.0)
-            )
+            charge = self.receptor.charges[:, None] * self.ligand.charges * (332.053986 / 20.0)
             charge = charge[keep]
 
             et = charge * rr2
@@ -207,11 +199,7 @@ class AttractForceField1:
             return vlj.sum()
 
         def electrostatics(dx, rr2):
-            charge = (
-                self.receptor.charges[:, None]
-                * self.ligand.charges
-                * (332.053986 / 20.0)
-            )
+            charge = self.receptor.charges[:, None] * self.ligand.charges * (332.053986 / 20.0)
             et = charge * rr2
             fdb = dx * (2.0 * et)[:, :, None]
             self.receptor.forces += fdb.sum(axis=1)
@@ -248,10 +236,7 @@ class AttractForceField1:
         contacts = pairlist.contacts()
         norm2 = pairlist.sqdistances()
 
-        alldx = [
-            self.receptor.coordinates[ir] - self.ligand.coordinates[il]
-            for ir, il in contacts
-        ]
+        alldx = [self.receptor.coordinates[ir] - self.ligand.coordinates[il] for ir, il in contacts]
 
         for i, (ir, il) in enumerate(contacts):
             category_rec = self.receptor.typeids[ir]

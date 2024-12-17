@@ -23,6 +23,7 @@ vector_3d = list[float]
 class MinimizationParameters:
     square_cutoff: float
     maximum_iterations: int
+    rstk: float = 0.0
 
     @property
     def cutoff(self) -> float:
@@ -44,6 +45,11 @@ class MinimizationResults:
     final_energy: float
     transformation_matrix: np.ndarray
     elapsed: float
+
+
+def default_minimization_parameters() -> MinimizationParameters:
+    """Returns default minimization parameters (cutoff=10., maxiter=100)."""
+    return MinimizationParameters(square_cutoff=100.0, maximum_iterations=100)
 
 
 class AttractRigidBody(RigidBody):
@@ -123,76 +129,44 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     return e
 
 
-def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
-    """Run the Attract docking procedure.
+def run_attract(
+    ligand: AttractRigidBody, receptor: AttractRigidBody, parameters: AttractDockingParameters
+):
+    """Run the Attract docking procedure."""
 
-    Args:
-        ligand (ptools.rigidbody.AttractRigidBody)
-        receptor (ptools.rigidbody.AttractRigidBody)
-        translations (dict)
-        rotations (dict[int]->[float, float, float])
-        minimlist (list[dict[str]->value])
-
-    Example:
-        >>> receptor = ptools.rigidbody.AttractRigidBody("receptor.red")
-        >>> ligand = ptools.rigidbody.AttractRigidBody("ligand.red")
-        >>> reference = ptools.rigidbody.AttractRigidBody("ligand.red")
-        >>> nbminim, lignames, minimlist, rstk = read_attract_parameters("attract.inp")
-        >>>
-        >>>
-        >>> options = {
-        ...   translations = {0: measure.centroid(ligand)},
-        ...   rotations = {0: (0, 0, 0)},
-        ...   minimlist = minimlist,
-        }
-        >>> ptools.attract.run_attract(ligand, receptor, **options)
-    """
-
-    minimlist = kwargs.pop("minimlist", None)
-    if minimlist is None:
-        raise ValueError("argument 'minimlist' is required")
-
-    _default_translation = {0: measure.centroid(ligand)}
-    _default_rotation = {0: (0, 0, 0)}
-
-    translations = kwargs.pop("translations", _default_translation)
-    rotations = kwargs.pop("rotations", _default_rotation)
+    minimlist = parameters.minimizations
+    translations = parameters.translations
+    rotations = parameters.rotations
 
     docking_data = []
 
-    for transi, transnb in enumerate(sorted(translations.keys())):
-        trans = translations[transnb]
-
-        for roti, rotnb in enumerate(sorted(rotations.keys())):
+    for translation_counter, translation in enumerate(translations):
+        for rotation_counter, rotation in enumerate(rotations):
             output_data = {
-                "translation": trans.tolist(),
-                "rotation": rotations[rotnb],
+                "translation": translation,
+                "rotation": rotation,
             }
 
-            rot = rotations[rotnb]
-
             transform.translate(ligand, -measure.centroid(ligand))
-            transform.attract_euler_rotate(ligand, rot)
-            transform.translate(ligand, trans)
+            transform.attract_euler_rotate(ligand, rotation)
+            transform.translate(ligand, translation)
 
             output_data["minimizations"] = []
-            for i, minim in enumerate(minimlist):
+            for minimization_counter, minim in enumerate(minimlist):
                 progress = (
-                    f"Translation {transi + 1:3d}/{len(translations):d}  "
-                    f"Rotation {roti + 1:3d}/{len(rotations):d}  "
-                    f"Minimization {i + 1:3d}/{len(minimlist):d}"
+                    f"Translation {translation_counter + 1:3d}/{len(translations):d}  "
+                    f"Rotation {rotation_counter + 1:3d}/{len(rotations):d}  "
+                    f"Minimization {minimization_counter + 1:3d}/{len(minimlist):d}"
                 )
                 print(progress, flush=True, end="")
-                parameters = MinimizationParameters(
-                    square_cutoff=minim["squarecutoff"], maximum_iterations=minim["maxiter"]
-                )
 
-                results = _run_minimization(parameters, receptor, ligand)
+                results = _run_minimization(minim, receptor, ligand)
+
                 output_data["minimizations"].append(
                     {
-                        "cutoff": parameters.cutoff,
-                        "maxiter": parameters.maximum_iterations,
-                        "rstk": minim["rstk"],
+                        "square_cutoff": minim.square_cutoff,
+                        "maxiter": minim.maximum_iterations,
+                        "rstk": minim.rstk,
                         "start_energy": results.start_energy,
                         "final_energy": results.final_energy,
                         "transformation_matrix": results.transformation_matrix.tolist(),
@@ -203,7 +177,7 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
 
                 transform.move(ligand, results.transformation_matrix)
 
-            ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
+            ff = AttractForceField1(receptor, ligand, 100.0)
             output_data["final_energy"] = ff.non_bonded_energy()
             docking_data.append(output_data)
 
@@ -215,12 +189,12 @@ def _run_minimization(
 ) -> MinimizationResults:
     """Run the minimization."""
 
-    start = time.time()
+    start = time.perf_counter()
 
     cutoff = params.cutoff
     niter = params.maximum_iterations
 
-    ff = AttractForceField1(receptor, ligand, cutoff, "aminon.par")
+    ff = AttractForceField1(receptor, ligand, cutoff)
     start_energy = ff.non_bonded_energy()
 
     x0 = np.zeros(6)
@@ -230,5 +204,5 @@ def _run_minimization(
         start_energy=start_energy,
         final_energy=res.fun,
         transformation_matrix=m,
-        elapsed=time.time() - start,
+        elapsed=time.perf_counter() - start,
     )
