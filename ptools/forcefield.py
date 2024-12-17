@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from .io.readers.attract import read_aminon
 from .pairlist import PairList
 
 if TYPE_CHECKING:
@@ -71,19 +70,16 @@ class AttractForceField1:
     receptor: "AttractRigidBody"
     ligand: "AttractRigidBody"
     cutoff: float
-    paramfile: str
 
     def __init__(
         self,
         receptor: "AttractRigidBody",
         ligand: "AttractRigidBody",
         cutoff: float = 10,
-        paramfile: str = "",
     ):
         self.receptor = receptor
         self.ligand = ligand
         self.cutoff = cutoff
-        self.paramfile = paramfile
 
         self._vdw_energy = 0.0
         self._electrostatic_energy = 0.0
@@ -96,10 +92,7 @@ class AttractForceField1:
         self._initialize_parameters()
 
     def _initialize_parameters(self):
-        if self.paramfile != "":
-            params = read_aminon(self.paramfile)
-        else:
-            params = ATTRACT_DEFAULT_FF_PARAMS
+        params = ATTRACT_DEFAULT_FF_PARAMS
 
         rad, amp = list(zip(*params, strict=True))
         rad = np.array(rad)

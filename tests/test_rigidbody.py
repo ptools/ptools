@@ -1,6 +1,6 @@
 """test_rigidbody - Tests for `ptools.rigidbody module."""
 
-from ptools.rigidbody import RigidBody
+from ptools import RigidBody, RigidBodyFactory
 
 from .generators import generate_atoms
 from .generators.pdb import generate_pdb_file
@@ -8,7 +8,7 @@ from .generators.pdb import generate_pdb_file
 
 def generate_rigid_from_pdb():
     with generate_pdb_file() as temporary_file:
-        rigid = RigidBody.from_pdb(temporary_file.name)
+        rigid = RigidBodyFactory.from_pdb(temporary_file.name)
     return rigid
 
 
@@ -19,7 +19,7 @@ def test_initialization_from_list_of_atoms():
 
 def test_initialization_from_pdb():
     with generate_pdb_file() as temporary_file:
-        rigid = RigidBody.from_pdb(temporary_file.name)
+        rigid = RigidBodyFactory.from_pdb(temporary_file.name)
         assert len(rigid) == 10
 
 

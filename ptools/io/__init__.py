@@ -9,6 +9,8 @@ from .formatters.reduced import (
     write_reduced_pdb as write_reduced_pdb,
 )
 from .readers.pdb import read_pdb as read_pdb
+from .readers.attract import read_docking_parameters as read_attract_docking_parameters
+from .readers.attract import read_topology as read_attract_topology
 from .writers.pdb import write_pdb as write_pdb
 
 

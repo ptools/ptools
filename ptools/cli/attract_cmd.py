@@ -5,7 +5,8 @@ import datetime
 from pathlib import Path
 
 import ptools
-from ptools import attract
+from ptools import AttractRigidBody, AttractDockingParameters
+from ptools.io import read_attract_docking_parameters, read_attract_topology
 
 from .header import print_header
 
@@ -36,52 +37,45 @@ def create_subparser(parent):
     parser.add_argument(
         "-c",
         "--conf",
-        default="attract.inp",
-        type=Path,
-        help="attract configuration file " "(default=attract.inp)",
-    )
-    parser.add_argument(
-        "-p",
-        "--param",
-        dest="parameters_path",
-        type=Path,
-        help="attract force field parameter file " "(default=default force field file)",
-    )
-    parser.add_argument(
-        "--ngroups",
-        action="store",
-        type=int,
-        default=1,
-        help="Desired number of divisions of translations file",
-    )
-    parser.add_argument(
-        "--ngroup",
-        action="store",
-        type=int,
-        default=1,
-        help="Which translation group (1 <= ngroup <= ngroups) " "to run (requires --ngroups)",
-    )
-    parser.add_argument(
-        "-s",
-        "--start-config-only",
-        dest="startconfig",
-        action="store_true",
-        help="minimize starting configuration only",
-    )
-    parser.add_argument(
-        "--translation",
-        type=int,
-        dest="transnb",
         default=None,
-        help="minimize for the provided translation number",
+        type=Path,
+        help="attract configuration file (json)",
     )
-    parser.add_argument(
-        "--rotation",
-        type=int,
-        dest="rotnb",
-        default=None,
-        help="minimize for the given rotation number",
-    )
+    # parser.add_argument(
+    #     "-p",
+    #     "--param",
+    #     dest="parameters_path",
+    #     type=Path,
+    #     help="attract force field parameter file " "(default=default force field file)",
+    # )
+    # parser.add_argument(
+    #     "--ngroups",
+    #     action="store",
+    #     type=int,
+    #     default=1,
+    #     help="Desired number of divisions of translations file",
+    # )
+    # parser.add_argument(
+    #     "--ngroup",
+    #     action="store",
+    #     type=int,
+    #     default=1,
+    #     help="Which translation group (1 <= ngroup <= ngroups) " "to run (requires --ngroups)",
+    # )
+    # parser.add_argument(
+    #     "--translation",
+    #     type=int,
+    #     dest="transnb",
+    #     default=None,
+    #     help="minimize for the provided translation number",
+    # )
+    # parser.add_argument(
+    #     "--rotation",
+    #     type=int,
+    #     dest="rotnb",
+    #     default=None,
+    #     help="minimize for the given rotation number",
+    # )
 
 
 def parse_args(args: argparse.Namespace):
@@ -97,9 +91,35 @@ def parse_args(args: argparse.Namespace):
         assert args.parameters_path.exists(), f"Parameter file not found: {args.parameters_path}"
 
 
+def assert_forcefield_match(receptor: AttractRigidBody, ligand: AttractRigidBody):
+    """Asserts that the force fields of the receptor and ligand match."""
+    if receptor.forcefield != ligand.forcefield:
+        raise ValueError(
+            f"Receptor and ligand force fields do not match: "
+            f"'{receptor.forcefield}' != '{ligand.forcefield}'"
+        )
+
+
+def assert_forcefield_is_attract1(topology: ptools.AttractRigidBody):
+    """Asserts that the force field of the topology is 'ATTRACT1'."""
+    if topology.forcefield != "ATTRACT1":
+        raise NotImplementedError(f"Force field {topology.forcefield!r} not implemented yet")
+
+
+def read_docking_parameters_file(file_path: Path) -> AttractDockingParameters:
+    """Reads docking parameters from a file."""
+    log(f"Reading parameters file: {file_path}")
+    parameters = read_attract_docking_parameters(file_path)
+    log(f"  - {len(parameters.translations)} translations")
+    log(f"  - {len(parameters.rotations)} rotations per translation")
+    log(f"  - {len(parameters.minimizations)} series of minimizations")
+    N = len(parameters.translations) * len(parameters.rotations) * len(parameters.minimizations)
+    log(f"Total number of minimizations: {N:,}")
+    return parameters
+
+
 def log(*args, **kwargs):
     """Logs a message."""
-    return
     print(*args, **kwargs)
 
 
@@ -109,31 +129,38 @@ def run(args):
     time_start = datetime.datetime.now()
     log("Start time:", time_start)
 
-    log(f"Reading parameters file: {args.conf}")
-    parameters = ptools.io.readers.attract_legacy.read_attract_parameter(args.conf)
-    log(f"{parameters.nbminim} series of minimizations")
-
-    ff_name = ptools.io.readers.attract.check_ff_version_match(args.receptor_path, args.ligand_path)
-    if ff_name != "attract1":
-        raise NotImplementedError(f"force field '{ff_name}' not implemented yet")
-    log(f"Detected forcefield: '{ff_name}'")
-
-    # ff_specs = ptools.forcefield.PTOOLS_FORCEFIELDS[ff_name]
-    if args.parameters_path:
-        raise NotImplementedError("not implemented yet")
-        # ff_specs["ff_file"] = args.param
+    parameters = None
+    if args.conf:
+        read_docking_parameters_file(args.conf)
 
     # Load receptor and ligand.
-    receptor = ptools.AttractRigidBody.from_red(args.receptor_path)
-    ligand = ptools.AttractRigidBody.from_red(args.ligand_path)
+    receptor = read_attract_topology(args.receptor_path)
+    ligand = read_attract_topology(args.ligand_path)
     log(f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules")
     log(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
 
+    exit()
+
+    # Sanity checks for forcefield: should be 'ATTRACT1' and match between receptor and ligand.
+    assert_forcefield_match(receptor, ligand)
+    assert_forcefield_is_attract1(receptor)
+    log(f"Detected forcefield: {receptor.forcefield!r}")
+
+    # Reads reference topology if provided.
+    reference_topology = None
     if args.reference_path:
-        ref = ptools.RigidBody.from_pdb(args.reference_path)
-        log(f"Read reference file: {args.reference_path} with {len(ref)} particules")
-    else:
-        ref = None
+        reference_topology = ptools.read_pdb(args.reference_path)
+        log(f"Read reference file: {args.reference_path} with {len(reference_topology)} particules")
+
+    # If no parameters file, minimize from starting configuration.
+    if not parameters:
+        log("Minimize from starting configuration")
+        translations = {0: ptools.measure.centroid(ligand)}
+        rotations = {0: (0, 0, 0)}
+        minimlist = None
+
+    print("coucou")
+    exit()
 
     if args.startconfig:
         log("Minimize from starting configuration")
@@ -145,8 +172,8 @@ def run(args):
         ptools.io.assert_file_exists(
             "translation.dat", "translation file 'translation.dat' is required."
         )
-        translations = ptools.io.readers.attract.read_translations()
-        rotations = ptools.io.readers.attract.read_rotations()
+        translations = ptools.io.readers.attract_legacy.read_translations()
+        rotations = ptools.io.readers.attract_legacy.read_rotations()
 
     log("Number of translations:", len(translations))
     log("Number of rotations per translation:", len(rotations))
@@ -186,7 +213,6 @@ def run(args):
         "rotations": rotations,
         "minimlist": parameters.minimlist,
     }
-    attract.run_attract(ligand, receptor, **params)
 
     # output compressed ligand and receptor:
     # if not single and print_files:

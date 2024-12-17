@@ -1,32 +1,41 @@
 """Attract docking."""
 
+from __future__ import annotations
+
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TypeVar
 
 import numpy as np
 from scipy.optimize import minimize
-import tqdm
 
 from . import measure, transform
-from ._typing import FilePath
 from .forcefield import AttractForceField1
-from .io.readers.red import read_red
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
 
 AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
+vector_3d = list[float]
+
 
 @dataclass
 class MinimizationParameters:
-
     square_cutoff: float
     maximum_iterations: int
 
     @property
     def cutoff(self) -> float:
-        return self.square_cutoff ** 0.5
+        return self.square_cutoff**0.5
+
+
+@dataclass
+class AttractDockingParameters:
+    """Stores parameters for an Attract docking."""
+
+    translations: list[vector_3d] = field(default_factory=list)
+    rotations: list[vector_3d] = field(default_factory=list)
+    minimizations: list[vector_3d] = field(default_factory=list)  # TODO: type is not good
 
 
 @dataclass
@@ -40,7 +49,10 @@ class MinimizationResults:
 class AttractRigidBody(RigidBody):
     """AttractRigidBody is a RigidBody on which one can calculate the energy.
 
-    It has 3 additionnal arrays compared to ParticleCollection:
+    It has additionnal attributes compared to ParticleCollection.
+
+    Attributes:
+        - forcefield (str): forcefield name
         - typeids (np.ndarray(N, )):
             1 x N shaped array for atom typeids
         - charges (np.ndarray(N, )):O
@@ -50,12 +62,14 @@ class AttractRigidBody(RigidBody):
         - forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
 
+
     Atom typeids and charges are parsed from input PDB file.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initialize_attract_properties()
+        self.forcefield = ""
 
     def _initialize_attract_properties(self):
         """Initializes atom type ids, charges and forces from PDB extra field."""
@@ -74,13 +88,8 @@ class AttractRigidBody(RigidBody):
             self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=float))
 
     @classmethod
-    def from_red(cls: type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
-        rigid = cls.from_properties(read_red(path).atom_properties)
-        return rigid
-
-    @classmethod
-    def from_pdb(cls: type[AttractRigidBodyType], path: FilePath) -> AttractRigidBodyType:
-        raise NotImplementedError("Use AttractRigidBody.from_red instead.")
+    def from_pdb(cls, *args, **kwargs):
+        raise NotImplementedError("Use ptools.read_attract_topology instead.")
 
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""
@@ -168,9 +177,14 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
 
             output_data["minimizations"] = []
             for i, minim in enumerate(minimlist):
+                progress = (
+                    f"Translation {transi + 1:3d}/{len(translations):d}  "
+                    f"Rotation {roti + 1:3d}/{len(rotations):d}  "
+                    f"Minimization {i + 1:3d}/{len(minimlist):d}"
+                )
+                print(progress, flush=True, end="")
                 parameters = MinimizationParameters(
-                    square_cutoff=minim["squarecutoff"],
-                    maximum_iterations=minim["maxiter"]
+                    square_cutoff=minim["squarecutoff"], maximum_iterations=minim["maxiter"]
                 )
 
                 results = _run_minimization(parameters, receptor, ligand)
@@ -185,13 +199,13 @@ def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
                         "elapsed": results.elapsed,
                     }
                 )
+                print("\r" + progress + f"  elapsed: {results.elapsed:.2f}s", flush=True)
 
                 transform.move(ligand, results.transformation_matrix)
 
             ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
             output_data["final_energy"] = ff.non_bonded_energy()
             docking_data.append(output_data)
-
 
 
 def _run_minimization(

@@ -3,7 +3,7 @@
 import numpy as np
 
 from ..._typing import FilePath
-from ...rigidbody import RigidBody
+from ... import RigidBodyFactory
 
 
 class AttractFileParameters:
@@ -210,7 +210,7 @@ def read_attract_parameter(path: FilePath) -> AttractFileParameters:
 
 def read_translations(path: FilePath = "translation.dat") -> dict[int, np.ndarray]:
     """Reads a translation file and returns the dictionary of translations."""
-    rb = RigidBody.from_pdb(path)
+    rb = RigidBodyFactory.from_pdb(path)
     translations = [(atom.index, atom.coordinates) for atom in rb]
     return dict(translations)
 

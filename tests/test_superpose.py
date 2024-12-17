@@ -2,7 +2,7 @@
 import unittest
 
 # Type-hinting special types.
-from typing import Callable
+from collections.abc import Callable
 
 # Scientific libraries.
 import numpy as np
@@ -15,7 +15,7 @@ from scipy.spatial.transform import Rotation
 # PTools imports.
 from ptools import superpose, transform
 from ptools.linalg import transformation_matrix
-from ptools.rigidbody import RigidBody
+from ptools import RigidBodyFactory
 from ptools.superpose import Screw
 
 # Test-specific imports.
@@ -67,7 +67,7 @@ def vectors3(
 
 class TestSuperpose(unittest.TestCase):
     def setUp(self):
-        self.target = RigidBody.from_pdb(TEST_LIGAND)
+        self.target = RigidBodyFactory.from_pdb(TEST_LIGAND)
 
     @given(vectors3(), vectors3())
     def test_fit(self, translation_vector: np.ndarray, rotation_vector: np.ndarray):

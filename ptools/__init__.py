@@ -16,7 +16,7 @@ from . import (
     superpose,
     tables,
 )
-from .attract import AttractRigidBody
+from .attract import AttractDockingParameters, AttractRigidBody
 from .io import read_pdb as read_pdb
 from .io import write_pdb as write_pdb
 from .particlecollection import ParticleCollection
@@ -39,7 +39,14 @@ __all__ = [
     "tables",
     "read_pdb",
     "write_pdb",
+    "AttractDockingParameters",
     "AttractRigidBody",
     "RigidBody",
     "ParticleCollection",
 ]
+
+
+class RigidBodyFactory:
+    @staticmethod
+    def from_pdb(path: str) -> RigidBody:
+        return RigidBody(read_pdb(path))
