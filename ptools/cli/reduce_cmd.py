@@ -1,9 +1,9 @@
 """PTools reduce command."""
 
-import datetime
-import logging
+import time
 
 import click
+from loguru import logger
 
 from .. import reduce as Reduce
 from ..io import write_reduced_pdb
@@ -12,9 +12,6 @@ from .header import print_header
 __COMMAND__ = "reduce"
 
 ExistingFile = click.Path(exists=True, dir_okay=False)
-
-logging.basicConfig(format="%(name)s:%(levelname)s: %(message)s", level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -76,7 +73,7 @@ def reduce(
         topology_path: input topology file in atomistic resolution.
     """
     print_header(__COMMAND__)
-    logger.info("Start time: %s", str(datetime.datetime.now()))
+    start = time.perf_counter()
 
     if "all" in ignore_errors:
         ignore_errors = Reduce.exceptions.all_exceptions_names()
@@ -89,9 +86,8 @@ def reduce(
     reducer.reduce(ignore_exceptions)
 
     logger.info(
-        "Reduced atomistic model from %d to %d",
-        reducer.number_of_atoms(),
-        reducer.number_of_beads(),
+        f"Reduced atomistic model from {reducer.number_of_atoms()} to "
+        f"{reducer.number_of_beads()} beads."
     )
 
     if ff == "scorpion":
@@ -103,10 +99,10 @@ def reduce(
         if optimize_charges:
             _optimize_charges(reducer)
 
-    logger.info("Writing reduced model to %s", output_path)
+    logger.info(f"Writing reduced model to {output_path}")
     write_reduced_pdb(reducer.reduced_model, output_path)
+    logger.info(f"Elapsed time: {time.perf_counter() - start:.2f} s")
 
-    logger.info("End time: %s", str(datetime.datetime.now()))
 
 
 def _optimize_charges(reducer: Reduce.Reducer):

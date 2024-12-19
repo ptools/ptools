@@ -1,6 +1,6 @@
 """Top-level package for PTools"""
 
-__version__ = "0.2.0"
+from loguru import logger
 
 from . import (
     atomattrs,
@@ -23,6 +23,9 @@ from .particlecollection import ParticleCollection
 from .rigidbody import RigidBody
 from .transform import move as move
 
+__version__ = "0.2.0"
+
+
 __all__ = [
     "atomattrs",
     "attract",
@@ -44,6 +47,8 @@ __all__ = [
     "RigidBody",
     "ParticleCollection",
 ]
+
+logger.disable("ptools")
 
 
 class RigidBodyFactory:
