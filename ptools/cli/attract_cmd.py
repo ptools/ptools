@@ -1,95 +1,24 @@
 """PTools attract command."""
 
-import argparse
 import datetime
 import json
 from pathlib import Path
 
+import click
+
 import ptools
-from ptools.attract import AttractRigidBody, AttractDockingParameters, default_minimization_parameters
+from ptools.attract import (
+    AttractDockingParameters,
+    AttractRigidBody,
+    default_minimization_parameters,
+)
 from ptools.io import read_attract_docking_parameters, read_attract_topology
 
 from .header import print_header
 
+ExistingFile = click.Path(exists=True, dir_okay=False)
+
 __COMMAND__ = "attract"
-
-
-def create_subparser(parent):
-    """Creates command-line parser."""
-    parser = parent.add_parser(__COMMAND__, help=__doc__)
-    parser.set_defaults(func=run)
-    parser.add_argument(
-        "-r",
-        "--receptor",
-        dest="receptor_path",
-        required=True,
-        type=Path,
-        help="name of the receptor file",
-    )
-    parser.add_argument(
-        "-l",
-        "--ligand",
-        dest="ligand_path",
-        required=True,
-        type=Path,
-        help="name of the ligand file",
-    )
-    parser.add_argument("--ref", dest="reference_path", type=Path, help="reference ligand for rmsd")
-    parser.add_argument(
-        "-c",
-        "--conf",
-        default=None,
-        type=Path,
-        help="attract configuration file (json)",
-    )
-    # parser.add_argument(
-    #     "-p",
-    #     "--param",
-    #     dest="parameters_path",
-    #     type=Path,
-    #     help="attract force field parameter file " "(default=default force field file)",
-    # )
-    # parser.add_argument(
-    #     "--ngroups",
-    #     action="store",
-    #     type=int,
-    #     default=1,
-    #     help="Desired number of divisions of translations file",
-    # )
-    # parser.add_argument(
-    #     "--ngroup",
-    #     action="store",
-    #     type=int,
-    #     default=1,
-    #     help="Which translation group (1 <= ngroup <= ngroups) " "to run (requires --ngroups)",
-    # )
-    # parser.add_argument(
-    #     "--translation",
-    #     type=int,
-    #     dest="transnb",
-    #     default=None,
-    #     help="minimize for the provided translation number",
-    # )
-    # parser.add_argument(
-    #     "--rotation",
-    #     type=int,
-    #     dest="rotnb",
-    #     default=None,
-    #     help="minimize for the given rotation number",
-    # )
-
-
-def parse_args(args: argparse.Namespace):
-    """Parses command-line arguments."""
-    assert args.receptor_path.exists(), f"Receptor file not found: {args.receptor_path}"
-    assert args.ligand_path.exists(), f"Ligand file not found: {args.ligand_path}"
-    assert args.conf.exists(), f"Configuration file not found: {args.conf}"
-
-    if args.reference_path:
-        assert args.reference_path.exists(), f"Reference file not found: {args.reference_path}"
-
-    if args.parameters_path:
-        assert args.parameters_path.exists(), f"Parameter file not found: {args.parameters_path}"
 
 
 def assert_forcefield_match(receptor: AttractRigidBody, ligand: AttractRigidBody):
@@ -124,17 +53,47 @@ def log(*args, **kwargs):
     print(*args, **kwargs)
 
 
-def run(args):
+@click.command()
+@click.option(
+    "-r",
+    "--receptor",
+    "receptor_path",
+    required=True,
+    type=ExistingFile,
+    help="path to receptor file (attract pdb)",
+)
+@click.option(
+    "-l",
+    "--ligand",
+    "ligand_path",
+    required=True,
+    type=ExistingFile,
+    help="path to ligand file (attract pdb)",
+)
+@click.option(
+    "--ref",
+    "reference_path",
+    type=ExistingFile,
+    help="path to reference ligand file (pdb)",
+)
+@click.option(
+    "-c",
+    "--conf",
+    "configuration_path",
+    type=ExistingFile,
+    help="path to attract configuration file (json)",
+)
+def attract(receptor_path, ligand_path, reference_path, configuration_path):
     """Runs attract."""
     print_header(__COMMAND__)
     time_start = datetime.datetime.now()
     log("Start time:", time_start)
 
     # Load receptor and ligand.
-    receptor = read_attract_topology(args.receptor_path)
-    ligand = read_attract_topology(args.ligand_path)
-    log(f"Read receptor (fixed): {args.receptor_path} with {len(receptor)} particules")
-    log(f"Read ligand (mobile): {args.ligand_path} with {len(ligand)} particules")
+    receptor = read_attract_topology(receptor_path)
+    ligand = read_attract_topology(ligand_path)
+    log(f"Read receptor (fixed): {receptor_path} with {len(receptor)} particules")
+    log(f"Read ligand (mobile): {ligand_path} with {len(ligand)} particules")
 
     # Sanity checks for forcefield: should be 'ATTRACT1' and match between receptor and ligand.
     assert_forcefield_match(receptor, ligand)
@@ -143,15 +102,15 @@ def run(args):
 
     # Reads reference topology if provided.
     reference_topology = None
-    if args.reference_path:
-        reference_topology = ptools.read_pdb(args.reference_path)
-        log(f"Read reference file: {args.reference_path} with {len(reference_topology)} particules")
+    if reference_path:
+        reference_topology = ptools.read_pdb(reference_path)
+        log(f"Read reference file: {reference_path} with {len(reference_topology)} particules")
 
     # If a configuration file is provided, read it.
     # Otherwise, minimize from the starting configuration.
     parameters = None
-    if args.conf:
-        parameters = read_docking_parameters_file(args.conf)
+    if configuration_path:
+        parameters = read_docking_parameters_file(configuration_path)
     else:
         log("Minimize from starting configuration")
         translations = [ptools.measure.centroid(ligand)]

@@ -5,26 +5,19 @@ For more specific help, provide the name of a positional argument, e.g.,
    ptools --help
 """
 
+import click
 
-import argparse
-
-from . import attract_cmd, reduce_cmd
-
-
-def parse_command_line(args=None):
-    """Main ptools command-line parsing."""
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--version", action="version")
-    subparsers = parser.add_subparsers(required=True)
-    attract_cmd.create_subparser(subparsers)
-    reduce_cmd.create_subparser(subparsers)
-    return parser.parse_args(args)
+from .attract_cmd import attract
+from .reduce_cmd import reduce
 
 
-def main(args=None):
-    """Main ptools command."""
-    args = parse_command_line(args)
-    args.func(args)
+@click.group(help=__doc__)
+def main():
+    pass
+
+
+main.add_command(attract)
+main.add_command(reduce)
 
 
 if __name__ == "__main__":
