@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import json
 from pathlib import Path
 
 import ptools
@@ -153,22 +154,19 @@ def run(args):
         parameters = read_docking_parameters_file(args.conf)
     else:
         log("Minimize from starting configuration")
-        translations = {0: ptools.measure.centroid(ligand)}
-        rotations = {0: (0, 0, 0)}
+        translations = [ptools.measure.centroid(ligand)]
+        rotations = [(0, 0, 0)]
         minimlist = [default_minimization_parameters()]
         parameters = AttractDockingParameters(translations, rotations, minimlist)
 
     # Run attract.
-    _ = ptools.attract.run_attract(ligand, receptor, parameters)
+    # results = ptools.attract.run_attract(ligand, receptor, parameters)
+    results = ptools.attract.run_attract_monop(ligand, receptor, parameters)
 
-    # output compressed ligand and receptor:
-    # if not single and print_files:
-    #     print(docking.compress_file(args.receptor_path))
-    #     print(docking.compress_file(args.ligand_path))
-    #     print(docking.compress_file(ff_specs['ff_file']))
-    #     print(docking.compress_file('translation.dat'))
-    #     print(docking.compress_file('rotation.dat'))
-    #     print(docking.compress_file('attract.inp'))
+    # Converts results to JSON-serializable format.
+    log("Writing results to 'results.json'")
+    with open("results.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2)
 
     # print end and elapsed time
     time_end = datetime.datetime.now()

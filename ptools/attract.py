@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import TypeVar
 
 import numpy as np
+import tqdm
 from scipy.optimize import minimize
 
 from . import measure, transform
@@ -129,57 +130,76 @@ def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     return e
 
 
-def run_attract(
+def run_attract(*args, **kwargs):
+    """Run the Attract docking procedure."""
+    return run_attract_monop(*args, **kwargs)
+
+
+def run_attract_monop(
     ligand: AttractRigidBody, receptor: AttractRigidBody, parameters: AttractDockingParameters
 ):
-    """Run the Attract docking procedure."""
+    """Run the Attract docking procedure (sequential)."""
+
+    _ligand = ligand.copy()
+    _receptor = receptor.copy()
 
     minimlist = parameters.minimizations
     translations = parameters.translations
     rotations = parameters.rotations
 
-    docking_data = []
+    jobs = [
+        (translation, rotation, minimlist) for translation in translations for rotation in rotations
+    ]
 
-    for translation_counter, translation in enumerate(translations):
-        for rotation_counter, rotation in enumerate(rotations):
-            output_data = {
-                "translation": translation,
-                "rotation": rotation,
-            }
+    total_number_of_jobs = len(jobs) * len(minimlist)
 
-            transform.translate(ligand, -measure.centroid(ligand))
-            transform.attract_euler_rotate(ligand, rotation)
-            transform.translate(ligand, translation)
+    all_results = []
 
-            output_data["minimizations"] = []
-            for minimization_counter, minim in enumerate(minimlist):
-                progress = (
-                    f"Translation {translation_counter + 1:3d}/{len(translations):d}  "
-                    f"Rotation {rotation_counter + 1:3d}/{len(rotations):d}  "
-                    f"Minimization {minimization_counter + 1:3d}/{len(minimlist):d}"
-                )
-                print(progress, flush=True, end="")
+    progress = tqdm.tqdm(total=total_number_of_jobs, desc="Attract docking")
+    for translation, rotation, minimlist in jobs:
+        ligand = _ligand.copy()
+        receptor = _receptor.copy()
 
-                results = _run_minimization(minim, receptor, ligand)
+        transform.translate(ligand, -measure.centroid(ligand))
+        transform.attract_euler_rotate(ligand, rotation)
+        transform.translate(ligand, translation)
 
-                output_data["minimizations"].append(
-                    {
-                        "square_cutoff": minim.square_cutoff,
-                        "maxiter": minim.maximum_iterations,
-                        "rstk": minim.rstk,
-                        "start_energy": results.start_energy,
-                        "final_energy": results.final_energy,
-                        "transformation_matrix": results.transformation_matrix.tolist(),
-                        "elapsed": results.elapsed,
-                    }
-                )
-                print("\r" + progress + f"  elapsed: {results.elapsed:.2f}s", flush=True)
+        output_data = {
+            "translation": translation,
+            "rotation": rotation,
+            "minimizations": [],
+        }
 
-                transform.move(ligand, results.transformation_matrix)
+        for minim in minimlist:
+            results = _run_minimization(minim, receptor, ligand)
+            new_ligand = ligand.copy()
 
-            ff = AttractForceField1(receptor, ligand, 100.0)
-            output_data["final_energy"] = ff.non_bonded_energy()
-            docking_data.append(output_data)
+            center = measure.centroid(new_ligand)
+            transform.translate(new_ligand, -center)
+            transform.transform(new_ligand, results.transformation_matrix)
+            transform.translate(new_ligand, center)
+
+            ligand = new_ligand
+
+            output_data["minimizations"].append(
+                {
+                    "square_cutoff": minim.square_cutoff,
+                    "maxiter": minim.maximum_iterations,
+                    "rstk": minim.rstk,
+                    "start_energy": results.start_energy,
+                    "final_energy": results.final_energy,
+                    "transformation_matrix": results.transformation_matrix.tolist(),
+                    "elapsed": results.elapsed,
+                }
+            )
+            progress.update()
+
+        ff = AttractForceField1(receptor, ligand, 100.0)
+        output_data["final_energy"] = ff.non_bonded_energy()
+
+        all_results.append(output_data)
+
+    return all_results
 
 
 def _run_minimization(
@@ -200,9 +220,11 @@ def _run_minimization(
     x0 = np.zeros(6)
     res = minimize(_function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter})
     m = transformation_matrix(res.x[3:], res.x[:3])
-    return MinimizationResults(
+    results = MinimizationResults(
         start_energy=start_energy,
         final_energy=res.fun,
         transformation_matrix=m,
         elapsed=time.perf_counter() - start,
     )
+    results.x = res.x
+    return results
