@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
-from typing import TypeVar
 
 import numpy as np
 import tqdm
@@ -14,8 +13,6 @@ from . import measure, transform
 from .forcefield import AttractForceField1
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
-
-AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
 
 vector_3d = list[float]
 

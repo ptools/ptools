@@ -135,7 +135,6 @@ class AttractForceField1:
         """Private method for non-bonded energy calculation with small cutoffs."""
 
         def van_der_waals(dx, rr2):
-            # pylint: disable=E1126
             a = np.array([self._attractive_pairs[i, j] for i, j in zip(*keep, strict=True)])
             b = np.array([self._repulsive_pairs[i, j] for i, j in zip(*keep, strict=True)])
 
