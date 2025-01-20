@@ -10,6 +10,7 @@ from .formatters.reduced import (
 )
 from .readers.pdb import read_pdb as read_pdb
 from .writers.pdb import write_pdb as write_pdb
+from .writers.mmcif import write_mmCIF as write_mmCIF
 
 
 def check_file_exists(path: FilePath, message: bool | str = False) -> bool:
