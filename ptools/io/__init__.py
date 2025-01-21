@@ -4,6 +4,7 @@ import pathlib
 
 from .._typing import FilePath
 from .formatters.pdb import to_pdb as to_pdb
+from .formatters.mmcif import to_mmCIF as to_mmCIF
 from .formatters.reduced import (
     to_reduced_pdb as to_reduced_pdb,
     write_reduced_pdb as write_reduced_pdb,
