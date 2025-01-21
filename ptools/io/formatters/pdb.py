@@ -26,40 +26,31 @@ class PDBConvertible(Protocol):
     """
 
     @property
-    def coordinates(self) -> tuple[float, float, float]:
-        ...
+    def coordinates(self) -> tuple[float, float, float]: ...
 
     @property
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
     @property
-    def index(self) -> int:
-        ...
+    def index(self) -> int: ...
 
     @property
-    def residue_name(self) -> str:
-        ...
+    def residue_name(self) -> str: ...
 
     @property
-    def residue_index(self) -> int:
-        ...
+    def residue_index(self) -> int: ...
 
     @property
-    def chain(self) -> str:
-        ...
+    def chain(self) -> str: ...
 
     @property
-    def occupancy(self) -> float | None:
-        ...
+    def occupancy(self) -> float | None: ...
 
     @property
-    def bfactor(self) -> float | None:
-        ...
+    def bfactor(self) -> float | None: ...
 
     @property
-    def element(self) -> str | None:
-        ...
+    def element(self) -> str | None: ...
 
 
 def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str:
@@ -77,7 +68,7 @@ def to_pdb(atom_or_collection: PDBConvertible | Iterable[PDBConvertible]) -> str
 def format_atom(atom: PDBConvertible) -> str:
     bfactor = getattr(atom, "bfactor", 0.0)
     occupancy = getattr(atom, "occupancy", 1.0)
-    element = getattr(atom, "element", '')
+    element = getattr(atom, "element", "")
     fmt_args: dict[str, Any] = {
         "record": "ATOM",
         "altloc": " ",
@@ -98,8 +89,7 @@ def format_atom(atom: PDBConvertible) -> str:
 
 
 def format_chain_token(chain: str) -> str:
-    assert len(chain) < 2
-    return " " if not chain else chain
+    return " " if not chain else chain[0]
 
 
 def format_atom_name_token(name: str) -> str:
