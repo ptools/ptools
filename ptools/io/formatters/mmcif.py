@@ -73,7 +73,7 @@ def to_mmCIF(
         the content of the mmCIF data
     """
 
-    mmCIF_header = f"data_{mmCIF_name}" + "\n" + format_header()
+    mmCIF_header = f"data_{mmCIF_name}" + "\n" + format_header() + "\n"
 
     if isinstance(atom_or_collection, Iterable):
         return mmCIF_header + "\n".join(format_atom(atom) for atom in atom_or_collection)
@@ -114,7 +114,7 @@ def format_header() -> str:
         "_atom_site.pdbx_PDB_model_num",
     )
 
-    return "\n".join(headers) + "\n"
+    return "\n".join(headers)
 
 
 def format_atom(atom: mmCIFConvertible) -> str:
