@@ -3,6 +3,7 @@
 Some more documentation coming soon.
 """
 
+from itertools import product
 import string
 
 import numpy as np
@@ -73,8 +74,21 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
     origin = hp.point
     axis = hp.unit
 
-    chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
-    rb_orig.atom_properties["chains"] = chains
+    # generates chains_id for the whole oligomer (between 1 and 100)
+    # One letter for the first 62 subunits
+    # 2 letters for the subunits above
+    possible_chains = list(
+        string.ascii_uppercase + string.ascii_lowercase + string.digits
+    )  # 1-letters chains
+    if N > 62:
+        # 2-letters chains.
+        # 300 is an arbitrary limit
+        two_letters_chains = [
+            "".join(comb) for comb in list(product(possible_chains, repeat=2))[0:300]
+        ]
+        possible_chains += two_letters_chains
+
+    rb_orig.atom_properties["chains"] = [possible_chains[chain_id]] * len(rb_orig)
     chain_id += 1
 
     final = rb_orig.copy()
@@ -83,12 +97,7 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
         transform.ab_rotate(rb_orig, origin, origin + axis, hp.angle, degrees=False)
         transform.translate(rb_orig, axis * hp.normtranslation)
 
-        all_chain_characters = string.ascii_letters + string.digits
-
-        # generates chains_id (based on 1 alphanumerical character) for the whole oligomer
-        # 62 possibles combinaisons
-        chains = [all_chain_characters[chain_id % len(all_chain_characters)]] * len(rb_orig)
-        rb_orig.atom_properties["chains"] = chains
+        rb_orig.atom_properties["chains"] = [possible_chains[chain_id]] * len(rb_orig)
         chain_id += 1
 
         final += rb_orig
