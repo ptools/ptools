@@ -83,7 +83,11 @@ def heli_construct(rb: RigidBody, hp: Screw, N: int, Z: bool = False) -> RigidBo
         transform.ab_rotate(rb_orig, origin, origin + axis, hp.angle, degrees=False)
         transform.translate(rb_orig, axis * hp.normtranslation)
 
-        chains = [string.ascii_uppercase[chain_id % 26]] * len(rb_orig)
+        all_chain_characters = string.ascii_letters + string.digits
+
+        # generates chains_id (based on 1 alphanumerical character) for the whole oligomer
+        # 62 possibles combinaisons
+        chains = [all_chain_characters[chain_id % len(all_chain_characters)]] * len(rb_orig)
         rb_orig.atom_properties["chains"] = chains
         chain_id += 1
 
