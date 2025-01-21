@@ -5,7 +5,7 @@ from typing import Any, Protocol
 class mmCIFConvertible(Protocol):
     """Protocol for objects that can be converted to mmCIF format.
 
-    Will convert only the coordinate section.
+    Will convert only the coordinates section.
 
     Those objects must have the following attributes:
 
@@ -56,7 +56,22 @@ def to_mmCIF(
     atom_or_collection: mmCIFConvertible | Iterable[mmCIFConvertible],
     mmCIF_name: str = "Ptools_output",
 ) -> str:
-    """Converts an atom or a collection of atoms to mmCIF format."""
+    """Converts an atom or a collection of atoms to mmCIF format.
+
+    Will convert only the coordinates section.
+
+    Parameters
+    ----------
+    atom_or_collection : mmCIFConvertible | Iterable[mmCIFConvertible]
+        an atom or a collection of atoms.
+    mmCIF_name : str, optional
+        name of mmCIF data block , by default "Ptools_output"
+
+    Returns
+    -------
+    str
+        the content of the mmCIF data
+    """
 
     mmCIF_header = f"data_{mmCIF_name}" + "\n" + format_header()
 
@@ -103,6 +118,18 @@ def format_header() -> str:
 
 
 def format_atom(atom: mmCIFConvertible) -> str:
+    """Format one atom to the mmCIF format
+
+    Parameters
+    ----------
+    atom : mmCIFConvertible
+        an atom
+
+    Returns
+    -------
+    str
+        data's atom in the mmCIF format
+    """
     bfactor = getattr(atom, "bfactor", 0.0)
     occupancy = getattr(atom, "occupancy", 1.0)
     element = getattr(atom, "element", "")
