@@ -46,9 +46,9 @@ class mmCIFConvertible(Protocol):
 # The format is just for aesthetic purposes
 MMCIF_FORMAT = (
     "{record:<6s} {atom_index:6d} {element:1s} {atom_name:6s} {altloc:1s} "
-    "{residue_name:4s} {chain:3s} {entity_id:1s} {residue_index:6d} {icode:1s} "
+    "{residue_name:3s} {chain:2s} {entity_id:1s} {residue_index:6d} {icode:1s} "
     "{x:8.3f} {y:8.3f} {z:8.3f} {occupancy:6.2f} {bfactor:6.2f} {charge:1s} "
-    "{residue_index:6d} {residue_name:4s} {chain:3s} {atom_name:6s} {num_model:1d}"
+    "{residue_index:6d} {residue_name:3s} {chain:2s} {atom_name:6s} {num_model:1d}"
 )
 
 
@@ -76,8 +76,10 @@ def to_mmCIF(
     mmCIF_header = f"data_{mmCIF_name}" + "\n" + format_header() + "\n"
 
     if isinstance(atom_or_collection, Iterable):
-        return mmCIF_header + "\n".join(format_atom(atom) for atom in atom_or_collection)
-    return mmCIF_header + format_atom(atom_or_collection)  # atom_or_collection is a single atom
+        return mmCIF_header + "\n".join(format_atom(atom) for atom in atom_or_collection) + "\n#\n"
+    return (
+        mmCIF_header + format_atom(atom_or_collection) + "\n#\n"
+    )  # atom_or_collection is a single atom
 
 
 def format_header() -> str:
