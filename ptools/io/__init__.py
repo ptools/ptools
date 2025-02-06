@@ -4,6 +4,7 @@ import pathlib
 
 from .._typing import FilePath
 from .formatters.pdb import to_pdb as to_pdb
+from .formatters.mmcif import to_mmCIF as to_mmCIF
 from .formatters.reduced import (
     to_reduced_pdb as to_reduced_pdb,
     write_reduced_pdb as write_reduced_pdb,
@@ -12,6 +13,7 @@ from .readers.pdb import read_pdb as read_pdb
 from .readers.attract import read_docking_parameters as read_attract_docking_parameters
 from .readers.attract import read_topology as read_attract_topology
 from .writers.pdb import write_pdb as write_pdb
+from .writers.mmcif import write_mmCIF as write_mmCIF
 
 
 def check_file_exists(path: FilePath, message: bool | str = False) -> bool:
