@@ -128,7 +128,7 @@ def attract(receptor_path, ligand_path, reference_path, configuration_path):
 
     # Run attract.
     # results = ptools.attract.run_attract(ligand, receptor, parameters)
-    results = ptools.attract.run_attract_monop(ligand, receptor, parameters)
+    results = ptools.attract.run_attract_parallel(ligand, receptor, parameters)
 
     # Converts results to JSON-serializable format.
     logger.info("Writing results to 'results.json'")

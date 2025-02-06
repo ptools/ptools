@@ -199,6 +199,84 @@ def run_attract_monop(
     return all_results
 
 
+def run_attract_parallel(
+    ligand: AttractRigidBody, receptor: AttractRigidBody, parameters: AttractDockingParameters
+):
+    """Run the Attract docking procedure (parallel)."""
+    ligand = ligand.copy()
+    receptor = receptor.copy()
+
+    minimlist = parameters.minimizations
+    translations = parameters.translations
+    rotations = parameters.rotations
+
+
+    start = time.perf_counter()
+
+    jobs = [
+        (_single_attract_job, (ligand.copy(), receptor.copy(), minimlist, translation, rotation))
+        for translation in translations
+        for rotation in rotations
+    ]
+
+    print("Created jobs in", time.perf_counter() - start)
+    exit()
+
+
+
+
+    import multiprocessing
+    with multiprocessing.Pool(2) as pool:
+        results = pool.starmap(_single_attract_job, jobs)
+    
+
+
+def _single_attract_job(
+    ligand: AttractRigidBody,
+    receptor: AttractRigidBody,
+    minimlist: MinimizationParameters,
+    translation: vector_3d,
+    rotation: vector_3d,
+):
+    transform.translate(ligand, -measure.centroid(ligand))
+    transform.attract_euler_rotate(ligand, rotation)
+    transform.translate(ligand, translation)
+
+    output_data = {
+        "translation": translation,
+        "rotation": rotation,
+        "minimizations": [],
+    }
+
+    for minim in minimlist:
+        results = _run_minimization(minim, receptor, ligand)
+        new_ligand = ligand.copy()
+
+        center = measure.centroid(new_ligand)
+        transform.translate(new_ligand, -center)
+        transform.transform(new_ligand, results.transformation_matrix)
+        transform.translate(new_ligand, center)
+
+        ligand = new_ligand
+
+        output_data["minimizations"].append(
+            {
+                "square_cutoff": minim.square_cutoff,
+                "maxiter": minim.maximum_iterations,
+                "rstk": minim.rstk,
+                "start_energy": results.start_energy,
+                "final_energy": results.final_energy,
+                "transformation_matrix": results.transformation_matrix.tolist(),
+                "elapsed": results.elapsed,
+            }
+        )
+
+        ff = AttractForceField1(receptor, ligand, 100.0)
+        output_data["final_energy"] = ff.non_bonded_energy()
+    return output_data
+
+
+
 def _run_minimization(
     params: MinimizationParameters,
     receptor: AttractRigidBody,
