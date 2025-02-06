@@ -2,6 +2,15 @@
 History
 =======
 
+0.2.1 (2025-02-06)
+------------------
+
+* PDB readers reads alternate locations
+* logging using loguru
+* command-line interface uses click
+* various refactorings
+
+
 0.2.0 (2024-12-11)
 ------------------
 

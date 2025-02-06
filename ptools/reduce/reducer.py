@@ -1,10 +1,10 @@
 import itertools
-import logging
 from collections.abc import Container, Iterable, Iterator
 from pathlib import Path
 from typing import Any, Protocol
 
 import yaml
+from loguru import logger
 
 from ..io import assert_file_exists
 from ..io.readers.pdb import read_single_model_pdb
@@ -35,9 +35,6 @@ FORCEFIELDS = {
     "attract2": PTOOLS_REDUCTION_PARAMETERS_DIR / "attract2_reduction_parameters.yml",
     "scorpion": PTOOLS_REDUCTION_PARAMETERS_DIR / "scorpion_reduction_parameters.yml",
 }
-
-
-logger = logging.getLogger(__name__)
 
 
 class AtomType(Protocol):
