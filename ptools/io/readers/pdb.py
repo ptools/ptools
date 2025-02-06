@@ -77,6 +77,11 @@ class AtomLine(PDBLine):
         return self[12:16].strip()
 
     @property
+    def altloc(self) -> str:
+        """Alternate location indicator."""
+        return self[16].strip()
+
+    @property
     def chain(self) -> str:
         """Chain identifier."""
         return self[21].strip()
@@ -128,6 +133,7 @@ class AtomLine(PDBLine):
             residue_name=self.residue_name,
             residue_index=self.residue_index,
             chain=self.chain,
+            altloc=self.altloc,
             coordinates=self.coordinates,
             hetero=self.is_hetero,
             meta={"extra": self.extra},
