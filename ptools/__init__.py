@@ -23,7 +23,7 @@ from .particlecollection import ParticleCollection
 from .rigidbody import RigidBody
 from .transform import move as move
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 
 __all__ = [
