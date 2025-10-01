@@ -77,9 +77,14 @@ class RedFileBuilder:
         return ["FOO"] * len(cls.base_atom_list())
 
     @property
+    def header(self) -> str:
+        """Header of the RED file."""
+        return "HEADER   ATTRACT1"
+
+    @property
     def content(self) -> str:
         """Returns the content of the RED file."""
-        return self.atoms()
+        return f"{self.header}\n{self.atoms()}"
 
 
 def generate_red_file(

@@ -1,6 +1,5 @@
 """Test for ptools.forcefield module."""
 
-import os
 import unittest
 from pathlib import Path
 
@@ -8,18 +7,10 @@ import numpy as np
 
 from ptools.attract import AttractRigidBody
 from ptools.forcefield import AttractForceField1
+from ptools.io import read_attract_topology
 
 from .attract import TEST_LIGAND_RED, TEST_RECEPTOR_RED
 from .testing.moreassert import assert_array_almost_equal
-
-# def test_foo():
-#     receptor = AttractRigidBody.from_red(TEST_RECEPTOR_RED)
-#     ligand = AttractRigidBody.from_red(TEST_LIGAND_RED)
-#     ff = AttractForceField1(receptor, ligand, cutoff=5.0)
-
-
-#     print(ff.electrostatic_energy())
-#     assert 1 == 2
 
 
 # Ignores W0212: Access to a protected member of a client class
@@ -30,8 +21,8 @@ class TestAttractForceField1DummyRigid(unittest.TestCase):
     path_ff_parameters = Path(__file__).parent / "data" / "ff_parameters.np"
 
     def setUp(self):
-        self.receptor = AttractRigidBody.from_red(TEST_RECEPTOR_RED)
-        self.ligand = AttractRigidBody.from_red(TEST_LIGAND_RED)
+        self.receptor = read_attract_topology(TEST_RECEPTOR_RED)
+        self.ligand = read_attract_topology(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
         # Save forcefield parameters for later use in non-regression tests.
@@ -62,8 +53,8 @@ class TestAttractForceField1(unittest.TestCase):
     """Tests for AttractForceField that requires actual AttractRigidBody instances."""
 
     def setUp(self):
-        self.receptor = AttractRigidBody.from_red(TEST_RECEPTOR_RED)
-        self.ligand = AttractRigidBody.from_red(TEST_LIGAND_RED)
+        self.receptor = read_attract_topology(TEST_RECEPTOR_RED)
+        self.ligand = read_attract_topology(TEST_LIGAND_RED)
         self.ff = AttractForceField1(self.receptor, self.ligand, cutoff=5.0)
 
     def test_calculate_energy(self):

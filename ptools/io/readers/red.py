@@ -54,6 +54,15 @@ class _ExtraField:
         return charge
 
 
+def read_forcefield_from_red(path: FilePath) -> str:
+    """Read the forcefield name from a RED file."""
+    with open(path, encoding="utf-8") as file:
+        header = file.readline().strip()
+        if not header.startswith("HEADER"):
+            raise InvalidREDFormatError("First line of RED file must be a HEADER line.")
+        return header.split()[1].upper()
+
+
 def read_red(path: FilePath) -> ParticleCollection:
     """Reads a RED file.
 

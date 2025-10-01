@@ -28,6 +28,7 @@ class AtomAttrs:
 
     name: str = "XXX"
     index: int = 0
+    altloc: str = ""
     residue_name: str = "XXX"
     residue_index: int = 0
     chain: str = "X"

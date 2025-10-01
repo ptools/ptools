@@ -1,6 +1,6 @@
 """Top-level package for PTools"""
 
-__version__ = "0.2.0"
+from loguru import logger
 
 from . import (
     atomattrs,
@@ -16,11 +16,15 @@ from . import (
     superpose,
     tables,
 )
-from .attract import AttractRigidBody
+from .attract import AttractDockingParameters, AttractRigidBody
 from .io import read_pdb as read_pdb
 from .io import write_pdb as write_pdb
 from .particlecollection import ParticleCollection
 from .rigidbody import RigidBody
+from .transform import move as move
+
+__version__ = "0.2.1"
+
 
 __all__ = [
     "atomattrs",
@@ -28,6 +32,7 @@ __all__ = [
     "forcefield",
     "heligeom",
     "io",
+    "move",
     "pairlist",
     "particlecollection",
     "reduce",
@@ -35,9 +40,18 @@ __all__ = [
     "selection",
     "superpose",
     "tables",
+    "read_pdb",
+    "write_pdb",
+    "AttractDockingParameters",
     "AttractRigidBody",
     "RigidBody",
     "ParticleCollection",
-    "read_pdb",
-    "write_pdb",
 ]
+
+logger.disable("ptools")
+
+
+class RigidBodyFactory:
+    @staticmethod
+    def from_pdb(path: str) -> RigidBody:
+        return RigidBody(read_pdb(path))

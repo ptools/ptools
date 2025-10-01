@@ -1,28 +1,62 @@
 """Attract docking."""
 
+from __future__ import annotations
+
 import time
-from typing import TYPE_CHECKING, Any, TypeVar
+from dataclasses import dataclass, field
 
 import numpy as np
+import tqdm
 from scipy.optimize import minimize
 
 from . import measure, transform
-from ._typing import FilePath
-from .io.readers.red import read_red
+from .forcefield import AttractForceField1
 from .linalg import transformation_matrix
 from .rigidbody import RigidBody
 
-AttractRigidBodyType = TypeVar("AttractRigidBodyType", bound="AttractRigidBody")
+vector_3d = list[float]
 
 
-if TYPE_CHECKING:
-    from .forcefield import AttractForceField1
+@dataclass
+class MinimizationParameters:
+    square_cutoff: float
+    maximum_iterations: int
+    rstk: float = 0.0
+
+    @property
+    def cutoff(self) -> float:
+        return self.square_cutoff**0.5
+
+
+@dataclass
+class AttractDockingParameters:
+    """Stores parameters for an Attract docking."""
+
+    translations: list[vector_3d] = field(default_factory=list)
+    rotations: list[vector_3d] = field(default_factory=list)
+    minimizations: list[vector_3d] = field(default_factory=list)  # TODO: type is not good
+
+
+@dataclass
+class MinimizationResults:
+    start_energy: float
+    final_energy: float
+    transformation_matrix: np.ndarray
+    elapsed: float
+
+
+def default_minimization_parameters() -> MinimizationParameters:
+    """Returns default minimization parameters (cutoff=10., maxiter=100)."""
+    return MinimizationParameters(square_cutoff=100.0, maximum_iterations=100)
 
 
 class AttractRigidBody(RigidBody):
     """AttractRigidBody is a RigidBody on which one can calculate the energy.
 
-    It has 3 additionnal arrays compared to ParticleCollection:
+    It has additionnal attributes compared to ParticleCollection.
+
+    Attributes:
+        - forcefield (str): forcefield name
         - typeids (np.ndarray(N, )):
             1 x N shaped array for atom typeids
         - charges (np.ndarray(N, )):O
@@ -32,12 +66,14 @@ class AttractRigidBody(RigidBody):
         - forces (np.ndarray(N, 3)):
             N x 3 shaped array for atom forces
 
+
     Atom typeids and charges are parsed from input PDB file.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._initialize_attract_properties()
+        self.forcefield = ""
 
     def _initialize_attract_properties(self):
         """Initializes atom type ids, charges and forces from PDB extra field."""
@@ -56,17 +92,8 @@ class AttractRigidBody(RigidBody):
             self.add_atom_property("force", "forces", np.zeros((n_atoms, 3), dtype=float))
 
     @classmethod
-    def from_red(
-        cls: type[AttractRigidBodyType], path: FilePath
-    ) -> AttractRigidBodyType:
-        rigid = cls.from_properties(read_red(path).atom_properties)
-        return rigid
-
-    @classmethod
-    def from_pdb(
-        cls: type[AttractRigidBodyType], path: FilePath
-    ) -> AttractRigidBodyType:
-        raise NotImplementedError("Use AttractRigidBody.from_red instead.")
+    def from_pdb(cls, *args, **kwargs):
+        raise NotImplementedError("Use ptools.read_attract_topology instead.")
 
     def reset_forces(self):
         """Set all atom forces to (0, 0 0)."""
@@ -77,7 +104,7 @@ class AttractRigidBody(RigidBody):
         self.forces += forces  # type: ignore[attr-defined]
 
 
-def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
+def _function(x: np.ndarray, ff: AttractForceField1) -> float:
     """Function to minimize.
 
     Args:
@@ -87,7 +114,7 @@ def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
     Returns:
         float: energy
     """
-    X = ff.ligand.coordinates.copy()
+    source_coordinates = ff.ligand.coordinates.copy()
 
     rotation = x[:3]
     translation = x[3:]
@@ -96,94 +123,105 @@ def _function(x: np.ndarray, ff: "AttractForceField1") -> float:
     transform.translate(ff.ligand, translation)
 
     e = ff.non_bonded_energy()
-    ff.ligand.coordinates = X
+    ff.ligand.coordinates = source_coordinates
     return e
 
 
-def run_attract(ligand: AttractRigidBody, receptor: AttractRigidBody, **kwargs):
-    """Run the Attract docking procedure.
+def run_attract(*args, **kwargs):
+    """Run the Attract docking procedure."""
+    return run_attract_monop(*args, **kwargs)
 
-    Args:
-        ligand (ptools.rigidbody.AttractRigidBody)
-        receptor (ptools.rigidbody.AttractRigidBody)
-        translations (dict)
-        rotations (dict[int]->[float, float, float])
-        minimlist (list[dict[str]->value])
 
-    Example:
-        >>> receptor = ptools.rigidbody.AttractRigidBody("receptor.red")
-        >>> ligand = ptools.rigidbody.AttractRigidBody("ligand.red")
-        >>> reference = ptools.rigidbody.AttractRigidBody("ligand.red")
-        >>> nbminim, lignames, minimlist, rstk = read_attract_parameters("attract.inp")
-        >>>
-        >>>
-        >>> options = {
-        ...   translations = {0: measure.centroid(ligand)},
-        ...   rotations = {0: (0, 0, 0)},
-        ...   minimlist = minimlist,
+def run_attract_monop(
+    ligand: AttractRigidBody, receptor: AttractRigidBody, parameters: AttractDockingParameters
+):
+    """Run the Attract docking procedure (sequential)."""
+
+    _ligand = ligand.copy()
+    _receptor = receptor.copy()
+
+    minimlist = parameters.minimizations
+    translations = parameters.translations
+    rotations = parameters.rotations
+
+    jobs = [
+        (translation, rotation, minimlist) for translation in translations for rotation in rotations
+    ]
+
+    total_number_of_jobs = len(jobs) * len(minimlist)
+
+    all_results = []
+
+    progress = tqdm.tqdm(total=total_number_of_jobs, desc="Attract docking")
+    for translation, rotation, minimlist in jobs:
+        ligand = _ligand.copy()
+        receptor = _receptor.copy()
+
+        transform.translate(ligand, -measure.centroid(ligand))
+        transform.attract_euler_rotate(ligand, rotation)
+        transform.translate(ligand, translation)
+
+        output_data = {
+            "translation": translation,
+            "rotation": rotation,
+            "minimizations": [],
         }
-        >>> ptools.attract.run_attract(ligand, receptor, **options)
-    """
 
-    minimlist = kwargs.pop("minimlist", None)
-    if minimlist is None:
-        raise ValueError("argument 'minimlist' is required")
+        for minim in minimlist:
+            results = _run_minimization(minim, receptor, ligand)
+            new_ligand = ligand.copy()
 
-    translations = kwargs.pop("translations", None)
-    rotations = kwargs.pop("rotations", None)
+            center = measure.centroid(new_ligand)
+            transform.translate(new_ligand, -center)
+            transform.transform(new_ligand, results.transformation_matrix)
+            transform.translate(new_ligand, center)
 
-    if translations is None:
-        translations = {0: measure.centroid(ligand)}
-    if rotations is None:
-        rotations = {0: (0, 0, 0)}
+            ligand = new_ligand
 
-    for transi, transnb in enumerate(sorted(translations.keys())):
-        trans = translations[transnb]
-        print(f"@@ Translation #{transnb} {transi}/{len(translations)}")
-        for roti, rotnb in enumerate(sorted(rotations.keys())):
-            print(f"@@ Rotation #{rotnb} {roti + 1}/{len(rotations)}")
-            rot = rotations[rotnb]
+            output_data["minimizations"].append(
+                {
+                    "square_cutoff": minim.square_cutoff,
+                    "maxiter": minim.maximum_iterations,
+                    "rstk": minim.rstk,
+                    "start_energy": results.start_energy,
+                    "final_energy": results.final_energy,
+                    "transformation_matrix": results.transformation_matrix.tolist(),
+                    "elapsed": results.elapsed,
+                }
+            )
+            progress.update()
 
-            transform.translate(ligand, -measure.centroid(ligand))
-            transform.attract_euler_rotate(ligand, rot)
-            transform.translate(ligand, trans)
+        ff = AttractForceField1(receptor, ligand, 100.0)
+        output_data["final_energy"] = ff.non_bonded_energy()
 
-            for i, minim in enumerate(minimlist):
-                print(f"- Minimization {i + 1}/{len(minimlist)}:")
-                _run_minimization(minim, receptor, ligand)
+        all_results.append(output_data)
 
-            ff = AttractForceField1(receptor, ligand, 100.0, "aminon.par")
-            print(f"  - Final energy: {ff.non_bonded_energy(): 6.2f}")
+    return all_results
 
 
 def _run_minimization(
-    params: dict[str, Any],
+    params: MinimizationParameters,
     receptor: AttractRigidBody,
     ligand: AttractRigidBody,
-):
-    start = time.time()
-    cutoff = params["squarecutoff"] ** 0.5
-    niter = params["maxiter"]
+) -> MinimizationResults:
+    """Run the minimization."""
 
-    ff = AttractForceField1(receptor, ligand, cutoff, "aminon.par")
+    start = time.perf_counter()
 
-    print(f"  - cutoff: {cutoff:.2f} A")
-    print(f"  - maxiter: {niter}")
-    print(f"  - start energy: {ff.non_bonded_energy():.2f}", flush=True)
+    cutoff = params.cutoff
+    niter = params.maximum_iterations
+
+    ff = AttractForceField1(receptor, ligand, cutoff)
+    start_energy = ff.non_bonded_energy()
 
     x0 = np.zeros(6)
-    res = minimize(
-        _function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter}
-    )
-
-    print("  - results:")
-    print(f"    - energy: {res.fun:6.2f}")
-    print("    - transformation matrix:")
+    res = minimize(_function, x0, args=(ff,), method="L-BFGS-B", options={"maxiter": niter})
     m = transformation_matrix(res.x[3:], res.x[:3])
-    print(m)
-
-    # Moving ligand accordingly.
-    transform.transform(ligand, m)
-
-    print(f"    - elapsed: {time.time() - start:.1f} seconds")
-    print("=" * 40, flush=True)
+    results = MinimizationResults(
+        start_energy=start_energy,
+        final_energy=res.fun,
+        transformation_matrix=m,
+        elapsed=time.perf_counter() - start,
+    )
+    results.x = res.x
+    return results

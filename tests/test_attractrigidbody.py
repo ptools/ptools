@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 from pytest import approx
 
-from ptools.attract import AttractRigidBody
+from ptools import AttractRigidBody
+from ptools.io import read_attract_topology
 from ptools.io.exceptions import InvalidREDFormatError
 
 from .generators import generate_red_file
@@ -15,7 +16,7 @@ from .generators.red import RedFileBuilder
 
 def test_initialization_from_pdb():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_red(temporary_file.name)
+        rigid = read_attract_topology(temporary_file.name)
 
     assert isinstance(rigid, AttractRigidBody)
     assert len(rigid) == 10
@@ -33,21 +34,21 @@ def test_initialization_from_pdb_fails_no_typeids():
     with generate_red_file(has_typeids=False) as temporary_file:
         err = "Expected atom type ids and charges, found"
         with pytest.raises(InvalidREDFormatError, match=err):
-            AttractRigidBody.from_red(temporary_file.name)
+            read_attract_topology(temporary_file.name)
 
 
 def test_initialization_from_pdb_fails_no_charges():
     with generate_red_file(has_charges=False) as temporary_file:
         err = "Expected atom type ids and charges, found"
         with pytest.raises(InvalidREDFormatError, match=err):
-            AttractRigidBody.from_red(temporary_file.name)
+            read_attract_topology(temporary_file.name)
 
 
 def test_constructor_fails_invalid_charges():
     with generate_red_file(invalid_charges=True) as temporary_file:
         err = "Atom charge expects a float"
         with pytest.raises(InvalidREDFormatError, match=err):
-            AttractRigidBody.from_red(temporary_file.name)
+            read_attract_topology(temporary_file.name)
 
 
 # =======================================================================================
@@ -55,7 +56,7 @@ def test_constructor_fails_invalid_charges():
 
 def test_apply_forces():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_red(temporary_file.name)
+        rigid = read_attract_topology(temporary_file.name)
 
     # Forces should be initialized to zero.
     expected = np.zeros((rigid.size(), 3))
@@ -73,7 +74,7 @@ def test_apply_forces():
 
 def test_reset_forces():
     with generate_red_file() as temporary_file:
-        rigid = AttractRigidBody.from_red(temporary_file.name)
+        rigid = read_attract_topology(temporary_file.name)
 
     assert rigid.forces == approx(0.0)
 
