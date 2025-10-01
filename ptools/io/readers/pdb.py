@@ -69,7 +69,14 @@ class AtomLine(PDBLine):
         See also:
             AtomLine.atom_index
         """
-        return int(self[6:11])
+        id_str = self[6:11]
+        try:
+            return int(id_str)
+        except ValueError:
+            try:
+                return int(id_str, base=16)
+            except:
+                raise
 
     @property
     def name(self) -> str:
