@@ -6,19 +6,33 @@ A fully pythonic library for building and analysing macromolecular assemblies.
 
 ## Installation
 
+### Installing `uv`
+
 We strongly recommend to install the package using [uv](https://github.com/astral-sh/uv).
 This will ensure that all dependencies are correctly installed.
 
 To install `uv`, run the following command:
 
 ```bash
-# With pip.
-pip install uv
-
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
 More details available at [uv](https://github.com/astral-sh/uv).
 
-Then, setup ptools using the following command:
+
+### Installing PTools
+
+To install PTools, run the following command:
+
+```bash
+uv venv ptools  # setup a virtual environment named 'ptools'
+source ptools/.venv/bin/activate  # activate the virtual environment
+uv pip install git+https://github.com/ptools/ptools.git  # install PTools
+```
+
+### Setting up PTools development environment
+
+If you want to contribute to PTools, you can setup a development environment using the following command:
 
 ```bash
 git clone https://github.com/ptools/ptools.git
