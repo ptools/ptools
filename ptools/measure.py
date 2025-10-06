@@ -10,6 +10,7 @@ from . import linalg as L
 from ._typing import ArrayLike, HasCoordinatesType, TopologyType
 from .pairlist import PairList
 from .particlecollection import ParticleCollection
+from .superpose import rmsd
 
 
 def bounding_box(obj: HasCoordinatesType) -> np.ndarray:
@@ -142,3 +143,22 @@ def fnat(
     res_pair2 = contacts_by_residue(receptor2, lig2, cutoff)
     intersect = res_pair1 & res_pair2
     return len(intersect) / len(res_pair1)
+
+
+__all__ = [
+    "bounding_box",
+    "centroid",
+    "center",
+    "center_of_mass",
+    "contacts",
+    "contacts_by_atom",
+    "contacts_by_residue",
+    "distance",
+    "distance_to_axis",
+    "fnat",
+    "inertia_tensor",
+    "minmax_distance_to_axis",
+    "principal_axes",
+    "radius_of_gyration",
+    "rmsd",
+]
