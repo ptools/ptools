@@ -60,6 +60,7 @@ class TestHeligeomSimple(unittest.TestCase):
         result = heli_construct(self.mono1, hp, N=3)
         reference_file = TEST_DATA_DIR / "test_heli_construct_simple_result.npy"
         reference = np.load(reference_file)
+        assert len(result) == 3 * len(self.mono1)
         assert result.coordinates == approx(reference)
 
 
@@ -82,6 +83,7 @@ class TestHeligeom(unittest.TestCase):
         result = heli_construct(self.mono1, self.hp, N=self.n_monomers)
         ref_coords = np.load(TEST_REF_COORDS_2GLSAB_N6)
 
+        assert len(result) == self.n_monomers * len(self.mono1)
         assert to_pdb(result) == to_pdb(self.ref)
         assert result.coordinates == approx(ref_coords)
 
