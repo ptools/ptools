@@ -89,14 +89,16 @@ def rotation_matrix_around_axis(
     Returns:
         np.ndarray: 4 x 4 transformation matrix
     """
+    axis = np.asarray(axis)
+    center = np.asarray(center)
     assert np.shape(axis) == (3,)
     assert np.shape(center) == (3,)
 
     if degrees:
         amount = math.radians(amount)
 
-    origin_matrix = translation_matrix(-np.array(center))
-    offset_matrix = translation_matrix(+np.array(center))
+    origin_matrix = translation_matrix(-center)
+    offset_matrix = translation_matrix(+center)
     rotation = scipy.linalg.expm(np.cross(np.identity(3), axis / scipy.linalg.norm(axis) * amount))
     matrix = np.identity(4)
     matrix[:3, :3] = rotation
@@ -198,6 +200,8 @@ def orientation_matrix(
 
 def ab_rotation_matrix(A: np.ndarray, B: np.ndarray, amount: float, degrees=True) -> np.ndarray:
     """Returns the rotation matrix to rotate around axis (A, B) by amount."""
+    A = np.asarray(A)
+    B = np.asarray(B)
     return rotation_matrix_around_axis(B - A, amount, A, degrees)
 
 
