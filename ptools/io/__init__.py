@@ -14,6 +14,7 @@ from .formatters.reduced import (
 from .readers.attract import read_docking_parameters as read_attract_docking_parameters
 from .readers.attract import read_topology as read_attract_topology
 from .readers.pdb import read_pdb as read_pdb
+from .readers.gro import read_gro as read_gro
 from .writers.mmcif import write_mmCIF as write_mmCIF
 from .writers.pdb import write_pdb as write_pdb
 
@@ -81,6 +82,7 @@ __all__ = [
     "to_mmCIF",
     "to_reduced_pdb",
     "write_reduced_pdb",
+    "read_gro",
     "read_pdb",
     "read_attract_docking_parameters",
     "read_attract_topology",

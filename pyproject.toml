@@ -69,3 +69,8 @@ select = [
     "I",  # isort
     "UP", # pyugrade
 ]
+
+[dependency-groups]
+dev = [
+    "icecream>=2.1.8",
+]
