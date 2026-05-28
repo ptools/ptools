@@ -36,7 +36,7 @@ def rotate_by(obj: HasCoordinatesType, angles: ArrayLike):
     """Rotates object coordinates around X, Y and Z axes.
 
     Args:
-        angles (3, ): rotation angles around the X-, Y- and Z-axes
+        angles (3, ): rotation angles around the X-, Y- and Z-axes, in degrees
     """
     T.rotate_by(obj.coordinates, angles)
 
